@@ -1,9 +1,9 @@
-** Arduino_gd32_freeRTOS 
+ # Arduino_gd32_freeRTOS
 
-** VERY MUCH WORK IN PROGRESS **
+**VERY MUCH WORK IN PROGRESS**
 
-This is a "enhanced" version of the Longan nano Riscv board Arduino port.
-What are the differences ?
+This is a "enhanced" version of the Longan nano Riscv board Arduino port.  
+What are the differences ?  
 * Cmake based build system
 * FreeRTOS out of the box, using the port made by QQxiaoming [1]
 * Better peripherals thanks to the above
