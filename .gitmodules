@@ -1,0 +1,6 @@
+[submodule "FreeRTOS"]
+	path = FreeRTOS
+	url = https://github.com/FreeRTOS/FreeRTOS-Kernel.git
+[submodule "Longduino_cmake"]
+	path = Longduino_cmake
+	url = https://github.com/mean00/Longduino_cmake.git
