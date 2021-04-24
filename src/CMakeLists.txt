@@ -1,2 +1,4 @@
-ADD_LIBRARY(gd32_overlay STATIC sysTimer.cpp)
-TARGET_INCLUDE_DIRECTORIES(gd32_overlay PRIVATE ${CMAKE_SOURCE_DIR}/overlay/include)
+include(../setup.cmake)
+ADD_LIBRARY(gd32_overlay STATIC systemHelper.cpp)
+
+

@@ -34,11 +34,11 @@ foreach(misc  init.c handlers.c )#entry.S start.S)
 endforeach()
 
 
-foreach(stubs close.c  _exit.c  fstat.c  isatty.c  lseek.c  read.c  sbrk.c  stub.h  write.c  write_hex.c)
+foreach(stubs close.c  fstat.c  isatty.c  lseek.c  read.c  sbrk.c  stub.h  write.c  write_hex.c) # _exit.c 
     LIST(APPEND GD32_STUBS ${GD32_ROOT_SRC}/RISCV/stubs/${stubs})
 endforeach()
 
 
 ADD_LIBRARY(gd32 STATIC  ${GD32_MAIN} ${GD32_STUBS} ${RISC_SRC} ${GD32_MISC} entry.S start.S)
 TARGET_INCLUDE_DIRECTORIES(gd32 PRIVATE ${CMAKE_SOURCE_DIR}/overlay/include)
-add_subdirectory(src)
+
