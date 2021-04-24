@@ -9,14 +9,10 @@
 MESSAGE(STATUS "Setting up GD32 arduino cmake environment")
 SET(ARDUINO_TOOLCHAIN_TOP ${CMAKE_SOURCE_DIR}/Arduino_gd32_freeRTOS CACHE INTERNAL "")
 
-#
-# Hardcoded for now
-SET(PLATFORM_TOOLCHAIN_PATH /opt/gd32/toolchain/bin/)
-SET(PLATFORM_PREFIX riscv32-unknown-elf-)
-SET(PLATFORM_TOOLCHAIN_SUFFIX "") # .exe on windows
-#
+include(${CMAKE_CURRENT_LIST_DIR}/../platformConfig.cmake)
+
 IF(NOT PLATFORM_TOOLCHAIN_PATH)
-        MESSAGE(FATAL_ERROR "PLATFORM_TOOLCHAIN_PATH is not defined !")
+        MESSAGE(FATAL_ERROR "PLATFORM_TOOLCHAIN_PATH is not defined in platformConfig.cmake !!")
 ENDIF(NOT PLATFORM_TOOLCHAIN_PATH)
 #
 
@@ -30,9 +26,6 @@ FUNCTION(FATAL_BANNER msg)
     MESSAGE(FATAL_ERROR "${msg}")
 ENDFUNCTION(FATAL_BANNER msg)
 
-IF(WIN32)
-	SET(TOOLCHAIN_SUFFIX ".exe")
-ENDIF(WIN32)
 #
 # Sanity check
 #
