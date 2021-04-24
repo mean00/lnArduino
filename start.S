@@ -9,13 +9,13 @@
     .weak  eclic_bwei_handler
     .weak  eclic_pmovi_handler
     
-#define dont(x) unhandled##x: \
-                .global unhandled##x \
+#define dont(x) unhandledException##x: \
+                .global unhandledException##x \
                 la a0, x \
                 jal unhandledException
 
 
-#define UNHANDLED(x) .word unhandled##x
+#define UNHANDLED(x) .word unhandledException##x
 
 vector_base:
     j _start
