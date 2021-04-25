@@ -23,7 +23,9 @@ public:
 
 
 
-
+/**
+ * 
+ */
 void Demo::run()
 {
     pinMode(LED,OUTPUT);
@@ -49,7 +51,8 @@ int main()
     
     eclic_priority_group_set(ECLIC_PRIGROUP_LEVEL4_PRIO0); //四位优先级组全配置为lvl
     eclic_global_interrupt_enable();                       //使能全局中断
-    //__asm volatile( "ecall" );
+    
+    // The LEDs are all on GPIO A
     rcu_periph_clock_enable(RCU_GPIOA);
     
     //

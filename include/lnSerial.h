@@ -10,6 +10,9 @@ public:
     bool setSpeed(int speed);
     bool enableTx(bool onoff);
     bool transmit(int size,uint8_t *buffer);
+    void _interrupt(void);
+    
+ static void interrupts(int instance);
 protected:
     int _instance;
     IRQn_Type _irq;
@@ -17,5 +20,6 @@ protected:
     uint32_t _adr;
     xMutex _mutex;
     xBinarySemaphore _txDone;
+    uint8_t *_cur,*_tail;
     
 };

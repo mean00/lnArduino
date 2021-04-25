@@ -1,6 +1,6 @@
 #include "lnArduino.h"
 #include "lnSerial.h"
- 
+ static lnSerial *SerialInstance[4]={NULL,NULL,NULL,NULL};
 /**
  * 
  * @param instance
@@ -12,6 +12,8 @@ lnSerial::lnSerial(int instance, IRQn_Type irq,uint32_t adr)
     _irq=irq;
     _stateTx=false;
     _adr=adr;
+    xAssert(SerialInstance[instance]==NULL) ;
+    SerialInstance[instance]=this;
 }
 /**
  * 
@@ -82,14 +84,72 @@ bool lnSerial::enableTx(bool onoff)
 bool lnSerial::transmit(int size,uint8_t *buffer)
 {
     _mutex.lock();
+    _tail=buffer+size;
+    _cur=buffer+1;
     // send 1st byte
     usart_data_transmit(_adr, buffer[0]);
     // enable interrupt    
-     usart_interrupt_enable(_adr,USART_INT_TC);
+     //usart_interrupt_enable(_adr,USART_INT_TC);
      usart_interrupt_enable(_adr,USART_INT_TBE);     
-    // _txDone.take();
+     //_txDone.take();
     _mutex.unlock();
     return true;
 }
+/**
+ * 
+ */
+void lnSerial::_interrupt(void)
+{
+    if(_cur && _cur<_tail)  // sending ?
+    {
+        if(usart_interrupt_flag_get(_adr,USART_INT_FLAG_TBE))
+        {
+            
+            // next one        
+            usart_data_transmit(_adr, *_cur);
+            _cur++;
+            if(_cur==_tail)
+            {
+                _cur=_tail=NULL;
+                usart_interrupt_disable(_adr,USART_INT_TBE);     
+                _txDone.giveFromInterrupt();
+            }
+        }else
+        {
+            xAssert(0);
+        }
+    }
+    // Clear interrupts
+    usart_interrupt_flag_clear(_adr,USART_INT_FLAG_TBE);
+    //usart_interrupt_flag_clear(_adr,USART_INT_TC);
+}
 
+/**
+ * 
+ */
+extern "C" void IRQ_USART0()
+{
+    lnSerial::interrupts(0);
+}
+extern "C" void IRQ_USART1()
+{
+    lnSerial::interrupts(1);
+}
+extern "C" void IRQ_USART2()
+{
+    lnSerial::interrupts(2);
+}
+extern "C" void IRQ_USART3()
+{
+    lnSerial::interrupts(3);
+}
+
+
+
+void lnSerial::interrupts(int instance)
+{
+    lnSerial *inst=SerialInstance[instance];
+    xAssert(inst);
+    inst->_interrupt();
+}
 // EOF
