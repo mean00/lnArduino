@@ -1,15 +1,4 @@
-#include "stdio.h"
-#include "Arduino.h"
-#include "systemHelper.h"
-extern "C"
-{
-#include "FreeRTOS.h"
-#include "task.h"
-#include "queue.h"
-#include "semphr.h"
-#include "event_groups.h"
-   
-}
+#include "lnArduino.h"
 // green = PA1, blue = PA2, RED PC13
 #define LED PA2
 
@@ -20,9 +9,22 @@ extern "C"
     void _init();    
 }
 
-extern "C" void _exit(int x);
-int roundup=0;
-void MainTask(void *a)
+class Demo : public xTask
+{
+public:
+        Demo(): xTask("Demo")
+            {
+                roundup=0;
+            }
+    void run (void);
+
+    int roundup;    
+};
+
+
+
+
+void Demo::run()
 {
     pinMode(LED,OUTPUT);
     bool onoff=true;
@@ -35,7 +37,10 @@ void MainTask(void *a)
         onoff=!onoff;
     }
 }
-int before=0;
+
+extern "C" void _exit(int x);
+/**
+ */
 int main()
 {
     // Initialize system
@@ -43,28 +48,12 @@ int main()
     
     eclic_priority_group_set(ECLIC_PRIGROUP_LEVEL4_PRIO0); //四位优先级组全配置为lvl
     eclic_global_interrupt_enable();                       //使能全局中断
-
-
     //__asm volatile( "ecall" );
      rcu_periph_clock_enable(RCU_GPIOA);
 
     // Start freertos
-    xTaskCreate( MainTask, "MainTask", 350, NULL, 10, NULL );   
+     Demo *demo=new Demo;     
     vTaskStartScheduler();      
-    _exit(-1);
+    deadEnd(25);
     
-}
-extern "C" void myInterruptHandler()
-{
-    
-}
-int dummyFunc()
-{
-    return 55;
-
-}
-
-extern "C" void vApplicationStackOverflowHook(TaskHandle_t t, char *s)
-{
-    _exit(2);
 }

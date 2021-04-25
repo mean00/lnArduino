@@ -11,4 +11,4 @@ add_subdirectory(${AF_FOLDER})
 
 include(${AF_FOLDER}/setup.cmake)
 ADD_EXECUTABLE(hello hello.cpp )
-ADD_DEPENDENCIES(hello gd32_overlay gd32 gd32_overlay FreeRTOS gd32Arduino )
+ADD_DEPENDENCIES(hello gd32_overlay gd32 gd32_overlay FreeRTOS gd32Arduino gd32_lowlevel)

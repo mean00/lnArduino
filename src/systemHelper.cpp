@@ -8,13 +8,13 @@ extern "C"
     
 #include "FreeRTOS.h"
 }
-
+#include "systemHelper.h"
 
 extern "C" 
 {
     void deadEnd(int code);
-    extern void vPortExitCritical( void );
-    extern void vPortEnterCritical( void );
+    extern void taskENTER_CRITICAL( void );
+    extern void taskEXIT_CRITICAL( void );
     
     __attribute__( ( interrupt ) )  void unhandledException( void ) 
     {
@@ -27,11 +27,23 @@ extern "C"
     }
     void interrupts()
     {
-        vPortExitCritical();
+        EXIT_CRITICAL();
     }
     void noInterrupt() 
     {
-        vPortEnterCritical();
+        ENTER_CRITICAL();
+    }
+    void vApplicationStackOverflowHook()
+    {
+        deadEnd(0x1001);
+    }
+    int _getpid()
+    {
+        return 0;
+    }
+    int _kill()
+    {
+        return 0;
     }
 
 }

@@ -75,6 +75,12 @@
 #define configIDLE_SHOULD_YIELD                 1
 #define configUSE_MUTEXES			1
 
+// If we use timers
+#define configTIMER_TASK_PRIORITY               5
+#define configUSE_TIMERS                        1
+#define configTIMER_TASK_STACK_DEPTH            400
+#define configTIMER_QUEUE_LENGTH                10
+#define INCLUDE_xTimerPendFunctionCall          1
 /* Co-routine definitions. */
 #define configUSE_CO_ROUTINES 		0
 #define configMAX_CO_ROUTINE_PRIORITIES ( 2 )
@@ -105,7 +111,7 @@ NVIC value of 255. */
 #define configUSE_RECURSIVE_MUTEXES		1
 #define configQUEUE_REGISTRY_SIZE		0
 #define configGENERATE_RUN_TIME_STATS           0
-#define configUSE_TIMERS                        0
+
 #if 0 // MEANX Needed ?
 #define configCOM0_RX_BUFFER_LENGTH		128
 #define configCOM0_TX_BUFFER_LENGTH		128
