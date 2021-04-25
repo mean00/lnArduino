@@ -45,6 +45,10 @@ extern "C"
     {
         return 0;
     }
+    void __cxa_pure_virtual()
+    {
+          deadEnd(0x2002);
+    }
 
 }
 void deadEnd(int code)
