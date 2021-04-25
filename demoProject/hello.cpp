@@ -12,7 +12,7 @@ extern "C"
 class Demo : public xTask
 {
 public:
-        Demo(): xTask("Demo")
+        Demo(): xTask("Demo",5,250)
             {
                 roundup=0;
             }
@@ -35,6 +35,7 @@ void Demo::run()
         vTaskDelay(500);
         digitalToggle(LED);
         onoff=!onoff;
+        Logger("*\n");
     }
 }
 
@@ -49,10 +50,13 @@ int main()
     eclic_priority_group_set(ECLIC_PRIGROUP_LEVEL4_PRIO0); //四位优先级组全配置为lvl
     eclic_global_interrupt_enable();                       //使能全局中断
     //__asm volatile( "ecall" );
-     rcu_periph_clock_enable(RCU_GPIOA);
-
+    rcu_periph_clock_enable(RCU_GPIOA);
+    
+    //
+    LoggerInit();
+    Logger("Starting demo:\n");
     // Start freertos
-     Demo *demo=new Demo;     
+    Demo *demo=new Demo;     
     vTaskStartScheduler();      
     deadEnd(25);
     
