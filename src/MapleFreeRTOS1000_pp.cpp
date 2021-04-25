@@ -279,5 +279,4 @@ uint32_t xFastEventGroup::readEvents(uint32_t maskInt)
     return v;
 }
 
-
  //EOF

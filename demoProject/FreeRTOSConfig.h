@@ -44,7 +44,7 @@
 #define configTICK_RATE_HZ			( ( TickType_t ) 1000 )
 #define configRTC_CLOCK_HZ                      ((uint32_t)TIMER_FREQ)
 
-
+//#define USER_MODE_TASKS 1 // this will use a ECALL to enable/disable interrupt, if not defined direct call
 //
 
 /* Library includes. */

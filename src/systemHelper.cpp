@@ -51,16 +51,6 @@ extern "C"
     }
 
 }
-void deadEnd(int code)
-{
-    // No interrrupt
-    noInterrupt();
-    while(1)
-    {
-        // blink red light...
-        
-    }
-}
 
 
 

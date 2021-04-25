@@ -61,3 +61,15 @@ int main()
     deadEnd(25);
     
 }
+
+
+extern "C" void deadEnd(int code)
+{
+    // No interrrupt
+    ENTER_CRITICAL();
+    while(1)
+    {
+        // blink red light...
+        
+    }
+}
