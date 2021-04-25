@@ -17,7 +17,10 @@ void sendString(const char *st)
     
     
 }
-
+void debugLogger(const char *fmt...)
+{
+     sendString(fmt);
+}
 void Logger(const char *fmt...)
 {
     va_list va;
@@ -35,6 +38,8 @@ void Logger(const char *fmt...)
 void LoggerInit()
 {
     rcu_periph_clock_enable(RCU_USART0);
+    gpio_init(GPIOA, GPIO_MODE_AF_PP, GPIO_OSPEED_50MHZ, GPIO_PIN_9);
+    gpio_init(GPIOA, GPIO_MODE_IN_FLOATING, GPIO_OSPEED_50MHZ, GPIO_PIN_10);
     usart_deinit(USART0);
     usart_baudrate_set(USART0, 115200);
     usart_parity_config(USART0, USART_PM_NONE);
