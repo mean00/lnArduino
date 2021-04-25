@@ -9,3 +9,8 @@ include_directories(${ARDUINO_VARIANT})
 include_directories(${ARDUINO_GD32_FREERTOS}/Longduino_cmake/cores/arduino/GD32VF103_Firmware_Library/GD32VF103_standard_peripheral)
 include_directories(${ARDUINO_GD32_FREERTOS}/Longduino_cmake/cores/arduino/GD32VF103_Firmware_Library/GD32VF103_standard_peripheral/Include)
 include_directories(${ARDUINO_GD32_FREERTOS}/Longduino_cmake/cores/arduino/GD32VF103_Firmware_Library/RISCV/drivers)
+
+MACRO(GENERATE_GD32_FIRMWARE target)
+    ADD_EXECUTABLE(${target} ${ARGN})
+    TARGET_LINK_LIBRARIES(${target} gd32_overlay gd32Arduino gd32  FreeRTOS  gd32_lowlevel c gd32 c gcc ) # dupicates are NOT a mistake !
+ENDMACRO(GENERATE_GD32_FIRMWARE target)

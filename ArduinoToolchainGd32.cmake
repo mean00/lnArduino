@@ -64,8 +64,8 @@ SET(CMAKE_C_FLAGS "${GD32_C_FLAGS}")
 SET(CMAKE_CXX_FLAGS "${GD32_C_FLAGS}  -fno-rtti -fno-exceptions" ) 
 #
 SET(GD32_LD_FLAGS "-nostdlib ${GD32_SPECS} ")
-SET(GD32_LD_LIBS "-lgd32_overlay  -lgd32Arduino -lgd32 -lFreeRTOS -lgd32_lowlevel  -lc -lm -lgd32 -lgcc -lc  -lgcc -L${CMAKE_BINARY_DIR}/Arduino_gd32_freeRTOS  -L${CMAKE_BINARY_DIR}/Arduino_gd32_freeRTOS/src/ ")
-#
+SET(GD32_LD_LIBS "-lm -lc -lgcc")
+#-lgd32_overlay  -lgd32Arduino -lgd32 -lFreeRTOS -lgd32_lowlevel  -lc -lm -lgd32 -lgcc -lc  -lgcc 
 #
 set(CMAKE_CXX_LINK_EXECUTABLE    "<CMAKE_CXX_COMPILER>   <CMAKE_CXX_LINK_FLAGS>  <LINK_FLAGS>  -T ${GD32_LDSCRIPT} -lgcc -Xlinker -print-memory-usage   -Wl,--start-group  <OBJECTS> <LINK_LIBRARIES> -Wl,--end-group  -Wl,-Map,<TARGET>.map   -o <TARGET> ${GD32_LD_FLAGS} ${GD32_LD_LIBS}")
 SET(CMAKE_EXECUTABLE_SUFFIX_C .elf)

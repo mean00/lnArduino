@@ -10,5 +10,6 @@ include_directories(${CMAKE_SOURCE_DIR})
 add_subdirectory(${AF_FOLDER})
 
 include(${AF_FOLDER}/setup.cmake)
-ADD_EXECUTABLE(hello hello.cpp )
-ADD_DEPENDENCIES(hello gd32_overlay gd32 gd32_overlay FreeRTOS gd32Arduino gd32_lowlevel)
+        
+GENERATE_GD32_FIRMWARE(hello hello.cpp)        
+        

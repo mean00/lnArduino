@@ -49,7 +49,6 @@ void LoggerInit()
     usart_hardware_flow_cts_config(USART0, USART_CTS_DISABLE);
     usart_receive_config(USART0, USART_RECEIVE_ENABLE);
     usart_transmit_config(USART0, USART_TRANSMIT_ENABLE);
-    usart_enable(USART0);
-
+    usart_enable(USART0); 
 }
 
