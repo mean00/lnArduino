@@ -1,5 +1,14 @@
+/*
+ *  (C) 2021 MEAN00 fixounet@free.fr
+ *  See license file
+ */
+
 #include "lnArduino.h"
 #include "lnSPI.h"
+extern "C"
+{
+    #include "gd32vf103_spi.h"
+}
 
 /**
  * 
@@ -8,7 +17,8 @@
  */
 hwlnSPIClass::hwlnSPIClass(int instance, int pinCs) : _internalSettings(1000000,SPI_MSBFIRST,SPI_MODE0,-1)
 {
-
+    _useDMA=false;
+    _cookie=NULL;
 }
 
 /**
@@ -27,19 +37,16 @@ void hwlnSPIClass::end(void)
 {
 }    
 
-/* This function should be used to configure the SPI instance in case you
- * don't use default parameters.
- * You can attach another CS pin to the SPI instance and each CS pin can be
- * attach with specific SPI settings.
- */
+
 void hwlnSPIClass::beginTransaction(lnSPISettings settings)
 {
+    _currentSetting=&settings;
 }
 /**
  */
-void endTransaction()
+void hwlnSPIClass::endTransaction()
 {
-
+    _currentSetting=&_internalSettings;
 }
 
 

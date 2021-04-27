@@ -1,9 +1,10 @@
+/*
+ *  (C) 2021 MEAN00 fixounet@free.fr
+ *  See license file
+ */
+
 #pragma once
 #include "lnArduino.h"
-extern "C"
-{
-#include "gd32vf103_spi.h"
-}
 
 //Mode          Clock Polarity (CPOL)   Clock Phase (CPHA)
 //SPI_MODE0             0                     0
@@ -53,6 +54,7 @@ class hwlnSPIClass
 {
   public:
     hwlnSPIClass(int instance, int pinCs=-1);
+    virtual ~hwlnSPIClass();
     
     void setSSEL(int ssel)
     {
@@ -62,11 +64,7 @@ class hwlnSPIClass
     void begin();
     void end(void);
 
-    /* This function should be used to configure the SPI instance in case you
-     * don't use default parameters.
-     * You can attach another CS pin to the SPI instance and each CS pin can be
-     * attach with specific SPI settings.
-     */
+    // The settings structure must stay valid while the transaction is on !
     void beginTransaction(lnSPISettings settings);
     void endTransaction();
 
@@ -83,7 +81,7 @@ class hwlnSPIClass
       _internalSettings.speed=speed;
     }
     
-   
+   //--
     bool write(int nbBytes, uint8_t *data);
     bool transfer(int nbBytes, uint8_t *dataOut, uint8_t *dataIn);
     
@@ -94,6 +92,7 @@ class hwlnSPIClass
     xMutex              _mutex;
     xBinarySemaphore    _done;
     bool                _useDMA;
+    void                *_cookie;
 };
 // EOF
 

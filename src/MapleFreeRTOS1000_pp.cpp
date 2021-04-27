@@ -1,4 +1,6 @@
 /*
+ *  (C) 2021 MEAN00 fixounet@free.fr
+ *  See license file
     Thin wrapper on top of FreeRTOS to be more C++ friendly
  */
 

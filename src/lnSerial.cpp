@@ -1,3 +1,8 @@
+/*
+ *  (C) 2021 MEAN00 fixounet@free.fr
+ *  See license file
+ */
+
 #include "lnArduino.h"
 #include "lnSerial.h"
  static lnSerial *SerialInstance[4]={NULL,NULL,NULL,NULL};
