@@ -68,7 +68,7 @@ class hwlnSPIClass
     void end(void);
 
     // The settings structure must stay valid while the transaction is on !
-    void beginTransaction(lnSPISettings settings);
+    void beginTransaction(lnSPISettings &settings);
     void endTransaction();
 
      void setBitOrder(spiBitOrder order)
@@ -91,11 +91,13 @@ class hwlnSPIClass
     bool asyncWrite(int nbBytes, uint8_t *data,lnSpiCallback *callback,void *cookie);
     bool asyncTransfer(int nbBytes, uint8_t *dataOut, uint8_t *dataIn,lnSpiCallback *callback,void *cookie);
 
-    
+  protected:
+    void setup();
    
-  private:
+  protected:
     lnSPISettings       _internalSettings;
-    lnSPISettings       *_currentSetting;
+    lnSPISettings       _currentSetting;
+    lnSPISettings       *_settings;
     xMutex              _mutex;
     xBinarySemaphore    _done;
     bool                _useDMA;
@@ -103,6 +105,8 @@ class hwlnSPIClass
     lnSpiCallback       *_callback;
     void                *_callbackCookie;
     int                 _instance;
+    uint32_t            _adr;
+    IRQn_Type           _irq;
 };
 // EOF
 
