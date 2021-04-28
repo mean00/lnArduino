@@ -117,7 +117,7 @@ void lnSerial::_interrupt(void)
             {
                 _cur=_tail=NULL;
                 usart_interrupt_disable(_adr,USART_INT_TBE);     
-                _txDone.giveFromInterrupt();
+                _txDone.give();
             }
         }else
         {

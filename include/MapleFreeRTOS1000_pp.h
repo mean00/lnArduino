@@ -18,7 +18,6 @@ public:
         bool take();
         bool take(int timeoutMs);
         bool give();
-        bool giveFromInterrupt();
   
 protected:
         SemaphoreHandle_t _handle;
@@ -51,7 +50,6 @@ public:
                 xEventGroup();
     virtual     ~xEventGroup();
     void        setEvents(uint32_t events);
-    void        setEventsFromISR(uint32_t events);
     uint32_t    waitEvents(uint32_t maskint, int timeout=0); //  the events are cleared upon return from here ! returns  0 if timeout
     uint32_t    readEvents(uint32_t maskInt); // it is also cleared automatically !
 protected:
@@ -68,7 +66,6 @@ public:
                 xFastEventGroup();
     virtual     ~xFastEventGroup();
     void        setEvents(uint32_t events);
-    void        setEventsFromISR(uint32_t events);
     uint32_t    waitEvents(uint32_t maskint, int timeout=0); //  the events are cleared upon return from here ! returns  0 if timeout
     uint32_t    readEvents(uint32_t maskInt); // it is also cleared automatically !
 protected:

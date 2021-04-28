@@ -5,7 +5,7 @@
  */
 
 #include "MapleFreeRTOS1000_pp.h"
-
+uint32_t underInterrupt=0;
 #define  fos_ms2tick(ms) (((ms)+portTICK_PERIOD_MS-1)/portTICK_PERIOD_MS)
 
 extern "C"
@@ -58,19 +58,16 @@ bool xBinarySemaphore::take(int timeoutMs)
  * @return 
  */
  bool xBinarySemaphore::give()
-{
-  xAssert(xSemaphoreGive(_handle)); // should never fail
-  return true;
-}
-/**
- * 
- * @return 
- */
- bool xBinarySemaphore::giveFromInterrupt()
-{
-  BaseType_t awake;
-  xSemaphoreGiveFromISR(_handle,&awake); // should never fail... 
-  portYIELD_FROM_ISR(awake); // reschedule
+{   
+  if(!underInterrupt)
+  {
+    xAssert(xSemaphoreGive(_handle)); // should never fail
+  }else
+  {
+    BaseType_t awake;
+    xSemaphoreGiveFromISR(_handle,&awake); // should never fail... 
+    portYIELD_FROM_ISR(awake); // reschedule
+  }
   return true;
 }
  /**
@@ -144,17 +141,15 @@ xEventGroup::~xEventGroup()
  */
 void        xEventGroup::setEvents(uint32_t events)
 {
-    xEventGroupSetBits(_handle,events);
-}
-/**
- * 
- * @param events
- */
-void        xEventGroup::setEventsFromISR(uint32_t events)
-{
-    BaseType_t wakeUp ;
-    xEventGroupSetBitsFromISR(_handle,events,&wakeUp);
-    portYIELD_FROM_ISR(wakeUp); 
+    if(!underInterrupt)
+    {
+        xEventGroupSetBits(_handle,events);
+    }else
+    {
+        BaseType_t wakeUp ;
+        xEventGroupSetBitsFromISR(_handle,events,&wakeUp);
+        portYIELD_FROM_ISR(wakeUp);  
+    }
 }
 /**
  * 
@@ -217,23 +212,23 @@ xFastEventGroup::~xFastEventGroup()
  * 
  * @param events
  */
-void xFastEventGroup::setEvents(uint32_t events) {
-    BEGIN_LOCK();
-    _value = _value | events;
-    bool w = _value & _mask;
-    END_LOCK();
-    if (w)
-        _sem.give();
-}
-/**
- * 
- * @param events
- */
-void xFastEventGroup::setEventsFromISR(uint32_t events) {
-    _value = _value | events;
-    bool w = _value & _mask;
-    if (w)
-        _sem.giveFromInterrupt();
+void xFastEventGroup::setEvents(uint32_t events) 
+{
+    if(!underInterrupt)
+    {
+        BEGIN_LOCK();
+        _value = _value | events;
+        bool w = _value & _mask;
+        END_LOCK();
+        if (w)
+            _sem.give();
+    }else
+    {
+        _value = _value | events;
+        bool w = _value & _mask;
+        if (w)
+            _sem.give();
+    }
 }
 /**
  * 

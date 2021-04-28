@@ -45,6 +45,9 @@ class lnSPISettings
     
     friend class hwlnSPIClass;
 };
+
+typedef void lnSpiCallback(void *cookie);
+
 /**
  * 
  * @param instance
@@ -84,6 +87,10 @@ class hwlnSPIClass
    //--
     bool write(int nbBytes, uint8_t *data);
     bool transfer(int nbBytes, uint8_t *dataOut, uint8_t *dataIn);
+
+    bool asyncWrite(int nbBytes, uint8_t *data,lnSpiCallback *callback,void *cookie);
+    bool asyncTransfer(int nbBytes, uint8_t *dataOut, uint8_t *dataIn,lnSpiCallback *callback,void *cookie);
+
     
    
   private:
@@ -93,6 +100,9 @@ class hwlnSPIClass
     xBinarySemaphore    _done;
     bool                _useDMA;
     void                *_cookie;
+    lnSpiCallback       *_callback;
+    void                *_callbackCookie;
+    int                 _instance;
 };
 // EOF
 

@@ -15,6 +15,11 @@
 	.global vPortEndScheduler
 
 
+.macro setUnderInterrupt x
+	li t1, \x
+	la t0, underInterrupt
+        sw t1,(t0)
+.endm
 
 
 /* -------------------------------------------------------------------------------------------------------- */
@@ -80,7 +85,9 @@ irq_entry:
 1:	
 	CONFIG_FS_CLEAN  
 #endif
-
+// Also mark we are under interrupt 
+zzz:
+        setUnderInterrupt(1)
 int_loop:
   	csrrw ra, CSR_JALMNXTI, ra
 
@@ -94,6 +101,7 @@ int_loop:
 	popVFPREGFILE sp
 2:
 #endif
+        setUnderInterrupt(0)
 	portRESTORE_CONTEXT_EXCP sp
   	popREGFILE sp
 #if USE_MSP

@@ -19,6 +19,8 @@ hwlnSPIClass::hwlnSPIClass(int instance, int pinCs) : _internalSettings(1000000,
 {
     _useDMA=false;
     _cookie=NULL;
+    _callback=NULL;
+    _instance=instance;
 }
 
 /**
@@ -48,8 +50,36 @@ void hwlnSPIClass::endTransaction()
 {
     _currentSetting=&_internalSettings;
 }
+/**
+ * 
+ * @param nbBytes
+ * @param data
+ * @param callback
+ * @return 
+ */
+bool hwlnSPIClass::asyncWrite(int nbBytes, uint8_t *data,lnSpiCallback *callback,void *cookie)
+{
+    xAssert(callback);
+    _callback=callback;
+    _callbackCookie=cookie;
+    return write(nbBytes,data);
+}
+/**
+ * 
+ * @param nbBytes
+ * @param dataOut
+ * @param dataIn
+ * @param callback
+ * @return 
+ */
+bool hwlnSPIClass::asyncTransfer(int nbBytes, uint8_t *dataOut, uint8_t *dataIn,lnSpiCallback *callback,void *cookie)
+{
+    xAssert(callback);
+    _callback=callback;
+    _callbackCookie=cookie;
+    return transfer(nbBytes,dataOut,dataIn);
 
-
+}
 
 /**
  */
@@ -62,7 +92,7 @@ bool hwlnSPIClass::write(int nbBytes, uint8_t *data)
  */
 bool hwlnSPIClass::transfer(int nbBytes, uint8_t *dataOut, uint8_t *dataIn)
 {
-        xAssert(0);
+    xAssert(0);
     return false;
 
 }
