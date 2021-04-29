@@ -1,4 +1,5 @@
 #include "lnArduino.h"
+#include "lnSPI.h"
 // green = PA1, blue = PA2, RED PC13
 #define LED PA2
 
@@ -31,11 +32,17 @@ void Demo::run()
     pinMode(LED,OUTPUT);
     bool onoff=true;
     digitalWrite(LED,HIGH);
+    uint8_t data[5]={0x55,0xAA,0x55,0xAA,0x55};
+    hwlnSPIClass *spi=new hwlnSPIClass(0); // SPI 0
+    spi->begin();
+    lnSPISettings settings(2*1000,SPI_MSBFIRST,SPI_MODE0,-1);
+    spi->beginTransaction(settings);
     while(1)
     {
         roundup++;
-        vTaskDelay(500);
+      //  vTaskDelay(500);
         digitalToggle(LED);
+        spi->write(5,data);
         onoff=!onoff;
         Logger("*\n");
     }
@@ -54,7 +61,8 @@ int main()
     
     // The LEDs are all on GPIO A
     rcu_periph_clock_enable(RCU_GPIOA);
-    
+    // We need alternate functions too
+    rcu_periph_clock_enable(RCU_AF); 
     //
     LoggerInit();
     Logger("Starting demo:\n");

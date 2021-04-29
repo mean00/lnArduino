@@ -93,6 +93,8 @@ class hwlnSPIClass
 
   protected:
     void setup();
+    void csOn();
+    void csOff();
    
   protected:
     lnSPISettings       _internalSettings;
