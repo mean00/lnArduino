@@ -1,6 +1,7 @@
 #include "lnArduino.h"
 #include "lnSPI.h"
 #include "gd32ST7735.h"
+#include "FreeSans7pt7b.h"
 // green = PA1, blue = PA2, RED PC13
 #define LED PA2
 
@@ -45,6 +46,12 @@ void demoMe()
     lcd->init();
     lcd->setRotation(2);
     lcd->fillScreen(0);
+    
+    // init fonts
+    lcd->setFontFamily(&FreeSans7pt7b,&FreeSans7pt7b,&FreeSans7pt7b);
+    lcd->setFontSize(st7735::SmallFont);    
+    
+    
     int r=0;
     int roundup;
     bool onoff;
@@ -57,6 +64,7 @@ void demoMe()
         if(onoff)
         {
             lcd->square(0x1f,10,20,40,20);
+            lcd->print(20,20,"This is  a test");
         }else
         {
             lcd->square(0xffff,10,20,40,20);

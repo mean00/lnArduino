@@ -57,6 +57,8 @@ st7735::st7735(int width, int height,  int pinDc, int pinCS)
     _rotation=0;
     _width=_physicalWidth;
     _height=_physicalHeight;
+     _fg=0xffff;
+     _bg=0;
 }
 /**
  * 

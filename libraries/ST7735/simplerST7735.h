@@ -4,6 +4,19 @@
  */
 #pragma once
 #include "lnArduino.h"
+#include "gfxfont.h"
+
+struct _current_font
+{
+	uint8_t* font;
+	uint8_t x_size;
+	uint8_t y_size;
+	uint8_t offset;
+	uint8_t numchars;
+	uint8_t inverted;
+};
+
+
 /**
  */
 class st7735Access
@@ -21,6 +34,25 @@ public:
 class st7735 : public st7735Access
 {
 public:
+               enum FontSize
+               {
+                   SmallFont,MediumFont,BigFont
+               };
+               class FontInfo
+               {
+               public:
+                 int               maxHeight;          
+                 int               maxWidth;
+                 const GFXfont    *font;        
+               };  
+               FontInfo          fontInfo[3];
+
+               FontInfo          *currentFont;
+               const GFXfont     *gfxFont;
+               int               _fg,_bg;
+
+    
+    
                          st7735(int width, int height,  int pinDc,int pinCS);
                 virtual ~st7735();
                 virtual void init()=0;
@@ -29,6 +61,7 @@ public:
                 void setAddress(int x, int y, int w, int h);
                 void square(int color, int x, int y, int w, int g);
                 void setRotation(int rotation);  // 0 1 2 3
+                void push2Colors(uint8_t *data, int len, boolean first,uint16_t fg, uint16_t bg);
             
 protected:
                 int _physicalWidth;
@@ -47,5 +80,21 @@ protected:
                 void csOff();
                 void sendCommand(uint8_t cmd, int size, const uint8_t *data);
                 void baseInit();
+                
+public: // freetype font
+                int     myDrawChar(int x, int y, unsigned char c,  int color, int bg,FontInfo &infos);
+                void    square(int x,int y,int w, int h, bool color);
+                void    setFontSize(FontSize size);
+                void    setFontFamily(const GFXfont *small, const GFXfont *medium, const GFXfont *big);
+                void    print(int x,int y,const char *z);
+                int     writeChar(char c);
+                void    drawRLEBitmap(int widthInPixel, int height, int wx, int wy, int fgcolor, int bgcolor, const uint8_t *data);
+                
+protected:
+                int     mySquare(int x, int y, int w, int xheight, uint16_t filler);
+                uint8_t scrbuf[1024];
+                int     cursor_x,cursor_y;
+
+
 };
 //EOF
