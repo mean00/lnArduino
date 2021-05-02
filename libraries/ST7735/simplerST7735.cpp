@@ -6,17 +6,27 @@
 
 #define cmdMode()  digitalWrite(_pinDC,LOW)
 #define dataMode() digitalWrite(_pinDC,HIGH)
-
+/**
+ * 
+ */
 void st7735::csOn()
 {
     digitalWrite(_pinCS,LOW) ;
 }
+/**
+ * 
+ */
 void st7735::csOff()
 {
      digitalWrite(_pinCS,HIGH) ;
 }
 
-
+/**
+ * 
+ * @param cmd
+ * @param size
+ * @param data
+ */
 void st7735::sendCommand(uint8_t cmd, int size, const uint8_t *data)
 {
         cmdMode();
@@ -27,7 +37,13 @@ void st7735::sendCommand(uint8_t cmd, int size, const uint8_t *data)
             sendBytes(size,data);
         }  
 }
-
+/**
+ * 
+ * @param width
+ * @param height
+ * @param pinDc
+ * @param pinCS
+ */
 st7735::st7735(int width, int height,  int pinDc, int pinCS)
 {
     _xOffset=0;
@@ -42,13 +58,17 @@ st7735::st7735(int width, int height,  int pinDc, int pinCS)
     _width=_physicalWidth;
     _height=_physicalHeight;
 }
+/**
+ * 
+ */
 st7735::~st7735()
 {
 
 }
-
-
-                
+/*
+ * 
+ * @param color
+ */              
 void st7735::fillScreen(int color) // 16 bits!
 {
     square(color,0,0,_width,_height);
@@ -80,9 +100,16 @@ void st7735::setAddress(int x, int y, int w, int h)
       sendWord(b1);
       sendWord(b2);
       cmdMode();
-      sendByte(0x2c);
-      
+      sendByte(0x2c);      
 }
+/**
+ * 
+ * @param color
+ * @param x
+ * @param y
+ * @param w
+ * @param h
+ */
 void st7735::square(int color, int x, int y, int w, int h)
 {
     csOn();
@@ -92,6 +119,10 @@ void st7735::square(int color, int x, int y, int w, int h)
     floodWords(f,color);
     csOff();
 }
+/**
+ * 
+ * @param rotation
+ */
 void st7735::setRotation(int rotation)
 {
     _rotation=rotation;
@@ -116,6 +147,9 @@ void st7735::setRotation(int rotation)
     }
     updateHwRotation();
 }
+/**
+ * 
+ */
 void st7735::baseInit()
 {
     pinMode(_pinDC,OUTPUT);
@@ -124,3 +158,4 @@ void st7735::baseInit()
     digitalWrite(_pinDC,HIGH);
     digitalWrite(_pinCS,HIGH);
 }
+// EOF
