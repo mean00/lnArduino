@@ -48,3 +48,4 @@ protected:
                 void sendCommand(uint8_t cmd, int size, const uint8_t *data);
                 void baseInit();
 };
+//EOF

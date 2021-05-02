@@ -5,7 +5,14 @@
 #pragma once
 #include "lnSPI.h"
 #include "simplerST7735.h"
-
+/**
+ * 
+ * @param w
+ * @param h
+ * @param spi
+ * @param pinDc
+ * @param pinCS
+ */
 class gd32ST7735 : public st7735
 {
     public:
