@@ -79,18 +79,25 @@ class hwlnSPIClass
     {
         _internalSettings.dMode=mode;
     }
-    void setSspeed(int speed)
+    void setSpeed(int speed)
     {
       _internalSettings.speed=speed;
     }
+    // DMA ones
+    bool     dmaSend(const void *data, int size,bool repeat);
+    
+    void setDataSize(int dataSize); // 8 or 16
     
    //--
-    bool write(int nbBytes, uint8_t *data);
+    bool write(int z);
+    bool write16(int z);
+    bool write(int nbBytes, const uint8_t *data);
     bool transfer(int nbBytes, uint8_t *dataOut, uint8_t *dataIn);
 
-    bool asyncWrite(int nbBytes, uint8_t *data,lnSpiCallback *callback,void *cookie);
+    bool asyncWrite(int nbBytes, const uint8_t *data,lnSpiCallback *callback,void *cookie);
     bool asyncTransfer(int nbBytes, uint8_t *dataOut, uint8_t *dataIn,lnSpiCallback *callback,void *cookie);
 
+    void waitForCompletion(); // wait for everything to be COMPLETELY done
   protected:
     void setup();
     void csOn();

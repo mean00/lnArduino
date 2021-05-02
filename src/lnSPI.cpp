@@ -30,6 +30,49 @@ static const SpiPin spiPins[3]=
 };
 
 /**
+ * switch between RX/TX and TX only
+ * @param adr
+ * @param rxTx
+ */
+static void updateMode(uint32_t adr,bool rxTx)
+{
+#if 0
+    uint32_t reg=SPI_CTL0(adr);
+    reg&=~(SPI_CTL0_BDOEN | SPI_CTL0_BDEN+SPI_CTL0_RO);
+    if(rxTx)
+    {
+        reg|=SPI_TRANSMODE_FULLDUPLEX;
+    }else
+        reg|=SPI_BIDIRECTIONAL_TRANSMIT;
+    SPI_CTL0(adr)=reg;
+#endif    
+}
+/**
+ * 
+ * @param adr
+ * @param bits
+ */
+void updateDataSize(uint32_t adr,int bits)
+{
+    uint32_t reg=SPI_CTL0(adr);
+    reg&=~SPI_CTL0_SPIEN;
+    SPI_CTL0(adr)=reg;
+    
+    switch(bits)
+    {
+        case 8:
+             reg&=~SPI_CTL0_FF16;
+             break;
+        case 16:
+            reg|=SPI_FRAMESIZE_16BIT;
+            break;
+        default:xAssert(0);
+    }
+    reg|=SPI_CTL0_SPIEN;
+    SPI_CTL0(adr)=reg;
+}
+
+/**
  * 
  * @param instance
  * @param pinCs
@@ -124,7 +167,7 @@ void hwlnSPIClass::endTransaction()
  * @param callback
  * @return 
  */
-bool hwlnSPIClass::asyncWrite(int nbBytes, uint8_t *data,lnSpiCallback *callback,void *cookie)
+bool hwlnSPIClass::asyncWrite(int nbBytes, const uint8_t *data,lnSpiCallback *callback,void *cookie)
 {
     xAssert(callback);
     _callback=callback;
@@ -146,11 +189,50 @@ bool hwlnSPIClass::asyncTransfer(int nbBytes, uint8_t *dataOut, uint8_t *dataIn,
     _callbackCookie=cookie;
     return transfer(nbBytes,dataOut,dataIn);
 }
+/**
+ * 
+ * @param z
+ * @return 
+ */
+bool hwlnSPIClass::write(int z)
+{
+    csOn();
+    updateDataSize(_adr,8);
+    updateMode(_adr,false);
+    
+    while (!spi_i2s_flag_get(_adr, SPI_FLAG_TBE)) 
+    {
+    }
+    spi_i2s_data_transmit(_adr, z);
+    waitForCompletion();
+    csOff();
+    return true;
+}
+/**
+ * 
+ * @param z
+ * @return 
+ */
+bool hwlnSPIClass::write16(int z)
+{
+    updateMode(_adr,false);
+    updateDataSize(_adr,16);
+    csOn();    
+    while (!spi_i2s_flag_get(_adr, SPI_FLAG_TBE)) 
+    {
+    }
+    spi_i2s_data_transmit(_adr, z);
+    waitForCompletion();
+    csOff();
+    return true;
+}
 
 /**
  */
-bool hwlnSPIClass::write(int nbBytes, uint8_t *data)
+bool hwlnSPIClass::write(int nbBytes, const uint8_t *data)
 {
+    updateMode(_adr,false);
+    updateDataSize(_adr,8);
     csOn();
     for (size_t i = 0; i < nbBytes; i++) 
     {
@@ -159,10 +241,9 @@ bool hwlnSPIClass::write(int nbBytes, uint8_t *data)
         }
         spi_i2s_data_transmit(_adr, data[i]);
     }
-
+    waitForCompletion();
     csOff();
     return true;
-
 }
 /**
  * 
@@ -185,9 +266,20 @@ void hwlnSPIClass::csOff()
     }
 }
 /**
+ *  This is needed to be able to toggle the CS when all is done
+ */
+void hwlnSPIClass::waitForCompletion()
+{
+        while (spi_i2s_flag_get(_adr, SPI_FLAG_TRANS)) 
+        {
+        }
+}
+/**
  */
 bool hwlnSPIClass::transfer(int nbBytes, uint8_t *dataOut, uint8_t *dataIn)
 {
+    updateMode(_adr,true);
+    updateDataSize(_adr,8);
     csOn();
     for (size_t i = 0; i < nbBytes; i++) 
     {
@@ -200,6 +292,7 @@ bool hwlnSPIClass::transfer(int nbBytes, uint8_t *dataOut, uint8_t *dataIn)
         }
         dataIn[i] = spi_i2s_data_receive(_adr);
     }
+    waitForCompletion();
     csOff();
     return true;
 }
@@ -255,6 +348,7 @@ void hwlnSPIClass::setup()
     }
     prescale = (apb*1000000) / speed- 1;
     // prescale can only go from 2 to 256, and prescale=2^(psc+1) actually
+    
     uint32_t psc=0;
     if(prescale<=2) psc=0;
     else if(prescale>=256) psc=7;
@@ -273,6 +367,24 @@ void hwlnSPIClass::setup()
     param.trans_mode = SPI_TRANSMODE_FULLDUPLEX;
     spi_init(_adr, &param);
     spi_enable(_adr);  
+}
+/**
+ * 
+ * @param dataSize
+ */
+void hwlnSPIClass::setDataSize(int dataSize)
+{
+    updateDataSize(_adr,dataSize);
+}
+/**
+ */
+bool     hwlnSPIClass::dmaSend(const void *data, int size,bool repeat)
+{
+    if(repeat==false)
+        return write(size,(const uint8_t *)data);
+    for(int i=0;i<size;i++)
+        write(2,(const uint8_t *)data);
+    return true;
 }
 // EOF
 
