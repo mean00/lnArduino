@@ -1,3 +1,7 @@
+/*
+ *  (C) 2021 MEAN00 fixounet@free.fr
+ *  See license file
+ */
 #include "simplerST7735.h"
 
 #define cmdMode()  digitalWrite(_pinDC,LOW)
