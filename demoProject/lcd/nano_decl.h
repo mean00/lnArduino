@@ -1,3 +1,3 @@
-#define nano_width 64
-#define nano_height 54
+#define nano_width 57
+#define nano_height 48
 extern const unsigned char nano[];
