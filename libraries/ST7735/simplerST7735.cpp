@@ -4,8 +4,6 @@
  */
 #include "simplerST7735.h"
 
-#define cmdMode()  digitalWrite(_pinDC,LOW)
-#define dataMode() digitalWrite(_pinDC,HIGH)
 /**
  * 
  */

@@ -12,7 +12,7 @@ add_subdirectory(${AF_FOLDER})
 
 include(${AF_FOLDER}/setup.cmake)
         
-
+SET(ST7735_DRIVER ${AF_FOLDER}/libraries/ST7735/gd32ST7735.cpp)
 add_subdirectory(${AF_FOLDER}/libraries/ST7735)
 include_directories(${AF_FOLDER}/libraries/ST7735)        
 
