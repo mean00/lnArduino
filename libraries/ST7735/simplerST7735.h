@@ -92,7 +92,9 @@ public: // freetype font
                 
 protected:
                 int     mySquare(int x, int y, int w, int xheight, uint16_t filler);
-                uint8_t scrbuf[1024];
+                void    pushColors16(uint16_t *data,int nb);
+#define         ST7735_BUFFER_SIZE_WORD 256
+                uint16_t scrbuf[ST7735_BUFFER_SIZE_WORD];
                 int     cursor_x,cursor_y;
 
 

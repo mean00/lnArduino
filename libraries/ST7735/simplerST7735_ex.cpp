@@ -265,6 +265,17 @@ int st7735::writeChar(char c)
     return 1;
 }
 /**
+ * 
+ * @param 
+ * @param 
+ * @param 
+ */
+void st7735::pushColors16(uint16_t *data,int nb)
+{        
+    sendWords(nb,data);
+}
+
+/**
  * This could be optimized ** A LOT ** by swapping x & y in the source image
  * @param widthInPixel
  * @param height
@@ -276,59 +287,56 @@ int st7735::writeChar(char c)
  */
 void st7735::drawRLEBitmap(int widthInPixel, int height, int wx, int wy, int fgcolor, int bgcolor, const uint8_t *data)
 {    
-
+    
     bool first=true;
-    int nbPixel=widthInPixel*height;    
+    int nbPixel=widthInPixel*height;
+    int pixel=0;
+    setAddress(wx, wy, widthInPixel, height);
     int mask=0;
-    int cur;       
+    int cur;   
+    uint16_t *o=scrbuf;
+    int ready=0;
     int repeat;
-    bool color;
-    for( int yy=0;yy<height;yy++)    
+    uint16_t color;
+    dataMode();
+    while(pixel<nbPixel)        
     {
-        int column=64-(wy+yy);        
-        int bitToChange=1<<(column%8);
-        column=128*(column/8);
-        int pack=wx;
-        for(int xx=0;xx<widthInPixel;)
+        // load next
+        cur=*data++;
+        if(cur==0x76)
         {
-            // load next
             cur=*data++;
-            if(cur==0x76)
-            {
-                cur=*data++;
-                repeat=*data++;
-            }else
-            {
-                repeat=1;
-            }
-            // 8 pixels at a time
-            for(int r=0;r<repeat;r++)
-            {
-                int mask=0x80;
-                for(int i=0;i<8;i++)
-                {
-                    if(mask & cur)
-                    {
-                        color=true;
-                    }else
-                        color=false;
-                    mask>>=1;                
-                    pack++;
-                    xx++;                   
-                    if(color) 
-                    {
-                        scrbuf[column+pack] |=bitToChange;                        
-                    }
-                    else 
-                    {
-                        scrbuf[column+pack] &=~bitToChange;                        
-                    }
-                    
-                }
-                    
-            }
-            
+            repeat=*data++;
+        }else
+        {
+            repeat=1;
         }
+        // 8 pixels at a time
+        for(int r=0;r<repeat;r++)
+        {
+            int mask=0x80;
+            for(int i=0;i<8;i++)
+            {
+                if(mask & cur)
+                {
+                    color=fgcolor;
+                }else
+                    color=0xff00*0+1*bgcolor;
+                mask>>=1;
+                *o++=color;
+                ready++;
+            }
+            if(ready>(ST7735_BUFFER_SIZE_WORD-16))
+            { // Flush
+              pushColors16(scrbuf,ready);
+              first=false;
+              ready=0;
+              o=scrbuf;
+            }
+        }
+        pixel+=repeat*8;
     }
+    pushColors16(scrbuf,ready);  
 }
+
 // EOF
