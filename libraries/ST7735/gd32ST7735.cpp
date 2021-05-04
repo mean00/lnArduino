@@ -99,7 +99,8 @@ void gd32ST7735::sendBytes(int nb, const uint8_t *data)
  */
 void gd32ST7735::sendWords(int nb, const uint16_t *data)
 {
-    _spi->write(nb*2,(uint8_t *)data); // we have endianness issue here...
+    for(int i=0;i<nb;i++)
+        _spi->write16(data[i]);
 }
 /**
 * 
