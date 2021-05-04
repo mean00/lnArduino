@@ -2,8 +2,8 @@
 #include "lnSPI.h"
 #include "gd32ST7735.h"
 #include "FreeSans7pt7b.h"
-#include "nano_compressed.h"
-#include "nano_decl.h"
+#include "PNP_compressed.h"
+#include "PNP_decl.h"
 
 #define splash_width 128
 #define splash_height 96
@@ -54,7 +54,7 @@ void demoMe()
     lcd->setRotation(2);
     lcd->fillScreen(0);
     
-    lcd->drawRLEBitmap(nano_width,nano_height,0,0,0x1f<<6,0x1f<<11,nano);
+    lcd->drawRLEBitmap(PNP_width,PNP_height,0,0,0x1f<<6,0x1f<<11,PNP);
     
     // init fonts
     lcd->setFontFamily(&FreeSans7pt7b,&FreeSans7pt7b,&FreeSans7pt7b);
