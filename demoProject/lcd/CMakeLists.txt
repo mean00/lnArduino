@@ -12,9 +12,10 @@ add_subdirectory(${AF_FOLDER})
 
 include(${AF_FOLDER}/setup.cmake)
         
-SET(ST7735_DRIVER ${AF_FOLDER}/libraries/ST7735/gd32ST7735.cpp)
-add_subdirectory(${AF_FOLDER}/libraries/ST7735)
-include_directories(${AF_FOLDER}/libraries/ST7735)        
+SET(ST7735_DRIVER ${AF_FOLDER}/libraries/simplerST7735/platformExample/longanNano/gd32ST7735.cpp)
+include_directories(ST7735_DRIVER ${AF_FOLDER}/libraries/simplerST7735/platformExample/longanNano/)
+add_subdirectory(${AF_FOLDER}/libraries/simplerST7735)
+include_directories(${AF_FOLDER}/libraries/simplerST7735)        
 
 
 GENERATE_GD32_FIRMWARE(hello hello.cpp ${AMG})         

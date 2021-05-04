@@ -4,3 +4,6 @@
 [submodule "Longduino_cmake"]
 	path = Longduino_cmake
 	url = https://github.com/mean00/Longduino_cmake.git
+[submodule "libraries/simplerST7735"]
+	path = libraries/simplerST7735
+	url = https://github.com/mean00/simplerST7735.git
