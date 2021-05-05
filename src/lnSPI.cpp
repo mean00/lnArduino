@@ -77,7 +77,8 @@ void updateDataSize(uint32_t adr,int bits)
  * @param instance
  * @param pinCs
  */
-hwlnSPIClass::hwlnSPIClass(int instance, int pinCs) : _internalSettings(1000000,SPI_MSBFIRST,SPI_MODE0,-1),_currentSetting(1000000,SPI_MSBFIRST,SPI_MODE0,-1)
+hwlnSPIClass::hwlnSPIClass(int instance, int pinCs) : _internalSettings(1000000,SPI_MSBFIRST,SPI_MODE0,-1),_currentSetting(1000000,SPI_MSBFIRST,SPI_MODE0,-1),
+        txDma(lnDMA::DMA_MEMORY_TO_PERIPH,0,2,16,16)
 {
     _useDMA=false;
     _cookie=NULL;
@@ -241,6 +242,55 @@ bool hwlnSPIClass::write(int nbBytes, const uint8_t *data)
         }
         spi_i2s_data_transmit(_adr, data[i]);
     }
+    waitForCompletion();
+    csOff();
+    return true;
+}
+/**
+ */
+bool hwlnSPIClass::dmaWrite(int nbBytes, const uint8_t *data)
+{
+    updateMode(_adr,false);
+    updateDataSize(_adr,8);
+    csOn();
+    for (size_t i = 0; i < nbBytes; i++) 
+    {
+        while (!spi_i2s_flag_get(_adr, SPI_FLAG_TBE)) 
+        {
+        }
+        spi_i2s_data_transmit(_adr, data[i]);
+    }
+    waitForCompletion();
+    csOff();
+    return true;
+}
+
+/**
+ */
+bool hwlnSPIClass::dmaWrite16(int nbWord, const uint16_t *data)
+{
+    updateMode(_adr,false);
+    updateDataSize(_adr,16);
+    csOn();
+    txDma.doMemoryToPeripheralTransfer(nbWord, data, false);        
+    waitForCompletion();
+    csOff();
+    return true;
+}
+
+
+
+/**
+ */
+bool hwlnSPIClass::dmaWrite16Repeat(int nbWord, const uint16_t data)
+{
+    updateMode(_adr,false);
+    updateDataSize(_adr,16);
+    csOn();
+   updateMode(_adr,false);
+    updateDataSize(_adr,16);
+    csOn();
+    txDma.doMemoryToPeripheralTransfer(nbWord, &data, true);        
     waitForCompletion();
     csOff();
     return true;

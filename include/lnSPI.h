@@ -5,6 +5,7 @@
 
 #pragma once
 #include "lnArduino.h"
+#include "lnDma.h"
 
 //Mode          Clock Polarity (CPOL)   Clock Phase (CPHA)
 //SPI_MODE0             0                     0
@@ -92,6 +93,11 @@ class hwlnSPIClass
     bool write(int z);
     bool write16(int z);
     bool write(int nbBytes, const uint8_t *data);
+    bool dmaWrite16(int nbBytes, const uint16_t *data);
+    bool dmaWrite16Repeat(int nbBytes, const uint16_t data);
+    bool dmaWrite(int nbBytes, const uint8_t *data);
+    
+    
     bool transfer(int nbBytes, uint8_t *dataOut, uint8_t *dataIn);
 
     bool asyncWrite(int nbBytes, const uint8_t *data,lnSpiCallback *callback,void *cookie);
@@ -116,6 +122,8 @@ class hwlnSPIClass
     int                 _instance;
     uint32_t            _adr;
     IRQn_Type           _irq;
+    
+    lnDMA               txDma;
 };
 // EOF
 
