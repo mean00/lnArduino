@@ -272,8 +272,10 @@ bool hwlnSPIClass::dmaWrite16(int nbWord, const uint16_t *data)
     updateMode(_adr,false);
     updateDataSize(_adr,16);
     csOn();
+    SPI_CTL1(_adr) = (uint32_t)(SPI_CTL1_DMATEN);
     txDma.doMemoryToPeripheralTransfer(nbWord, data, false);        
     waitForCompletion();
+    SPI_CTL1(_adr) = 0;
     csOff();
     return true;
 }
@@ -287,11 +289,10 @@ bool hwlnSPIClass::dmaWrite16Repeat(int nbWord, const uint16_t data)
     updateMode(_adr,false);
     updateDataSize(_adr,16);
     csOn();
-   updateMode(_adr,false);
-    updateDataSize(_adr,16);
-    csOn();
+    SPI_CTL1(_adr) = (uint32_t)(SPI_CTL1_DMATEN);
     txDma.doMemoryToPeripheralTransfer(nbWord, &data, true);        
     waitForCompletion();
+    SPI_CTL1(_adr) = 0;
     csOff();
     return true;
 }

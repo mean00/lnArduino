@@ -27,6 +27,7 @@ protected:
     int             _channelInt;
     int             _dmaInt;
     DmaTransferType _type;
+    IRQn_Type       _irq;
     
     doneCallback    *_cb;
     void            *_cookie;
