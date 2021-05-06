@@ -20,7 +20,8 @@ public:
                 ~lnDMA();
         void    attachCallback(doneCallback *cb, void *cookie);
   
-        bool    doMemoryToPeripheralTransfer(int count, const uint16_t *source,  bool repeat);
+        bool    doMemoryToPeripheralTransfer(int count, const uint16_t *source,const uint16_t *target,  bool repeat);
+        void    invokeCallback();
 protected:
     dma_channel_enum _channel;
     uint32_t         _dma;

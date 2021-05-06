@@ -71,6 +71,18 @@ void updateDataSize(uint32_t adr,int bits)
     reg|=SPI_CTL0_SPIEN;
     SPI_CTL0(adr)=reg;
 }
+void updateDmaTX(uint32_t adr,bool onoff)
+{
+    uint32_t reg=SPI_CTL0(adr);
+    reg&=~SPI_CTL0_SPIEN;
+    SPI_CTL0(adr)=reg;
+    if(onoff)
+         SPI_CTL1(adr) |= (uint32_t)(SPI_CTL1_DMATEN);
+    else
+         SPI_CTL1(adr) &= ~((uint32_t)(SPI_CTL1_DMATEN));
+    reg|=SPI_CTL0_SPIEN;
+    SPI_CTL0(adr)=reg;
+}
 
 /**
  * 
@@ -271,12 +283,15 @@ bool hwlnSPIClass::dmaWrite16(int nbWord, const uint16_t *data)
 {
     updateMode(_adr,false);
     updateDataSize(_adr,16);
+    updateDmaTX(_adr,true);
     csOn();
-    SPI_CTL1(_adr) = (uint32_t)(SPI_CTL1_DMATEN);
-    txDma.doMemoryToPeripheralTransfer(nbWord, data, false);        
+    
+    txDma.doMemoryToPeripheralTransfer(nbWord, data, (uint16_t *)&SPI_DATA(_adr),false);        
+    _done.take();
     waitForCompletion();
-    SPI_CTL1(_adr) = 0;
+    
     csOff();
+    updateDmaTX(_adr,false);
     return true;
 }
 
@@ -288,12 +303,15 @@ bool hwlnSPIClass::dmaWrite16Repeat(int nbWord, const uint16_t data)
 {
     updateMode(_adr,false);
     updateDataSize(_adr,16);
+    updateDmaTX(_adr,true);
     csOn();
-    SPI_CTL1(_adr) = (uint32_t)(SPI_CTL1_DMATEN);
-    txDma.doMemoryToPeripheralTransfer(nbWord, &data, true);        
+    
+    txDma.doMemoryToPeripheralTransfer(nbWord, &data, (uint16_t *)&SPI_DATA(_adr), true);        
+    _done.take();
     waitForCompletion();
-    SPI_CTL1(_adr) = 0;
+    
     csOff();
+    updateDmaTX(_adr,false);
     return true;
 }
 /**
@@ -346,6 +364,23 @@ bool hwlnSPIClass::transfer(int nbBytes, uint8_t *dataOut, uint8_t *dataIn)
     waitForCompletion();
     csOff();
     return true;
+}
+/**
+ * 
+ * @param c
+ */
+void hwlnSPIClass::exTxDone(void *c)
+{
+    hwlnSPIClass *i=(hwlnSPIClass *)c;
+    i->txDone();
+}
+/**
+ * 
+ * @return 
+ */
+void hwlnSPIClass::txDone()
+{
+    _done.give();
 }
 /**
  * \brief program the peripheral with the current settings
@@ -417,6 +452,7 @@ void hwlnSPIClass::setup()
     param.prescale = psc;;
     param.trans_mode = SPI_TRANSMODE_FULLDUPLEX;
     spi_init(_adr, &param);
+    txDma.attachCallback(exTxDone,this);
     spi_enable(_adr);  
 }
 /**

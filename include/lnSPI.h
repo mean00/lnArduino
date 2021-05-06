@@ -124,6 +124,10 @@ class hwlnSPIClass
     IRQn_Type           _irq;
     
     lnDMA               txDma;
+    // callbacks
+    static void exTxDone(void *c);
+public:
+    void                txDone();
 };
 // EOF
 

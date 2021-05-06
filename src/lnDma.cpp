@@ -112,9 +112,16 @@ void lnDMA::attachCallback(doneCallback *cb, void *cookie)
     _cookie=cookie;
 
 }
-
-bool lnDMA::doMemoryToPeripheralTransfer(int count, const uint16_t *source,  bool repeat)
+/**
+ * 
+ * @param count
+ * @param source
+ * @param repeat
+ * @return 
+ */
+bool lnDMA::doMemoryToPeripheralTransfer(int count, const uint16_t *source,const uint16_t *target,  bool repeat)
 {
+    DMA_CHPADDR(_dma, _channel) = (uint32_t)target;
     dma_memory_address_config(_dma,_channel,(uint32_t)(source));
     if(repeat)
         dma_memory_increase_disable(_dma,_channel);
@@ -129,7 +136,14 @@ bool lnDMA::doMemoryToPeripheralTransfer(int count, const uint16_t *source,  boo
     dma_channel_enable(_dma,_channel);
     return true;
 }
-
+/**
+ * 
+ */
+void    lnDMA::invokeCallback()
+{
+    xAssert(_cb);
+    _cb(_cookie);
+}
 /**
  * 
  * @param dma
@@ -137,7 +151,12 @@ bool lnDMA::doMemoryToPeripheralTransfer(int count, const uint16_t *source,  boo
  */
 void dmaIrqHandler(int dma, int channel)
 {
-    xAssert(0);
+    // First clear the interrupt
+    dma_interrupt_flag_clear(dma,(dma_channel_enum)channel,DMA_INT_FTF |DMA_INT_ERR);
+    // then call handler
+    lnDMA *l=_lnDmas[dma][channel];
+    xAssert(l);
+    l->invokeCallback();
 }
 
 
