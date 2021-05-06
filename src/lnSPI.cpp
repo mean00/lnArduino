@@ -30,22 +30,24 @@ static const SpiPin spiPins[3]=
 };
 
 /**
- * switch between RX/TX and TX only
+ * switch between RX/TX and TX only : false is txRx, 
  * @param adr
  * @param rxTx
  */
 static void updateMode(uint32_t adr,bool rxTx)
 {
-#if 0
+
     uint32_t reg=SPI_CTL0(adr);
-    reg&=~(SPI_CTL0_BDOEN | SPI_CTL0_BDEN+SPI_CTL0_RO);
+    reg&=~(SPI_CTL0_BDOEN | SPI_CTL0_BDEN | SPI_CTL0_RO);
     if(rxTx)
     {
-        reg|=SPI_TRANSMODE_FULLDUPLEX;
+        reg|=0; // 0 all bits = full duplex
     }else
-        reg|=SPI_BIDIRECTIONAL_TRANSMIT;
+    {   // Tx Only: unidirectional, transmit only, 
+        reg|=SPI_CTL0_BDEN | SPI_CTL0_BDOEN;
+    }
     SPI_CTL0(adr)=reg;
-#endif    
+
 }
 /**
  * 

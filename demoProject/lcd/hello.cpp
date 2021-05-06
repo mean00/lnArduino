@@ -112,7 +112,7 @@ int main()
     // We need alternate functions too
     rcu_periph_clock_enable(RCU_AF); 
     rcu_periph_clock_enable(RCU_DMA0); 
-    //
+    // DMA TX for LCD
     DMA_CHCTL(DMA0, DMA_CH2) = (uint32_t)(DMA_PRIORITY_HIGH | DMA_CHXCTL_DIR); 
     //
     LoggerInit();

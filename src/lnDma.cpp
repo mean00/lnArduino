@@ -121,6 +121,7 @@ void lnDMA::attachCallback(doneCallback *cb, void *cookie)
  */
 bool lnDMA::doMemoryToPeripheralTransfer(int count, const uint16_t *source,const uint16_t *target,  bool repeat)
 {
+    dma_transfer_direction_config(_dma,_channel, DMA_MEMORY_TO_PERIPHERAL);
     DMA_CHPADDR(_dma, _channel) = (uint32_t)target;
     dma_memory_address_config(_dma,_channel,(uint32_t)(source));
     if(repeat)
@@ -130,9 +131,10 @@ bool lnDMA::doMemoryToPeripheralTransfer(int count, const uint16_t *source,const
     dma_transfer_number_config(_dma,_channel, count);
         
     // enable IRQ
-    dma_interrupt_enable(_dma,_channel,DMA_INT_FTF |DMA_INT_ERR );
-    eclic_enable_interrupt(_dmaIrqs[_dmaInt][_channelInt]);    
     // Start DMA
+    dma_flag_clear(_dma,_channel, DMA_FLAG_G);
+    dma_interrupt_enable(_dma,_channel,DMA_INT_FTF  );
+    eclic_enable_interrupt(_dmaIrqs[_dmaInt][_channelInt]);        
     dma_channel_enable(_dma,_channel);
     return true;
 }
@@ -152,7 +154,7 @@ void    lnDMA::invokeCallback()
 void dmaIrqHandler(int dma, int channel)
 {
     // First clear the interrupt
-    dma_interrupt_flag_clear(dma,(dma_channel_enum)channel,DMA_INT_FTF |DMA_INT_ERR);
+    dma_interrupt_flag_clear(_dmas[dma],_channels[channel],DMA_INT_FTF |DMA_INT_ERR);
     // then call handler
     lnDMA *l=_lnDmas[dma][channel];
     xAssert(l);
