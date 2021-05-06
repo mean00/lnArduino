@@ -111,6 +111,7 @@ int main()
     rcu_periph_clock_enable(RCU_GPIOC);
     // We need alternate functions too
     rcu_periph_clock_enable(RCU_AF); 
+    rcu_periph_clock_enable(RCU_DMA0); 
     //
     LoggerInit();
     Logger("Starting demo:\n");
@@ -121,14 +122,3 @@ int main()
     
 }
 
-
-extern "C" void deadEnd(int code)
-{
-    // No interrrupt
-    ENTER_CRITICAL();
-    while(1)
-    {
-        // blink red light...
-        
-    }
-}

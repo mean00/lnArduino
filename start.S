@@ -49,13 +49,13 @@ vector_base:
 	UNHANDLED(27) //.word     unhandledException //EXTI2_IRQHandler
 	UNHANDLED(28) //.word     unhandledException //EXTI3_IRQHandler
 	UNHANDLED(29) //.word     unhandledException //EXTI4_IRQHandler
-	UNHANDLED(30) //.word     unhandledException //DMA0_Channel0_IRQHandler
-	UNHANDLED(31) //.word     unhandledException //DMA0_Channel1_IRQHandler
-	UNHANDLED(32) //.word     unhandledException //DMA0_Channel2_IRQHandler
-	UNHANDLED(33) //.word     unhandledException //DMA0_Channel3_IRQHandler
-	UNHANDLED(34) //.word     unhandledException //DMA0_Channel4_IRQHandler
-	UNHANDLED(35) //.word     unhandledException //DMA0_Channel5_IRQHandler
-	UNHANDLED(36) //.word     unhandledException //DMA0_Channel6_IRQHandler
+	.word DMA0_Channel0_IRQHandler //.word     unhandledException //DMA0_Channel0_IRQHandler
+	.word DMA0_Channel1_IRQHandler //.word     unhandledException //DMA0_Channel1_IRQHandler
+	.word DMA0_Channel2_IRQHandler //.word     unhandledException //DMA0_Channel2_IRQHandler SPI0 TX
+	.word DMA0_Channel3_IRQHandler //UNHANDLED(33) //.word     unhandledException //DMA0_Channel3_IRQHandler
+	.word DMA0_Channel4_IRQHandler //UNHANDLED(34) //.word     unhandledException //DMA0_Channel4_IRQHandler
+	.word DMA0_Channel5_IRQHandler //UNHANDLED(35) //.word     unhandledException //DMA0_Channel5_IRQHandler
+	.word DMA0_Channel6_IRQHandler //UNHANDLED(36) //.word     unhandledException //DMA0_Channel6_IRQHandler
 	UNHANDLED(37) //.word     unhandledException //ADC0_1_IRQHandler
 	UNHANDLED(38) //.word     unhandledException //CAN0_TX_IRQHandler
 	UNHANDLED(39) //.word     unhandledException //CAN0_RX0_IRQHandler
@@ -94,11 +94,11 @@ vector_base:
 	UNHANDLED(72) //.word     unhandledException //UART4_IRQHandler
 	UNHANDLED(73) //.word     unhandledException //TIMER5_IRQHandler
 	UNHANDLED(74) //.word     unhandledException //TIMER6_IRQHandler
-	UNHANDLED(75) //.word     unhandledException //DMA1_Channel0_IRQHandler
-	UNHANDLED(76) //.word     unhandledException //DMA1_Channel1_IRQHandler
-	UNHANDLED(77) //.word     unhandledException //DMA1_Channel2_IRQHandler
-	UNHANDLED(78) //.word     unhandledException //DMA1_Channel3_IRQHandler
-	UNHANDLED(79) //.word     unhandledException //DMA1_Channel4_IRQHandler
+	.word DMA1_Channel0_IRQHandler //UNHANDLED(75) //.word     unhandledException //DMA1_Channel0_IRQHandler
+	.word DMA1_Channel1_IRQHandler //UNHANDLED(76) //.word     unhandledException //DMA1_Channel1_IRQHandler
+	.word DMA1_Channel2_IRQHandler //UNHANDLED(77) //.word     unhandledException //DMA1_Channel2_IRQHandler
+	.word DMA1_Channel3_IRQHandler //UNHANDLED(78) //.word     unhandledException //DMA1_Channel3_IRQHandler
+	.word DMA1_Channel4_IRQHandler //UNHANDLED(79) //.word     unhandledException //DMA1_Channel4_IRQHandler
         UNHANDLED(80) //.word     unhandledException //0
         UNHANDLED(81) //.word     unhandledException // 0
 	UNHANDLED(82) //.word     unhandledException //CAN1_TX_IRQHandler

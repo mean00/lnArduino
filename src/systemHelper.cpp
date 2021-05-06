@@ -21,6 +21,12 @@ extern "C"
     extern void taskENTER_CRITICAL( void );
     extern void taskEXIT_CRITICAL( void );
     
+    uintptr_t handle_trap(uintptr_t mcause, uintptr_t sp)
+    {
+         deadEnd(0xffff);
+    }
+
+    
     __attribute__( ( interrupt ) )  void unhandledException( void ) 
     {
         deadEnd(0x1000);

@@ -78,7 +78,7 @@ lnDMA::lnDMA(DmaTransferType type, int dmaEngine, int dmaChannel, int sourceWidt
         {
             source=memoryWidth(sourceWidth);
             target=peripheralWidth(targetWidth);
-            dma_memory_width_config(_dma,_channel, source);
+            dma_memory_width_config(_dma,_channel,source);
             dma_periph_width_config(_dma,_channel,target);
             break;
         }
@@ -115,23 +115,30 @@ void lnDMA::attachCallback(doneCallback *cb, void *cookie)
 
 bool lnDMA::doMemoryToPeripheralTransfer(int count, const uint16_t *source,  bool repeat)
 {
-    dma_memory_address_config(_dma,_channel,(uint32_t)(&source));
+    dma_memory_address_config(_dma,_channel,(uint32_t)(source));
     if(repeat)
         dma_memory_increase_disable(_dma,_channel);
     else
         dma_memory_increase_enable(_dma,_channel);
     dma_transfer_number_config(_dma,_channel, count);
+        
+    // enable IRQ
+    dma_interrupt_enable(_dma,_channel,DMA_INT_FTF |DMA_INT_ERR );
+    eclic_enable_interrupt(_dmaIrqs[_dmaInt][_channelInt]);    
+    // Start DMA
     dma_channel_enable(_dma,_channel);
-    
-    // wait for it to be over
-    while(0)
-    {
-       if(1==dma_flag_get(_dma,_channel,DMA_INT_FTF))
-       {
-           break;
-       }
-    }
-    xDelay(2);
-    
     return true;
 }
+
+/**
+ * 
+ * @param dma
+ * @param channel
+ */
+void dmaIrqHandler(int dma, int channel)
+{
+    xAssert(0);
+}
+
+
+// EOF
