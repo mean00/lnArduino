@@ -10,7 +10,8 @@
 
 
 // green = PA1, blue = PA2, RED PC13
-#define LED PA2
+#define LED     PA2
+#define LEDRED  PC13
 
 #define PINDC PB0
 #define PINCS PB2
@@ -97,6 +98,20 @@ void Demo::run()
 extern "C" void _exit(int x);
 /**
  */
+
+void blinkRed(void *a)
+{
+    bool red=false;
+    pinMode(LEDRED,OUTPUT);
+    digitalWrite(LEDRED,LOW);
+    while(1)
+    {
+        xDelay(1000);
+        red=!red;
+        digitalToggle(LEDRED);
+    }
+}
+
 int main()
 {
     // Initialize system
@@ -118,6 +133,7 @@ int main()
     LoggerInit();
     Logger("Starting demo:\n");
     // Start freertos
+     xTaskCreate(blinkRed,"blinkRed",200,NULL,2,NULL);
     Demo *demo=new Demo;     
     vTaskStartScheduler();      
     deadEnd(25);

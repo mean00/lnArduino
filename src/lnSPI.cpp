@@ -287,9 +287,11 @@ bool hwlnSPIClass::dmaWrite16(int nbWord, const uint16_t *data)
     updateDataSize(_adr,16);
     updateDmaTX(_adr,true);
     csOn();
-    
+    Logger(">>1\n");
     txDma.doMemoryToPeripheralTransfer(nbWord, data, (uint16_t *)&SPI_DATA(_adr),false);        
+    Logger("++1\n");
     _done.take();
+    Logger("<<1\n");
     waitForCompletion();
     
     csOff();
@@ -308,8 +310,12 @@ bool hwlnSPIClass::dmaWrite16Repeat(int nbWord, const uint16_t data)
     updateDmaTX(_adr,true);
     csOn();
     
+    Logger(">>2\n");
+    
     txDma.doMemoryToPeripheralTransfer(nbWord, &data, (uint16_t *)&SPI_DATA(_adr), true);        
+    Logger("++2\n");
     _done.take();
+    Logger("<<2\n");
     waitForCompletion();
     
     csOff();

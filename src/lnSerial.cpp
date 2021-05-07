@@ -5,6 +5,10 @@
 
 #include "lnArduino.h"
 #include "lnSerial.h"
+#include "lnSerial_priv.h"
+
+LN_USART_Registers *usart0=(LN_USART_Registers *)USART0;
+
  static lnSerial *SerialInstance[4]={NULL,NULL,NULL,NULL};
 /**
  * 
@@ -27,8 +31,17 @@ lnSerial::lnSerial(int instance, IRQn_Type irq,uint32_t adr)
  */
 bool lnSerial::setSpeed(int speed)
 {
-     usart_baudrate_set(_adr, speed);
-     return true;
+    int freq;
+    if(!_instance) freq=rcu_clock_freq_get(CK_APB2);
+        else freq=rcu_clock_freq_get(CK_APB1);
+    // compute closest divider
+    int divider=(freq+speed/2)/speed;
+    // Fixed 4 buts decimal, just ignore since we oversample by 16
+    LN_USART_Registers *d=(LN_USART_Registers *)_adr;
+    d->CTL0&=~LN_USART_CTL0_UEN; 
+    d->BAUD=divider; // change speed when usart is off
+    d->CTL0|=LN_USART_CTL0_UEN; 
+    return true;
 }
 /**
  * 
@@ -36,6 +49,7 @@ bool lnSerial::setSpeed(int speed)
  */
 bool lnSerial::init()
 {
+    LN_USART_Registers *d=(LN_USART_Registers *)_adr;
     switch(_instance)
     {
         case 0:
@@ -48,16 +62,10 @@ bool lnSerial::init()
             break;
 
     }
-    usart_deinit(_adr);
-    usart_baudrate_set(_adr, 115200);
-    usart_parity_config(_adr, USART_PM_NONE);
-    usart_word_length_set(_adr, USART_WL_8BIT);
-    usart_stop_bit_set(_adr, USART_STB_1BIT);
-    usart_hardware_flow_rts_config(_adr, USART_RTS_DISABLE);
-    usart_hardware_flow_cts_config(_adr, USART_CTS_DISABLE);
-    usart_receive_config(_adr, USART_RECEIVE_DISABLE);
-    usart_transmit_config(_adr, USART_TRANSMIT_DISABLE);
-    usart_enable(_adr); 
+    // Disable RX & TX
+    d->CTL0&=~LN_USART_CTL0_KEEP_MASK; // default is good enough
+    setSpeed(115200);
+    d->CTL0|=LN_USART_CTL0_UEN; // enable uart
     return true;
 }
 /**
@@ -66,17 +74,18 @@ bool lnSerial::init()
  */
 bool lnSerial::enableTx(bool onoff)
 {
-    
+    LN_USART_Registers *d=(LN_USART_Registers *)_adr;
     if(onoff)
     {
-        usart_transmit_config(_adr, USART_TRANSMIT_ENABLE);;
-        usart_interrupt_disable(_adr,USART_INT_TBE);
-        usart_interrupt_disable(_adr,USART_INT_TC);        
-        eclic_enable_interrupt(_irq);        
+        // disable TC & TE tx interrupt
+        d->CTL0&=~( LN_USART_CTL0_TBIE +LN_USART_CTL0_TCIE);
+        // enable Tx
+        d->CTL0|=LN_USART_CTL0_TEN; // enable TX        
+        eclic_enable_interrupt(_irq);      // enable eclic   
     }else
     {
-         eclic_disable_interrupt(_irq);        
-         usart_transmit_config(_adr, USART_TRANSMIT_DISABLE);;
+         eclic_disable_interrupt(_irq);    
+         d->CTL0&=~LN_USART_CTL0_TEN; // disable TX
     }
     return true;
 }
@@ -88,15 +97,22 @@ bool lnSerial::enableTx(bool onoff)
  */
 bool lnSerial::transmit(int size,uint8_t *buffer)
 {
+    return true;
+    LN_USART_Registers *d=(LN_USART_Registers *)_adr;
     _mutex.lock();
+    ENTER_CRITICAL();
     _tail=buffer+size;
     _cur=buffer+1;
+    // Clear TC
+    d->STAT&=~(LN_USART_STAT_TC);
     // send 1st byte
-    usart_data_transmit(_adr, buffer[0]);
-    // enable interrupt    
-     //usart_interrupt_enable(_adr,USART_INT_TC);
-     usart_interrupt_enable(_adr,USART_INT_TBE);     
-     //_txDone.take();
+    d->DATA=(uint32_t )buffer[0];
+    // enable TB interrupt    
+    d->CTL0|= LN_USART_CTL0_TBIE;
+    
+    
+    EXIT_CRITICAL();
+    _txDone.take();    
     _mutex.unlock();
     return true;
 }
@@ -105,18 +121,21 @@ bool lnSerial::transmit(int size,uint8_t *buffer)
  */
 void lnSerial::_interrupt(void)
 {
+    LN_USART_Registers *d=(LN_USART_Registers *)_adr;
     if(_cur && _cur<_tail)  // sending ?
     {
-        if(usart_interrupt_flag_get(_adr,USART_INT_FLAG_TBE))
+        
+        if(d->STAT & LN_USART_STAT_TBE) // emitter empty
         {
-            
-            // next one        
-            usart_data_transmit(_adr, *_cur);
+            // next one  
+            d->DATA=(uint32_t )*_cur;
             _cur++;
+            // last one ?
             if(_cur==_tail)
             {
                 _cur=_tail=NULL;
-                usart_interrupt_disable(_adr,USART_INT_TBE);     
+                d->CTL0|=LN_USART_CTL0_TCIE;
+                d->CTL0&=~(LN_USART_CTL0_TBIE ) ; // only let the Transmission complete bit
                 _txDone.give();
             }
         }else
@@ -124,31 +143,11 @@ void lnSerial::_interrupt(void)
             xAssert(0);
         }
     }
-    // Clear interrupts
-    usart_interrupt_flag_clear(_adr,USART_INT_FLAG_TBE);
-    //usart_interrupt_flag_clear(_adr,USART_INT_TC);
+    // last byte sent
+    d->CTL0&=~( LN_USART_CTL0_TBIE +LN_USART_CTL0_TCIE);
+    // Clear TC bit in STAT
+    d->STAT&=~(LN_USART_STAT_TC);
 }
-
-/**
- * 
- */
-extern "C" void IRQ_USART0()
-{
-    lnSerial::interrupts(0);
-}
-extern "C" void IRQ_USART1()
-{
-    lnSerial::interrupts(1);
-}
-extern "C" void IRQ_USART2()
-{
-    lnSerial::interrupts(2);
-}
-extern "C" void IRQ_USART3()
-{
-    lnSerial::interrupts(3);
-}
-
 
 
 void lnSerial::interrupts(int instance)
@@ -157,4 +156,11 @@ void lnSerial::interrupts(int instance)
     xAssert(inst);
     inst->_interrupt();
 }
+
+#define IRQHANDLER(x) extern "C" void IRQ_USART##x () {    lnSerial::interrupts(x);}
+
+IRQHANDLER(0)
+IRQHANDLER(1)
+IRQHANDLER(2)
+IRQHANDLER(3)
 // EOF

@@ -15,6 +15,8 @@ extern "C"
 }
 #include "systemHelper.h"
 
+
+
 extern "C" 
 {
     void deadEnd(int code);
@@ -24,6 +26,7 @@ extern "C"
     uintptr_t handle_trap(uintptr_t mcause, uintptr_t sp)
     {
          deadEnd(0xffff);
+         return 0;
     }
 
     

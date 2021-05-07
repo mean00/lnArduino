@@ -14,6 +14,7 @@
 
 /* use SystemView include */
 // MEANX #include "SYSVIEW_Serial_Conf.h"
+//#define USER_MODE_TASKS 1
 
 /* Each task maintains its own interrupt status in the critical nesting variable. */
 UBaseType_t uxCriticalNesting = 0xaaaaaaaa;

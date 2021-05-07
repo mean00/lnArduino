@@ -3,7 +3,6 @@
  *  See license file
  */
 #pragma once
-#include "gd32vf103_dma.h"
 /**
  */
 class lnDMA
@@ -32,5 +31,6 @@ protected:
     
     doneCallback    *_cb;
     void            *_cookie;
+    uint32_t        _control;
     
 };
