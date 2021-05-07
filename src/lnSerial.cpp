@@ -23,6 +23,7 @@ lnSerial::lnSerial(int instance, IRQn_Type irq,uint32_t adr)
     _adr=adr;
     xAssert(SerialInstance[instance]==NULL) ;
     SerialInstance[instance]=this;
+    _txState=txIdle;
 }
 /**
  * 
@@ -101,6 +102,7 @@ bool lnSerial::transmit(int size,uint8_t *buffer)
     LN_USART_Registers *d=(LN_USART_Registers *)_adr;
     _mutex.lock();
     ENTER_CRITICAL();
+    _txState=txTransmitting;
     _tail=buffer+size;
     _cur=buffer+1;
     // Clear TC
@@ -122,32 +124,35 @@ bool lnSerial::transmit(int size,uint8_t *buffer)
 void lnSerial::_interrupt(void)
 {
     LN_USART_Registers *d=(LN_USART_Registers *)_adr;
-    if(_cur && _cur<_tail)  // sending ?
+    switch(_txState)
     {
-        
-        if(d->STAT & LN_USART_STAT_TBE) // emitter empty
-        {
-            // next one  
-            d->DATA=(uint32_t )*_cur;
+        case txTransmitting:
+             xAssert(d->STAT & LN_USART_STAT_TBE) ;
+             d->DATA=(uint32_t )*_cur;
             _cur++;
-            // last one ?
             if(_cur==_tail)
             {
-                _cur=_tail=NULL;
+                
                 d->CTL0|=LN_USART_CTL0_TCIE;
                 d->CTL0&=~(LN_USART_CTL0_TBIE ) ; // only let the Transmission complete bit
-                _txDone.give();
+                _txState=txLast;              
             }
             return;
-        }else
-        {
+            break;
+        case txLast:
+             xAssert(d->STAT & LN_USART_STAT_TC) ;
+             d->CTL0&=~( LN_USART_CTL0_TBIE +LN_USART_CTL0_TCIE);
+            d->STAT&=~(LN_USART_STAT_TC);
+            _txState=txIdle;
+            _txDone.give();
+            return;
+            break;
+        default:
             xAssert(0);
-        }
+            break;
     }
-    // last byte sent
-    d->CTL0&=~( LN_USART_CTL0_TBIE +LN_USART_CTL0_TCIE);
-    // Clear TC bit in STAT
-    d->STAT&=~(LN_USART_STAT_TC);
+            
+   
 }
 
 

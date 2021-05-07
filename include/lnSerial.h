@@ -10,6 +10,13 @@
 class lnSerial
 {
 public:
+    enum txState
+    {
+        txIdle,
+        txTransmitting,
+        txLast
+    };
+    
     lnSerial(int instance, IRQn_Type irq,uint32_t adr);    
     bool init();
     bool setSpeed(int speed);
@@ -26,5 +33,6 @@ protected:
     xMutex _mutex;
     xBinarySemaphore _txDone;
     uint8_t *_cur,*_tail;
+    txState _txState;
     
 };
