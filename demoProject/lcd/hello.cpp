@@ -27,7 +27,7 @@ extern "C"
 class Demo : public xTask
 {
 public:
-        Demo(): xTask("Demo",5,250)
+        Demo(): xTask("Demo",5,500)
             {
                 roundup=0;
             }
@@ -82,7 +82,7 @@ void demoMe()
         r++;
         r&=15;
         lcd->setRotation(r>>2);
-        Logger("*\n");
+        
     }
     
 }
@@ -101,9 +101,11 @@ extern "C" void _exit(int x);
 
 void blinkRed(void *a)
 {
+    Logger("Starting blinkRed\n");
     bool red=false;
     pinMode(LEDRED,OUTPUT);
     digitalWrite(LEDRED,LOW);
+    Logger("blinkRed:Go!\n");
     while(1)
     {
         xDelay(1000);
@@ -130,10 +132,9 @@ int main()
     // DMA TX for LCD
     DMA_CHCTL(DMA0, DMA_CH2) = (uint32_t)(DMA_PRIORITY_HIGH | DMA_CHXCTL_DIR); 
     //
-    LoggerInit();
-    Logger("Starting demo:\n");
+    LoggerInit();    
     // Start freertos
-     xTaskCreate(blinkRed,"blinkRed",200,NULL,2,NULL);
+     xTaskCreate(blinkRed,"blinkRed",500,NULL,2,NULL);
     Demo *demo=new Demo;     
     vTaskStartScheduler();      
     deadEnd(25);
