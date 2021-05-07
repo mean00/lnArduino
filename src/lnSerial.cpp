@@ -97,7 +97,7 @@ bool lnSerial::enableTx(bool onoff)
  */
 bool lnSerial::transmit(int size,uint8_t *buffer)
 {
-    return true;
+    //return true;
     LN_USART_Registers *d=(LN_USART_Registers *)_adr;
     _mutex.lock();
     ENTER_CRITICAL();
@@ -138,6 +138,7 @@ void lnSerial::_interrupt(void)
                 d->CTL0&=~(LN_USART_CTL0_TBIE ) ; // only let the Transmission complete bit
                 _txDone.give();
             }
+            return;
         }else
         {
             xAssert(0);
