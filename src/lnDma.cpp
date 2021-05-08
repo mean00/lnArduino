@@ -15,21 +15,6 @@ static const uint32_t _dmas[2]={DMA0,DMA1};
 static const dma_channel_enum _channels[7]={DMA_CH0,DMA_CH1,DMA_CH2,DMA_CH3,DMA_CH4,DMA_CH5,DMA_CH6};
 /**
  */
-struct DMA_channels
-    {
-        uint32_t CTL;  // 8 0
-        uint32_t CNT;  // c 4
-        uint32_t PADDR; // 10 8
-        uint32_t MADDR; // 14 C
-        uint32_t empty;
-    };
-struct DMA_struct
-{
-    uint32_t INTF;
-    uint32_t INTC;
-   
-    DMA_channels channels[6];
-};
 
 DMA_struct *dma0=(DMA_struct *)DMA0;
 

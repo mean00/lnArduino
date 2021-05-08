@@ -5,6 +5,24 @@
 
 #pragma once
 
+struct DMA_channels
+    {
+        uint32_t CTL;  // 8 0
+        uint32_t CNT;  // c 4
+        uint32_t PADDR; // 10 8
+        uint32_t MADDR; // 14 C
+        uint32_t empty;
+    };
+struct DMA_struct
+{
+    uint32_t INTF;
+    uint32_t INTC;
+   
+    DMA_channels channels[6];
+};
+
+
+
 #define DMA_CHAN_ENABLE         (1<<0)
 #define DMA_CHAN_TFTFIE         (1<<1)      // transfer interrupt enable
 #define DMA_CHAN_HTFIE          (1<<2)      // half interrupt enable

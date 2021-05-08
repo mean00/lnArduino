@@ -9,11 +9,7 @@ extern "C"
 {
 #include "gd32vf103_spi.h"
 }
-
-extern "C"
-{
-    #include "gd32vf103_spi.h"
-}
+#include "lnSPI_priv.h"
 
 struct SpiDescriptor
 {
@@ -222,7 +218,7 @@ bool hwlnSPIClass::write(int z)
  */
 bool hwlnSPIClass::write16(int z)
 {
-    updateMode(_adr,false);
+    updateMode(_adr,false); // Tx only
     updateDataSize(_adr,16);
     csOn();    
     while (!spi_i2s_flag_get(_adr, SPI_FLAG_TBE)) 
@@ -275,12 +271,13 @@ bool hwlnSPIClass::dmaWrite(int nbBytes, const uint8_t *data)
  */
 bool hwlnSPIClass::dmaWrite16(int nbWord, const uint16_t *data)
 {
-    updateMode(_adr,false);
-    updateDataSize(_adr,16);
-    updateDmaTX(_adr,true);
+    updateMode(_adr,false); // tx only
+    updateDataSize(_adr,16);// 16 bits at a time
+    
     csOn();
     Logger(">>1\n");
     txDma.doMemoryToPeripheralTransfer(nbWord, data, (uint16_t *)&SPI_DATA(_adr),false);        
+    updateDmaTX(_adr,true); // activate DMA
     Logger("++1\n");
     _done.take();
     Logger("<<1\n");
