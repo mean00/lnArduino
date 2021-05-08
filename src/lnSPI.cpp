@@ -15,18 +15,23 @@ extern "C"
     #include "gd32vf103_spi.h"
 }
 
-struct SpiPin
+struct SpiDescriptor
 {
-    uint32_t bank, mosi,miso, clk;
+    uint32_t    spiAddress;
+    IRQn_Type   spiIrq;
+    int         dmaEngine;
+    int         dmaTxChannel;
+    rcu_periph_enum rcu;
+    uint32_t    bank, mosi,miso, clk;
 };
 
 // We assume all the pins of a given SPI are on the same gpio bank
-static const SpiPin spiPins[3]=
+static const SpiDescriptor spiDescriptor[3]=
 {
-    //     MOSI MISO CLK
-    {GPIOA,PA7, PA6, PA5},
-    {GPIOB,PB15,PB14,PB13},
-    {GPIOB,PB5, PB4, PB3}
+    //             DMA DMATX CLOCK   GPIO MOSI MISO CLK
+    {SPI0, SPI0_IRQn,0, 2, RCU_SPI0, GPIOA,PA7, PA6, PA5},
+    {SPI1, SPI1_IRQn,0, 4, RCU_SPI1, GPIOB,PB15,PB14,PB13},
+    {SPI2, SPI2_IRQn,1, 1, RCU_SPI2, GPIOB,PB5, PB4, PB3}
 };
 
 /**
@@ -91,40 +96,27 @@ void updateDmaTX(uint32_t adr,bool onoff)
  * @param instance
  * @param pinCs
  */
+#define M(x) spiDescriptor[instance].x
+
 hwlnSPIClass::hwlnSPIClass(int instance, int pinCs) : _internalSettings(1000000,SPI_MSBFIRST,SPI_MODE0,-1),_currentSetting(1000000,SPI_MSBFIRST,SPI_MODE0,-1),
-        txDma(lnDMA::DMA_MEMORY_TO_PERIPH,0,2,16,16)
+        txDma(lnDMA::DMA_MEMORY_TO_PERIPH,M(dmaEngine),M(dmaTxChannel),16,16)
 {
     _useDMA=false;
     _cookie=NULL;
     _callback=NULL;
     _instance=instance;
     _settings=NULL;
-    switch(instance)
-    {
-        case 0:
-                _adr=SPI0;
-                _irq=SPI0_IRQn;
-                rcu_periph_clock_enable(RCU_SPI0);
-                break;
-        case 1:
-                _adr=SPI1;
-                _irq=SPI1_IRQn;
-                rcu_periph_clock_enable(RCU_SPI1);
-                break;
-        case 2:
-                _adr=SPI2;
-                _irq=SPI2_IRQn;
-                rcu_periph_clock_enable(RCU_SPI2);
-                break;
-        default:
-            xAssert(0);
-            break;
-    }
+    
+    xAssert(instance<3);
+    const SpiDescriptor *d=spiDescriptor+instance;
+    
+    _irq=d->spiIrq;
+    _adr=d->spiAddress;
+    rcu_periph_clock_enable(d->rcu);
     // setup miso/mosi & clk
-    const SpiPin *p=spiPins+instance;
-    gpio_init(p->bank, GPIO_MODE_AF_PP,         GPIO_OSPEED_50MHZ, digitalPinToBitMask(p->mosi));
-    gpio_init(p->bank, GPIO_MODE_IN_FLOATING,   GPIO_OSPEED_50MHZ, digitalPinToBitMask(p->miso));
-    gpio_init(p->bank, GPIO_MODE_AF_PP,         GPIO_OSPEED_50MHZ, digitalPinToBitMask(p->clk));
+    gpio_init(d->bank, GPIO_MODE_AF_PP,         GPIO_OSPEED_50MHZ, digitalPinToBitMask(d->mosi));
+    gpio_init(d->bank, GPIO_MODE_IN_FLOATING,   GPIO_OSPEED_50MHZ, digitalPinToBitMask(d->miso));
+    gpio_init(d->bank, GPIO_MODE_AF_PP,         GPIO_OSPEED_50MHZ, digitalPinToBitMask(d->clk));
     
     if(pinCs!=-1)
     {
