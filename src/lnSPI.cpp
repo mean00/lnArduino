@@ -5,10 +5,6 @@
 
 #include "lnArduino.h"
 #include "lnSPI.h"
-extern "C"
-{
-#include "gd32vf103_spi.h"
-}
 #include "lnSPI_priv.h"
 
 struct SpiDescriptor
@@ -29,25 +25,28 @@ static const SpiDescriptor spiDescriptor[3]=
     {SPI1, SPI1_IRQn,0, 4, RCU_SPI1, GPIOB,PB15,PB14,PB13},
     {SPI2, SPI2_IRQn,1, 1, RCU_SPI2, GPIOB,PB5, PB4, PB3}
 };
-
+LN_SPI_Registers *aspi0=(LN_SPI_Registers *)SPI0;
 /**
  * switch between RX/TX and TX only : false is txRx, 
  * @param adr
  * @param rxTx
  */
-static void updateMode(uint32_t adr,bool rxTx)
-{
 
-    uint32_t reg=SPI_CTL0(adr);
-    reg&=~(SPI_CTL0_BDOEN | SPI_CTL0_BDEN | SPI_CTL0_RO);
+
+
+static void updateMode(LN_SPI_Registers *d,bool rxTx)
+{
+    
+    uint32_t reg=d->CTL0;
+    reg&=~(LN_SPI_CTL0_BDOEN | LN_SPI_CTL0_BDEN | LN_SPI_CTL0_RO);
     if(rxTx)
     {
         reg|=0; // 0 all bits = full duplex
     }else
     {   // Tx Only: unidirectional, transmit only, 
-        reg|=SPI_CTL0_BDEN | SPI_CTL0_BDOEN;
+        reg|=LN_SPI_CTL0_BDOEN | LN_SPI_CTL0_BDEN;
     }
-    SPI_CTL0(adr)=reg;
+    d->CTL0=reg;
 
 }
 /**
@@ -55,36 +54,29 @@ static void updateMode(uint32_t adr,bool rxTx)
  * @param adr
  * @param bits
  */
-void updateDataSize(uint32_t adr,int bits)
+void updateDataSize(LN_SPI_Registers *d,int bits)
 {
-    uint32_t reg=SPI_CTL0(adr);
-    reg&=~SPI_CTL0_SPIEN;
-    SPI_CTL0(adr)=reg;
     
+    uint32_t reg=d->CTL0;    
     switch(bits)
     {
         case 8:
-             reg&=~SPI_CTL0_FF16;
+             reg&=~LN_SPI_CTL0_FF16;
              break;
         case 16:
-            reg|=SPI_FRAMESIZE_16BIT;
+            reg|=LN_SPI_CTL0_FF16;
             break;
         default:xAssert(0);
     }
-    reg|=SPI_CTL0_SPIEN;
-    SPI_CTL0(adr)=reg;
+    d->CTL0=reg;
+    
 }
-void updateDmaTX(uint32_t adr,bool onoff)
+void updateDmaTX(LN_SPI_Registers *d,bool onoff)
 {
-    uint32_t reg=SPI_CTL0(adr);
-    reg&=~SPI_CTL0_SPIEN;
-    SPI_CTL0(adr)=reg;
     if(onoff)
-         SPI_CTL1(adr) |= (uint32_t)(SPI_CTL1_DMATEN);
+         d->CTL1 |= (uint32_t)(LN_SPI_CTL1_DMATEN);
     else
-         SPI_CTL1(adr) &= ~((uint32_t)(SPI_CTL1_DMATEN));
-    reg|=SPI_CTL0_SPIEN;
-    SPI_CTL0(adr)=reg;
+         d->CTL1 &= ~((uint32_t)(LN_SPI_CTL1_DMATEN));    
 }
 
 /**
@@ -104,45 +96,46 @@ hwlnSPIClass::hwlnSPIClass(int instance, int pinCs) : _internalSettings(1000000,
     _settings=NULL;
     
     xAssert(instance<3);
-    const SpiDescriptor *d=spiDescriptor+instance;
+    const SpiDescriptor *s=spiDescriptor+instance;
     
-    _irq=d->spiIrq;
-    _adr=d->spiAddress;
-    rcu_periph_clock_enable(d->rcu);
+    _irq=s->spiIrq;
+    _adr=s->spiAddress;
+    rcu_periph_clock_enable(s->rcu);
     // setup miso/mosi & clk
-    gpio_init(d->bank, GPIO_MODE_AF_PP,         GPIO_OSPEED_50MHZ, digitalPinToBitMask(d->mosi));
-    gpio_init(d->bank, GPIO_MODE_IN_FLOATING,   GPIO_OSPEED_50MHZ, digitalPinToBitMask(d->miso));
-    gpio_init(d->bank, GPIO_MODE_AF_PP,         GPIO_OSPEED_50MHZ, digitalPinToBitMask(d->clk));
+    gpio_init(s->bank, GPIO_MODE_AF_PP,         GPIO_OSPEED_50MHZ, digitalPinToBitMask(s->mosi));
+    gpio_init(s->bank, GPIO_MODE_IN_FLOATING,   GPIO_OSPEED_50MHZ, digitalPinToBitMask(s->miso));
+    gpio_init(s->bank, GPIO_MODE_AF_PP,         GPIO_OSPEED_50MHZ, digitalPinToBitMask(s->clk));
     
     if(pinCs!=-1)
     {
         pinMode(pinCs,OUTPUT);
         digitalWrite(pinCs,HIGH);
     }
-    spi_i2s_deinit(_adr);    
+    LN_SPI_Registers *d=(LN_SPI_Registers *)_adr;
+    _settings=&_internalSettings;
+    disable();   
 }
 /**
  * 
  */
 hwlnSPIClass::~hwlnSPIClass()
 {
-     spi_i2s_deinit(_adr);    
+    end();
 }
 /**
  * 
  */
 void hwlnSPIClass::begin()
-{    
-    _settings=&_internalSettings;
-    spi_enable(_adr);
-    setup();
+{   _settings=&_internalSettings; 
+    setup();    
 }
 /**
  * 
  */
 void hwlnSPIClass::end(void)
 {
-    spi_disable(_adr);
+    LN_SPI_Registers *d=(LN_SPI_Registers *)_adr;
+    disable();
 }    
 
 
@@ -150,8 +143,7 @@ void hwlnSPIClass::beginTransaction(lnSPISettings &settings)
 {
     _mutex.lock();
     _currentSetting=settings;
-    _settings=&settings;
-    
+    _settings=&_currentSetting;    
     // setup
     setup();
 }
@@ -192,6 +184,46 @@ bool hwlnSPIClass::asyncTransfer(int nbBytes, uint8_t *dataOut, uint8_t *dataIn,
     _callbackCookie=cookie;
     return transfer(nbBytes,dataOut,dataIn);
 }
+
+bool hwlnSPIClass::writeInternal(int sz, int data)
+{
+    LN_SPI_Registers *d=(LN_SPI_Registers *)_adr;
+    updateDataSize(d,sz);
+    updateMode(d,false);
+    enable();
+    csOn();
+    while (txBusy()) 
+    {
+    }
+    d->DATA=data;
+    
+    waitForCompletion();
+    csOff();
+    disable();
+    return true;
+}
+
+/**
+ */
+bool hwlnSPIClass::writesInternal(int sz, int nbBytes, const uint8_t *data)
+{
+    LN_SPI_Registers *d=(LN_SPI_Registers *)_adr;
+    updateMode(d,false);
+    updateDataSize(d,sz);
+    enable();
+    csOn();
+    for (size_t i = 0; i < nbBytes; i++) 
+    {
+        while (txBusy()) 
+        {
+        }
+        d->DATA=data[i];
+    }
+    waitForCompletion();
+    csOff();
+    disable();
+    return true;
+}
 /**
  * 
  * @param z
@@ -199,17 +231,7 @@ bool hwlnSPIClass::asyncTransfer(int nbBytes, uint8_t *dataOut, uint8_t *dataIn,
  */
 bool hwlnSPIClass::write(int z)
 {
-    csOn();
-    updateDataSize(_adr,8);
-    updateMode(_adr,false);
-    
-    while (!spi_i2s_flag_get(_adr, SPI_FLAG_TBE)) 
-    {
-    }
-    spi_i2s_data_transmit(_adr, z);
-    waitForCompletion();
-    csOff();
-    return true;
+    return writeInternal(8,z);
 }
 /**
  * 
@@ -218,52 +240,33 @@ bool hwlnSPIClass::write(int z)
  */
 bool hwlnSPIClass::write16(int z)
 {
-    updateMode(_adr,false); // Tx only
-    updateDataSize(_adr,16);
-    csOn();    
-    while (!spi_i2s_flag_get(_adr, SPI_FLAG_TBE)) 
-    {
-    }
-    spi_i2s_data_transmit(_adr, z);
-    waitForCompletion();
-    csOff();
-    return true;
+    return writeInternal(16,z);
 }
 
 /**
  */
 bool hwlnSPIClass::write(int nbBytes, const uint8_t *data)
 {
-    updateMode(_adr,false);
-    updateDataSize(_adr,8);
-    csOn();
-    for (size_t i = 0; i < nbBytes; i++) 
-    {
-        while (!spi_i2s_flag_get(_adr, SPI_FLAG_TBE)) 
-        {
-        }
-        spi_i2s_data_transmit(_adr, data[i]);
-    }
-    waitForCompletion();
-    csOff();
-    return true;
+   return writesInternal(8,nbBytes,data);
 }
 /**
  */
 bool hwlnSPIClass::dmaWrite(int nbBytes, const uint8_t *data)
 {
-    updateMode(_adr,false);
-    updateDataSize(_adr,8);
+    LN_SPI_Registers *d=(LN_SPI_Registers *)_adr;
+    updateDataSize(d,8);
+    enable();
     csOn();
     for (size_t i = 0; i < nbBytes; i++) 
     {
-        while (!spi_i2s_flag_get(_adr, SPI_FLAG_TBE)) 
+        while (!d->STAT & LN_SPI_STAT_TBE) 
         {
         }
-        spi_i2s_data_transmit(_adr, data[i]);
+        d->DATA=data[i];
     }
     waitForCompletion();
     csOff();
+    disable();
     return true;
 }
 
@@ -271,20 +274,22 @@ bool hwlnSPIClass::dmaWrite(int nbBytes, const uint8_t *data)
  */
 bool hwlnSPIClass::dmaWrite16(int nbWord, const uint16_t *data)
 {
-    updateMode(_adr,false); // tx only
-    updateDataSize(_adr,16);// 16 bits at a time
-    
+    LN_SPI_Registers *d=(LN_SPI_Registers *)_adr;
+    updateMode(d,false); // tx only
+    updateDataSize(d,16);// 16 bits at a time
+    enable();
     csOn();
     Logger(">>1\n");
     txDma.doMemoryToPeripheralTransfer(nbWord, data, (uint16_t *)&SPI_DATA(_adr),false);        
-    updateDmaTX(_adr,true); // activate DMA
+    updateDmaTX(d,true); // activate DMA
     Logger("++1\n");
     _done.take();
     Logger("<<1\n");
     waitForCompletion();
     
     csOff();
-    updateDmaTX(_adr,false);
+    updateDmaTX(d,false);
+    disable();
     return true;
 }
 
@@ -294,9 +299,11 @@ bool hwlnSPIClass::dmaWrite16(int nbWord, const uint16_t *data)
  */
 bool hwlnSPIClass::dmaWrite16Repeat(int nbWord, const uint16_t data)
 {
-    updateMode(_adr,false);
-    updateDataSize(_adr,16);
-    updateDmaTX(_adr,true);
+    LN_SPI_Registers *d=(LN_SPI_Registers *)_adr;
+    updateMode(d,false);
+    updateDataSize(d,16);
+    updateDmaTX(d,true);
+    enable();
     csOn();
     
     Logger(">>2\n");
@@ -308,7 +315,8 @@ bool hwlnSPIClass::dmaWrite16Repeat(int nbWord, const uint16_t data)
     waitForCompletion();
     
     csOff();
-    updateDmaTX(_adr,false);
+    updateDmaTX(d,false);
+    disable();
     return true;
 }
 /**
@@ -336,30 +344,52 @@ void hwlnSPIClass::csOff()
  */
 void hwlnSPIClass::waitForCompletion()
 {
-        while (spi_i2s_flag_get(_adr, SPI_FLAG_TRANS)) 
-        {
-        }
+    LN_SPI_Registers *d=(LN_SPI_Registers *)_adr;
+    int dir=d->CTL0>>14;
+    switch(dir)
+    {
+        case 0:
+        case 1: // bidir mode
+            while(busy())
+                    {
+
+                    }
+            break;
+        case 2: // receive only
+            xAssert(0);
+            break;
+        case 3: //  t only
+            while(txBusy())
+            {
+                
+            }
+            break;
+    }
 }
 /**
  */
 bool hwlnSPIClass::transfer(int nbBytes, uint8_t *dataOut, uint8_t *dataIn)
 {
-    updateMode(_adr,true);
-    updateDataSize(_adr,8);
+    LN_SPI_Registers *d=(LN_SPI_Registers *)_adr;
+    updateMode(d,true);
+    updateDataSize(d,8);
+    enable();
     csOn();
     for (size_t i = 0; i < nbBytes; i++) 
     {
-        while (!spi_i2s_flag_get(_adr, SPI_FLAG_TBE)) 
+        while (!d->STAT & LN_SPI_STAT_TBE) 
         {
         }
-        spi_i2s_data_transmit(_adr, dataOut[i]);
-        while (!spi_i2s_flag_get(_adr, SPI_FLAG_RBNE)) 
+        d->DATA=dataOut[i];
+        
+        while (!(d->STAT & LN_SPI_STAT_RBNE) )
         {        
         }
-        dataIn[i] = spi_i2s_data_receive(_adr);
+        dataIn[i] = d->DATA;
     }
     waitForCompletion();
     csOff();
+    disable();
     return true;
 }
 /**
@@ -384,41 +414,41 @@ void hwlnSPIClass::txDone()
  */
 void hwlnSPIClass::setup()
 {
+    LN_SPI_Registers *d=(LN_SPI_Registers *)_adr;
     xAssert(_settings);
+    disable();
+    d->CTL0&=LN_SPI_CTL0_MASK;
+    d->CTL1&=LN_SPI_CTL1_MASK;
+    d->STAT&=LN_SPI_STAT_MASK;
     
-    
-    spi_parameter_struct param;
-    spi_struct_para_init(&param);
-    
-    param.device_mode=SPI_MASTER;
-    param.frame_size=SPI_FRAMESIZE_8BIT;
-    param.nss=SPI_NSS_SOFT;
-    
+    d->CTL0|=LN_SPI_CTL0_MSTMODE;
     
     switch(_settings->bOrder)
     {
-        case   SPI_LSBFIRST: param.endian=SPI_ENDIAN_LSB;break;
-        case   SPI_MSBFIRST:param.endian=SPI_ENDIAN_MSB;break;
+        case   SPI_LSBFIRST: d->CTL0|=LN_SPI_CTL0_LSB;break;
+        case   SPI_MSBFIRST: break;
         default:xAssert(0);
                 break;            
     }
+    uint32_t s=0;
     switch(_settings->dMode)
     {
         case SPI_MODE0:
-            param.clock_polarity_phase=SPI_CK_PL_LOW_PH_1EDGE;
+            s=0; // Low 1 edge
             break;
         case SPI_MODE1:
-            param.clock_polarity_phase=SPI_CK_PL_LOW_PH_2EDGE;
+            s=LN_SPI_CTL0_CKPH; // Low 2 edge
             break;
         case SPI_MODE2:
-            param.clock_polarity_phase=SPI_CK_PL_HIGH_PH_1EDGE;
+            s=LN_SPI_CTL0_CKPL; // high , 1 edge
             break;
         case SPI_MODE3:
-            param.clock_polarity_phase=SPI_CK_PL_HIGH_PH_2EDGE;
+            s=LN_SPI_CTL0_CKPL|LN_SPI_CTL0_CKPH; // high , 2 edge
             break;
         default:xAssert(0);
                 break;
     }     
+    d->CTL0|=s;
     uint32_t prescale = 0,speed=_settings->speed,apb ;
     xAssert(speed);
     if (!_instance ) 
@@ -445,12 +475,9 @@ void hwlnSPIClass::setup()
             psc++;
         }
     }
-    
-    param.prescale = psc;;
-    param.trans_mode = SPI_TRANSMODE_FULLDUPLEX;
-    spi_init(_adr, &param);
-    txDma.attachCallback(exTxDone,this);
-    spi_enable(_adr);  
+    d->I2SPSC=psc;
+    updateMode(0,false); // Tx only by default
+    txDma.attachCallback(exTxDone,this);    
 }
 /**
  * 
@@ -458,7 +485,8 @@ void hwlnSPIClass::setup()
  */
 void hwlnSPIClass::setDataSize(int dataSize)
 {
-    updateDataSize(_adr,dataSize);
+    LN_SPI_Registers *d=(LN_SPI_Registers *)_adr;
+    updateDataSize(d,dataSize);
 }
 /**
  */

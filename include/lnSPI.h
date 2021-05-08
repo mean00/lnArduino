@@ -126,6 +126,10 @@ class hwlnSPIClass
     lnDMA               txDma;
     // callbacks
     static void exTxDone(void *c);
+    bool writeInternal(int sz, int data);
+    bool writesInternal(int sz, int nbBytes, const uint8_t *data);
+    
+    
 public:
     void                txDone();
 };
