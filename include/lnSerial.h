@@ -23,7 +23,7 @@ public:
         txInterrupt,
         txDma
     };
-    lnSerial(int instance, IRQn_Type irq,uint32_t adr);    
+    lnSerial(int instance);    
     bool init();
     bool setSpeed(int speed);
     bool enableTx(txMode mode);

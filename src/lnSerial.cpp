@@ -8,19 +8,42 @@
 #include "lnSerial_priv.h"
 
 LN_USART_Registers *usart0=(LN_USART_Registers *)USART0;
+ static lnSerial *SerialInstance[5]={NULL,NULL,NULL,NULL,NULL};
+                                     //0   1    2    3  
 
- static lnSerial *SerialInstance[4]={NULL,NULL,NULL,NULL};
+/**
+ */
+struct UsartMapping
+{
+    uint32_t usartEngine;
+    uint32_t dmaEngine;
+    int      dmaTxChannel;
+    IRQn_Type irq;
+};
+static const UsartMapping usartMapping[5]=
+{
+    {USART0,0,3,USART0_IRQn},
+    {USART1,0,6,USART1_IRQn},
+    {USART2,0,1,USART2_IRQn},
+    {UART3, 1,4,UART3_IRQn},
+    {UART4, 0,7,UART4_IRQn},
+};
 /**
  * 
  * @param instance
  * @param irq
  */
-lnSerial::lnSerial(int instance, IRQn_Type irq,uint32_t adr) :    _txDma(lnDMA::DMA_MEMORY_TO_PERIPH,0,4,8,8)
+#define M(x) usartMapping[instance].x
+
+lnSerial::lnSerial(int instance) :  _txDma(lnDMA::DMA_MEMORY_TO_PERIPH, M(dmaEngine),M(dmaTxChannel),8,32)
 {
+    
+    
+    const UsartMapping *m=usartMapping+instance;
     _instance=instance;
-    _irq=irq;
+    _irq=m->irq;
     _stateTx=false;
-    _adr=adr;
+    _adr=m->usartEngine;
     xAssert(SerialInstance[instance]==NULL) ;
     SerialInstance[instance]=this;
     _txState=txIdle;
@@ -139,7 +162,13 @@ bool lnSerial::transmit(int size,uint8_t *buffer)
  */
 void lnSerial::txDmaCb()
 {
-    
+    LN_USART_Registers *d=(LN_USART_Registers *)_adr;
+    // disable TC & TBE
+    d->CTL0&=~( LN_USART_CTL0_TBIE +LN_USART_CTL0_TCIE);
+    // clear TC
+    d->STAT&=~(LN_USART_STAT_TC);
+    _txState=txIdle;
+    _txDone.give();
 }
 /**
  * 
@@ -197,7 +226,7 @@ void lnSerial::_interrupt(void)
         case txLast:
              xAssert(d->STAT & LN_USART_STAT_TC) ;
              d->CTL0&=~( LN_USART_CTL0_TBIE +LN_USART_CTL0_TCIE);
-            d->STAT&=~(LN_USART_STAT_TC);
+             d->STAT&=~(LN_USART_STAT_TC);
             _txState=txIdle;
             _txDone.give();
             return;

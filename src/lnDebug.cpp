@@ -6,7 +6,7 @@
 #include "lnArduino.h"
 #include "stdarg.h"
 #include "lnSerial.h"
-//#define LOGGER_USE_DMA 1
+#define LOGGER_USE_DMA 1
 lnSerial *serial0=NULL;
 
 static char buffer[1024];
@@ -34,7 +34,7 @@ void Logger(const char *fmt...)
  */
 void LoggerInit()
 {
-    serial0=new lnSerial(0,USART0_IRQn,USART0);
+    serial0=new lnSerial(0);
     serial0->init();  
     serial0->setSpeed(115200);    
 }
