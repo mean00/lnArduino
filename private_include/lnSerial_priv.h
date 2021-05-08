@@ -57,3 +57,7 @@ struct LN_USART_Registers
 #define LN_USART_CTL0_WM         (1<<11)
 #define LN_USART_CTL0_WL         (1<<12)
 #define LN_USART_CTL0_UEN        (1<<13)
+
+// CTL2
+#define LN_USART_CTL2_DMA_TX     (1<<7)
+#define LN_USART_CTL2_DMA_RX     (1<<6)

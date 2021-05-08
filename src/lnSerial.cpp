@@ -15,7 +15,7 @@ LN_USART_Registers *usart0=(LN_USART_Registers *)USART0;
  * @param instance
  * @param irq
  */
-lnSerial::lnSerial(int instance, IRQn_Type irq,uint32_t adr)
+lnSerial::lnSerial(int instance, IRQn_Type irq,uint32_t adr) :    _txDma(lnDMA::DMA_MEMORY_TO_PERIPH,0,1,8,32)
 {
     _instance=instance;
     _irq=irq;
@@ -73,21 +73,38 @@ bool lnSerial::init()
  * 
  * @return 
  */
-bool lnSerial::enableTx(bool onoff)
+bool lnSerial::enableTx(txMode mode)
 {
     LN_USART_Registers *d=(LN_USART_Registers *)_adr;
-    if(onoff)
+    d->CTL0&=~LN_USART_CTL0_UEN;
+    switch(mode)
     {
-        // disable TC & TE tx interrupt
-        d->CTL0&=~( LN_USART_CTL0_TBIE +LN_USART_CTL0_TCIE);
-        // enable Tx
-        d->CTL0|=LN_USART_CTL0_TEN; // enable TX        
-        eclic_enable_interrupt(_irq);      // enable eclic   
-    }else
-    {
-         eclic_disable_interrupt(_irq);    
-         d->CTL0&=~LN_USART_CTL0_TEN; // disable TX
+        case txInterrupt:
+             // disable TC & TE tx interrupt
+            d->CTL0&=~( LN_USART_CTL0_TBIE +LN_USART_CTL0_TCIE);
+            // enable Tx            
+            d->CTL2&=~LN_USART_CTL2_DMA_TX;    // disable TX DMA
+            d->CTL0|=LN_USART_CTL0_TEN; // enable TX   
+            d->CTL0|= LN_USART_CTL0_TBIE; // enable TBIE
+            eclic_enable_interrupt(_irq);      // enable eclic   
+            break;
+        case txNone:
+             eclic_disable_interrupt(_irq);    
+             d->CTL0&=~LN_USART_CTL0_TEN; // disable TX
+             d->CTL2&=~LN_USART_CTL2_DMA_TX; // disable TX DMA
+             d->CTL0&=~( LN_USART_CTL0_TBIE +LN_USART_CTL0_TCIE);
+             break;
+        case txDma:
+            eclic_disable_interrupt(_irq);    
+            d->CTL0|=
+            d->CTL0|=LN_USART_CTL0_TEN; // disable TX
+            d->CTL2|=LN_USART_CTL2_DMA_TX; // enable TX DMA
+            break;
+        default:
+            xAssert(0);
+            break;
     }
+    d->CTL0|=LN_USART_CTL0_UEN;
     return true;
 }
 /**
@@ -107,12 +124,31 @@ bool lnSerial::transmit(int size,uint8_t *buffer)
     _cur=buffer+1;
     // Clear TC
     d->STAT&=~(LN_USART_STAT_TC);
+    // enable TB interrupt    
+    enableTx(txInterrupt);
     // send 1st byte
     d->DATA=(uint32_t )buffer[0];
-    // enable TB interrupt    
-    d->CTL0|= LN_USART_CTL0_TBIE;
-    
-    
+    EXIT_CRITICAL();
+    _txDone.take();    
+    _mutex.unlock();
+    return true;
+}
+/**
+ * 
+ * @param size
+ * @param buffer
+ * @return 
+ */
+bool lnSerial::dmaTransmit(int size,uint8_t *buffer)
+{
+    //return true;
+    LN_USART_Registers *d=(LN_USART_Registers *)_adr;
+    _mutex.lock();
+    ENTER_CRITICAL();
+    _txState=txTransmitting;
+    d->STAT&=~(LN_USART_STAT_TC|LN_USART_CTL0_TBIE);    
+    _txDma.      doMemoryToPeripheralTransfer(size,(uint16_t *)buffer,(uint16_t *)&(d->DATA),false);    
+    enableTx(txDma);
     EXIT_CRITICAL();
     _txDone.take();    
     _mutex.unlock();

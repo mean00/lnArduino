@@ -68,7 +68,7 @@ void demoMe()
     while(1)
     {
         roundup++;
-        vTaskDelay(500);
+        vTaskDelay(1200);
         digitalToggle(LED);
         onoff=!onoff;
         if(onoff)
@@ -82,7 +82,7 @@ void demoMe()
         r++;
         r&=15;
         lcd->setRotation(r>>2);
-        
+        Logger("Blue\n");
     }
     
 }
@@ -111,6 +111,7 @@ void blinkRed(void *a)
         xDelay(1000);
         red=!red;
         digitalToggle(LEDRED);
+        Logger("Red\n");
     }
 }
 

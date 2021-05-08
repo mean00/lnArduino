@@ -5,6 +5,7 @@
 
 #pragma once
 #include "lnArduino.h"
+#include "lnDma.h"
 /**
  */
 class lnSerial
@@ -16,12 +17,18 @@ public:
         txTransmitting,
         txLast
     };
-    
+    enum txMode
+    {
+        txNone,
+        txInterrupt,
+        txDma
+    };
     lnSerial(int instance, IRQn_Type irq,uint32_t adr);    
     bool init();
     bool setSpeed(int speed);
-    bool enableTx(bool onoff);
+    bool enableTx(txMode mode);
     bool transmit(int size,uint8_t *buffer);
+    bool dmaTransmit(int size,uint8_t *buffer);
     void _interrupt(void);
     
  static void interrupts(int instance);
@@ -34,5 +41,6 @@ protected:
     xBinarySemaphore _txDone;
     uint8_t *_cur,*_tail;
     txState _txState;
+    lnDMA   _txDma;
     
 };
