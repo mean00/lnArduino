@@ -15,7 +15,7 @@ LN_USART_Registers *usart0=(LN_USART_Registers *)USART0;
  * @param instance
  * @param irq
  */
-lnSerial::lnSerial(int instance, IRQn_Type irq,uint32_t adr) :    _txDma(lnDMA::DMA_MEMORY_TO_PERIPH,0,1,8,32)
+lnSerial::lnSerial(int instance, IRQn_Type irq,uint32_t adr) :    _txDma(lnDMA::DMA_MEMORY_TO_PERIPH,0,4,8,8)
 {
     _instance=instance;
     _irq=irq;
@@ -96,9 +96,9 @@ bool lnSerial::enableTx(txMode mode)
              break;
         case txDma:
             eclic_disable_interrupt(_irq);    
-            d->CTL0|=
-            d->CTL0|=LN_USART_CTL0_TEN; // disable TX
-            d->CTL2|=LN_USART_CTL2_DMA_TX; // enable TX DMA
+            d->CTL0|=( LN_USART_CTL0_TBIE +LN_USART_CTL0_TCIE);
+            d->CTL0|=LN_USART_CTL0_TEN; // enable TX
+            d->CTL2|=LN_USART_CTL2_DMA_TX; // enable TX DMA            
             break;
         default:
             xAssert(0);
@@ -133,6 +133,24 @@ bool lnSerial::transmit(int size,uint8_t *buffer)
     _mutex.unlock();
     return true;
 }
+
+/**
+ * 
+ */
+void lnSerial::txDmaCb()
+{
+    
+}
+/**
+ * 
+ * @param c
+ */
+void lnSerial:: _dmaCallback(void *c)
+{
+    lnSerial *i=(lnSerial *)c;
+    i->txDmaCb();
+}
+
 /**
  * 
  * @param size
@@ -145,10 +163,11 @@ bool lnSerial::dmaTransmit(int size,uint8_t *buffer)
     LN_USART_Registers *d=(LN_USART_Registers *)_adr;
     _mutex.lock();
     ENTER_CRITICAL();
-    _txState=txTransmitting;
-    d->STAT&=~(LN_USART_STAT_TC|LN_USART_CTL0_TBIE);    
-    _txDma.      doMemoryToPeripheralTransfer(size,(uint16_t *)buffer,(uint16_t *)&(d->DATA),false);    
+    _txState=txTransmitting;   
     enableTx(txDma);
+    d->STAT&=~LN_USART_STAT_TC;
+    _txDma.attachCallback(_dmaCallback,this);
+    _txDma.      doMemoryToPeripheralTransfer(size,(uint16_t *)buffer,(uint16_t *)&(d->DATA),false);            
     EXIT_CRITICAL();
     _txDone.take();    
     _mutex.unlock();
@@ -199,7 +218,7 @@ void lnSerial::interrupts(int instance)
     inst->_interrupt();
 }
 
-#define IRQHANDLER(x) extern "C" void IRQ_USART##x () {    lnSerial::interrupts(x);}
+#define IRQHANDLER(x) extern "C" void USART##x##_IRQHandler () {    lnSerial::interrupts(x);}
 
 IRQHANDLER(0)
 IRQHANDLER(1)

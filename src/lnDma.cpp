@@ -176,7 +176,7 @@ bool lnDMA::doMemoryToPeripheralTransfer(int count, const uint16_t *source,const
     control|=DMA_CHAN_ERRIE+DMA_CHAN_TFTFIE; // error and transmit complete interrupt
     
     c->CTL=control|DMA_CHAN_ENABLE; // GO!       
-    eclic_enable_interrupt(_dmaIrqs[_dmaInt][_channelInt]);        
+    eclic_enable_interrupt(_irq);        
     return true;
 }
 /**

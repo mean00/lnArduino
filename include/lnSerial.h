@@ -43,4 +43,9 @@ protected:
     txState _txState;
     lnDMA   _txDma;
     
+protected:    
+    void txDmaCb();
+ static    void _dmaCallback(void *c);
+    
+    
 };

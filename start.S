@@ -75,9 +75,9 @@ vector_base:
 	UNHANDLED(53) //.word     unhandledException //I2C1_ER_IRQHandler
 	UNHANDLED(54) //.word     unhandledException //SPI0_IRQHandler
 	UNHANDLED(55) //.word     unhandledException //SPI1_IRQHandler
-	.word IRQ_USART0 //.word     unhandledException-56 //USART0_IRQHandler
-	.word IRQ_USART1 //.word     unhandledException //USART1_IRQHandler
-	.word IRQ_USART2 //.word     unhandledException //USART2_IRQHandler
+	.word USART0_IRQHandler //.word     unhandledException-56 //USART0_IRQHandler
+	.word USART1_IRQHandler //.word     unhandledException //USART1_IRQHandler
+	.word USART2_IRQHandler //.word     unhandledException //USART2_IRQHandler
 	UNHANDLED(59) //.word     unhandledException //EXTI10_15_IRQHandler
 	UNHANDLED(60) //.word     unhandledException //RTC_Alarm_IRQHandler
 	UNHANDLED(61) //.word     unhandledException //USBFS_WKUP_IRQHandler
@@ -90,7 +90,7 @@ vector_base:
 	UNHANDLED(68) //.word     unhandledException //0
 	UNHANDLED(69) //.word     unhandledException //TIMER4_IRQHandler
 	UNHANDLED(70) //.word     unhandledException //SPI2_IRQHandler
-	.word IRQ_USART3 //UNHANDLED(71) //.word     unhandledException //UART3_IRQHandler
+	.word USART3_IRQHandler //UNHANDLED(71) //.word     unhandledException //UART3_IRQHandler
 	UNHANDLED(72) //.word     unhandledException //UART4_IRQHandler
 	UNHANDLED(73) //.word     unhandledException //TIMER5_IRQHandler
 	UNHANDLED(74) //.word     unhandledException //TIMER6_IRQHandler

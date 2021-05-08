@@ -17,25 +17,10 @@
 #define PINCS PB2
 #define PINRST PB1
 
-uint8_t ucHeap[configTOTAL_HEAP_SIZE];
 
-extern "C"
-{
-    void _init();    
-}
-
-class Demo : public xTask
-{
-public:
-        Demo(): xTask("Demo",5,500)
-            {
-                roundup=0;
-            }
-    void run (void);
-
-    int roundup;    
-};
-
+/**
+ * 
+ */
 void demoMe()
 {
     hwlnSPIClass *spi=new hwlnSPIClass(0,-1);
@@ -87,15 +72,6 @@ void demoMe()
     
 }
 
-void Demo::run()
-{
-    pinMode(LED,OUTPUT);
-    bool onoff=true;
-    digitalWrite(LED,HIGH);
-    demoMe();
-}
-
-extern "C" void _exit(int x);
 /**
  */
 
@@ -114,31 +90,16 @@ void blinkRed(void *a)
         Logger("Red\n");
     }
 }
-
-int main()
+/**
+ * 
+ */
+void loop()
 {
-    // Initialize system
-    _init();
-    
-    eclic_priority_group_set(ECLIC_PRIGROUP_LEVEL4_PRIO0); //四位优先级组全配置为lvl
-    eclic_global_interrupt_enable();                       //使能全局中断
-    
-    // The LEDs are all on GPIO A
-    rcu_periph_clock_enable(RCU_GPIOA);
-    rcu_periph_clock_enable(RCU_GPIOB);
-    rcu_periph_clock_enable(RCU_GPIOC);
-    // We need alternate functions too
-    rcu_periph_clock_enable(RCU_AF); 
-    rcu_periph_clock_enable(RCU_DMA0); 
-    // DMA TX for LCD
-    DMA_CHCTL(DMA0, DMA_CH2) = (uint32_t)(DMA_PRIORITY_HIGH | DMA_CHXCTL_DIR); 
-    //
-    LoggerInit();    
-    // Start freertos
-     xTaskCreate(blinkRed,"blinkRed",500,NULL,2,NULL);
-    Demo *demo=new Demo;     
-    vTaskStartScheduler();      
-    deadEnd(25);
+    Logger("Entering main app...\n");
+    pinMode(LED,OUTPUT);
+    bool onoff=true;
+    digitalWrite(LED,HIGH);
+    demoMe();
     
 }
 
