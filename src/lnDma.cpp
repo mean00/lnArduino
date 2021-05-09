@@ -109,6 +109,31 @@ lnDMA::lnDMA(DmaTransferType type, int dmaEngine, int dmaChannel, int sourceWidt
 }
 /**
  * 
+ * @param sourceWordSize
+ * @param targetWordSize
+ */
+void    lnDMA::setWordSize(int sourceWordSize, int targetWordSize)
+{
+    uint32_t source=0,target=0;
+    switch(_type)
+    {
+        case DMA_MEMORY_TO_PERIPH:
+            {
+                source=memoryWidth(sourceWordSize);
+                target=peripheralWidth(targetWordSize);
+                _control&=LN_DMA_CHAN_WIDTH_MASK;
+                _control|=source;
+                _control|=target;
+            }
+        break;
+        default:
+            xAssert(0);
+            break;
+      }
+}
+
+/**
+ * 
  */
 lnDMA::~lnDMA()
 {
@@ -187,9 +212,11 @@ void dmaIrqHandler(int dma, int channel)
     {
         xAssert(0);
     }
-    d->INTC=1<<(4*channel); // clear global    
+    d->INTC=(3)<<(4*channel); // clear global+Transmit    
     // Disable DMA
-    d->channels[channel].CTL&=LN_DMA_CHAN_KEEP_MASK;
+    d->channels[channel].CTL&=~LN_DMA_CHAN_ENABLE;
+    // disable interrupt
+    eclic_disable_interrupt(_dmaIrqs[dma][channel]);       
     // then call handler
     lnDMA *l=_lnDmas[dma][channel];
     xAssert(l);

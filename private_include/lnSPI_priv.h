@@ -66,7 +66,12 @@ struct LN_SPI_Registers
 
 //-- Others are CRC/I2S registers, wec dont use that for now ---
 
-#define enable()  (d->CTL0 |=LN_SPI_CTL0_SPIEN)
+#define enable()  { if(d->CTL0 &LN_SPI_CTL0_SPIEN) xAssert(0); (d->CTL0 |=LN_SPI_CTL0_SPIEN);}
 #define disable() (d->CTL0&=~LN_SPI_CTL0_SPIEN)
 #define busy()    (d->STAT&LN_SPI_STAT_TRANS)
 #define txBusy() !(d->STAT&LN_SPI_STAT_TBE)
+
+
+void updateMode(LN_SPI_Registers *d,bool rxTx);
+void updateDataSize(LN_SPI_Registers *d,int bits);
+void updateDmaTX(LN_SPI_Registers *d,bool onoff);

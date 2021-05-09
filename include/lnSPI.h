@@ -85,8 +85,6 @@ class hwlnSPIClass
       _internalSettings.speed=speed;
     }
     // DMA ones
-    bool     dmaSend(const void *data, int size,bool repeat);
-    
     void setDataSize(int dataSize); // 8 or 16
     
    //--
@@ -128,6 +126,7 @@ class hwlnSPIClass
     static void exTxDone(void *c);
     bool writeInternal(int sz, int data);
     bool writesInternal(int sz, int nbBytes, const uint8_t *data);
+    bool dmaWriteInternal(int wordSize,int nbBytes, const uint8_t *data,bool repeat);
     
     
 public:

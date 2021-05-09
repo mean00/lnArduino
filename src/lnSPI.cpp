@@ -34,7 +34,7 @@ LN_SPI_Registers *aspi0=(LN_SPI_Registers *)SPI0;
 
 
 
-static void updateMode(LN_SPI_Registers *d,bool rxTx)
+void updateMode(LN_SPI_Registers *d,bool rxTx)
 {
     
     uint32_t reg=d->CTL0;
@@ -99,6 +99,7 @@ hwlnSPIClass::hwlnSPIClass(int instance, int pinCs) : _internalSettings(1000000,
     const SpiDescriptor *s=spiDescriptor+instance;
     
     _irq=s->spiIrq;
+    eclic_disable_interrupt(_irq);
     _adr=s->spiAddress;
     rcu_periph_clock_enable(s->rcu);
     // setup miso/mosi & clk
@@ -250,76 +251,6 @@ bool hwlnSPIClass::write(int nbBytes, const uint8_t *data)
    return writesInternal(8,nbBytes,data);
 }
 /**
- */
-bool hwlnSPIClass::dmaWrite(int nbBytes, const uint8_t *data)
-{
-    LN_SPI_Registers *d=(LN_SPI_Registers *)_adr;
-    updateDataSize(d,8);
-    enable();
-    csOn();
-    for (size_t i = 0; i < nbBytes; i++) 
-    {
-        while (!d->STAT & LN_SPI_STAT_TBE) 
-        {
-        }
-        d->DATA=data[i];
-    }
-    waitForCompletion();
-    csOff();
-    disable();
-    return true;
-}
-
-/**
- */
-bool hwlnSPIClass::dmaWrite16(int nbWord, const uint16_t *data)
-{
-    LN_SPI_Registers *d=(LN_SPI_Registers *)_adr;
-    updateMode(d,false); // tx only
-    updateDataSize(d,16);// 16 bits at a time
-    enable();
-    csOn();
-    Logger(">>1\n");
-    txDma.doMemoryToPeripheralTransfer(nbWord, data, (uint16_t *)&SPI_DATA(_adr),false);        
-    updateDmaTX(d,true); // activate DMA
-    Logger("++1\n");
-    _done.take();
-    Logger("<<1\n");
-    waitForCompletion();
-    
-    csOff();
-    updateDmaTX(d,false);
-    disable();
-    return true;
-}
-
-
-
-/**
- */
-bool hwlnSPIClass::dmaWrite16Repeat(int nbWord, const uint16_t data)
-{
-    LN_SPI_Registers *d=(LN_SPI_Registers *)_adr;
-    updateMode(d,false);
-    updateDataSize(d,16);
-    updateDmaTX(d,true);
-    enable();
-    csOn();
-    
-    Logger(">>2\n");
-    
-    txDma.doMemoryToPeripheralTransfer(nbWord, &data, (uint16_t *)&SPI_DATA(_adr), true);        
-    Logger("++2\n");
-    _done.take();
-    Logger("<<2\n");
-    waitForCompletion();
-    
-    csOff();
-    updateDmaTX(d,false);
-    disable();
-    return true;
-}
-/**
  * 
  */
 void hwlnSPIClass::csOn()
@@ -391,15 +322,6 @@ bool hwlnSPIClass::transfer(int nbBytes, uint8_t *dataOut, uint8_t *dataIn)
     csOff();
     disable();
     return true;
-}
-/**
- * 
- * @param c
- */
-void hwlnSPIClass::exTxDone(void *c)
-{
-    hwlnSPIClass *i=(hwlnSPIClass *)c;
-    i->txDone();
 }
 /**
  * 
@@ -476,8 +398,7 @@ void hwlnSPIClass::setup()
         }
     }
     d->I2SPSC=psc;
-    updateMode(0,false); // Tx only by default
-    txDma.attachCallback(exTxDone,this);    
+    updateMode(0,false); // Tx only by default    
 }
 /**
  * 
@@ -487,16 +408,6 @@ void hwlnSPIClass::setDataSize(int dataSize)
 {
     LN_SPI_Registers *d=(LN_SPI_Registers *)_adr;
     updateDataSize(d,dataSize);
-}
-/**
- */
-bool     hwlnSPIClass::dmaSend(const void *data, int size,bool repeat)
-{
-    if(repeat==false)
-        return write(size,(const uint8_t *)data);
-    for(int i=0;i<size;i++)
-        write(2,(const uint8_t *)data);
-    return true;
 }
 // EOF
 

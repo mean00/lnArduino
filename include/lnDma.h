@@ -20,6 +20,7 @@ public:
         void    attachCallback(doneCallback *cb, void *cookie);
   
         bool    doMemoryToPeripheralTransfer(int count, const uint16_t *source,const uint16_t *target,  bool repeat);
+        void    setWordSize(int sourceWordSize, int targetWordSize);
         void    invokeCallback();
 protected:
     dma_channel_enum _channel;

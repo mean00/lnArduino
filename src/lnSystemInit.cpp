@@ -23,8 +23,8 @@ int main()
     // Initialize system
     _init();
     
-    eclic_priority_group_set(ECLIC_PRIGROUP_LEVEL4_PRIO0); //四位优先级组全配置为lvl
-    eclic_global_interrupt_enable();                       //使能全局中断
+    eclic_priority_group_set(ECLIC_PRIGROUP_LEVEL4_PRIO0); 
+    eclic_global_interrupt_enable();                       
     
     // The LEDs are all on GPIO A
     rcu_periph_clock_enable(RCU_GPIOA);
@@ -33,8 +33,9 @@ int main()
     // We need alternate functions too
     rcu_periph_clock_enable(RCU_AF); 
     rcu_periph_clock_enable(RCU_DMA0); 
-    // DMA TX for LCD
+    // DMA TX for SPI0 (LCD)
     DMA_CHCTL(DMA0, DMA_CH2) = (uint32_t)(DMA_PRIORITY_HIGH | DMA_CHXCTL_DIR); 
+    // DMA TX for usart0
     DMA_CHCTL(DMA0, DMA_CH4) = (uint32_t)(DMA_PRIORITY_HIGH | DMA_CHXCTL_DIR); 
     //
     

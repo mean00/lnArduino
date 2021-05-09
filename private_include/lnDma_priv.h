@@ -47,3 +47,5 @@ struct DMA_struct
 #define LN_DMA_CHAN_MEM            (1<<14)       // circular
 
 #define LN_DMA_CHAN_KEEP_MASK      0xffff8000U
+
+#define LN_DMA_CHAN_WIDTH_MASK     (~( (3<<10)+(3<<8)))
