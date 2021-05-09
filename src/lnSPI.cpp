@@ -381,7 +381,7 @@ void hwlnSPIClass::setup()
     {
         apb=rcu_clock_freq_get(CK_APB1);
     }
-    prescale = (apb*1000000) / speed- 1;
+    prescale = (apb+speed/2) / speed;
     // prescale can only go from 2 to 256, and prescale=2^(psc+1) actually
     
     uint32_t psc=0;
@@ -397,7 +397,7 @@ void hwlnSPIClass::setup()
             psc++;
         }
     }
-    d->I2SPSC=psc;
+    d->CTL0|=psc<<3;
     updateMode(0,false); // Tx only by default    
 }
 /**
@@ -408,6 +408,22 @@ void hwlnSPIClass::setDataSize(int dataSize)
 {
     LN_SPI_Registers *d=(LN_SPI_Registers *)_adr;
     updateDataSize(d,dataSize);
+}
+
+void hwlnSPIClass::setBitOrder(spiBitOrder order)
+{
+       _internalSettings.bOrder=order; 
+       setup();
+}
+void hwlnSPIClass::setDataMode(spiDataMode mode)
+{
+      _internalSettings.dMode=mode;
+      setup();
+}
+void hwlnSPIClass::setSpeed(int speed)
+{
+    _internalSettings.speed=speed;
+    setup();
 }
 // EOF
 

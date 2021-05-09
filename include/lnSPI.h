@@ -72,18 +72,9 @@ class hwlnSPIClass
     void beginTransaction(lnSPISettings &settings);
     void endTransaction();
 
-     void setBitOrder(spiBitOrder order)
-    {
-         _internalSettings.bOrder=order;      
-    }
-    void setDataMode(spiDataMode mode)
-    {
-        _internalSettings.dMode=mode;
-    }
-    void setSpeed(int speed)
-    {
-      _internalSettings.speed=speed;
-    }
+    void setBitOrder(spiBitOrder order)    ;
+    void setDataMode(spiDataMode mode);
+    void setSpeed(int speed); // speed in b/s
     // DMA ones
     void setDataSize(int dataSize); // 8 or 16
     
