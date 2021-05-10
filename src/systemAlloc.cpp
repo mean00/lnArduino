@@ -47,6 +47,11 @@ void *operator new(size_t size)
 {
     return sysAlloc(size);
 }
+void *operator new[](size_t size)
+{
+    return sysAlloc(size);
+}
+
 void operator delete(void *p)
 {
     sysFree(p);
