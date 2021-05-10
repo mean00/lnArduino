@@ -11,8 +11,12 @@ extern "C" void _init();
  */
 void initTask(void *)
 {
-    LoggerInit();    
-    loop();
+    LoggerInit();   
+    setup();
+    while(1)
+    {
+        loop();
+    }
 }
 /**
  * 
