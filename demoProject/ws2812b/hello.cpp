@@ -58,12 +58,21 @@ void setColor(uint32_t color)
         p+=8;        
     }
 }
+
 /**
  * 
  */
-void demoMe()
+void setup()
 {
-   // 1-setup WS2812B
+    pinMode(LED,OUTPUT);
+    digitalWrite(LED,HIGH);
+}
+/**
+ * 
+ */
+void loop()
+{
+    // 1-setup WS2812B
    spi=new hwlnSPIClass(0);
    spi->begin();
    spi->setSpeed(108000000/16);
@@ -76,20 +85,6 @@ void demoMe()
        flushWs2812B();
        xDelay(10);
    }
-    
-    
-}
-
-/**
- * 
- */
-void loop()
-{
-    Logger("Entering main app...\n");
-    pinMode(LED,OUTPUT);
-    bool onoff=true;
-    digitalWrite(LED,HIGH);
-    demoMe();
     
 }
 
