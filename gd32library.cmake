@@ -1,10 +1,9 @@
 
-SET(LONGDUINO ${ARDUINO_GD32_FREERTOS}/Longduino_cmake CACHE INTERNAL "")
+SET(LONGDUINO ${ARDUINO_GD32_FREERTOS}/legacy/ CACHE INTERNAL "")
 
 
 # Generate runtime libraries
-SET(GD32SK ${LONGDUINO}/cores/arduino//)
-SET(GD32_ROOT_SRC ${GD32SK}/GD32VF103_Firmware_Library)
+SET(GD32_ROOT_SRC ${LONGDUINO}/GD32VF103_Firmware_Library)
 
 SET(GD32_RISC ${GD32_ROOT_SRC}/RISCV)
 include_directories( ${GD32_RISC}/drivers)
@@ -32,7 +31,7 @@ endforeach(sys system_gd32vf103.c)
 
 
 foreach(misc  init.c handlers.c )#entry.S start.S)
-    LIST(APPEND GD32_MISC  ${GD32_ROOT_SRC}/RISCV/env_Eclipse/${misc})
+   # LIST(APPEND GD32_MISC  ${GD32_ROOT_SRC}/RISCV/env_Eclipse/${misc})
 endforeach()
 
 

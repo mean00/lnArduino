@@ -24,9 +24,12 @@ void initTask(void *)
  */
 int main()
 {
-    // Initialize system
-    _init();
-    
+    // Initialize system    
+    SystemInit();
+
+    //ECLIC init
+    eclic_init(ECLIC_NUM_INTERRUPTS);
+    eclic_mode_enable();
     eclic_priority_group_set(ECLIC_PRIGROUP_LEVEL4_PRIO0); 
     eclic_global_interrupt_enable();                       
     

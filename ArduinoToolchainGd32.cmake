@@ -41,9 +41,9 @@ SET(CMAKE_CXX_COMPILER_ID "GNU" CACHE INTERNAL "")
 set(CMAKE_C_COMPILER_WORKS      TRUE)
 set(CMAKE_CXX_COMPILER_WORKS    TRUE)
 #
-SET(GD32_BOARD      -DGD32VF103C_START) # Longan nano ?
-SET(GD32MCU         GD32VF103xB)
-SET(GD32_LDSCRIPT   ${ARDUINO_TOOLCHAIN_TOP}/Longduino_cmake/cores/arduino/GD32VF103_Firmware_Library/RISCV/env_Eclipse/${GD32MCU}.lds)
+SET(GD32_BOARD_FLAG      -DGD32VF103C_START) # Longan nano ?
+SET(GD32_BOARD       sipeed-longan-nano CACHE INTERNAL "")
+SET(GD32_LDSCRIPT   ${ARDUINO_TOOLCHAIN_TOP}/legacy/boards/${GD32_BOARD}/ld.lds)
 
 #
 
@@ -59,7 +59,7 @@ MESSAGE(STATUS "GD32 C++ compiler ${CMAKE_CXX_COMPILER}")
 
 SET(GD32_SPECS  "--specs=nano.specs")
 #
-SET(GD32_C_FLAGS  "${GD32_SPECS}  ${PLATFORM_C_FLAGS} -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -fno-common ${GD32_BOARD}")
+SET(GD32_C_FLAGS  "${GD32_SPECS}  ${PLATFORM_C_FLAGS} -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -fno-common ${GD32_BOARD_FLAG}")
 SET(CMAKE_C_FLAGS "${GD32_C_FLAGS}")
 SET(CMAKE_CXX_FLAGS "${GD32_C_FLAGS}  -fno-rtti -fno-exceptions" ) 
 #
@@ -71,11 +71,10 @@ set(CMAKE_CXX_LINK_EXECUTABLE    "<CMAKE_CXX_COMPILER>   <CMAKE_CXX_LINK_FLAGS> 
 SET(CMAKE_EXECUTABLE_SUFFIX_C .elf)
 SET(CMAKE_EXECUTABLE_SUFFIX_CXX .elf)
 
+include_directories(${ARDUINO_GD32_FREERTOS}/legacy/GD32VF103_Firmware_Library/GD32VF103_standard_peripheral)
+include_directories(${ARDUINO_GD32_FREERTOS}/legacy/GD32VF103_Firmware_Library/GD32VF103_standard_peripheral/Include)
+include_directories(${ARDUINO_GD32_FREERTOS}/legacy/GD32VF103_Firmware_Library/RISCV/drivers)
+include_directories(${ARDUINO_GD32_FREERTOS}/legacy/boards/${GD32_BOARD}/)
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Longduino_cmake/cores/arduino)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Longduino_cmake/cores/arduino/GD32VF103_Firmware_Library/GD32VF103_standard_peripheral)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Longduino_cmake/cores/arduino/GD32VF103_Firmware_Library/GD32VF103_standard_peripheral/Include)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Longduino_cmake/cores/arduino/GD32VF103_Firmware_Library/RISCV/drivers)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Longduino_cmake/variants/sipeed-longan-nano)
 
 ADD_DEFINITIONS("-g3 -O1")
