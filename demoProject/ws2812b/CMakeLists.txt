@@ -13,9 +13,6 @@ add_subdirectory(${AF_FOLDER})
 
 include(${AF_FOLDER}/setup.cmake)
         
-add_subdirectory(${AF_FOLDER}/libraries/WS2812B)
-include_directories(${AF_FOLDER}/libraries/WS2812B)
-
-GENERATE_GD32_FIRMWARE(hello hello.cpp ${AMG})       
-TARGET_LINK_LIBRARIES(hello WS2812B)
+USE_LIBRARY(WS2812B)
+GENERATE_GD32_FIRMWARE(ws2812 hello.cpp )       
         
