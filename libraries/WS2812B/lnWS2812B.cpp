@@ -15,8 +15,9 @@ WS2812B::WS2812B(int nbLeds, hwlnSPIClass *s)
     _nbLeds=nbLeds;
     _spi=s;
     _ledsColor=new uint8_t[3*nbLeds];
-    _ledsBrightness=new uint8_t[nbLeds];
-    _ledsColorSPI=new uint8_t[3*nbLeds*8]; // spi expansion
+    _ledsBrightness=new int[nbLeds];
+    int up=(nbLeds+3)&(~3); // next multiple of 4
+    _ledsColorSPI=new uint8_t[3*up*8]; // spi expansion
     for(int i=0;i<nbLeds;i++)
     {
         _ledsColor[3*i+0]=0;
@@ -87,8 +88,8 @@ WS2812B::~WS2812B()
  {
       uint8_t *pr=_ledsColor+led*3;
       pr[0]=r;
-      pr[0]=g;
-      pr[0]=b;
+      pr[1]=g;
+      pr[2]=b;
       convert(led);
  }
  /**
@@ -112,17 +113,41 @@ WS2812B::~WS2812B()
  * 
  * @param led
  */   
- const uint8_t multiply[2]={0x7<<5,0x1f<<3};
+#define ZRANK(x,y)  ((((x*0x1fU)<<3)+(((1-x)*0x7U)<<5))<<y)
+#define Z0(x) ZRANK(x,24)
+#define Z1(x) ZRANK(x,16)
+#define Z2(x) ZRANK(x,8)
+#define Z3(x) ZRANK(x,0)
+ 
+static const uint32_t   lookupTable[16]={ 
+            Z0(0) + Z1(0)+ Z2(0)+ Z3(0),
+            Z0(0) + Z1(0)+ Z2(0)+ Z3(1),
+            Z0(0) + Z1(0)+ Z2(1)+ Z3(0),
+            Z0(0) + Z1(0)+ Z2(1)+ Z3(1),
+            Z0(0) + Z1(1)+ Z2(0)+ Z3(0),
+            Z0(0) + Z1(1)+ Z2(0)+ Z3(1),
+            Z0(0) + Z1(1)+ Z2(1)+ Z3(0),
+            Z0(0) + Z1(0)+ Z2(1)+ Z3(1),
+            Z0(1) + Z1(0)+ Z2(0)+ Z3(0),
+            Z0(1) + Z1(0)+ Z2(0)+ Z3(1),
+            Z0(1) + Z1(0)+ Z2(1)+ Z3(0),
+            Z0(1) + Z1(0)+ Z2(1)+ Z3(1),
+            Z0(1) + Z1(1)+ Z2(0)+ Z3(0),
+            Z0(1) + Z1(1)+ Z2(0)+ Z3(1),
+            Z0(1) + Z1(1)+ Z2(1)+ Z3(0),
+            Z0(1) + Z1(0)+ Z2(1)+ Z3(1)         
+};
+ 
+#define ZZZ(a,b,c,d) 
+ 
+ static const uint8_t lookup[16]={0x7<<5,0x1f<<3};
+ 
  static void convertOne(int color, uint8_t *target)
  {
-    int mask=1<<7;
-    for(int i=0;i<8;i++)
-    {
-        if(color&mask) *target=multiply[1];
-                  else *target=multiply[0];
-        target++;
-        mask>>=1;
-    }
+     uint32_t *p=(uint32_t *)target;
+     
+     p[0]=lookupTable[(color>>4)&0xf];
+     p[1]=lookupTable[(color)&0xf];
  }
  /**
   * 

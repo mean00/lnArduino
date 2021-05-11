@@ -22,7 +22,7 @@ protected:
         hwlnSPIClass *_spi;
         int           _nbLeds;
         uint8_t       *_ledsColor;
-        uint8_t       *_ledsBrightness;
+        int           *_ledsBrightness;
         uint8_t       *_ledsColorSPI;
         int           _brightness;
 protected:
