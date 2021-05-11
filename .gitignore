@@ -12,3 +12,4 @@ build*
 pyUsb/__pycache__/
 pyUsb/*.csv
 bins
+demoProject/*/Arduino_gd32_freeRTOS
