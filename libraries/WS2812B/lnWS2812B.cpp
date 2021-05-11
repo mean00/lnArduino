@@ -14,17 +14,17 @@ WS2812B::WS2812B(int nbLeds, hwlnSPIClass *s)
 {
     _nbLeds=nbLeds;
     _spi=s;
+    _brightness=0xff;
     _ledsColor=new uint8_t[3*nbLeds];
-    _ledsBrightness=new int[nbLeds];
-    int up=(nbLeds+3)&(~3); // next multiple of 4
-    _ledsColorSPI=new uint8_t[3*up*8]; // spi expansion
+    _ledsBrightness=new uint8_t[nbLeds];
+    int up=((nbLeds+3)&(~3))+2; // next multiple of 4 + add one before / one after
+    _ledsColorSPI=new uint8_t[3*up*8]; // spi expansion    
     for(int i=0;i<nbLeds;i++)
     {
         _ledsColor[3*i+0]=0;
         _ledsColor[3*i+1]=0;
         _ledsColor[3*i+2]=0;
-        _ledsBrightness[i]=255;
-        
+        _ledsBrightness[i]=255;        
     }
 }
 /**
@@ -142,9 +142,11 @@ static const uint32_t   lookupTable[16]={
  
  static const uint8_t lookup[16]={0x7<<5,0x1f<<3};
  
- static void convertOne(int color, uint8_t *target)
+ static void convertOne(int color, int b16, uint8_t *target)
  {
      uint32_t *p=(uint32_t *)target;
+     
+     color=(color*b16)>>16;
      
      p[0]=lookupTable[(color>>4)&0xf];
      p[1]=lookupTable[(color)&0xf];
@@ -157,9 +159,13 @@ void         WS2812B::convert(int led)
 {
     uint8_t *p=_ledsColorSPI+3*8*led;
     uint8_t *c=_ledsColor+led*3;
-    convertOne(c[0],p);
-    convertOne(c[1],p+8);
-    convertOne(c[2],p+16);
+    
+    int  b=(int)_ledsBrightness[led]*(int)_brightness;
+    
+    
+    convertOne(c[0],b,p);
+    convertOne(c[1],b,p+8);
+    convertOne(c[2],b,p+16);
   
 }
 /**

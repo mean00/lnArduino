@@ -22,9 +22,9 @@ protected:
         hwlnSPIClass *_spi;
         int           _nbLeds;
         uint8_t       *_ledsColor;
-        int           *_ledsBrightness;
+        uint8_t       *_ledsBrightness;
         uint8_t       *_ledsColorSPI;
-        int           _brightness;
+        uint8_t       _brightness;
 protected:
          void         convert(int led);
          void         convertAll();
