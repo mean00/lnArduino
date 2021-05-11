@@ -21,8 +21,19 @@
 /**
  * 
  */
-void demoMe()
+
+void setup()
 {
+    pinMode(LED,OUTPUT);
+    digitalWrite(LED,HIGH);
+    
+}
+/**
+ */
+void loop()
+{
+    Logger("Entering main app...\n");
+   
     hwlnSPIClass *spi=new hwlnSPIClass(0,-1);
     spi->begin();
     lnSPISettings transaction(8*1000*1000, SPI_MSBFIRST, SPI_MODE0,-1);
@@ -69,37 +80,6 @@ void demoMe()
         lcd->setRotation(r>>2);
         Logger("Blue\n");
     }
-    
-}
-
-/**
- */
-
-void blinkRed(void *a)
-{
-    Logger("Starting blinkRed\n");
-    bool red=false;
-    pinMode(LEDRED,OUTPUT);
-    digitalWrite(LEDRED,LOW);
-    Logger("blinkRed:Go!\n");
-    while(1)
-    {
-        xDelay(1000);
-        red=!red;
-        digitalToggle(LEDRED);
-        Logger("Red\n");
-    }
-}
-/**
- * 
- */
-void loop()
-{
-    Logger("Entering main app...\n");
-    pinMode(LED,OUTPUT);
-    bool onoff=true;
-    digitalWrite(LED,HIGH);
-    demoMe();
     
 }
 
