@@ -137,8 +137,9 @@ void    lnDMA::setWordSize(int sourceWordSize, int targetWordSize)
  */
 lnDMA::~lnDMA()
 {
-    _lnDmas[_dmaInt][_channelInt]=NULL;
-     dma_deinit(_dma,_channel);
+    DMA_struct *d=(DMA_struct *)_dma;
+    DMA_channels *c=d->channels+_channelInt;
+    c->CTL=0;
 }
 
 /**
