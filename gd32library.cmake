@@ -27,15 +27,7 @@ endforeach()
 foreach(sys system_gd32vf103.c)   
      LIST(APPEND GD32_MAIN ${GD32_STD}/${sys})
 endforeach(sys system_gd32vf103.c)   
-    
 
+ADD_LIBRARY(gd32 STATIC  ${GD32_MAIN} ${GD32_STUBS} ${RISC_SRC}  entry.S start.S)
 
-foreach(misc  init.c handlers.c )#entry.S start.S)
-   # LIST(APPEND GD32_MISC  ${GD32_ROOT_SRC}/RISCV/env_Eclipse/${misc})
-endforeach()
-
-
-
-ADD_LIBRARY(gd32 STATIC  ${GD32_MAIN} ${GD32_STUBS} ${RISC_SRC} ${GD32_MISC} entry.S start.S)
-TARGET_INCLUDE_DIRECTORIES(gd32 PRIVATE ${CMAKE_SOURCE_DIR}/overlay/include)
 
