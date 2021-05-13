@@ -23,7 +23,6 @@ public:
         void    setWordSize(int sourceWordSize, int targetWordSize);
         void    invokeCallback();
 protected:
-    dma_channel_enum _channel;
     uint32_t         _dma;
     int             _channelInt;
     int             _dmaInt;

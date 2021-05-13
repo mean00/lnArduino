@@ -6,6 +6,8 @@
 #pragma once
 
 #include "stdio.h"
+#include "string.h"
+#include "stdint.h"
 #include "Arduino.h"
 #include "systemHelper.h"
 extern "C"
@@ -19,3 +21,8 @@ extern "C"
 }
 #include "MapleFreeRTOS1000_pp.h"
 #include "lnDebug.h"
+#include "lnGPIO.h"
+#include "gd32vf103.h"
+
+#define byte uint8_t 
+

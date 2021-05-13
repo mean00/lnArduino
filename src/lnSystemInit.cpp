@@ -3,6 +3,7 @@
 
 uint8_t ucHeap[configTOTAL_HEAP_SIZE];
 
+extern void setup();
 extern void loop();
 extern "C" void _init();
 /**

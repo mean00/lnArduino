@@ -1,5 +1,6 @@
-/**
- 
+/*
+ *  (C) 2021 MEAN00 fixounet@free.fr
+ *  See license file
  */
 #include "lnArduino.h"
 #include "lnDma.h"
@@ -68,7 +69,6 @@ lnDMA::lnDMA(DmaTransferType type, int dmaEngine, int dmaChannel, int sourceWidt
     _dmaInt=dmaEngine;
     
     _dma=_dmas[dmaEngine];
-    _channel=_channels[dmaChannel];
     _type=type;
     _irq=_dmaIrqs[dmaEngine][dmaChannel];
     

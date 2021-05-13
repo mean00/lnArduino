@@ -1,7 +1,7 @@
 //
 // The "wheel" effect is derived from the WS2812Demo found in stm32duino
 // https://github.com/rogerclarkmelbourne/WS2812B_STM32_Libmaple/blob/master/examples/WS2812B_test/WS2812B_test.ino
-#include "lnArduino.h"
+#include "Arduino.h"
 #include "lnSPI.h"
 #include "lnWS2812B.h"
 
@@ -17,7 +17,7 @@
 void setup()
 {
     pinMode(LED,OUTPUT);
-    digitalWrite(LED,HIGH);
+    digitalWrite(LED,true);
 }
 
 
@@ -161,8 +161,8 @@ void loop()
    WS2812B    *ws=new WS2812B(NB_WS2812B,spi);
    ws->begin();
    
-   //wheelDemo(ws);
-   pulse(ws);
+   wheelDemo(ws);
+   //pulse(ws);
    //dot(ws);
    //colors(ws);
    

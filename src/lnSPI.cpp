@@ -6,6 +6,7 @@
 #include "lnArduino.h"
 #include "lnSPI.h"
 #include "lnSPI_priv.h"
+#include "lnGPIO.h"
 
 struct SpiDescriptor
 {
@@ -14,7 +15,8 @@ struct SpiDescriptor
     int         dmaEngine;
     int         dmaTxChannel;
     rcu_periph_enum rcu;
-    uint32_t    bank, mosi,miso, clk;
+    uint32_t    bank;
+    lnPin       mosi,miso, clk;
 };
 
 // We assume all the pins of a given SPI are on the same gpio bank
@@ -103,14 +105,15 @@ hwlnSPIClass::hwlnSPIClass(int instance, int pinCs) : _internalSettings(1000000,
     _adr=s->spiAddress;
     rcu_periph_clock_enable(s->rcu);
     // setup miso/mosi & clk
-    gpio_init(s->bank, GPIO_MODE_AF_PP,         GPIO_OSPEED_50MHZ, digitalPinToBitMask(s->mosi));
-    gpio_init(s->bank, GPIO_MODE_IN_FLOATING,   GPIO_OSPEED_50MHZ, digitalPinToBitMask(s->miso));
-    gpio_init(s->bank, GPIO_MODE_AF_PP,         GPIO_OSPEED_50MHZ, digitalPinToBitMask(s->clk));
+    lnPinMode( s->mosi, lnALTERNATE_PP);
+    lnPinMode( s->miso, lnFLOATING);
+    lnPinMode( s->clk,  lnALTERNATE_PP);
+       
     
     if(pinCs!=-1)
     {
-        pinMode(pinCs,OUTPUT);
-        digitalWrite(pinCs,HIGH);
+        lnPinMode((lnPin)pinCs,lnOUTPUT);
+        lnDigitalWrite((lnPin)pinCs,true);
     }
     LN_SPI_Registers *d=(LN_SPI_Registers *)_adr;
     _settings=&_internalSettings;
@@ -257,7 +260,7 @@ void hwlnSPIClass::csOn()
 {
     if(_settings->pinCS!=-1)
     {
-        digitalWrite(_settings->pinCS,LOW);
+        lnDigitalWrite((lnPin)_settings->pinCS,false);
     }
 }
 /**
@@ -267,7 +270,7 @@ void hwlnSPIClass::csOff()
 {
     if(_settings->pinCS!=-1)
     {
-        digitalWrite(_settings->pinCS,HIGH);
+        lnDigitalWrite((lnPin)_settings->pinCS,true);
     }
 }
 /**
