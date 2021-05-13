@@ -82,7 +82,7 @@ void wheelDemo(WS2812B *ws)
 }
 void pulse(WS2812B *ws)
 {
-    int brightness=0xff;
+    int brightness=127;
     int dir=-1;
     ws->setColor(0xff,0,0); // RED G* R* B*
     while(1)
@@ -92,9 +92,9 @@ void pulse(WS2812B *ws)
         ws->setGlobalBrightness(brightness);
         brightness+=dir;
         if(brightness==0 && dir<0) dir=-dir;
-        if(brightness==255 && dir>0) dir=-dir;
+        if(brightness==127 && dir>0) dir=-dir;
         ws->update();
-        xDelay(20);
+        xDelay(10);
     }
 }
 #define VAL 0x0f
@@ -127,17 +127,26 @@ void dot(WS2812B *ws)
         xDelay(80);
     }
 }
+void singleValue(WS2812B *ws, int v)
+{
+    Logger("Value =%d\n",v);
+    ws->setColor(v,0,0);// r g b
+    ws->update();
+}
+
 void colors(WS2812B *ws)
 {
+    
     int dex=0;
     while(1)
     {
         //ws->setLedBrightness(olddex,10);
-        dex+=10;
-        if(dex>=255) dex=0;        
+        dex+=1;
+        if(dex>=127) dex=0;        
         ws->setColor(dex,0,0);// r g b
         ws->update();
-        xDelay(100);
+        Logger("Value =%d\n",dex);
+        xDelay(20);
     }
 }
     
@@ -153,10 +162,11 @@ void loop()
    ws->begin();
    
    //wheelDemo(ws);
-   //pulse(ws);
+   pulse(ws);
    //dot(ws);
-   colors(ws);
+   //colors(ws);
    
 }
 // EOF
+
 

@@ -132,12 +132,9 @@ WS2812B::~WS2812B()
  * @param led
  */   
 #define ZRANK(x,y)  ((((x*0x1fUL)<<3UL)+(((1UL-x)*0x7UL)<<5UL))<<y)
-#define Z0(x) ZRANK(x,24)
-#define Z1(x) ZRANK(x,16)
-#define Z2(x) ZRANK(x,8)
-#define Z3(x) ZRANK(x,0)
+//#define ZZ(a,b,c,d)   ZRANK(a,24)+ZRANK(b,16)+ZRANK(c,8)+ZRANK(d,0)
+ #define ZZ(a,b,c,d)   ZRANK(a,0)+ZRANK(b,8)+ZRANK(c,16)+ZRANK(d,24)
  
-#define ZZ(a,b,c,d)    Z0((uint32_t)a) + Z1((uint32_t)b)+ Z2((uint32_t)c)+ Z3((uint32_t)d)
  
 static const uint32_t   lookupTable[16]=
 { 
