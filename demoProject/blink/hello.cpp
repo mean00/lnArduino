@@ -13,7 +13,7 @@ void setup()
 void loop()
 {
     bool onoff=true;
-    digitalWrite(LED,HIGH);
+    digitalWrite(LED,true);
     int roundup=0;
     while(1)
     {

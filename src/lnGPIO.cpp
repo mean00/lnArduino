@@ -7,6 +7,9 @@
 #include "lnGPIO_priv.h"
 
 static  LN_GPIO *gpio[4]={(LN_GPIO *)GPIOA,(LN_GPIO *)GPIOB,(LN_GPIO *)GPIOC,(LN_GPIO *)GPIOD};
+
+static  LN_GPIO *gpioA=(LN_GPIO *)GPIOA;
+
 /**
  * 
  * @param pin
@@ -42,8 +45,8 @@ void lnPinMode(const lnPin xpin, const GpioMode mode)
             break;
     }
     uint32_t ref=*CTL;
-    ref&=~(0Xf<<pin);
-    ref|=value;
+    ref&=~(0Xf<<(pin*4));
+    ref|=value<<(pin*4);
     *CTL=ref;        
 }
 /**
@@ -65,6 +68,16 @@ void lnDigitalWrite(const lnPin pin, bool value)
     }
     port->BOP=radix<<xpin;
 }
+void lnDigitalToggle(const lnPin pin)
+{
+    LN_GPIO *port=gpio[pin>>4];
+    int xpin=pin&0xf; 
+    uint32_t val=port->OCTL;
+    val^=1<<xpin;
+    port->OCTL=val;
+}
+
+
 /**
  * 
  * @param pin

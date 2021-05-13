@@ -20,7 +20,10 @@ uint64_t millis(void)
 {
     return xTaskGetTickCount();
 }
-
+void digitalToggle(int a)
+{
+    lnDigitalToggle(a);
+}
 uint64_t micros(void)
 {
     return (uint64_t)(get_timer_value() * (4000000.F / SystemCoreClock));

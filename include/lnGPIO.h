@@ -29,6 +29,7 @@ typedef int lnPin;
 void lnPinMode(const lnPin pin, const GpioMode mode);
 void lnDigitalWrite(const lnPin pin, bool value);
 bool lnDigitalRead(const lnPin pin);
+void lnDigitalToggle(const lnPin pin);
 
 
 // EOF
