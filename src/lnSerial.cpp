@@ -78,8 +78,8 @@ bool lnSerial::init()
     {
         case 0:
             rcu_periph_clock_enable(RCU_USART0);
-            gpio_init(GPIOA, GPIO_MODE_AF_PP, GPIO_OSPEED_50MHZ, GPIO_PIN_9);
-            gpio_init(GPIOA, GPIO_MODE_IN_FLOATING, GPIO_OSPEED_50MHZ, GPIO_PIN_10);
+            lnPinMode(PA9,lnALTERNATE_PP);
+            lnPinMode(PA10,lnFLOATING);
             break;
         default:
             xAssert(0);

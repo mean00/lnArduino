@@ -156,6 +156,7 @@ void colors(WS2812B *ws)
  */
 void loop()
 {
+    Logger("WS2812B demo...\n");
     // 1-setup WS2812B
    hwlnSPIClass *spi=new hwlnSPIClass(0);
    WS2812B    *ws=new WS2812B(NB_WS2812B,spi);
