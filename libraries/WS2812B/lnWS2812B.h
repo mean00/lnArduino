@@ -15,7 +15,7 @@ public:
              void   setGlobalBrightness(int value); // between 0 & 255
              void   setColor(int r,int g, int b); // set all the same color
              void   setLedColor(int led, int r,int g, int b); // set only one led
-             void   setLedBrighness(int led, int brightness); // set only one led
+             void   setLedBrightness(int led, int brightness); // set only one led
              void   update(); // call this to have the changes committed
 
 protected:

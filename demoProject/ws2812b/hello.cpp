@@ -71,8 +71,8 @@ void wheelDemo(WS2812B *ws)
         
         after=micros();
         //Logger("Convert2 = %d\n",after-before);
-        xDelay(5);
-        ws->setGlobalBrightness(brightness);
+        xDelay(20);
+        //ws->setGlobalBrightness(brightness);
         brightness+=dir;
         if(brightness==0 && dir<0) dir=-dir;
         if(brightness==255 && dir>0) dir=-dir;
@@ -94,7 +94,50 @@ void pulse(WS2812B *ws)
         if(brightness==0 && dir<0) dir=-dir;
         if(brightness==255 && dir>0) dir=-dir;
         ws->update();
-        xDelay(10);
+        xDelay(20);
+    }
+}
+#define VAL 0x0f
+uint8_t single[3][3]={{0,0,VAL},{0,VAL,0},{VAL,0,0}};
+void dot(WS2812B *ws)
+{
+    int dex=0,olddex=0;
+    int r,g,b;
+    int color=0;
+    uint8_t *start=&(single[0][0]);
+    for(int i=0;i<NB_WS2812B;i++)
+    {
+        uint8_t *t=start+(i%3)*3;
+        
+        ws->setLedColor(i,t[0],t[1],t[2]);// g r b
+        ws->setLedBrightness(i,(255*((i%3)+1))/4);
+    }
+     ws->update();
+     while(1) {}
+         
+    while(1)
+    {
+        //ws->setLedBrightness(olddex,10);
+        dex++;
+        //if(dex>=NB_WS2812B) dex=0;
+        //ws->setLedBrightness(dex,255);
+        ws->setGlobalBrightness(dex&0xff);
+        olddex=dex;
+        ws->update();
+        xDelay(80);
+    }
+}
+void colors(WS2812B *ws)
+{
+    int dex=0;
+    while(1)
+    {
+        //ws->setLedBrightness(olddex,10);
+        dex+=10;
+        if(dex>=255) dex=0;        
+        ws->setColor(dex,0,0);// r g b
+        ws->update();
+        xDelay(100);
     }
 }
     
@@ -110,7 +153,9 @@ void loop()
    ws->begin();
    
    //wheelDemo(ws);
-   pulse(ws);
+   //pulse(ws);
+   //dot(ws);
+   colors(ws);
    
 }
 // EOF

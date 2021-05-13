@@ -1,6 +1,7 @@
 /*
  *  (C) 2021 MEAN00 fixounet@free.fr
  *  See license file
+ * 
  */
 #include "lnArduino.h"
 #include "lnWS2812B.h"
@@ -26,6 +27,8 @@ WS2812B::WS2812B(int nbLeds, hwlnSPIClass *s)
         _ledsColor[3*i+2]=0;
         _ledsBrightness[i]=255;        
     }
+    memset(  _ledsColorSPI,0,3*up*8);
+    
 }
 /**
  * 
@@ -35,7 +38,7 @@ void WS2812B::begin()
     xAssert(_spi);
     _spi->begin();
     _spi->setSpeed(108000000/16);
-    _spi->setDataMode(SPI_MODE0);
+    _spi->setDataMode(SPI_MODE1);
 }
 
 /**
@@ -86,10 +89,10 @@ WS2812B::~WS2812B()
   */
  void   WS2812B::setLedColor(int led, int r,int g, int b)
  {
-      uint8_t *pr=_ledsColor+led*3;
-      pr[0]=r;
-      pr[1]=g;
-      pr[2]=b;
+      uint8_t *p=_ledsColor+led*3;
+      p[0]=g;
+      p[1]=r;
+      p[2]=b;
       convert(led);
  }
  /**
@@ -97,7 +100,7 @@ WS2812B::~WS2812B()
   * @param led
   * @param brightness
   */
- void   WS2812B::setLedBrighness(int led, int brightness)
+ void   WS2812B::setLedBrightness(int led, int brightness)
  {
      _ledsBrightness[led]=brightness;
      convert(led);     
@@ -107,50 +110,65 @@ WS2812B::~WS2812B()
   */
  void WS2812B::update()
  {
-     _spi->dmaWrite(_nbLeds*3*8,_ledsColorSPI);
+     // If need be we change the first byte to lower the duration of the "HIGH" state
+     // as the GD32 adds ~ 100 ns of extra high state
+     uint8_t v=_ledsColorSPI[0];
+     switch(v)
+     {
+         case (0x1f<<3):
+            v=0x1e<<3;
+            break;                    
+         case (0x7<<5):
+            v=0x6<<5;
+            break;
+         default:
+            break;                            
+     }
+     _ledsColorSPI[0]=v;
+     _spi->dmaWrite(_nbLeds*3*8+24,_ledsColorSPI); // add a couple of zeros at the end
  }
 /**
  * 
  * @param led
  */   
-#define ZRANK(x,y)  ((((x*0x1fU)<<3)+(((1-x)*0x7U)<<5))<<y)
+#define ZRANK(x,y)  ((((x*0x1fUL)<<3UL)+(((1UL-x)*0x7UL)<<5UL))<<y)
 #define Z0(x) ZRANK(x,24)
 #define Z1(x) ZRANK(x,16)
 #define Z2(x) ZRANK(x,8)
 #define Z3(x) ZRANK(x,0)
  
-static const uint32_t   lookupTable[16]={ 
-            Z0(0) + Z1(0)+ Z2(0)+ Z3(0),
-            Z0(0) + Z1(0)+ Z2(0)+ Z3(1),
-            Z0(0) + Z1(0)+ Z2(1)+ Z3(0),
-            Z0(0) + Z1(0)+ Z2(1)+ Z3(1),
-            Z0(0) + Z1(1)+ Z2(0)+ Z3(0),
-            Z0(0) + Z1(1)+ Z2(0)+ Z3(1),
-            Z0(0) + Z1(1)+ Z2(1)+ Z3(0),
-            Z0(0) + Z1(0)+ Z2(1)+ Z3(1),
-            Z0(1) + Z1(0)+ Z2(0)+ Z3(0),
-            Z0(1) + Z1(0)+ Z2(0)+ Z3(1),
-            Z0(1) + Z1(0)+ Z2(1)+ Z3(0),
-            Z0(1) + Z1(0)+ Z2(1)+ Z3(1),
-            Z0(1) + Z1(1)+ Z2(0)+ Z3(0),
-            Z0(1) + Z1(1)+ Z2(0)+ Z3(1),
-            Z0(1) + Z1(1)+ Z2(1)+ Z3(0),
-            Z0(1) + Z1(0)+ Z2(1)+ Z3(1)         
+#define ZZ(a,b,c,d)    Z0((uint32_t)a) + Z1((uint32_t)b)+ Z2((uint32_t)c)+ Z3((uint32_t)d)
+ 
+static const uint32_t   lookupTable[16]=
+{ 
+            ZZ(0,0,0,0),
+            ZZ(0,0,0,1),
+            ZZ(0,0,1,0),
+            ZZ(0,0,1,1),
+            ZZ(0,1,0,0),
+            ZZ(0,1,0,1),
+            ZZ(0,1,1,0),
+            ZZ(0,1,1,1),
+            
+            ZZ(1,0,0,0),
+            ZZ(1,0,0,1),
+            ZZ(1,0,1,0),
+            ZZ(1,0,1,1),
+            ZZ(1,1,0,0),
+            ZZ(1,1,0,1),
+            ZZ(1,1,1,0),
+            ZZ(1,1,1,1)
 };
  
-#define ZZZ(a,b,c,d) 
- 
- static const uint8_t lookup[16]={0x7<<5,0x1f<<3};
- 
- static void convertOne(int color, int b16, uint8_t *target)
- {
+static void convertOne(int color, int b16, uint8_t *target)
+{
      uint32_t *p=(uint32_t *)target;
      
      color=(color*b16)>>16;
      
      p[0]=lookupTable[(color>>4)&0xf];
      p[1]=lookupTable[(color)&0xf];
- }
+}
  /**
   * 
   * @param led
@@ -160,7 +178,7 @@ void         WS2812B::convert(int led)
     uint8_t *p=_ledsColorSPI+3*8*led;
     uint8_t *c=_ledsColor+led*3;
     
-    int  b=(int)_ledsBrightness[led]*(int)_brightness;
+    int  b=(int)(_ledsBrightness[led])*(int)(_brightness);
     
     
     convertOne(c[0],b,p);
