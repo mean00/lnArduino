@@ -33,7 +33,7 @@ struct LN_RCU
 #define LN_RCU_CTL_CKMEN      (1<<19)
 #define LN_RCU_CTL_PLLEN      (1<<24)
 #define LN_RCU_CTL_PLLSTB     (1<<25)
-#define LN_RCU_CTL_PLL1       (1<<26)
+#define LN_RCU_CTL_PLL1EN     (1<<26)
 #define LN_RCU_CTL_PLL1STB    (1<<27)
 #define LN_RCU_CTL_PLL2EN     (1<<28)
 #define LN_RCU_CTL_PLL2STB    (1<<29)
@@ -87,3 +87,17 @@ struct LN_RCU
 
 // AHB RESET
 #define LN_RCU_AHBRST_USBFSRST      (1<<12)
+
+// CFG0
+#define LN_RCU_CFG0_PLL_USED   (1<<3)
+#define LN_RCU_CFG0_SYSCLOCK_MASK (3)
+#define LN_RCU_CFG0_SYSCLOCK_PLL (1<<1)
+
+
+// CFG1
+#define LN_RCU_CFG1_PRED_CLOCKSEL   (1<<16)
+#define LN_RCU_CFG1_PLL2_MUL(x)   ((x)<<12)
+#define LN_RCU_CFG1_PLL1_MUL(x)   ((x)<<8)
+#define LN_RCU_CFG1_PREDV1_DIV(x)   ((x)<<4)
+#define LN_RCU_CFG1_PREDV0_DIV(x)   ((x)<<0)
+

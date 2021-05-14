@@ -23,11 +23,11 @@ struct SpiDescriptor
 static const SpiDescriptor spiDescriptor[3]=
 {
     //             DMA DMATX CLOCK   GPIO MOSI MISO CLK
-    {SPI0, SPI0_IRQn,0, 2, pSPI0, GPIOA,PA7, PA6, PA5},
-    {SPI1, SPI1_IRQn,0, 4, pSPI1, GPIOB,PB15,PB14,PB13},
-    {SPI2, SPI2_IRQn,1, 1, pSPI2, GPIOB,PB5, PB4, PB3}
+    {LN_SPI0_ADR, SPI0_IRQn,0, 2, pSPI0, LN_GPIOA_ADR,PA7, PA6, PA5},
+    {LN_SPI1_ADR, SPI1_IRQn,0, 4, pSPI1, LN_GPIOB_ADR,PB15,PB14,PB13},
+    {LN_SPI2_ADR, SPI2_IRQn,1, 1, pSPI2, LN_GPIOB_ADR,PB5, PB4, PB3}
 };
-LN_SPI_Registers *aspi0=(LN_SPI_Registers *)SPI0;
+LN_SPI_Registers *aspi0=(LN_SPI_Registers *)LN_SPI0_ADR;
 /**
  * switch between RX/TX and TX only : false is txRx, 
  * @param adr

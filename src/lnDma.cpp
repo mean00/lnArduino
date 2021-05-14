@@ -12,12 +12,11 @@
 
 static lnDMA *_lnDmas[2][7]={ {NULL,NULL,NULL,NULL,NULL,NULL,NULL},{NULL,NULL,NULL,NULL,NULL,NULL,NULL}};
 static const IRQn  _dmaIrqs[2][7]= { { z0(0),z0(1),z0(2), z0(3),z0(4),z0(5),z0(6)},{ z1(0),z1(1),z1(2),z1(3),z1(4),IRQn_Type(0),IRQn_Type(0)}}; // Warning DMA CHANNEL5/6 is not available
-static const uint32_t _dmas[2]={DMA0,DMA1};
-static const dma_channel_enum _channels[7]={DMA_CH0,DMA_CH1,DMA_CH2,DMA_CH3,DMA_CH4,DMA_CH5,DMA_CH6};
+static const uint32_t _dmas[2]={LN_DMA0_ADR,LN_DMA1_ADR};
 /**
  */
 
-DMA_struct *dma0=(DMA_struct *)DMA0;
+DMA_struct *dma0=(DMA_struct *)LN_DMA0_ADR;
 
 /**
  * 

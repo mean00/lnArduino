@@ -7,7 +7,7 @@
 #include "lnSerial.h"
 #include "lnSerial_priv.h"
 
-LN_USART_Registers *usart0=(LN_USART_Registers *)USART0;
+LN_USART_Registers *usart0=(LN_USART_Registers *)LN_USART0_ADR;
  static lnSerial *SerialInstance[5]={NULL,NULL,NULL,NULL,NULL};
                                      //0   1    2    3  
 
@@ -22,11 +22,11 @@ struct UsartMapping
 };
 static const UsartMapping usartMapping[5]=
 {
-    {USART0,0,3,USART0_IRQn},
-    {USART1,0,6,USART1_IRQn},
-    {USART2,0,1,USART2_IRQn},
-    {UART3, 1,4,UART3_IRQn},
-    {UART4, 0,7,UART4_IRQn},
+    {LN_USART0_ADR, 0,3,USART0_IRQn},
+    {LN_USART1_ADR, 0,6,USART1_IRQn},
+    {LN_USART2_ADR, 0,1,USART2_IRQn},
+    {LN_USART3_ADR, 1,4,UART3_IRQn},
+    {LN_USART4_ADR, 0,7,UART4_IRQn},
 };
 /**
  * 
