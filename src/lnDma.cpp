@@ -5,7 +5,7 @@
 #include "lnArduino.h"
 #include "lnDma.h"
 #include "lnDma_priv.h"
-
+#include "lnPeripheral_priv.h"
 
 #define z0(x) DMA0_Channel##x##_IRQn
 #define z1(x) DMA1_Channel##x##_IRQn

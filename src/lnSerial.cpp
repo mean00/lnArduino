@@ -6,6 +6,7 @@
 #include "lnArduino.h"
 #include "lnSerial.h"
 #include "lnSerial_priv.h"
+#include "lnPeripheral_priv.h"
 
 LN_USART_Registers *usart0=(LN_USART_Registers *)LN_USART0_ADR;
  static lnSerial *SerialInstance[5]={NULL,NULL,NULL,NULL,NULL};

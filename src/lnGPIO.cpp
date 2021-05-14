@@ -5,7 +5,7 @@
 #include "lnArduino.h"
 #include "lnGPIO.h"
 #include "lnGPIO_priv.h"
-
+#include "lnPeripheral_priv.h"
 static  LN_GPIO *gpio[5]={(LN_GPIO *)LN_GPIOA_ADR,(LN_GPIO *)LN_GPIOB_ADR,(LN_GPIO *)LN_GPIOC_ADR,(LN_GPIO *)LN_GPIOD_ADR,(LN_GPIO *)LN_GPIOE_ADR};
 
 static  LN_GPIO *gpioA=(LN_GPIO *)LN_GPIOA_ADR;

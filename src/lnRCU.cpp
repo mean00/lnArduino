@@ -1,8 +1,12 @@
+/*
+ *  (C) 2021 MEAN00 fixounet@free.fr
+ *  See license file
+ */
 
 #include "lnArduino.h"
 #include "lnRCU.h"
 #include "lnRCU_priv.h"
-
+#include "lnPeripheral_priv.h"
 LN_RCU *arcu=(LN_RCU *)LN_RCU_ADR;
 /**
  */

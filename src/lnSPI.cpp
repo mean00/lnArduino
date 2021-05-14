@@ -7,7 +7,7 @@
 #include "lnSPI.h"
 #include "lnSPI_priv.h"
 #include "lnGPIO.h"
-
+#include "lnPeripheral_priv.h"
 struct SpiDescriptor
 {
     uint32_t    spiAddress;

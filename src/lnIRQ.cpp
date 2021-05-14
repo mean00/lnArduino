@@ -4,8 +4,35 @@
  */
 
 #include "lnArduino.h"
+#include "lnRCU.h"
+#include "lnIRQ.h"
+#include "lnIRQ_priv.h"
+
+
+/**
+ * 
+ * @param per
+ */
+void lnEnableInterrupt(const LnIRQ &irq)
+{
+    
+}
+/**
+ * 
+ * @param per
+ */
+void lnDisableInterrupt(const LnIRQ &irq)
+{
+    
+}
+
 
 #define DMA_IRQ(d,c) extern "C" void DMA##d##_Channel##c##_IRQHandler(void) { dmaIrqHandler(d,c);}
+/**
+ * 
+ * @param dma
+ * @param channel
+ */
 void dmaIrqHandler(int dma, int channel);
 DMA_IRQ(0,0)
 DMA_IRQ(0,1)
