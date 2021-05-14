@@ -8,6 +8,8 @@
 #include "riscv_encoding.h"
 #include "n200_func.h"
 
+extern uint32_t SystemCoreClock;
+
     // Configure PMP to make all the address space accesable and executable
 void pmp_open_all_space(){
     // Config entry0 addr to all 1s to make the range cover all space

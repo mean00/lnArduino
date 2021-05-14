@@ -1,6 +1,9 @@
 
 #include "lnArduino.h"
-
+extern "C"
+{
+#include "gd32vf103_eclic.h"
+}
 uint8_t ucHeap[configTOTAL_HEAP_SIZE];
 
 extern void setup();

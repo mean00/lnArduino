@@ -30,6 +30,8 @@
 
 // This is GD32/RISCV specific
 #include "n200_timer.h"
+extern uint32_t SystemCoreClock;
+
 #define configMTIME_BASE_ADDRESS    TIMER_CTRL_ADDR
 #define configMTIMECMP_BASE_ADDRESS (TIMER_CTRL_ADDR+8)
 #define configISR_STACK_SIZE_WORDS              (200)
