@@ -56,8 +56,9 @@ lnSerial::lnSerial(int instance) :  _txDma(lnDMA::DMA_MEMORY_TO_PERIPH, M(dmaEng
 bool lnSerial::setSpeed(int speed)
 {
     int freq;
-    if(!_instance) freq=rcu_clock_freq_get(CK_APB2);
-        else freq=rcu_clock_freq_get(CK_APB1);
+    
+    lnPeripherals::Peripherals periph=( lnPeripherals::Peripherals)((int)lnPeripherals::pUART0+_instance);
+    freq=lnPeripherals::getClock(periph);    
     // compute closest divider
     int divider=(freq+speed/2)/speed;
     // Fixed 4 buts decimal, just ignore since we oversample by 16
@@ -77,7 +78,7 @@ bool lnSerial::init()
     switch(_instance)
     {
         case 0:
-            rcu_periph_clock_enable(RCU_USART0);
+            lnPeripherals::enable(lnPeripherals::pUART0);
             lnPinMode(PA9,lnALTERNATE_PP);
             lnPinMode(PA10,lnFLOATING);
             break;

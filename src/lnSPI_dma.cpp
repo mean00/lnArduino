@@ -36,12 +36,12 @@ bool hwlnSPIClass::dmaWriteInternal(int wordSize,int nbTransfer, const uint8_t *
     // 3- Go!
     csOn();    
     nbReq++;    
-    enable();
+    senable();
     if(false==_done.take(5))
         xAssert(0);
     waitForCompletion();       
     csOff();    
-    disable();
+    sdisable();
     updateDmaTX(d,false);
     return true;
 }

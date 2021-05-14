@@ -35,12 +35,14 @@ int main()
     eclic_global_interrupt_enable();                       
     
     // The LEDs are all on GPIO A
-    rcu_periph_clock_enable(RCU_GPIOA);
-    rcu_periph_clock_enable(RCU_GPIOB);
-    rcu_periph_clock_enable(RCU_GPIOC);
+    lnPeripherals::enable(lnPeripherals::pGPIOA);
+    lnPeripherals::enable(lnPeripherals::pGPIOB);
+    lnPeripherals::enable(lnPeripherals::pGPIOC);
+        
     // We need alternate functions too
-    rcu_periph_clock_enable(RCU_AF); 
-    rcu_periph_clock_enable(RCU_DMA0); 
+    lnPeripherals::enable(lnPeripherals::pAF);
+    lnPeripherals::enable(lnPeripherals::pDMA0);
+    
     // DMA TX for SPI0 (LCD)
     DMA_CHCTL(DMA0, DMA_CH2) = (uint32_t)(DMA_PRIORITY_HIGH | DMA_CHXCTL_DIR); 
     // DMA TX for usart0

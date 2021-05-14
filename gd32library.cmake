@@ -24,7 +24,7 @@ foreach(periph # gd32vf103_adc.c   gd32vf103_can.c   gd32vf103_dac.c
                # gd32vf103_timer.c
                # gd32vf103_dbg.c                 
                # gd32vf103_exti.c 
-                gd32vf103_rcu.c                
+               # gd32vf103_rcu.c                
                 gd32vf103_eclic.c 
             )
     LIST(APPEND GD32_MAIN ${GD32_STD}/Source/${periph})

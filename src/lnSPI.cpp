@@ -14,7 +14,7 @@ struct SpiDescriptor
     IRQn_Type   spiIrq;
     int         dmaEngine;
     int         dmaTxChannel;
-    rcu_periph_enum rcu;
+    lnPeripherals::Peripherals rcu;
     uint32_t    bank;
     lnPin       mosi,miso, clk;
 };
@@ -23,9 +23,9 @@ struct SpiDescriptor
 static const SpiDescriptor spiDescriptor[3]=
 {
     //             DMA DMATX CLOCK   GPIO MOSI MISO CLK
-    {SPI0, SPI0_IRQn,0, 2, RCU_SPI0, GPIOA,PA7, PA6, PA5},
-    {SPI1, SPI1_IRQn,0, 4, RCU_SPI1, GPIOB,PB15,PB14,PB13},
-    {SPI2, SPI2_IRQn,1, 1, RCU_SPI2, GPIOB,PB5, PB4, PB3}
+    {SPI0, SPI0_IRQn,0, 2, lnPeripherals::pSPI0, GPIOA,PA7, PA6, PA5},
+    {SPI1, SPI1_IRQn,0, 4, lnPeripherals::pSPI1, GPIOB,PB15,PB14,PB13},
+    {SPI2, SPI2_IRQn,1, 1, lnPeripherals::pSPI2, GPIOB,PB5, PB4, PB3}
 };
 LN_SPI_Registers *aspi0=(LN_SPI_Registers *)SPI0;
 /**
@@ -103,7 +103,7 @@ hwlnSPIClass::hwlnSPIClass(int instance, int pinCs) : _internalSettings(1000000,
     _irq=s->spiIrq;
     eclic_disable_interrupt(_irq);
     _adr=s->spiAddress;
-    rcu_periph_clock_enable(s->rcu);
+    lnPeripherals::enable(s->rcu);
     // setup miso/mosi & clk
     lnPinMode( s->mosi, lnALTERNATE_PP);
     lnPinMode( s->miso, lnFLOATING);
@@ -117,7 +117,7 @@ hwlnSPIClass::hwlnSPIClass(int instance, int pinCs) : _internalSettings(1000000,
     }
     LN_SPI_Registers *d=(LN_SPI_Registers *)_adr;
     _settings=&_internalSettings;
-    disable();   
+    sdisable();   
 }
 /**
  * 
@@ -139,7 +139,7 @@ void hwlnSPIClass::begin()
 void hwlnSPIClass::end(void)
 {
     LN_SPI_Registers *d=(LN_SPI_Registers *)_adr;
-    disable();
+    sdisable();
 }    
 
 
@@ -194,16 +194,16 @@ bool hwlnSPIClass::writeInternal(int sz, int data)
     LN_SPI_Registers *d=(LN_SPI_Registers *)_adr;
     updateDataSize(d,sz);
     updateMode(d,false);
-    enable();
+    senable();
     csOn();
-    while (txBusy()) 
+    while (stxBusy()) 
     {
     }
     d->DATA=data;
     
     waitForCompletion();
     csOff();
-    disable();
+    sdisable();
     return true;
 }
 
@@ -214,18 +214,18 @@ bool hwlnSPIClass::writesInternal(int sz, int nbBytes, const uint8_t *data)
     LN_SPI_Registers *d=(LN_SPI_Registers *)_adr;
     updateMode(d,false);
     updateDataSize(d,sz);
-    enable();
+    senable();
     csOn();
     for (size_t i = 0; i < nbBytes; i++) 
     {
-        while (txBusy()) 
+        while (stxBusy()) 
         {
         }
         d->DATA=data[i];
     }
     waitForCompletion();
     csOff();
-    disable();
+    sdisable();
     return true;
 }
 /**
@@ -284,7 +284,7 @@ void hwlnSPIClass::waitForCompletion()
     {
         case 0:
         case 1: // bidir mode
-            while(busy())
+            while(sbusy())
                     {
 
                     }
@@ -293,7 +293,7 @@ void hwlnSPIClass::waitForCompletion()
             xAssert(0);
             break;
         case 3: //  t only
-            while(txBusy())
+            while(stxBusy())
             {
                 
             }
@@ -307,7 +307,7 @@ bool hwlnSPIClass::transfer(int nbBytes, uint8_t *dataOut, uint8_t *dataIn)
     LN_SPI_Registers *d=(LN_SPI_Registers *)_adr;
     updateMode(d,true);
     updateDataSize(d,8);
-    enable();
+    senable();
     csOn();
     for (size_t i = 0; i < nbBytes; i++) 
     {
@@ -323,7 +323,7 @@ bool hwlnSPIClass::transfer(int nbBytes, uint8_t *dataOut, uint8_t *dataIn)
     }
     waitForCompletion();
     csOff();
-    disable();
+    sdisable();
     return true;
 }
 /**
@@ -341,7 +341,7 @@ void hwlnSPIClass::setup()
 {
     LN_SPI_Registers *d=(LN_SPI_Registers *)_adr;
     xAssert(_settings);
-    disable();
+    sdisable();
     d->CTL0&=LN_SPI_CTL0_MASK;
     d->CTL1&=LN_SPI_CTL1_MASK;
     d->STAT&=LN_SPI_STAT_MASK;
@@ -376,14 +376,9 @@ void hwlnSPIClass::setup()
     d->CTL0|=s;
     uint32_t prescale = 0,speed=_settings->speed,apb ;
     xAssert(speed);
-    if (!_instance ) 
-    {
-        apb=rcu_clock_freq_get(CK_APB2);
-    }
-    else 
-    {
-        apb=rcu_clock_freq_get(CK_APB1);
-    }
+    
+    lnPeripherals::Peripherals periph=( lnPeripherals::Peripherals)((int)lnPeripherals::pSPI0+_instance);
+    apb=lnPeripherals::getClock(periph);
     prescale = (apb+speed/2) / speed;
     // prescale can only go from 2 to 256, and prescale=2^(psc+1) actually
     

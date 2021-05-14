@@ -22,6 +22,7 @@ extern "C"
 #include "MapleFreeRTOS1000_pp.h"
 #include "lnDebug.h"
 #include "lnGPIO.h"
+#include "lnRCU.h"
 #include "gd32vf103.h"
 
 #define byte uint8_t 
