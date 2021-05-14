@@ -57,7 +57,7 @@ bool lnSerial::setSpeed(int speed)
 {
     int freq;
     
-    lnPeripherals::Peripherals periph=( lnPeripherals::Peripherals)((int)lnPeripherals::pUART0+_instance);
+    Peripherals periph=( Peripherals)((int)pUART0+_instance);
     freq=lnPeripherals::getClock(periph);    
     // compute closest divider
     int divider=(freq+speed/2)/speed;
@@ -78,7 +78,7 @@ bool lnSerial::init()
     switch(_instance)
     {
         case 0:
-            lnPeripherals::enable(lnPeripherals::pUART0);
+            lnPeripherals::enable(pUART0);
             lnPinMode(PA9,lnALTERNATE_PP);
             lnPinMode(PA10,lnFLOATING);
             break;

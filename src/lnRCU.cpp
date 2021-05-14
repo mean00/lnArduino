@@ -5,12 +5,102 @@
 
 LN_RCU *arcu=(LN_RCU *)RCU;
 /**
+ */
+struct RCU_Peripheral
+{
+    Peripherals                 periph;
+    int                         AHB_APB; // 1=APB 1, 2=APB2,8=AHB
+    int                         APB;
+    uint32_t                    enable;
+};
+/**
+ */
+static const RCU_Peripheral _peripherals[]=
+{           // PERIP          APB         BIT
+    {        pNONE,          2,          LN_RCU_APB2_SPI0EN},
+    {        pSPI0,          2,          LN_RCU_APB2_TIMER0EN},
+    {        pSPI1,          1,          LN_RCU_APB1_SPI1EN},
+    {        pSPI2,          1,          LN_RCU_APB1_SPI1EN},
+    {        pUART0,         2,          LN_RCU_APB2_USART0EN},
+    {        pUART1,         1,          LN_RCU_APB1_USART1EN},
+    {        pUART2,         1,          LN_RCU_APB1_USART2EN},
+    {        pUART3,         1,          LN_RCU_APB1_USART3EN},
+    {        pUART4,         1,          LN_RCU_APB1_USART4EN},   
+    {        pI2C0,          1,          LN_RCU_APB1_I2C0EN},   
+    {        pI2C1,          1,          LN_RCU_APB1_I2C1EN},   
+    {        pCAN0,          1,          LN_RCU_APB1_CAN0EN}, 
+    {        pCAN1,          1,          LN_RCU_APB1_CAN1EN},  
+    {        pDAC,           1,          LN_RCU_APB1_DACEN},         
+    {        pPMU,           1,          LN_RCU_APB1_PMUEN},       
+    {        pBKPI,          1,          LN_RCU_APB1_BKPIEN},
+    {        pWWDGT,         1,          LN_RCU_APB1_WWDGTEN},
+    {        pTIMER0,        2,          LN_RCU_APB2_TIMER0EN},
+    {        pTIMER1,        1,          LN_RCU_APB1_TIMER1EN},
+    {        pTIMER2,        1,          LN_RCU_APB1_TIMER2EN},
+    {        pTIMER3,        1,          LN_RCU_APB1_TIMER3EN},
+    {        pTIMER4,        1,          LN_RCU_APB1_TIMER4EN},
+    {        pTIMER5,        1,          LN_RCU_APB1_TIMER5EN},
+    {        pTIMER6,        1,          LN_RCU_APB1_TIMER6EN},
+    {        pADC0  ,        2,          LN_RCU_APB2_ADC0EN},
+    {        pADC1  ,        2,          LN_RCU_APB2_ADC1EN},
+           // PERIP        AHB         APB         BIT    
+    {        pGPIOA,         2,          LN_RCU_APB2_PAEN},
+    {        pGPIOB,         2,          LN_RCU_APB2_PBEN},
+    {        pGPIOC,         2,          LN_RCU_APB2_PCEN},
+    {        pGPIOD,         2,          LN_RCU_APB2_PDEN},
+    {        pGPIOE,         2,          LN_RCU_APB2_PEEN},
+    {        pAF,            2,          LN_RCU_APB2_AFEN},
+    {        pDMA0,          8,          LN_RCU_AHB_DMA0EN},
+    {        pDMA1,          8,          LN_RCU_AHB_DMA1EN}
+};
+
+// 1 : Reset
+// 2: Enable
+// 3: disable
+static void _rcuAction(const Peripherals periph, int action)
+{
+    RCU_Peripheral *o=(RCU_Peripheral *)(_peripherals+(int)periph);
+    xAssert(o->periph==periph);
+    xAssert(o->enable);
+    switch(o->AHB_APB)
+    {
+        case 1: // APB1
+            switch(action)
+            {
+                case 1: arcu->APB1RST|= o->enable;break;
+                case 2: arcu->APB1EN |= o->enable;break;
+                case 3: arcu->APB1EN &=~o->enable;
+            }            
+            break;
+        case 2: // APB2
+            switch(action)
+            {
+                case 1: arcu->APB2RST|= o->enable;break;
+                case 2: arcu->APB2EN |= o->enable;break;
+                case 3: arcu->APB2EN &=~o->enable;
+            }            
+            break;
+        case 8: // AHB
+            switch(action)
+            {
+                case 1: arcu->AHBRST|= o->enable;break;
+                case 2: arcu->AHBEN |= o->enable;break;
+                case 3: arcu->AHBEN &=~o->enable;
+            }            
+
+            break;
+        default:
+            xAssert(0);
+    }
+}
+
+/**
  * 
  * @param periph
  */
 void lnPeripherals::reset(const Peripherals periph)
 {
-    
+    _rcuAction(periph,1);
 }
 /**
  * 
@@ -18,7 +108,7 @@ void lnPeripherals::reset(const Peripherals periph)
  */
 void lnPeripherals::enable(const Peripherals periph)
 {
-    
+    _rcuAction(periph,2);
 }
 /**
  * 
@@ -26,10 +116,10 @@ void lnPeripherals::enable(const Peripherals periph)
  */
 void lnPeripherals::disable(const Peripherals periph)
 {
-    
+    _rcuAction(periph,3);
 }
 
-uint32_t clockApb1,clockApb2;
+uint32_t _rcuClockApb1,_rcuClockApb2;
 
 /**
  * 
@@ -41,10 +131,12 @@ uint32_t lnPeripherals::getClock(const Peripherals periph)
     switch(periph)
     {
         case pUART0:
+        case pTIMER0:
         case pSPI0:
-                    return clockApb2;
+        case pAF:
+                    return _rcuClockApb2;
         default:
-                    return clockApb1;
+                    return _rcuClockApb1;
     }
 }
 

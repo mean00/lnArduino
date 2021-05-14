@@ -14,8 +14,8 @@ struct LN_RCU
     uint32_t APB2RST;
     uint32_t APB1RST;
     uint32_t AHBEN;
-    uint32_t AP2EN;
-    uint32_t AP1EN;
+    uint32_t APB2EN;
+    uint32_t APB1EN;
     uint32_t BDCTL;
     uint32_t RSTCLK;
     uint32_t AHBRST;

@@ -14,7 +14,7 @@ struct SpiDescriptor
     IRQn_Type   spiIrq;
     int         dmaEngine;
     int         dmaTxChannel;
-    lnPeripherals::Peripherals rcu;
+    Peripherals rcu;
     uint32_t    bank;
     lnPin       mosi,miso, clk;
 };
@@ -23,9 +23,9 @@ struct SpiDescriptor
 static const SpiDescriptor spiDescriptor[3]=
 {
     //             DMA DMATX CLOCK   GPIO MOSI MISO CLK
-    {SPI0, SPI0_IRQn,0, 2, lnPeripherals::pSPI0, GPIOA,PA7, PA6, PA5},
-    {SPI1, SPI1_IRQn,0, 4, lnPeripherals::pSPI1, GPIOB,PB15,PB14,PB13},
-    {SPI2, SPI2_IRQn,1, 1, lnPeripherals::pSPI2, GPIOB,PB5, PB4, PB3}
+    {SPI0, SPI0_IRQn,0, 2, pSPI0, GPIOA,PA7, PA6, PA5},
+    {SPI1, SPI1_IRQn,0, 4, pSPI1, GPIOB,PB15,PB14,PB13},
+    {SPI2, SPI2_IRQn,1, 1, pSPI2, GPIOB,PB5, PB4, PB3}
 };
 LN_SPI_Registers *aspi0=(LN_SPI_Registers *)SPI0;
 /**
@@ -377,7 +377,7 @@ void hwlnSPIClass::setup()
     uint32_t prescale = 0,speed=_settings->speed,apb ;
     xAssert(speed);
     
-    lnPeripherals::Peripherals periph=( lnPeripherals::Peripherals)((int)lnPeripherals::pSPI0+_instance);
+    Peripherals periph=( Peripherals)((int)pSPI0+_instance);
     apb=lnPeripherals::getClock(periph);
     prescale = (apb+speed/2) / speed;
     // prescale can only go from 2 to 256, and prescale=2^(psc+1) actually

@@ -5,10 +5,8 @@
 
 
 #pragma once
-class lnPeripherals
-{
-public:
-    enum Peripherals
+
+ enum Peripherals
     {
             pNONE=0,
             pSPI0,
@@ -23,8 +21,7 @@ public:
             pI2C1,    
             pCAN0,    
             pCAN1,    
-            pDAC,        
-            pPLMU,        
+            pDAC,           
             pPMU,        
             pBKPI,
             pWWDGT,
@@ -35,6 +32,8 @@ public:
             pTIMER4,
             pTIMER5,
             pTIMER6,
+            pADC0,
+            pADC1,
             pGPIOA,
             pGPIOB,
             pGPIOC,
@@ -44,6 +43,11 @@ public:
             pDMA0,
             pDMA1
     };
+
+class lnPeripherals
+{
+public:
+   
 public:            
     static void reset(const Peripherals periph);
     static void enable(const Peripherals periph);
