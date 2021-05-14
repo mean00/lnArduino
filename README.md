@@ -12,11 +12,18 @@ What are the differences ?
 A note of warning : This is my take on what i would like to have/use for such a board
 It might not fit your needs.
 
-What works for the moment :
+_What works for the moment :_
  * FreeRTOS
  * Spi transmit (DMA)
  * Serial transmit (DMA)
  * Onboard LCD support
+
+
+_How to build the examples :_
+Symlink/copy the Arduino_gd32_freeRTOS folder under the demo folder
+Fill-in platformconfig.cmake to point to your toolchain (adjust flags if needed)
+mkdir build && cd build && cmake .. && make
+
 
 
 Code from the longduino / gd32 libs are used internally for now, but they'll be removed as progress is done.
