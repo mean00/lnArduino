@@ -10,15 +10,14 @@ struct RCU_Peripheral
 {
     Peripherals                 periph;
     int                         AHB_APB; // 1=APB 1, 2=APB2,8=AHB
-    int                         APB;
     uint32_t                    enable;
 };
 /**
  */
 static const RCU_Peripheral _peripherals[]=
 {           // PERIP          APB         BIT
-    {        pNONE,          2,          LN_RCU_APB2_SPI0EN},
-    {        pSPI0,          2,          LN_RCU_APB2_TIMER0EN},
+    {        pNONE,          0,          0},
+    {        pSPI0,          2,          LN_RCU_APB2_SPI0EN},
     {        pSPI1,          1,          LN_RCU_APB1_SPI1EN},
     {        pSPI2,          1,          LN_RCU_APB1_SPI1EN},
     {        pUART0,         2,          LN_RCU_APB2_USART0EN},
@@ -140,4 +139,113 @@ uint32_t lnPeripherals::getClock(const Peripherals periph)
     }
 }
 
+// 
+void lnInitSystemClock()
+{
+ 
+     /* reset the RCC clock configuration to the default reset state */
+    /* enable IRC8M */
+    RCU_CTL |= RCU_CTL_IRC8MEN;
+    
+    /* reset SCS, AHBPSC, APB1PSC, APB2PSC, ADCPSC, CKOUT0SEL bits */
+    RCU_CFG0 &= ~(RCU_CFG0_SCS | RCU_CFG0_AHBPSC | RCU_CFG0_APB1PSC | RCU_CFG0_APB2PSC |
+                  RCU_CFG0_ADCPSC | RCU_CFG0_ADCPSC_2 | RCU_CFG0_CKOUT0SEL);
+
+    /* reset HXTALEN, CKMEN, PLLEN bits */
+    RCU_CTL &= ~(RCU_CTL_HXTALEN | RCU_CTL_CKMEN | RCU_CTL_PLLEN);
+
+    /* Reset HXTALBPS bit */
+    RCU_CTL &= ~(RCU_CTL_HXTALBPS);
+
+    /* reset PLLSEL, PREDV0_LSB, PLLMF, USBFSPSC bits */
+    
+    RCU_CFG0 &= ~(RCU_CFG0_PLLSEL | RCU_CFG0_PREDV0_LSB | RCU_CFG0_PLLMF |
+                  RCU_CFG0_USBFSPSC | RCU_CFG0_PLLMF_4);
+    RCU_CFG1 = 0x00000000U;
+
+    /* Reset HXTALEN, CKMEN, PLLEN, PLL1EN and PLL2EN bits */
+    RCU_CTL &= ~(RCU_CTL_PLLEN | RCU_CTL_PLL1EN | RCU_CTL_PLL2EN | RCU_CTL_CKMEN | RCU_CTL_HXTALEN);
+    /* disable all interrupts */
+    RCU_INT = 0x00FF0000U;
+    
+ //----------------------------------------------   
+    uint32_t timeout   = 0U;
+    uint32_t stab_flag = 0U;
+
+    /* enable HXTAL */
+    RCU_CTL |= RCU_CTL_HXTALEN;
+
+    /* wait until HXTAL is stable or the startup time is longer than HXTAL_STARTUP_TIMEOUT */
+    do{
+        timeout++;
+        stab_flag = (RCU_CTL & RCU_CTL_HXTALSTB);
+    }while((0U == stab_flag) && (HXTAL_STARTUP_TIMEOUT != timeout));
+
+    /* if fail */
+    if(0U == (RCU_CTL & RCU_CTL_HXTALSTB)){
+        while(1){
+        }
+    }
+
+    /* HXTAL is stable */
+    /* AHB = SYSCLK */
+    RCU_CFG0 |= RCU_AHB_CKSYS_DIV1;
+    /* APB2 = AHB/1 */
+    RCU_CFG0 |= RCU_APB2_CKAHB_DIV1;
+    /* APB1 = AHB/2 */
+    RCU_CFG0 |= RCU_APB1_CKAHB_DIV2;
+
+    /* CK_PLL = (CK_PREDIV0) * 27 = 108 MHz */ 
+    RCU_CFG0 &= ~(RCU_CFG0_PLLMF | RCU_CFG0_PLLMF_4);
+    RCU_CFG0 |= (RCU_PLLSRC_HXTAL | RCU_PLL_MUL27);
+
+    if(HXTAL_VALUE==25000000){
+		/* CK_PREDIV0 = (CK_HXTAL)/5 *8 /10 = 4 MHz */
+		RCU_CFG1 &= ~(RCU_CFG1_PREDV0SEL | RCU_CFG1_PREDV1 | RCU_CFG1_PLL1MF | RCU_CFG1_PREDV0);
+		RCU_CFG1 |= (RCU_PREDV0SRC_CKPLL1 | RCU_PREDV1_DIV5 | RCU_PLL1_MUL8 | RCU_PREDV0_DIV10);
+
+		/* enable PLL1 */
+		RCU_CTL |= RCU_CTL_PLL1EN;
+		/* wait till PLL1 is ready */
+		while(0U == (RCU_CTL & RCU_CTL_PLL1STB)){
+		}
+
+		/* enable PLL1 */
+		RCU_CTL |= RCU_CTL_PLL2EN;
+		/* wait till PLL1 is ready */
+		while(0U == (RCU_CTL & RCU_CTL_PLL2STB)){
+		}
+    }else if(HXTAL_VALUE==8000000){
+		RCU_CFG1 &= ~(RCU_CFG1_PREDV0SEL | RCU_CFG1_PREDV1 | RCU_CFG1_PLL1MF | RCU_CFG1_PREDV0);
+		RCU_CFG1 |= (RCU_PREDV0SRC_HXTAL | RCU_PREDV0_DIV2 | RCU_PREDV1_DIV2 | RCU_PLL1_MUL20 | RCU_PLL2_MUL20);
+
+		/* enable PLL1 */
+		RCU_CTL |= RCU_CTL_PLL1EN;
+		/* wait till PLL1 is ready */
+		while(0U == (RCU_CTL & RCU_CTL_PLL1STB)){
+		}
+
+		/* enable PLL2 */
+		RCU_CTL |= RCU_CTL_PLL2EN;
+		/* wait till PLL1 is ready */
+		while(0U == (RCU_CTL & RCU_CTL_PLL2STB)){
+		}
+
+    }
+    /* enable PLL */
+    RCU_CTL |= RCU_CTL_PLLEN;
+
+    /* wait until PLL is stable */
+    while(0U == (RCU_CTL & RCU_CTL_PLLSTB)){
+    }
+
+    /* select PLL as system clock */
+    RCU_CFG0 &= ~RCU_CFG0_SCS;
+    RCU_CFG0 |= RCU_CKSYSSRC_PLL;
+
+    /* wait until PLL is selected as system clock */
+    while(0U == (RCU_CFG0 & RCU_SCSS_PLL)){
+    }
+    
+}
 // EOF

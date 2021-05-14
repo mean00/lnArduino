@@ -26,8 +26,7 @@ void initTask(void *)
 int main()
 {
     // Initialize system    
-    SystemInit();
-
+    lnInitSystemClock();
     //ECLIC init
     eclic_init(ECLIC_NUM_INTERRUPTS);
     eclic_mode_enable();

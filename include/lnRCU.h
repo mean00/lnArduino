@@ -55,3 +55,4 @@ public:
     static uint32_t getClock(const Peripherals periph);
 };
 
+void lnInitSystemClock();
