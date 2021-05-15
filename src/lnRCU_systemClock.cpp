@@ -106,32 +106,37 @@ void lnInitSystemClock()
     volatile uint32_t *control=&(arcu->CTL);
     volatile uint32_t *cfg0=&(arcu->CFG0);
     
-    *control=LN_RCU_CTL_IRC8MEN;     // Enable internal 8 Mhz oscillator
-    *cfg0=0;         // select 8Mhz as source for sysclock
-    *control=LN_RCU_CTL_IRC8MEN;     // Enable internal 8 Mhz oscillator
-    arcu->INT=0;    // No interrupt
-    arcu->CFG1=0;   // PLL pre divider not set
-    
-    // start crystal...
-    *control|=LN_RCU_CTL_HXTALEN;
-    waitControlBit(LN_RCU_CTL_HXTASTB); // Wait Xtal stable
-    
+    {
+        *control=LN_RCU_CTL_IRC8MEN;     // Enable internal 8 Mhz oscillator
+        *cfg0=0;         // select 8Mhz as source for sysclock
+        *control=LN_RCU_CTL_IRC8MEN;     // Enable internal 8 Mhz oscillator
+        arcu->INT=0;    // No interrupt
+        arcu->CFG1=0;   // PLL pre divider not set
+    }
+    {
+        // start crystal...
+        *control|=LN_RCU_CTL_HXTALEN;
+        waitControlBit(LN_RCU_CTL_HXTASTB); // Wait Xtal stable
+    }
+    {
+        // Set HXTAL as source for PLL <<
+        *cfg0=LN_RCU_CFG0_PLLSEL;
+        setPll(27,2); // 8*27/2=108 Mhz
+    }
     // Setup AHB...
     // AHB is Xtal:1, divider value=0
-    *cfg0&=~(0xf)<<4;
+    
     // APB2=AHB/1
     uint32_t a=*cfg0;
-    a&=~(3<<11);
+    a&=~((0xf)<<4); // AHB PRESCALER CLEAR
+    a|=0<<4;      // AHB prescaler is CK_SYS
+    a&=~(3<<11); //  APB2 Prescaler clear
+    a|=0<<11;     // APB2 is AHB
     *cfg0=a;
     // APB1=AHB/2, divider value=4
-    a&=(3<<8);
-    a|=4<<8;
+    a&=~(7<<8);
+    a|=4<<8;        // APB1 is AHB/2
     *cfg0=a;
-    
-    setPll(27,2); // 8*27/2=108 Mhz
-    
-		
-
     
     // Enable PLL and wait for it to be stable
     *control|=LN_RCU_CTL_PLLEN;
