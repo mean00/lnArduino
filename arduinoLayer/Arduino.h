@@ -9,3 +9,8 @@ void digitalToggle(int a);
 extern uint64_t millis();
 extern uint64_t micros();
 extern void     delay(int ms);
+
+#define LOW 0
+#define HIGH 1
+#define boolean bool
+#define PROGMEM
