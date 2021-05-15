@@ -27,7 +27,7 @@ typedef volatile LN_RCUx LN_RCU;
 // CTL
 #define LN_RCU_CTL_IRC8MEN    (1<<0)
 #define LN_RCU_CTL_IRC8MSTB   (1<<1)
-#define LN_RCU_CTL_HXTALEN    (1<<16)
+#define LN_RCU_CTL_HXTALEN    (1<<16) //enable high speed external crystal (8Mhz)
 #define LN_RCU_CTL_HXTASTB    (1<<17)
 #define LN_RCU_CTL_HXTABPS    (1<<18)
 #define LN_RCU_CTL_CKMEN      (1<<19)
@@ -89,9 +89,10 @@ typedef volatile LN_RCUx LN_RCU;
 #define LN_RCU_AHBRST_USBFSRST      (1<<12)
 
 // CFG0
-#define LN_RCU_CFG0_PLL_USED   (1<<3)
+#define LN_RCU_CFG0_PLL_USED      (1<<3)
 #define LN_RCU_CFG0_SYSCLOCK_MASK (3)
-#define LN_RCU_CFG0_SYSCLOCK_PLL (1<<1)
+#define LN_RCU_CFG0_SYSCLOCK_PLL ( 1<<1)
+#define LN_RCU_CFG0_PLLSEL       ( 1<<16)
 
 
 // CFG1
