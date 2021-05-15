@@ -6,7 +6,7 @@
 
 #pragma once
 
-struct LN_RCU
+struct LN_RCUx
 {
     uint32_t CTL;
     uint32_t CFG0;
@@ -22,7 +22,7 @@ struct LN_RCU
     uint32_t CFG1;
     uint32_t DSV;
 };
-
+typedef volatile LN_RCUx LN_RCU;    
 
 // CTL
 #define LN_RCU_CTL_IRC8MEN    (1<<0)

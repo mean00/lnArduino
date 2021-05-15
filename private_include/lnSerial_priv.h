@@ -4,7 +4,7 @@
  */
 #pragma once
 
-struct LN_USART_Registers
+struct LN_USART_Registersx
 {
     uint32_t STAT;
     uint32_t DATA;
@@ -15,6 +15,7 @@ struct LN_USART_Registers
     uint32_t GP;
 };
 
+typedef volatile LN_USART_Registersx LN_USART_Registers;
 
 // Registers STAT...
 #define LN_USART_STAT_PERR  (1<<0) // parity

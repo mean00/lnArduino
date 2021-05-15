@@ -20,7 +20,7 @@ void lnPinMode(const lnPin xpin, const GpioMode mode)
     LN_GPIO *port=gpio[xpin>>4];
     int pin=xpin&0xf;
     
-    uint32_t *CTL;
+    volatile uint32_t *CTL;
     if(pin>7)
     {
         CTL=&(port->CTL1);

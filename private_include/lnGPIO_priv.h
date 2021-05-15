@@ -2,7 +2,7 @@
 
 #pragma once
 
-struct LN_GPIO
+struct LN_GPIOx
 {
     uint32_t CTL0;
     uint32_t CTL1;
@@ -12,6 +12,8 @@ struct LN_GPIO
     uint32_t BC;
     uint32_t LOCK;    
 };
+
+typedef volatile LN_GPIOx LN_GPIO;    
 
 #define LN_CTL_MD_INPUT         0
 #define LN_CTL_MD_OUTPUT        3 // dont care about 2Mh/10Mhz for now

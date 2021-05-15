@@ -5,7 +5,7 @@
 
 #pragma once
 
-struct DMA_channels
+struct DMA_channelsx
     {
         uint32_t CTL;  // 8 0
         uint32_t CNT;  // c 4
@@ -13,7 +13,10 @@ struct DMA_channels
         uint32_t MADDR; // 14 C
         uint32_t empty;
     };
-struct DMA_struct
+    
+typedef volatile DMA_channelsx DMA_channels;    
+    
+struct DMA_structx
 {
     uint32_t INTF;
     uint32_t INTC;
@@ -21,6 +24,7 @@ struct DMA_struct
     DMA_channels channels[6];
 };
 
+typedef volatile DMA_structx DMA_struct;
 
 
 #define LN_DMA_CHAN_ENABLE         (1<<0)

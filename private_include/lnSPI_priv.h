@@ -5,7 +5,7 @@
 
 #pragma once
 
-struct LN_SPI_Registers
+struct LN_SPI_Registersx
 {
     uint32_t CTL0; //0
     uint32_t CTL1; //4
@@ -19,7 +19,7 @@ struct LN_SPI_Registers
 };
 
 
-
+typedef volatile LN_SPI_Registersx LN_SPI_Registers;
 
 //----------- CTL0 --------------------
 
