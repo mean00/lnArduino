@@ -158,8 +158,8 @@ void loop()
 {
     Logger("WS2812B demo...\n");
     
-    uint32_t cpuFreq=get_cpu_freq();
-    Logger("CPU FREQ=%d...\n",cpuFreq);
+  //  uint32_t cpuFreq=get_cpu_freq();
+  //  Logger("CPU FREQ=%d...\n",cpuFreq);
     // 1-setup WS2812B
    hwlnSPIClass *spi=new hwlnSPIClass(0);
    WS2812B    *ws=new WS2812B(NB_WS2812B,spi);

@@ -5,7 +5,7 @@
 
 #include "riscv_encoding.h"
 #include "riscv_bits.h"
-#include "n200_eclic.h"
+//#include "n200_eclic.h"
 #include "n200_timer.h"
 
 ###############################################

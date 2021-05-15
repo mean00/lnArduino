@@ -97,13 +97,14 @@ extern void vPortSetMSIPInt(void);
 /* Critical section management. */
 extern void vPortEnterCritical( void );
 extern void vPortExitCritical( void );
+extern void lnWriteMthDirect(int val);
 #define portDISABLE_INTERRUPTS()	                            \
 {                                                               \
-    eclic_set_mth((configMAX_SYSCALL_INTERRUPT_PRIORITY)|0x1f); \
+    lnWriteMthDirect((configMAX_SYSCALL_INTERRUPT_PRIORITY)|0x1f); \
     __asm volatile("fence");                                    \
     __asm volatile("fence.i");                                  \
 }
-#define portENABLE_INTERRUPTS()			    eclic_set_mth(0)
+#define portENABLE_INTERRUPTS()			    lnWriteMthDirect(0)
 #define portSET_INTERRUPT_MASK_FROM_ISR()   xPortSetInterruptMask()
 #define portCLEAR_INTERRUPT_MASK_FROM_ISR( uxSavedStatusValue )  vPortClearInterruptMask( uxSavedStatusValue )
 #define portENTER_CRITICAL()			    vPortEnterCritical()

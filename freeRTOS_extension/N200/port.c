@@ -5,9 +5,7 @@
 #include "n200_func.h"
 #include "riscv_encoding.h"
 #include "n200_timer.h"
-#include "n200_eclic.h"
-#include "gd32vf103.h" // MEANX
-#include "gd32vf103_eclic.h" // MEANX
+
 /* Standard Includes */
 #include <stdlib.h>
 #include <stdio.h>

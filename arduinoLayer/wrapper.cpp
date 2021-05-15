@@ -24,9 +24,11 @@ void digitalToggle(int a)
 {
     lnDigitalToggle(a);
 }
+#warning FIXME micros is not working
 uint64_t micros(void)
 {
-    return (uint64_t)(get_timer_value() * (4000000.F / SystemCoreClock));
+  //  return (uint64_t)(get_timer_value() * (4000000.F / SystemCoreClock));
+    return 0;
 }
 
 void delay(unsigned long dwMs)
