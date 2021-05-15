@@ -10,7 +10,7 @@ struct LN_ECLIC_irq
 };
 
 uint32_t     *eclicCfg=(uint32_t *)(LN_ECLIC_ADR);
-uint32_t     *eclicInfo=(uint32_t *)(LN_ECLIC_ADR+4);
+uint32_t     *eclicInfo=(uint32_t *)(LN_ECLIC_ADR+4); // Read only
 uint8_t      *eclicMth=(uint8_t *)(LN_ECLIC_ADR+11);
 
 
@@ -27,6 +27,7 @@ struct _irqDesc
 
 static const _irqDesc _irqs[]=
 {  
+    {LN_IRQ_NONE                , 18},
     {LN_IRQ_WWDGT               , 19},      /*!< window watchDog timer interrupt                          */
     {LN_IRQ_LVD                 , 20},      /*!< LVD through EXTI line detect interrupt                   */
     {LN_IRQ_TAMPER              , 21},      /*!< tamper through EXTI line detect                          */
@@ -88,3 +89,6 @@ static const _irqDesc _irqs[]=
     {LN_IRQ_CAN1_EWMC           , 85},     /*!< CAN1 EWMC interrupt                                      */
     {LN_IRQ_USBFS               , 86},     /*!< USBFS global interrupt                                   */   
 };
+
+extern "C" void lnWriteMthDirect(int val);
+extern "C" int  lnReadMthDirect();

@@ -11,7 +11,7 @@
 struct SpiDescriptor
 {
     uint32_t    spiAddress;
-    IRQn_Type   spiIrq;
+    LnIRQ       spiIrq;
     int         dmaEngine;
     int         dmaTxChannel;
     Peripherals rcu;
@@ -23,9 +23,9 @@ struct SpiDescriptor
 static const SpiDescriptor spiDescriptor[3]=
 {
     //             DMA DMATX CLOCK   GPIO MOSI MISO CLK
-    {LN_SPI0_ADR, SPI0_IRQn,0, 2, pSPI0, LN_GPIOA_ADR,PA7, PA6, PA5},
-    {LN_SPI1_ADR, SPI1_IRQn,0, 4, pSPI1, LN_GPIOB_ADR,PB15,PB14,PB13},
-    {LN_SPI2_ADR, SPI2_IRQn,1, 1, pSPI2, LN_GPIOB_ADR,PB5, PB4, PB3}
+    {LN_SPI0_ADR, LN_IRQ_SPI0,0, 2, pSPI0, LN_GPIOA_ADR,PA7, PA6, PA5},
+    {LN_SPI1_ADR, LN_IRQ_SPI1,0, 4, pSPI1, LN_GPIOB_ADR,PB15,PB14,PB13},
+    {LN_SPI2_ADR, LN_IRQ_SPI2,1, 1, pSPI2, LN_GPIOB_ADR,PB5, PB4, PB3}
 };
 LN_SPI_Registers *aspi0=(LN_SPI_Registers *)LN_SPI0_ADR;
 /**
@@ -101,7 +101,7 @@ hwlnSPIClass::hwlnSPIClass(int instance, int pinCs) : _internalSettings(1000000,
     const SpiDescriptor *s=spiDescriptor+instance;
     
     _irq=s->spiIrq;
-    eclic_disable_interrupt(_irq);
+    lnEnableInterrupt(_irq);
     _adr=s->spiAddress;
     lnPeripherals::enable(s->rcu);
     // setup miso/mosi & clk

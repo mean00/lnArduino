@@ -110,7 +110,7 @@ class hwlnSPIClass
     void                *_callbackCookie;
     int                 _instance;
     uint32_t            _adr;
-    IRQn_Type           _irq;
+    LnIRQ               _irq;
     
     lnDMA               txDma;
     // callbacks

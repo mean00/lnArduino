@@ -34,7 +34,7 @@ public:
  static void interrupts(int instance);
 protected:
     int _instance;
-    IRQn_Type _irq;
+    LnIRQ _irq;
     bool _stateTx;
     uint32_t _adr;
     xMutex _mutex;

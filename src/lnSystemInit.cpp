@@ -1,14 +1,12 @@
 
 #include "lnArduino.h"
-extern "C"
-{
-#include "gd32vf103_eclic.h"
-}
+
 uint8_t ucHeap[configTOTAL_HEAP_SIZE];
 
 extern void setup();
 extern void loop();
 extern "C" void _init();
+void lnIrqSysInit();
 /**
  * 
  * @param 
@@ -31,10 +29,7 @@ int main()
     // Initialize system    
     lnInitSystemClock();
     //ECLIC init
-    eclic_init(ECLIC_NUM_INTERRUPTS);
-    eclic_mode_enable();
-    eclic_priority_group_set(ECLIC_PRIGROUP_LEVEL4_PRIO0); 
-    eclic_global_interrupt_enable();                       
+    lnIrqSysInit();
     
     // The LEDs are all on GPIO A
     lnPeripherals::enable(pGPIOA);

@@ -23,6 +23,7 @@ extern "C"
 #include "lnDebug.h"
 #include "lnGPIO.h"
 #include "lnRCU.h"
+#include "lnIRQ.h"
 #include "gd32vf103.h"
 #include "lnPeripherals.h"
 #define byte uint8_t 

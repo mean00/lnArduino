@@ -19,15 +19,15 @@ struct UsartMapping
     uint32_t usartEngine;
     uint32_t dmaEngine;
     int      dmaTxChannel;
-    IRQn_Type irq;
+    LnIRQ    irq;
 };
 static const UsartMapping usartMapping[5]=
 {
-    {LN_USART0_ADR, 0,3,USART0_IRQn},
-    {LN_USART1_ADR, 0,6,USART1_IRQn},
-    {LN_USART2_ADR, 0,1,USART2_IRQn},
-    {LN_USART3_ADR, 1,4,UART3_IRQn},
-    {LN_USART4_ADR, 0,7,UART4_IRQn},
+    {LN_USART0_ADR, 0,3,LN_IRQ_USART0},
+    {LN_USART1_ADR, 0,6,LN_IRQ_USART1},
+    {LN_USART2_ADR, 0,1,LN_IRQ_USART2},
+    {LN_USART3_ADR, 1,4,LN_IRQ_UART3},
+    {LN_USART4_ADR, 0,7,LN_IRQ_UART4},
 };
 /**
  * 
@@ -111,16 +111,16 @@ bool lnSerial::enableTx(txMode mode)
             d->CTL2&=~LN_USART_CTL2_DMA_TX;    // disable TX DMA
             d->CTL0|=LN_USART_CTL0_TEN; // enable TX   
             d->CTL0|= LN_USART_CTL0_TBIE; // enable TBIE
-            eclic_enable_interrupt(_irq);      // enable eclic   
+            lnEnableInterrupt(_irq);      // enable eclic   
             break;
         case txNone:
-             eclic_disable_interrupt(_irq);    
+             lnDisableInterrupt(_irq);    
              d->CTL0&=~LN_USART_CTL0_TEN; // disable TX
              d->CTL2&=~LN_USART_CTL2_DMA_TX; // disable TX DMA
              d->CTL0&=~( LN_USART_CTL0_TBIE +LN_USART_CTL0_TCIE);
              break;
         case txDma:
-            eclic_disable_interrupt(_irq);    
+            lnDisableInterrupt(_irq);    
             d->CTL0|=( LN_USART_CTL0_TBIE +LN_USART_CTL0_TCIE);
             d->CTL0|=LN_USART_CTL0_TEN; // enable TX
             d->CTL2|=LN_USART_CTL2_DMA_TX; // enable TX DMA            

@@ -7,15 +7,87 @@
 #include "lnRCU.h"
 #include "lnIRQ.h"
 #include "lnIRQ_priv.h"
+/**
+ * 
+ */
+void lnIrqSysInit()
+{
+    // start from a clean state
+    *eclicCfg=0;
+    *eclicMth=0;
+        
+    for(int i=0;i<87;i++)
+    {
+        eclicIrqs[i].ie=0; 
+        eclicIrqs[i].control=0x0; 
+        eclicIrqs[i].ip=0x0; 
+        eclicIrqs[i].attr=0; //Non Vector mode
+    }
+    
+    
+    // Switch to ECLIC mode
+    // If the 6 lower bits= 3 => eclic mode
+    uint32_t tmp1,tmp2;
+    
+    asm volatile (
+                  "li  %0,0x3f\n" // https://stackoverflow.com/questions/64547741/how-is-risc-v-neg-instruction-imeplemented
+                  "not %1,%0\n"
+                  "csrr %0, mtvec\n" 
+                  "and  %0,%0,%1\n" 
+                  "ori  %0,%0,3\n"
+                  "csrw mtvec, %0\n"     
+            :: "r"(tmp1),"r"(tmp2)
+    ); 
+    // See bumblebee Core Architecture Manual
+    *eclicCfg=4<<1;
+    
+    // Preconfigure timer & syscall
+    // these 2 are in vector mode
+     eclicIrqs[7].attr=0xc1;
+     eclicIrqs[3].attr=0xc1;
+     eclicIrqs[7].control=0x1f;
+     eclicIrqs[3].control=0x1f;    
+    return;
+}
 
+void _enableDisable(bool enableDisable, const LnIRQ &irq)
+{
+    const _irqDesc *i=_irqs+(int)irq;
+    xAssert(i->interrpt==irq)
+    
+    
+    LN_ECLIC_irq *iclic=eclicIrqs+i->irqNb;
+    if(enableDisable)
+        iclic->ie|=1;
+    else
+        iclic->ie&=~1;
+}
+/**
+ * 
+ * @param irq
+ */
+extern "C" void lnEnableInterruptDirect(int irq)
+{   
+    LN_ECLIC_irq *iclic=eclicIrqs+irq;
+    iclic->ie|=1;
+}
+/**
+ * 
+ * @param irq
+ */
+extern "C" void lnDisableInterruptDirect(int irq)
+{   
+    LN_ECLIC_irq *iclic=eclicIrqs+irq;
+    iclic->ie&=~1;
+}
 
 /**
  * 
  * @param per
  */
 void lnEnableInterrupt(const LnIRQ &irq)
-{
-    
+{   
+    _enableDisable(true,irq);   
 }
 /**
  * 
@@ -23,9 +95,17 @@ void lnEnableInterrupt(const LnIRQ &irq)
  */
 void lnDisableInterrupt(const LnIRQ &irq)
 {
-    
+     _enableDisable(false,irq);
 }
 
+void lnWriteMthDirect(int mth)
+{
+    *eclicMth=mth;
+}
+int  lnReadMthDirect()
+{
+    return *eclicMth;
+}
 
 #define DMA_IRQ(d,c) extern "C" void DMA##d##_Channel##c##_IRQHandler(void) { dmaIrqHandler(d,c);}
 /**
@@ -62,3 +142,4 @@ extern "C" void deadEnd(int code)
     }
 }        
 // EOF
+

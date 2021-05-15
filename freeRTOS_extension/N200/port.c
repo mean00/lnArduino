@@ -13,6 +13,19 @@
 #include <stdio.h>
 #include <unistd.h>
 
+extern void deadEnd(int er); // crash handler
+extern void lnWriteMthDirect(int val);
+extern int  lnReadMthDirect();
+extern void lnDisableInterruptDirect(int irq);
+extern void lnEnableInterruptDirect(int irq);
+
+#define ECLIC_IRQ_TIMER 7
+#define ECLIC_IRQ_SFT   3
+#define ECLIC_IRQ_BWEI  17
+#define ECLIC_IRQ_PMOVI 18
+
+
+
 /* use SystemView include */
 // MEANX #include "SYSVIEW_Serial_Conf.h"
 //#define USER_MODE_TASKS 1
@@ -51,48 +64,48 @@ static void prvTaskExitError( void );
  */
 unsigned long ulSynchTrap(unsigned long mcause, unsigned long sp, unsigned long arg1)
 {
-	switch(mcause&0X00000fff)	
-	{
-		//on User and Machine ECALL, handler the request
-		case 8:
-		case 11:
-		{
-			if(arg1==IRQ_DISABLE)	
-			{
-				//zero out mstatus.mpie
-				clear_csr(mstatus,MSTATUS_MPIE);
-			}
-			else if(arg1==IRQ_ENABLE)	
-			{
-				//set mstatus.mpie
-				set_csr(mstatus,MSTATUS_MPIE);
-			} 
-			else if(arg1==PORT_YIELD)		
-			{
-				//always yield from machine mode
-				//fix up mepc on sync trap
-				unsigned long epc = read_csr(mepc);
-				vPortYield_from_ulSynchTrap(sp,epc+4);
-			}
-			else if(arg1==PORT_YIELD_TO_RA)	
-			{
-				vPortYield_from_ulSynchTrap(sp,(*(unsigned long*)(sp+1*sizeof(sp))));
-			}
-			break;
-		}
-		default:
-		{
-			/* 异常处理 */
-			extern uintptr_t handle_trap(uintptr_t mcause, uintptr_t sp);
-			handle_trap(mcause,sp);
-		}
-	}
+    switch(mcause&0X00000fff)	
+    {
+        //on User and Machine ECALL, handler the request
+        case 8:
+        case 11:
+        {
+            if(arg1==IRQ_DISABLE)	
+            {
+                //zero out mstatus.mpie
+                clear_csr(mstatus,MSTATUS_MPIE);
+            }
+            else if(arg1==IRQ_ENABLE)	
+            {
+                //set mstatus.mpie
+                set_csr(mstatus,MSTATUS_MPIE);
+            } 
+            else if(arg1==PORT_YIELD)		
+            {
+                //always yield from machine mode
+                //fix up mepc on sync trap
+                unsigned long epc = read_csr(mepc);
+                vPortYield_from_ulSynchTrap(sp,epc+4);
+            }
+            else if(arg1==PORT_YIELD_TO_RA)	
+            {
+                vPortYield_from_ulSynchTrap(sp,(*(unsigned long*)(sp+1*sizeof(sp))));
+            }
+            break;
+        }
+        default:
+        {
+            /* 异常处理 */
+            extern uintptr_t handle_trap(uintptr_t mcause, uintptr_t sp);
+            handle_trap(mcause,sp);
+        }
+    }
 
-	//fix mepc and return 
-	unsigned long epc = read_csr(mepc);
+    //fix mepc and return 
+    unsigned long epc = read_csr(mepc);
 
-	write_csr(mepc,epc+4);
-	return sp;
+    write_csr(mepc,epc+4);
+    return sp;
 }
 /*-----------------------------------------------------------*/
 
@@ -104,9 +117,9 @@ unsigned long ulSynchTrap(unsigned long mcause, unsigned long sp, unsigned long 
  */
 void vPortSetMSIPInt(void)
 {
-	*(volatile uint8_t *) (TIMER_CTRL_ADDR + TIMER_MSIP) |=0x01;
-	__asm volatile("fence");
-	__asm volatile("fence.i");
+    *(volatile uint8_t *) (TIMER_CTRL_ADDR + TIMER_MSIP) |=0x01;
+    __asm volatile("fence");
+    __asm volatile("fence.i");
 }
 /*-----------------------------------------------------------*/
 
@@ -117,7 +130,7 @@ void vPortSetMSIPInt(void)
  */
 void vPortClearMSIPInt(void)
 {
-	*(volatile uint8_t *) (TIMER_CTRL_ADDR + TIMER_MSIP) &= ~0x01;
+    *(volatile uint8_t *) (TIMER_CTRL_ADDR + TIMER_MSIP) &= ~0x01;
 }
 /*-----------------------------------------------------------*/
 
@@ -131,12 +144,12 @@ void vPortClearMSIPInt(void)
  */
 unsigned long taskswitch( unsigned long sp, unsigned long arg1)
 {
-	//always yield from machine mode
-	//fix up mepc on 
-	unsigned long epc = read_csr(mepc);
-	vPortYield(sp,epc); //never returns
+    //always yield from machine mode
+    //fix up mepc on 
+    unsigned long epc = read_csr(mepc);
+    vPortYield(sp,epc); //never returns
 
-	return sp;
+    return sp;
 }
 /*-----------------------------------------------------------*/
 
@@ -147,9 +160,9 @@ unsigned long taskswitch( unsigned long sp, unsigned long arg1)
  */
 void vDoTaskSwitchContext( void )
 {
-	portDISABLE_INTERRUPTS();
-	vTaskSwitchContext();
-	portENABLE_INTERRUPTS();
+    portDISABLE_INTERRUPTS();
+    vTaskSwitchContext();
+    portENABLE_INTERRUPTS();
 }
 /*-----------------------------------------------------------*/
 
@@ -160,13 +173,13 @@ void vDoTaskSwitchContext( void )
  */
 void vPortEnterCritical( void )
 {
-	#if USER_MODE_TASKS
-		ECALL(IRQ_DISABLE);
-	#else
-		portDISABLE_INTERRUPTS();
-	#endif
+    #if USER_MODE_TASKS
+            ECALL(IRQ_DISABLE);
+    #else
+            portDISABLE_INTERRUPTS();
+    #endif
 
-	uxCriticalNesting++;
+    uxCriticalNesting++;
 }
 /*-----------------------------------------------------------*/
 
@@ -177,17 +190,17 @@ void vPortEnterCritical( void )
  */
 void vPortExitCritical( void )
 {
-	configASSERT( uxCriticalNesting );
-	uxCriticalNesting--;
-	if( uxCriticalNesting == 0 )
-	{
-		#if USER_MODE_TASKS
-			ECALL(IRQ_ENABLE);
-		#else
-			portENABLE_INTERRUPTS();
-		#endif
-	}
-	return;
+    configASSERT( uxCriticalNesting );
+    uxCriticalNesting--;
+    if( uxCriticalNesting == 0 )
+    {
+            #if USER_MODE_TASKS
+                    ECALL(IRQ_ENABLE);
+            #else
+                    portENABLE_INTERRUPTS();
+            #endif
+    }
+    return;
 }
 /*-----------------------------------------------------------*/
 
@@ -199,7 +212,7 @@ void vPortExitCritical( void )
  */
 void vPortClearInterruptMask(int int_mask)
 {
-	eclic_set_mth (int_mask); 
+    lnWriteMthDirect (int_mask); 
 }
 /*-----------------------------------------------------------*/
 
@@ -211,11 +224,11 @@ void vPortClearInterruptMask(int int_mask)
  */
 int xPortSetInterruptMask(void)
 {
-	int int_mask=0;
-	int_mask=eclic_get_mth();
-	
-	portDISABLE_INTERRUPTS();
-	return int_mask;
+    int int_mask=0;
+    int_mask=lnReadMthDirect();
+
+    portDISABLE_INTERRUPTS();
+    return int_mask;
 }
 /*-----------------------------------------------------------*/
 
@@ -230,32 +243,32 @@ int xPortSetInterruptMask(void)
  */
 StackType_t *pxPortInitialiseStack( StackType_t *pxTopOfStack, TaskFunction_t pxCode, void *pvParameters )
 {
-	/* Simulate the stack frame as it would be created by a context switch
-	interrupt. */
+    /* Simulate the stack frame as it would be created by a context switch
+    interrupt. */
 #ifdef __riscv_flen
-	pxTopOfStack -= 32;                               /* 浮点寄存器 */
+    pxTopOfStack -= 32;                               /* 浮点寄存器 */
 #endif
 
-	pxTopOfStack--;
-	*pxTopOfStack = 0xb8000000;			              /* CSR_MCAUSE */
+    pxTopOfStack--;
+    *pxTopOfStack = 0xb8000000;			              /* CSR_MCAUSE */
 
-	pxTopOfStack--;
-	*pxTopOfStack = 0x40;      			              /* CSR_SUBM */
+    pxTopOfStack--;
+    *pxTopOfStack = 0x40;      			              /* CSR_SUBM */
 
-	pxTopOfStack--;
-	*pxTopOfStack = (portSTACK_TYPE)pxCode;			  /* Start address */
+    pxTopOfStack--;
+    *pxTopOfStack = (portSTACK_TYPE)pxCode;			  /* Start address */
 
-	pxTopOfStack--;
-	*pxTopOfStack = MSTATUS_INIT;                     /* CSR_MSTATUS */
+    pxTopOfStack--;
+    *pxTopOfStack = MSTATUS_INIT;                     /* CSR_MSTATUS */
 
-	pxTopOfStack -= 22;
-	*pxTopOfStack = (portSTACK_TYPE)pvParameters;	  /* Register a0 */
+    pxTopOfStack -= 22;
+    *pxTopOfStack = (portSTACK_TYPE)pvParameters;	  /* Register a0 */
 
-	pxTopOfStack -=9;
-	*pxTopOfStack = (portSTACK_TYPE)prvTaskExitError; /* Register ra */
-	pxTopOfStack--;
+    pxTopOfStack -=9;
+    *pxTopOfStack = (portSTACK_TYPE)prvTaskExitError; /* Register ra */
+    pxTopOfStack--;
 
-	return pxTopOfStack;
+    return pxTopOfStack;
 }
 /*-----------------------------------------------------------*/
 
@@ -266,14 +279,14 @@ StackType_t *pxPortInitialiseStack( StackType_t *pxTopOfStack, TaskFunction_t px
  */
 void prvTaskExitError( void )
 {
-	/* A function that implements a task must not exit or attempt to return to
-	its caller as there is nothing to return to.  If a task wants to exit it
-	should instead call vTaskDelete( NULL ).
-	Artificially force an assert() to be triggered if configASSERT() is
-	defined, then stop here so application writers can catch the error. */
-	configASSERT( uxCriticalNesting == ~0UL );
-	portDISABLE_INTERRUPTS();
-	for( ;; );
+    /* A function that implements a task must not exit or attempt to return to
+    its caller as there is nothing to return to.  If a task wants to exit it
+    should instead call vTaskDelete( NULL ).
+    Artificially force an assert() to be triggered if configASSERT() is
+    defined, then stop here so application writers can catch the error. */
+    configASSERT( uxCriticalNesting == ~0UL );
+    portDISABLE_INTERRUPTS();
+    deadEnd(1234);
 }
 /*-----------------------------------------------------------*/
 
@@ -288,32 +301,32 @@ void vPortSysTickHandler(void)
     volatile uint64_t * mtime       = (uint64_t*) (TIMER_CTRL_ADDR + TIMER_MTIME);
     volatile uint64_t * mtimecmp    = (uint64_t*) (TIMER_CTRL_ADDR + TIMER_MTIMECMP);
 	
-	UBaseType_t uxSavedInterruptStatus = portSET_INTERRUPT_MASK_FROM_ISR();
+    UBaseType_t uxSavedInterruptStatus = portSET_INTERRUPT_MASK_FROM_ISR();
 
-	#if CONFIG_SYSTEMVIEW_EN
-	traceISR_ENTER();
-	#endif
+    #if CONFIG_SYSTEMVIEW_EN
+    traceISR_ENTER();
+    #endif
 
-	uint64_t now = *mtime;
-	now += (configRTC_CLOCK_HZ / configTICK_RATE_HZ);
-	*mtimecmp = now;
+    uint64_t now = *mtime;
+    now += (configRTC_CLOCK_HZ / configTICK_RATE_HZ);
+    *mtimecmp = now;
 
-	/* 调用freertos的tick增加接口 */
-	if( xTaskIncrementTick() != pdFALSE )
-	{
-		#if CONFIG_SYSTEMVIEW_EN
-		traceISR_EXIT_TO_SCHEDULER();
-		#endif
-		portYIELD();
-	}
-	#if CONFIG_SYSTEMVIEW_EN
-	else
-	{
-		traceISR_EXIT();
-	}
-	#endif
+    /* 调用freertos的tick增加接口 */
+    if( xTaskIncrementTick() != pdFALSE )
+    {
+            #if CONFIG_SYSTEMVIEW_EN
+            traceISR_EXIT_TO_SCHEDULER();
+            #endif
+            portYIELD();
+    }
+    #if CONFIG_SYSTEMVIEW_EN
+    else
+    {
+            traceISR_EXIT();
+    }
+    #endif
 
-	portCLEAR_INTERRUPT_MASK_FROM_ISR( uxSavedInterruptStatus );
+    portCLEAR_INTERRUPT_MASK_FROM_ISR( uxSavedInterruptStatus );
 }
 /*-----------------------------------------------------------*/
 
@@ -324,18 +337,17 @@ void vPortSysTickHandler(void)
  */
 void vPortSetupTimer(void)
 {
-	/* 内核timer定时器使用64位的计数器来实现 */
+    /* 内核timer定时器使用64位的计数器来实现 */
     volatile uint64_t * mtime       = (uint64_t*) (TIMER_CTRL_ADDR + TIMER_MTIME);
     volatile uint64_t * mtimecmp    = (uint64_t*) (TIMER_CTRL_ADDR + TIMER_MTIMECMP);
 
-	portENTER_CRITICAL();
+        portENTER_CRITICAL();
     uint64_t now = *mtime;
     now += (configRTC_CLOCK_HZ / configTICK_RATE_HZ);
     *mtimecmp = now;
-	portEXIT_CRITICAL();
+    portEXIT_CRITICAL();
 
-	eclic_set_vmode(CLIC_INT_TMR);
-	eclic_irq_enable(CLIC_INT_TMR,configKERNEL_INTERRUPT_PRIORITY>>configPRIO_BITS,0);
+    lnEnableInterruptDirect(ECLIC_IRQ_TIMER);
 }
 /*-----------------------------------------------------------*/
 
@@ -346,8 +358,7 @@ void vPortSetupTimer(void)
  */
 void vPortSetupMSIP(void)
 {
-	eclic_set_vmode(CLIC_INT_SFT);
-	eclic_irq_enable(CLIC_INT_SFT,configKERNEL_INTERRUPT_PRIORITY>>configPRIO_BITS,0);
+    lnEnableInterruptDirect(ECLIC_IRQ_SFT);
 }
 /*-----------------------------------------------------------*/
 
@@ -358,8 +369,8 @@ void vPortSetupMSIP(void)
  */
 void vPortSetup(void)
 {
-	vPortSetupTimer();
-	vPortSetupMSIP();
-	uxCriticalNesting = 0;
+    vPortSetupTimer();
+    vPortSetupMSIP();
+    uxCriticalNesting = 0;
 }
 /*-----------------------------------------------------------*/

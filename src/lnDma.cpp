@@ -7,11 +7,11 @@
 #include "lnDma_priv.h"
 #include "lnPeripheral_priv.h"
 
-#define z0(x) DMA0_Channel##x##_IRQn
-#define z1(x) DMA1_Channel##x##_IRQn
+#define z0(x) LN_IRQ_DMA0_Channel##x
+#define z1(x) LN_IRQ_DMA1_Channel##x
 
 static lnDMA *_lnDmas[2][7]={ {NULL,NULL,NULL,NULL,NULL,NULL,NULL},{NULL,NULL,NULL,NULL,NULL,NULL,NULL}};
-static const IRQn  _dmaIrqs[2][7]= { { z0(0),z0(1),z0(2), z0(3),z0(4),z0(5),z0(6)},{ z1(0),z1(1),z1(2),z1(3),z1(4),IRQn_Type(0),IRQn_Type(0)}}; // Warning DMA CHANNEL5/6 is not available
+static const LnIRQ  _dmaIrqs[2][7]= { { z0(0),z0(1),z0(2), z0(3),z0(4),z0(5),z0(6)},{ z1(0),z1(1),z1(2),z1(3),z1(4),LN_IRQ_NONE,LN_IRQ_NONE}}; // Warning DMA CHANNEL5/6 is not available
 static const uint32_t _dmas[2]={LN_DMA0_ADR,LN_DMA1_ADR};
 /**
  */
@@ -186,7 +186,7 @@ bool lnDMA::doMemoryToPeripheralTransfer(int count, const uint16_t *source,const
     control|=LN_DMA_CHAN_ERRIE+LN_DMA_CHAN_TFTFIE; // error and transmit complete interrupt
     
     c->CTL=control|LN_DMA_CHAN_ENABLE; // GO!       
-    eclic_enable_interrupt(_irq);        
+    lnEnableInterrupt(_irq);        
     return true;
 }
 /**
@@ -216,7 +216,7 @@ void dmaIrqHandler(int dma, int channel)
     // Disable DMA
     d->channels[channel].CTL&=~LN_DMA_CHAN_ENABLE;
     // disable interrupt
-    eclic_disable_interrupt(_dmaIrqs[dma][channel]);       
+    lnDisableInterrupt(_dmaIrqs[dma][channel]);       
     // then call handler
     lnDMA *l=_lnDmas[dma][channel];
     xAssert(l);

@@ -4,6 +4,7 @@
 
 enum LnIRQ
 {
+LN_IRQ_NONE=0,
 LN_IRQ_WWDGT               ,      /*!< window watchDog timer interrupt                          */
 LN_IRQ_LVD                 ,      /*!< LVD through EXTI line detect interrupt                   */
 LN_IRQ_TAMPER              ,      /*!< tamper through EXTI line detect                          */
@@ -64,7 +65,9 @@ LN_IRQ_CAN1_RX0            ,     /*!< CAN1 RX0 interrupt                        
 LN_IRQ_CAN1_RX1            ,     /*!< CAN1 RX1 interrupt                                       */
 LN_IRQ_CAN1_EWMC           ,     /*!< CAN1 EWMC interrupt                                      */
 LN_IRQ_USBFS               ,     /*!< USBFS global interrupt                                   */
+LN_IRQ_LAST=LN_IRQ_USBFS
 };
+
 
 void lnEnableInterrupt(const LnIRQ &irq);
 void lnDisableInterrupt(const LnIRQ &irq);
