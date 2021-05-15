@@ -1,7 +1,7 @@
 This project contains subprojects with difference licenses:
-Longduino : See Longduino_cmake/LICENSE.md
 FreeRTOS  : See FreeRTOS/LICENSE.md
 FreeRTOS/GD32VF103 : See freeRTOS_extension/LICENSE
+legacy /start.S/entry.S   : not really sure if they are nuclei/sipeed. See legacy/LICENSE
 
 The parts *i* wrote are public domain
 It would be appreciated for you to share your changes but not mandatory.
