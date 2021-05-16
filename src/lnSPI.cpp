@@ -394,13 +394,8 @@ void hwlnSPIClass::setup()
             toggle*=2;
             psc++;
         }
-    }   
-    // 0 : Works
-    // 1 : does not work
-    //     
-#warning FIXME FIXME FIXME
-#warning SOMETHING IS WRONG HERE    
-    // d->CTL0|=psc<<3;
+    }       
+    d->CTL0|=psc<<3;
     updateMode(0,false); // Tx only by default    
 }
 /**
