@@ -10,18 +10,31 @@
 /**
  * 
  */
+
+#define ECLIC_CTLBIT 4      // We have the 4 higher bits
+#define ECLIC_CTLBIT_SHIFT (8-ECLIC_CTLBIT) // # number of low bits
+#define ECLIC_CTLBIT_LOW   ((1<<(ECLIC_CTLBIT_SHIFT))-1)
+#define ECLIC_NB_SOURCES 87
+
 void lnIrqSysInit()
 {
     // start from a clean state
     *eclicCfg=0;
     *eclicMth=0;
         
-    for(int i=0;i<87;i++)
+    // Check the compilation value are the same as the runtime value
+    xAssert((*eclicInfo &0xfff)==ECLIC_NB_SOURCES);
+    xAssert(((*eclicInfo >>21)&0xf)==ECLIC_CTLBIT);
+    
+      // See bumblebee Core Architecture Manual
+    *eclicCfg=4<<1; // nlbits =4
+    
+    for(int i=0;i<ECLIC_NB_SOURCES;i++)
     {
-        eclicIrqs[i].ie=0; 
-        eclicIrqs[i].control=0x0; 
+        eclicIrqs[i].ie=0;  // default : disabled
+        eclicIrqs[i].control=ECLIC_CTLBIT_LOW;  // level 0 by default
         eclicIrqs[i].ip=0x0; 
-        eclicIrqs[i].attr=0; //Non Vector mode
+        eclicIrqs[i].attr=0; // Default : Level trigger + Non Vector mode
     }
     
     
@@ -38,14 +51,13 @@ void lnIrqSysInit()
                   "csrw mtvec, %0\n"     
             :: "r"(tmp1),"r"(tmp2)
     ); 
-    // See bumblebee Core Architecture Manual
-    *eclicCfg=4<<1;
+  
     
     // Preconfigure timer & syscall
     // these 2 are in vector mode
      eclicIrqs[7].attr=0xc1;
      eclicIrqs[3].attr=0xc1;
-     eclicIrqs[7].control=0x1f;
+     eclicIrqs[7].control=0x1f; // level 1
      eclicIrqs[3].control=0x1f;    
     return;
 }
