@@ -13,6 +13,13 @@
 #define LED     PA2
 #define LEDRED  PC13
 
+
+
+// MOSI is PA7
+// CLK  is PA5
+// MISO is PA6
+// NSS  is PA4
+
 #define PINDC PB0
 #define PINCS PB2
 #define PINRST PB1
@@ -36,7 +43,7 @@ void loop()
    
     hwlnSPIClass *spi=new hwlnSPIClass(0,-1);
     spi->begin();
-    lnSPISettings transaction(60*1000*1000, SPI_MSBFIRST, SPI_MODE0,-1);
+    lnSPISettings transaction(30*1000*1000, SPI_MSBFIRST, SPI_MODE0,-1);
     spi->beginTransaction(transaction);
     // Reset LCD
     pinMode(PINRST,OUTPUT);
