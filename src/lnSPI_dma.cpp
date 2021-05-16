@@ -37,7 +37,7 @@ bool hwlnSPIClass::dmaWriteInternal(int wordSize,int nbTransfer, const uint8_t *
     csOn();    
     nbReq++;    
     senable();
-    if(false==_done.take(5))
+    if(false==_done.take(100)) // 100 ms should be plenty enough!
         xAssert(0);
     waitForCompletion();       
     csOff();    
