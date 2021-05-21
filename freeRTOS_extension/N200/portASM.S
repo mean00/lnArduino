@@ -115,8 +115,8 @@ int_loop:
  * @brife MTIME入口函数
  */
     .align 2
-    .globl MTIME_HANDLER
-MTIME_HANDLER:
+    .globl eclic_mtip_handler
+eclic_mtip_handler:
 #if USE_MSP
 	csrrw sp, CSR_MSCRATCHCSWL, sp
 #endif
@@ -140,9 +140,9 @@ MTIME_HANDLER:
  * @brife MSIP入口函数
  */
 	.align 2
-	.globl MSIP_HANDLER
+	.globl eclic_msip_handler
 
-MSIP_HANDLER:
+eclic_msip_handler:
 	pushREGFILE sp
 	portSAVE_CONTEXT_EXCP sp
 

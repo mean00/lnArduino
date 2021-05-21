@@ -2,7 +2,7 @@
 #include "task.h"
 #include "portmacro.h"
 
-#include "n200_func.h"
+//#include "n200_func.h"
 #include "riscv_encoding.h"
 //#include "n200_timer.h"
 

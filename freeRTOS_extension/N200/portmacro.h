@@ -7,7 +7,7 @@ extern "C" {
 
 
 #include "riscv_encoding.h"
-#include "n200_func.h" // MEANX
+//#include "n200_func.h" // MEANX
 /* use SystemView include */
 // MEANX #include "SYSVIEW_Serial_Conf.h"
 
