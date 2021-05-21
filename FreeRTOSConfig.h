@@ -29,7 +29,7 @@
 #define FREERTOS_CONFIG_H
 
 // This is GD32/RISCV specific
-#include "n200_timer.h"
+
 extern uint32_t SystemCoreClock;
 
 #define configMTIME_BASE_ADDRESS    TIMER_CTRL_ADDR

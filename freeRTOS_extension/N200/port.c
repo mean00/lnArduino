@@ -4,7 +4,7 @@
 
 #include "n200_func.h"
 #include "riscv_encoding.h"
-#include "n200_timer.h"
+//#include "n200_timer.h"
 
 /* Standard Includes */
 #include <stdlib.h>
@@ -113,9 +113,10 @@ unsigned long ulSynchTrap(unsigned long mcause, unsigned long sp, unsigned long 
  * @note 目的是在软中断内进行任务上下文切换 The purpose is to switch the task context within the soft interrupt 
  * 
  */
+extern void lnSystemTimerTriggerSwInterrupt();
 void vPortSetMSIPInt(void)
 {
-    *(volatile uint8_t *) (TIMER_CTRL_ADDR + TIMER_MSIP) |=0x01;
+    lnSystemTimerTriggerSwInterrupt();
     __asm volatile("fence");
     __asm volatile("fence.i");
 }
@@ -126,9 +127,10 @@ void vPortSetMSIPInt(void)
  * @brief 清除软中断 Clear soft interrupt 
  * 
  */
+extern void lnSystemTimerClearSwInterrupt();
 void vPortClearMSIPInt(void)
 {
-    *(volatile uint8_t *) (TIMER_CTRL_ADDR + TIMER_MSIP) &= ~0x01;
+    lnSystemTimerClearSwInterrupt();
 }
 /*-----------------------------------------------------------*/
 
@@ -294,36 +296,17 @@ void prvTaskExitError( void )
  * @note 由于该中断配置为向量模式，则中断到来会调用portasm.S的MTIME_HANDLER,进行栈帧保存之后该函数会调用vPortSysTickHandler
  * 
  */
+extern void lnSystemTimerTick();
+
 void vPortSysTickHandler(void)
 {
-    volatile uint64_t * mtime       = (uint64_t*) (TIMER_CTRL_ADDR + TIMER_MTIME);
-    volatile uint64_t * mtimecmp    = (uint64_t*) (TIMER_CTRL_ADDR + TIMER_MTIMECMP);
-	
     UBaseType_t uxSavedInterruptStatus = portSET_INTERRUPT_MASK_FROM_ISR();
-
-    #if CONFIG_SYSTEMVIEW_EN
-    traceISR_ENTER();
-    #endif
-
-    uint64_t now = *mtime;
-    now += (configRTC_CLOCK_HZ / configTICK_RATE_HZ);
-    *mtimecmp = now;
-
+    lnSystemTimerTick();    
     /* 调用freertos的tick增加接口 */
     if( xTaskIncrementTick() != pdFALSE )
     {
-            #if CONFIG_SYSTEMVIEW_EN
-            traceISR_EXIT_TO_SCHEDULER();
-            #endif
             portYIELD();
     }
-    #if CONFIG_SYSTEMVIEW_EN
-    else
-    {
-            traceISR_EXIT();
-    }
-    #endif
-
     portCLEAR_INTERRUPT_MASK_FROM_ISR( uxSavedInterruptStatus );
 }
 /*-----------------------------------------------------------*/
@@ -333,16 +316,11 @@ void vPortSysTickHandler(void)
  * @brief 初始化tick
  * 
  */
+extern void lnSystemTimerInit();
 void vPortSetupTimer(void)
 {
-    /* 内核timer定时器使用64位的计数器来实现 */
-    volatile uint64_t * mtime       = (uint64_t*) (TIMER_CTRL_ADDR + TIMER_MTIME);
-    volatile uint64_t * mtimecmp    = (uint64_t*) (TIMER_CTRL_ADDR + TIMER_MTIMECMP);
-
-        portENTER_CRITICAL();
-    uint64_t now = *mtime;
-    now += (configRTC_CLOCK_HZ / configTICK_RATE_HZ);
-    *mtimecmp = now;
+    portENTER_CRITICAL();
+    lnSystemTimerInit();
     portEXIT_CRITICAL();
 
     lnEnableInterruptDirect(ECLIC_IRQ_TIMER);

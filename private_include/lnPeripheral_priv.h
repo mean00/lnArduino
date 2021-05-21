@@ -25,3 +25,6 @@
 #define LN_GPIOE_ADR    (0x40011800)
 #define LN_AFIO_ADR     (0x40010000)
 #define LN_ECLIC_ADR    (0xd2000000)
+#define LN_I2C0_ADR     (0x40005400)
+#define LN_I2C1_ADR     (0x40005800)
+#define LN_SYS_TIMER_ADR (0xd1000000)
