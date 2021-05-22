@@ -7,7 +7,7 @@
 extern "C" uint32_t xTickCount;
 extern "C" uint64_t get_timer_value();
 extern "C" uint32_t SystemCoreClock ;
-
+extern "C" uint64_t lnGetUs();
 void pinMode(int a, GpioMode b)
 {
     lnPinMode(a,b);
@@ -27,11 +27,26 @@ void digitalToggle(int a)
 #warning FIXME micros is not working
 uint64_t micros(void)
 {
-  //  return (uint64_t)(get_timer_value() * (4000000.F / SystemCoreClock));
-    return 0;
+    return lnGetUs();
 }
 
 void delay(unsigned long dwMs)
 {
     xDelay(dwMs);
+}
+/**
+ * 
+ * @param wait
+ */
+void delayMicroseconds(int wait)
+{
+    uint64_t target=lnGetUs()+wait;
+    while(1)
+    {
+        uint64_t vw=lnGetUs();
+        if(vw>target) 
+            return;
+        __asm__("nop"::);
+    }
+    
 }
