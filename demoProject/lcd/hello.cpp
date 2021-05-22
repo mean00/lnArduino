@@ -31,8 +31,19 @@
 
 void setup()
 {
+#define WAIT 15
     pinMode(LED,OUTPUT);
     digitalWrite(LED,HIGH);
+    
+    uint32_t before=millis();
+    delayMicroseconds(WAIT*1000);
+    uint32_t after=millis();
+    Logger("Should be ~ %d : %d, %d delta= %d  \n",WAIT,before,after,(int)(after-before));
+    
+    int usBefore=micros();
+    xDelay(WAIT);
+    int usAfter=micros();
+    Logger("Should be %d x 1000 : %d->%d,delta=%d  \n",WAIT,usBefore,usAfter,(int)(usAfter-usBefore));
     
 }
 /**
