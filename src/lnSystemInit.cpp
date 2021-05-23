@@ -7,6 +7,7 @@ extern void setup();
 extern void loop();
 extern "C" void _init();
 void lnIrqSysInit();
+void lnExtiSysInit();
 /**
  * 
  * @param 
@@ -39,6 +40,10 @@ int main()
     // We need alternate functions too
     lnPeripherals::enable(pAF);
     lnPeripherals::enable(pDMA0);
+    
+    // Enable exti
+    lnExtiSysInit();
+    
 #warning FIXME FIXME FIXME
 #if 0    
     // DMA TX for SPI0 (LCD)

@@ -44,11 +44,11 @@ vector_base:
 	UNHANDLED(22) //.word     unhandledException //RTC_IRQHandler
 	UNHANDLED(23) //.word     unhandledException //FMC_IRQHandler
 	UNHANDLED(24) //.word     unhandledException //RCU_IRQHandler
-	UNHANDLED(25) //.word     unhandledException //EXTI0_IRQHandler
-	UNHANDLED(26) //.word     unhandledException //EXTI1_IRQHandler
-	UNHANDLED(27) //.word     unhandledException //EXTI2_IRQHandler
-	UNHANDLED(28) //.word     unhandledException //EXTI3_IRQHandler
-	UNHANDLED(29) //.word     unhandledException //EXTI4_IRQHandler
+	.word EXTI0_IRQHandler //.word     unhandledException //EXTI0_IRQHandler
+	.word EXTI1_IRQHandler //.word     unhandledException //EXTI1_IRQHandler
+	.word EXTI2_IRQHandler //.word     unhandledException //EXTI2_IRQHandler
+	.word EXTI3_IRQHandler //.word     unhandledException //EXTI3_IRQHandler
+	.word EXTI4_IRQHandler //.word     unhandledException //EXTI4_IRQHandler
 	.word DMA0_Channel0_IRQHandler //.word     unhandledException //DMA0_Channel0_IRQHandler
 	.word DMA0_Channel1_IRQHandler //.word     unhandledException //DMA0_Channel1_IRQHandler
 	.word DMA0_Channel2_IRQHandler //.word     unhandledException //DMA0_Channel2_IRQHandler SPI0 TX
@@ -61,7 +61,7 @@ vector_base:
 	UNHANDLED(39) //.word     unhandledException //CAN0_RX0_IRQHandler
 	UNHANDLED(40) //.word     unhandledException //CAN0_RX1_IRQHandler
 	UNHANDLED(41) //.word     unhandledException //CAN0_EWMC_IRQHandler
-	UNHANDLED(42) //.word     unhandledException //EXTI5_9_IRQHandler
+	.word EXTI5_9_IRQHandler //.word     unhandledException //EXTI5_9_IRQHandler
 	UNHANDLED(43) //.word     unhandledException //TIMER0_BRK_IRQHandler
 	UNHANDLED(44) //.word     unhandledException //TIMER0_UP_IRQHandler
 	UNHANDLED(45) //.word     unhandledException //TIMER0_TRG_CMT_IRQHandler
@@ -78,7 +78,7 @@ vector_base:
 	.word USART0_IRQHandler //.word     unhandledException-56 //USART0_IRQHandler
 	.word USART1_IRQHandler //.word     unhandledException //USART1_IRQHandler
 	.word USART2_IRQHandler //.word     unhandledException //USART2_IRQHandler
-	UNHANDLED(59) //.word     unhandledException //EXTI10_15_IRQHandler
+	.word EXTI10_15_IRQHandler //.word     unhandledException //EXTI10_15_IRQHandler
 	UNHANDLED(60) //.word     unhandledException //RTC_Alarm_IRQHandler
 	UNHANDLED(61) //.word     unhandledException //USBFS_WKUP_IRQHandler
         UNHANDLED(62) //.word     unhandledException //0

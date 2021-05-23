@@ -28,3 +28,4 @@
 #define LN_I2C0_ADR     (0x40005400)
 #define LN_I2C1_ADR     (0x40005800)
 #define LN_SYS_TIMER_ADR (0xd1000000)
+#define LN_EXTI_ADR     (0x40010400)
