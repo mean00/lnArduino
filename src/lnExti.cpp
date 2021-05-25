@@ -107,10 +107,12 @@ void lnExtiDetachInterrupt(const lnPin pin)
  */
 void lnExtiEnableInterrupt(const lnPin pin)
 {
+    
     int port=pin>>4;
     int source=pin&0xf; 
     _lnExtidescriptor *d=_extiDesc+source;
     xAssert(port==d->port);
+    aExiti->PD=1<<source; // clear pending interrupt
     aExiti->INTEN|=(1<<source);
 }
 /**
