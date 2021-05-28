@@ -70,7 +70,10 @@ static void _rcuAction(const Peripherals periph, int action)
         case 1: // APB1
             switch(action)
             {
-                case 1: arcu->APB1RST|= o->enable;break;
+                case 1:
+                        arcu->APB1RST|= o->enable;
+                        arcu->APB1RST&= ~(o->enable); // not sure if it auto clears itself
+                        break;
                 case 2: arcu->APB1EN |= o->enable;break;
                 case 3: arcu->APB1EN &=~o->enable;
             }            
@@ -78,7 +81,10 @@ static void _rcuAction(const Peripherals periph, int action)
         case 2: // APB2
             switch(action)
             {
-                case 1: arcu->APB2RST|= o->enable;break;
+                case 1: 
+                        arcu->APB2RST|= o->enable;
+                        arcu->APB2RST&=~( o->enable); // not sure if it auto clears itself
+                        break;
                 case 2: arcu->APB2EN |= o->enable;break;
                 case 3: arcu->APB2EN &=~o->enable;
             }            
@@ -86,7 +92,9 @@ static void _rcuAction(const Peripherals periph, int action)
         case 8: // AHB
             switch(action)
             {
-                case 1: arcu->AHBRST|= o->enable;break;
+                case 1: arcu->AHBRST|= o->enable;
+                        arcu->AHBRST&= ~(o->enable); // not sure if it auto clears itself
+                        break;
                 case 2: arcu->AHBEN |= o->enable;break;
                 case 3: arcu->AHBEN &=~o->enable;
             }            
