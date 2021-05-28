@@ -41,6 +41,10 @@ int main()
     lnPeripherals::enable(pAF);
     lnPeripherals::enable(pDMA0);
     
+    // I2C0 & 1
+    lnPeripherals::enable(pI2C0);
+    lnPeripherals::enable(pI2C1);
+    
     // Enable exti
     lnExtiSysInit();
     
