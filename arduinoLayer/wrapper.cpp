@@ -8,6 +8,7 @@ extern "C" uint32_t xTickCount;
 extern "C" uint64_t get_timer_value();
 extern "C" uint32_t SystemCoreClock ;
 extern "C" uint64_t lnGetUs();
+
 void pinMode(int a, GpioMode b)
 {
     lnPinMode(a,b);
@@ -30,7 +31,7 @@ uint64_t micros(void)
     return lnGetUs();
 }
 
-void delay(unsigned long dwMs)
+void delay(int  dwMs)
 {
     xDelay(dwMs);
 }

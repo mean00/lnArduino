@@ -34,7 +34,7 @@ bool  waitStat0BitSet(LN_I2C_Registers *reg, uint32_t bit)
         if(v&bit) return true;
         if(v&(LN_I2C_STAT0_ERROR_MASK))
         {
-         //   Logger("I2C:Stat error 0x%x\n",v);
+            Logger("I2C:Stat error 0x%x\n",v);
             // clear error
             v&=~LN_I2C_STAT0_ERROR_MASK;
             reg->STAT0=v;            
@@ -124,7 +124,7 @@ bool lnTwoWire::write(int target, int n, uint8_t *data)
     adr->CTL0|=LN_I2C_CTL0_START; // send start    
     waitStat0BitSet(adr,LN_I2C_STAT0_SBSEND);
     // Send address
-    adr->DATA=((_targetAddress & 0x7F)<<1);
+    adr->DATA=((target & 0x7F)<<1);
     if(!waitStat0BitSet(adr,LN_I2C_STAT0_ADDSEND)) return false;
     stat1=adr->STAT1;
     
@@ -169,7 +169,7 @@ bool lnTwoWire::read(int target,  int n, uint8_t *data)
     adr->CTL0|=LN_I2C_CTL0_START; // send start    
     waitStat0BitSet(adr,LN_I2C_STAT0_SBSEND);
     // Send address
-    adr->DATA=((_targetAddress & 0x7F)<<1)+1;
+    adr->DATA=((target & 0x7F)<<1)+1;
     if(!waitStat0BitSet(adr,LN_I2C_STAT0_ADDSEND)) return false;
     stat1=adr->STAT1;
     

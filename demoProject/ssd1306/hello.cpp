@@ -28,7 +28,11 @@ void loop()
   ssd1306->begin();
   while(1)
   {
-      ssd1306->drawCircle(48,48,25);
+      Logger("Loop..\n");
+      ssd1306->square(20,20,30,30,true);
+      //ssd1306->drawCircle(48,48,25);
+      ssd1306->update();
+      xDelay(500);
       
   }
 }
