@@ -42,6 +42,22 @@ bool  waitStat0BitSet(LN_I2C_Registers *reg, uint32_t bit)
         }
     }
 }
+bool  waitStat0BitClear(LN_I2C_Registers *reg, uint32_t bit)
+{
+    while(1)
+    {
+        uint32_t v=(reg->STAT0);
+        if(!(v&bit)) return true;
+        if(v&(LN_I2C_STAT0_ERROR_MASK))
+        {
+            Logger("I2C:Stat error 0x%x\n",v);
+            // clear error
+            v&=~LN_I2C_STAT0_ERROR_MASK;
+            reg->STAT0=v;            
+            return false;
+        }
+    }
+}
 
 /**
  * 
@@ -83,15 +99,8 @@ bool lnTwoWire::begin(int target)
     lnPinMode( d->_sda,  lnALTERNATE_OD);    
     // back to default
     
-    adr->CTL1= lnPeripherals::getClock(periph)/1000000;; // 54 mhz apb1 max
-    int speed=lnPeripherals::getClock(periph);
-    if(!_speed) speed=speed/(100*1000); // default speed is 100k
-    else speed=speed/_speed;
-    
-#define SPDMAX ((1<<12)-1)
-    if(speed>SPDMAX) 
-        speed=SPDMAX;
-    adr->CKCFG=speed;
+    setSpeed(_speed);
+ 
     adr->CTL0=LN_I2C_CTL0_I2CEN; // And go!
     
     return true;
@@ -101,21 +110,26 @@ bool lnTwoWire::begin(int target)
  * 
  * @param speed
  */
-void lnTwoWire::setSpeed(int speed)
+void lnTwoWire::setSpeed(int newSpeed)
 {
     const LN_I2C_DESCRIPTOR *d=i2c_descriptors+_instance;
-    LN_I2C_Registers *adr=d->adr;
+    LN_I2C_Registers *adr=d->adr;  
+    Peripherals periph=(Peripherals)(pI2C0+_instance);
     
+    adr->CTL1= lnPeripherals::getClock(periph)/1000000;; // 54 mhz apb1 max
+    int speed=lnPeripherals::getClock(periph);
+    if(!_speed) speed=speed/(100*1000); // default speed is 100k
+    else speed=speed/newSpeed;
+    
+#define SPDMAX ((1<<12)-1)
+    if(speed>SPDMAX) 
+        speed=SPDMAX;
+    adr->CKCFG=speed;
     
 }
 /**
- * 
- * @param target
- * @param n
- * @param data
- * @return 
  */
-bool lnTwoWire::write(int target, int n, uint8_t *data)
+bool lnTwoWire::multiWrite(int target, int nbSeqn,int *seqLength, uint8_t **seqData)
 {
     volatile uint32_t stat1;
     // Send start
@@ -129,29 +143,44 @@ bool lnTwoWire::write(int target, int n, uint8_t *data)
     stat1=adr->STAT1;
     
     // wait for completion
-    
-    while(n)
+    int seq=0;
+    while(nbSeqn)
     {
-        // wait for Tx ready
-        if(!waitStat0BitSet(adr,LN_I2C_STAT0_TBE)) return false;
-        
-        // send next
-        adr->DATA=*data;
-        
-        // next
-        data++;
-        n--;
+        int n=seqLength[seq];
+        uint8_t *data=seqData[seq];
+        while(n)
+        {
+            // wait for Tx ready
+            if(!waitStat0BitSet(adr,LN_I2C_STAT0_TBE)) return false;
+
+            // send next
+            adr->DATA=*data;
+
+            // next
+            data++;
+            n--;
+        }
+        nbSeqn--;
+        seq++;
     }
     // wait for BTC
     if(!waitStat0BitSet(adr,LN_I2C_STAT0_BTC)) return false;
     // send stop
-    adr->CTL0|=LN_I2C_CTL0_STOP;     
-    while(adr->CTL0&LN_I2C_CTL0_STOP)
-    {
-        
-    }
-    
+    adr->CTL0|=LN_I2C_CTL0_STOP;  
+    if(!waitStat0BitClear(adr,LN_I2C_CTL0_STOP)) return false;
     return true;
+}
+
+/**
+ * 
+ * @param target
+ * @param n
+ * @param data
+ * @return 
+ */
+bool lnTwoWire::write(int target, int n, uint8_t *data)
+{
+    return multiWrite(target,1,&n,&data);
 }
 /**
  * 
