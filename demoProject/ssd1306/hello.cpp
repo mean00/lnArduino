@@ -6,7 +6,7 @@
 #define LED     PA2
 #define LEDRED  PC13
 #define SPEED   (200*1000)
-
+#include "FreeSans7pt7b.h"
 /**
  * 
  */
@@ -26,14 +26,21 @@ void loop()
   i2c->begin(0x3c);
   OLED_lnGd32 *ssd1306=new OLED_lnGd32( *i2c, -1);
   ssd1306->begin();
+  ssd1306->setFontFamily(&FreeSans7pt7b,&FreeSans7pt7b,&FreeSans7pt7b);
+  ssd1306->setFontSize(OLEDCore::SmallFont);
   while(1)
   {
       Logger("Loop..\n");
-      ssd1306->square(20,20,30,30,true);
-      //ssd1306->drawCircle(48,48,25);
+      ssd1306->clrScr();
+      ssd1306->square(100,20,30,30,true);
+      ssd1306->print(2,40,"Demo");
       ssd1306->update();
       xDelay(500);
-      
+      ssd1306->clrScr();
+      ssd1306->square(2,20,30,30,true);
+      ssd1306->print(80,40,"Demo");
+      ssd1306->update();
+      xDelay(500);
   }
 }
 // EOF
