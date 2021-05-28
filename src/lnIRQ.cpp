@@ -141,7 +141,16 @@ DMA_IRQ(1,4)
 DMA_IRQ(1,5)
 DMA_IRQ(1,6)
   
-        
+/**
+ * I2C
+ * @param code
+ */     
+void i2cIrqHandler(int instance, bool error);
+#define I2C_IRQ(d) extern "C" void I2C##d##_EV_IRQHandler(void) { i2cIrqHandler(d,false);} \
+                   extern "C" void I2C##d##_ERR_IRQHandler(void) { i2cIrqHandler(d,true);} 
+
+I2C_IRQ(0)
+I2C_IRQ(1)
 
 extern "C" void deadEnd(int code)
 {

@@ -16,16 +16,63 @@ struct LN_I2C_DESCRIPTOR
     LN_I2C_Registers *adr;
     lnPin           _scl;
     lnPin           _sda;
+    LnIRQ           _irqEv;
+    LnIRQ           _irqErr;
 };
 
 static const LN_I2C_DESCRIPTOR i2c_descriptors[2]=
 {
-    {(LN_I2C_Registers *)LN_I2C0_ADR,PB6,PB7},
-    {(LN_I2C_Registers *)LN_I2C1_ADR,PB10,PB11},
+    {(LN_I2C_Registers *)LN_I2C0_ADR,PB6,PB7,LN_IRQ_I2C0_EV,LN_IRQ_I2C0_ER},
+    {(LN_I2C_Registers *)LN_I2C1_ADR,PB10,PB11,LN_IRQ_I2C1_EV,LN_IRQ_I2C1_ER}
 };
 
 #define LN_I2C_STAT0_ERROR_MASK (LN_I2C_STAT0_LOSTARB | LN_I2C_STAT0_AERR | LN_I2C_STAT0_BERR | LN_I2C_STAT0_OUERR)
+/**
+ */
+class lnI2CSession 
+{
+public:
+    int target;
+    int nbTransaction;
+    int *transactionSize;
+    uint8_t **transactionData;
+    int     curTransaction;
+    int     curIndex;
+};
 
+
+
+lnTwoWire *irqHandler[2]={NULL,NULL};
+/**
+ * 
+ */
+void lnTwoWire::startIrq()
+{
+    
+    xAssert(irqHandler[_instance]==NULL);
+    irqHandler[_instance]=this;
+    
+    lnEnableInterrupt(_d->_irqErr);
+    lnEnableInterrupt(_d->_irqEv);
+     LN_I2C_Registers *adr=_d->adr;
+     adr->CTL1|=(LN_I2C_CTL1_ERRIE | LN_I2C_CTL1_EVIE | LN_I2C_CTL1_BUFIE);
+}
+/**
+ * 
+ */
+void lnTwoWire::stopIrq()
+{
+    lnDisableInterrupt(_d->_irqErr);
+    lnDisableInterrupt(_d->_irqEv);
+    _d->adr->CTL1&=~(LN_I2C_CTL1_ERRIE | LN_I2C_CTL1_EVIE | LN_I2C_CTL1_BUFIE);
+     irqHandler[_instance]=NULL;
+}
+/**
+ * 
+ * @param reg
+ * @param bit
+ * @return 
+ */
 bool  waitStat0BitSet(LN_I2C_Registers *reg, uint32_t bit)
 {
     while(1)
@@ -68,12 +115,15 @@ lnTwoWire::lnTwoWire(int instance, int speed)
 {
     _instance=instance;
     _speed=speed;
+    _d=i2c_descriptors+_instance;    
+    _session=NULL;
 }
 /**
  * 
  */
 lnTwoWire::~lnTwoWire()
 {
+      _session=NULL;
 }
 /**
  * 
@@ -84,8 +134,8 @@ bool lnTwoWire::begin(int target)
 {
     // reset peripheral
     Peripherals periph=(Peripherals)(pI2C0+_instance);
-    const LN_I2C_DESCRIPTOR *d=i2c_descriptors+_instance;
-    LN_I2C_Registers *adr=d->adr;
+    
+    LN_I2C_Registers *adr=_d->adr;
     
     lnPeripherals::reset(periph);
     adr->CTL0=LN_I2C_CTL0_SRESET;
@@ -95,12 +145,12 @@ bool lnTwoWire::begin(int target)
         _targetAddress=target;
     
     // set pin
-    lnPinMode( d->_scl,  lnALTERNATE_OD);
-    lnPinMode( d->_sda,  lnALTERNATE_OD);    
+    lnPinMode( _d->_scl,  lnALTERNATE_OD);
+    lnPinMode( _d->_sda,  lnALTERNATE_OD);    
     // back to default
     
-    setSpeed(_speed);
- 
+    adr->CTL1=0;
+    setSpeed(_speed);    
     adr->CTL0=LN_I2C_CTL0_I2CEN; // And go!
     
     return true;
@@ -112,11 +162,16 @@ bool lnTwoWire::begin(int target)
  */
 void lnTwoWire::setSpeed(int newSpeed)
 {
-    const LN_I2C_DESCRIPTOR *d=i2c_descriptors+_instance;
-    LN_I2C_Registers *adr=d->adr;  
+    
+    LN_I2C_Registers *adr=_d->adr;  
     Peripherals periph=(Peripherals)(pI2C0+_instance);
     
-    adr->CTL1= lnPeripherals::getClock(periph)/1000000;; // 54 mhz apb1 max
+    uint32_t ctl1=adr->CTL1;
+    ctl1&=~(0x3f);
+    ctl1|=lnPeripherals::getClock(periph)/1000000;; // 54 mhz apb1 max
+    adr->CTL1= ctl1;
+    _speed=newSpeed;
+    
     int speed=lnPeripherals::getClock(periph);
     if(!_speed) speed=speed/(100*1000); // default speed is 100k
     else speed=speed/newSpeed;
@@ -133,8 +188,28 @@ bool lnTwoWire::multiWrite(int target, int nbSeqn,int *seqLength, uint8_t **seqD
 {
     volatile uint32_t stat1;
     // Send start
-    const LN_I2C_DESCRIPTOR *d=i2c_descriptors+_instance;
-    LN_I2C_Registers *adr=d->adr;
+    
+    LN_I2C_Registers *adr=_d->adr;
+   
+#if 0
+    
+    lnI2CSession session;
+    session.target=target;
+    session.nbTransaction=nbSeqn;
+    session.transactionSize=seqLength;
+    session.transactionData=seqData;
+    session.curTransaction=0;
+    session.curIndex=0;
+    _session=&session;
+    _txState=I2C_TX_START;
+    adr->CTL0|=LN_I2C_CTL0_START; // send start    
+    // enable interrupt
+    startIrq();
+    _sem.take();
+    stopIrq();
+    _session=NULL;
+    return _result;
+#else    
     adr->CTL0|=LN_I2C_CTL0_START; // send start    
     waitStat0BitSet(adr,LN_I2C_STAT0_SBSEND);
     // Send address
@@ -168,6 +243,7 @@ bool lnTwoWire::multiWrite(int target, int nbSeqn,int *seqLength, uint8_t **seqD
     // send stop
     adr->CTL0|=LN_I2C_CTL0_STOP;  
     if(!waitStat0BitClear(adr,LN_I2C_CTL0_STOP)) return false;
+#endif    
     return true;
 }
 
@@ -193,8 +269,8 @@ bool lnTwoWire::read(int target,  int n, uint8_t *data)
 {
      volatile uint32_t stat1;
     // Send start
-    const LN_I2C_DESCRIPTOR *d=i2c_descriptors+_instance;
-    LN_I2C_Registers *adr=d->adr;
+    
+    LN_I2C_Registers *adr=_d->adr;
     adr->CTL0|=LN_I2C_CTL0_START; // send start    
     waitStat0BitSet(adr,LN_I2C_STAT0_SBSEND);
     // Send address
@@ -226,11 +302,118 @@ bool lnTwoWire::read(int target,  int n, uint8_t *data)
     
     return true;
 }
-
-
-void   waitCtl0BitSet(uint32_t bit)
+/**
+ * 
+ * @return  true if we continue, false if all has been transferred
+ */
+bool lnTwoWire::sendNext()
 {
+    xAssert(_d->adr->STAT0 & LN_I2C_STAT0_TBE);
+    int t=_session->curTransaction;
+    uint8_t  *data=_session->transactionData[t];
+    int      size=_session->transactionSize[t];
     
+    _d->adr->DATA=data[_session->curIndex++];
+    if(_session->curIndex<=size) // next transaction
+        return true;
+    // next transaction
+    _session->curTransaction++;
+    if(_session->curTransaction>_session->nbTransaction)
+    {
+        // all done!
+        return false;
+    }
+    _session->curIndex=0; // start next transaction
+    return true;
+}
+
+/**
+ * 
+ * evt:
+ *      0 : Event
+ *      1:  Error
+ * @param evt
+ * @return 
+ */
+void lnTwoWire::irq(int evt)
+{
+    xAssert(_session);
+    switch(evt)
+    {
+        case 1: // error
+                lnDisableInterrupt(_d->_irqErr);
+                lnDisableInterrupt(_d->_irqEv);
+                _result=false;
+                _sem.give();
+                return;
+                break;
+        case 0:
+                break;
+        default:
+                xAssert(0);
+                break;
+    }    
+    uint32_t v=(_d->adr->STAT0);
+    volatile uint32_t v1;
+    switch(_txState)
+    {
+        case I2C_TX_START:                  
+                  xAssert(v&LN_I2C_STAT0_SBSEND);
+                  _d->adr->DATA=((_session->target & 0x7F)<<1); 
+                  _txState=I2C_TX_ADDR_SENT;
+                  return;
+                  break;
+        case I2C_TX_ADDR_SENT:
+                  xAssert(v&LN_I2C_STAT0_ADDSEND);
+                  v1=_d->adr->STAT1;// Clear bit
+                  
+                  if(!sendNext())
+                  {
+                      _d->adr->CTL1&=~( LN_I2C_CTL1_BUFIE);
+                      _txState=I2C_TX_END;
+                  }
+                  else
+                      _txState=I2C_TX_DATA;
+                  return;
+                  break;
+            
+        case I2C_TX_DATA:
+                   if(!sendNext())
+                   {
+                      _txState=I2C_TX_STOP;
+                       _d->adr->CTL1&=~( LN_I2C_CTL1_BUFIE);
+                   }
+                  else
+                      _txState=I2C_TX_DATA;
+                  return;
+        case I2C_TX_STOP:
+                    xAssert(v&LN_I2C_STAT0_BTC);
+                    _d->adr->CTL0|=LN_I2C_CTL0_STOP;  
+                    return;
+                    break;
+        case I2C_TX_END:
+                    lnDisableInterrupt(_d->_irqErr);
+                    lnDisableInterrupt(_d->_irqEv);
+                    _result=true;
+                    _sem.give();
+                    return;
+                    break;
+        default:
+            xAssert(0);
+            break;
+    }
+}
+
+/**
+ * 
+ * @param instance
+ * @param error
+ */
+void i2cIrqHandler(int instance, bool error)
+{
+    lnTwoWire *i=irqHandler[instance];
+    xAssert(i);
+    i->irq((int)error);
 }
 
 // EOF

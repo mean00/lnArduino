@@ -4,6 +4,9 @@
  */
 #pragma once
 #include "lnArduino.h"
+
+struct LN_I2C_DESCRIPTOR;
+class  lnI2CSession;
 /**
  * 
  * @param instance
@@ -11,6 +14,7 @@
  */
 class lnTwoWire
 {
+    
 public:
                  lnTwoWire(int instance, int speed=0);
                  ~lnTwoWire();
@@ -32,9 +36,30 @@ public:
             bool read(int target,  int n, uint8_t *data);
             bool begin(int target=0);
 protected:
+            void stopIrq();
+            void startIrq();
+            bool sendNext();
+           
+protected:  
+    
+            enum _I2C_TX
+            {
+                I2C_TX_START=0,
+                I2C_TX_ADDR_SENT=1,
+                I2C_TX_DATA=2,
+                I2C_TX_STOP=3,
+                I2C_TX_END=4,
+            };
+    
+            int _instance;
+            int _targetAddress;
+            int _speed;
+            const LN_I2C_DESCRIPTOR *_d;
+            xBinarySemaphore        _sem;
+            bool                    _result;
+            _I2C_TX                 _txState;
+            lnI2CSession            *_session;
+public:            
+            void irq(int evt);            
             
-protected:    
-        int _instance;
-        int _targetAddress;
-        int _speed;
 };
