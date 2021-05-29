@@ -5,7 +5,7 @@
 // green = PA1, blue = PA2, RED PC13
 #define LED     PA2
 #define LEDRED  PC13
-#define SPEED   (100*1000)
+#define SPEED   (400*1000)
 #include "FreeSans7pt7b.h"
 /**
  * 

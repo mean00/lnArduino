@@ -192,20 +192,14 @@ bool lnTwoWire::multiWrite(int target, int nbSeqn,int *seqLength, uint8_t **seqD
     // Send start
     
     LN_I2C_Registers *adr=_d->adr;
-   
-#if 0
-    
-    lnI2CSession session(target,nbSeqn,seqLength,seqData);
+     lnI2CSession session(target,nbSeqn,seqLength,seqData);
     _session=&session;
+#if 0
     stat0=_d->adr->STAT0;
     stat0&=~(LN_I2C_STAT0_ERROR_MASK);
-    _d->adr->STAT0=stat0;
-    
+    _d->adr->STAT0=stat0;    
     _txState=I2C_TX_START;
     stat1=_d->adr->STAT1;
-    
-    
-   
     // enable interrupt
     startIrq();
     adr->CTL0|=LN_I2C_CTL0_START; // send start    
@@ -226,25 +220,12 @@ bool lnTwoWire::multiWrite(int target, int nbSeqn,int *seqLength, uint8_t **seqD
     stat1=adr->STAT1;
     
     // wait for completion
-    int seq=0;
-    while(nbSeqn)
+    while(1)
     {
-        int n=seqLength[seq];
-        uint8_t *data=seqData[seq];
-        while(n)
-        {
-            // wait for Tx ready
-            if(!waitStat0BitSet(adr,LN_I2C_STAT0_TBE)) return false;
-
-            // send next
-            adr->DATA=*data;
-
-            // next
-            data++;
-            n--;
-        }
-        nbSeqn--;
-        seq++;
+           if(!waitStat0BitSet(adr,LN_I2C_STAT0_TBE)) xAssert(0);
+           if(sendNext())
+               continue;
+           break;
     }
     // wait for BTC
     if(!waitStat0BitSet(adr,LN_I2C_STAT0_BTC)) return false;
@@ -316,22 +297,23 @@ bool lnTwoWire::read(int target,  int n, uint8_t *data)
  */
 bool lnTwoWire::sendNext()
 {    
-    int t=_session->curTransaction;
-    uint8_t  *data=_session->transactionData[t];
-    int      size=_session->transactionSize[t];
+    int     t=_session->curTransaction;
+    uint8_t *data=_session->transactionData[t];
+    int     size=_session->transactionSize[t];
     
-    _d->adr->DATA=data[_session->curIndex++];
-    if(_session->curIndex<=size) // next transaction
+    _d->adr->DATA=data[_session->curIndex];
+    _session->curIndex++;
+    if(_session->curIndex<size) // next transaction
         return true;
     // next transaction
     _session->curTransaction++;
-    if(_session->curTransaction>=_session->nbTransaction)
+    if(_session->curTransaction<_session->nbTransaction)
     {
-        // all done!
-        return false;
+        _session->curIndex=0; // start next transaction
+        return true;
     }
-    _session->curIndex=0; // start next transaction
-    return true;
+    // all done!
+    return false;
 }
 
 /**
