@@ -6,7 +6,31 @@
 #include "lnArduino.h"
 
 struct LN_I2C_DESCRIPTOR;
-class  lnI2CSession;
+
+
+/**
+ */
+class lnI2CSession 
+{
+public:
+    lnI2CSession(int t, int nb, int *sz, uint8_t **dt)
+    {
+        target=t;
+        nbTransaction=nb;
+        transactionSize=sz;
+        transactionData=dt;
+        curTransaction=0;
+        curIndex=0;
+    }
+    int target;
+    int nbTransaction;
+    int *transactionSize;
+    uint8_t **transactionData;
+    int     curTransaction;
+    int     curIndex;
+};
+
+
 /**
  * 
  * @param instance

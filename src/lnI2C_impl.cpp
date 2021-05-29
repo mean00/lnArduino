@@ -31,18 +31,6 @@ static const LN_I2C_DESCRIPTOR i2c_descriptors[2]=
 };
 
 #define LN_I2C_STAT0_ERROR_MASK (LN_I2C_STAT0_LOSTARB | LN_I2C_STAT0_AERR | LN_I2C_STAT0_BERR | LN_I2C_STAT0_OUERR)
-/**
- */
-class lnI2CSession 
-{
-public:
-    int target;
-    int nbTransaction;
-    int *transactionSize;
-    uint8_t **transactionData;
-    int     curTransaction;
-    int     curIndex;
-};
 
 
 
@@ -56,10 +44,20 @@ void lnTwoWire::startIrq()
     xAssert(irqHandler[_instance]==NULL);
     irqHandler[_instance]=this;
     
+    LN_I2C_Registers *adr=_d->adr;
+    
+    uint32_t ctl1=adr->CTL1;
+    ctl1|=(LN_I2C_CTL1_ERRIE | LN_I2C_CTL1_EVIE );
+    ctl1&=~(LN_I2C_CTL1_BUFIE);
+    adr->CTL1=ctl1;
+    
+    uint32_t stat0=adr->STAT0;
+    uint32_t stat1=adr->STAT1;
+    
     lnEnableInterrupt(_d->_irqErr);
     lnEnableInterrupt(_d->_irqEv);
-     LN_I2C_Registers *adr=_d->adr;
-     adr->CTL1|=(LN_I2C_CTL1_ERRIE | LN_I2C_CTL1_EVIE | LN_I2C_CTL1_BUFIE);
+    
+    
 }
 /**
  * 
@@ -190,25 +188,27 @@ void lnTwoWire::setSpeed(int newSpeed)
  */
 bool lnTwoWire::multiWrite(int target, int nbSeqn,int *seqLength, uint8_t **seqData)
 {
-    volatile uint32_t stat1;
+    volatile uint32_t stat1,stat0;
     // Send start
     
     LN_I2C_Registers *adr=_d->adr;
    
 #if 0
     
-    lnI2CSession session;
-    session.target=target;
-    session.nbTransaction=nbSeqn;
-    session.transactionSize=seqLength;
-    session.transactionData=seqData;
-    session.curTransaction=0;
-    session.curIndex=0;
+    lnI2CSession session(target,nbSeqn,seqLength,seqData);
     _session=&session;
+    stat0=_d->adr->STAT0;
+    stat0&=~(LN_I2C_STAT0_ERROR_MASK);
+    _d->adr->STAT0=stat0;
+    
     _txState=I2C_TX_START;
-    adr->CTL0|=LN_I2C_CTL0_START; // send start    
+    stat1=_d->adr->STAT1;
+    
+    
+   
     // enable interrupt
     startIrq();
+    adr->CTL0|=LN_I2C_CTL0_START; // send start    
     _sem.take();
     stopIrq();
     _session=NULL;
@@ -325,7 +325,7 @@ bool lnTwoWire::sendNext()
         return true;
     // next transaction
     _session->curTransaction++;
-    if(_session->curTransaction>_session->nbTransaction)
+    if(_session->curTransaction>=_session->nbTransaction)
     {
         // all done!
         return false;
@@ -349,11 +349,16 @@ void lnTwoWire::irq(int evt)
     switch(evt)
     {
         case 1: // error
+            {
                 lnDisableInterrupt(_d->_irqErr);
                 lnDisableInterrupt(_d->_irqEv);
                 _result=false;
+                uint32_t stat0=_d->adr->STAT0;
+                stat0&=~(LN_I2C_STAT0_ERROR_MASK); // clear error
+                _d->adr->STAT0=stat0;
                 _sem.give();
                 return;
+            }
                 break;
         case 0:
                 break;
@@ -372,8 +377,14 @@ void lnTwoWire::irq(int evt)
                   return;
                   break;
         case I2C_TX_ADDR_SENT:
-                  xAssert(lastI2cStat&LN_I2C_STAT0_ADDSEND);
+                  if(!lastI2cStat&LN_I2C_STAT0_ADDSEND)
+                  {
+                      if(lastI2cStat & LN_I2C_STAT0_BTC)
+                        return; // how to block that one ?
+                      xAssert(0);
+                  }
                   v1=_d->adr->STAT1;// Clear bit
+                  _d->adr->CTL1|= LN_I2C_CTL1_BUFIE;
                   xAssert(_d->adr->STAT0 & LN_I2C_STAT0_TBE);
                   if(!sendNext())
                   {
