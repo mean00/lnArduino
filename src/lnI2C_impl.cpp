@@ -14,6 +14,7 @@ static const LN_I2C_Registers *aI2C1=(LN_I2C_Registers *)LN_I2C1_ADR;
 volatile uint32_t *LN_I2C0_FMPCFG=(volatile uint32_t *)(LN_I2C0_ADR+0x90);
 volatile uint32_t *LN_I2C1_FMPCFG=(volatile uint32_t *)(LN_I2C1_ADR+0x90);
 
+#define I2C_USES_INTERRUPT
 
 struct LN_I2C_DESCRIPTOR
 {
@@ -107,7 +108,14 @@ bool  waitStat0BitClear(LN_I2C_Registers *reg, uint32_t bit)
         }
     }
 }
-
+bool  waitCTL0BitClear(LN_I2C_Registers *reg, uint32_t bit)
+{
+    while(1)
+    {
+        uint32_t v=(reg->CTL0);
+        if(!(v&bit)) return true;
+    }
+}
 /**
  * 
  * @param instance
@@ -186,6 +194,7 @@ void lnTwoWire::setSpeed(int newSpeed)
 }
 /**
  */
+#ifdef I2C_USES_INTERRUPT
 bool lnTwoWire::multiWrite(int target, int nbSeqn,int *seqLength, uint8_t **seqData)
 {
     volatile uint32_t stat1,stat0;
@@ -194,7 +203,7 @@ bool lnTwoWire::multiWrite(int target, int nbSeqn,int *seqLength, uint8_t **seqD
     LN_I2C_Registers *adr=_d->adr;
      lnI2CSession session(target,nbSeqn,seqLength,seqData);
     _session=&session;
-#if 0
+
     stat0=_d->adr->STAT0;
     stat0&=~(LN_I2C_STAT0_ERROR_MASK);
     _d->adr->STAT0=stat0;    
@@ -208,33 +217,12 @@ bool lnTwoWire::multiWrite(int target, int nbSeqn,int *seqLength, uint8_t **seqD
     _session=NULL;
     if(_result)
     {
-          if(!waitStat0BitClear(adr,LN_I2C_CTL0_STOP)) _result=false;
+        if(!waitCTL0BitClear(adr,LN_I2C_CTL0_STOP)) 
+            _result=false;
     }
     return _result;
-#else    
-    adr->CTL0|=LN_I2C_CTL0_START; // send start    
-    waitStat0BitSet(adr,LN_I2C_STAT0_SBSEND);
-    // Send address
-    adr->DATA=((target & 0x7F)<<1);
-    if(!waitStat0BitSet(adr,LN_I2C_STAT0_ADDSEND)) return false;
-    stat1=adr->STAT1;
-    
-    // wait for completion
-    while(1)
-    {
-           if(!waitStat0BitSet(adr,LN_I2C_STAT0_TBE)) xAssert(0);
-           if(sendNext())
-               continue;
-           break;
-    }
-    // wait for BTC
-    if(!waitStat0BitSet(adr,LN_I2C_STAT0_BTC)) return false;
-    // send stop
-    adr->CTL0|=LN_I2C_CTL0_STOP;  
-    if(!waitStat0BitClear(adr,LN_I2C_CTL0_STOP)) return false;
-#endif    
-    return true;
 }
+#endif
 
 /**
  * 
@@ -283,12 +271,11 @@ bool lnTwoWire::read(int target,  int n, uint8_t *data)
         n--;
     }
     // send stop
-    adr->CTL0|=LN_I2C_CTL0_STOP;     
-    while(adr->CTL0&LN_I2C_CTL0_STOP)
+    adr->CTL0|=LN_I2C_CTL0_STOP;  
+    if(!waitCTL0BitClear(adr,LN_I2C_CTL0_STOP))
     {
-        
-    }
-    
+        return false;
+    }    
     return true;
 }
 /**
@@ -422,6 +409,40 @@ void i2cIrqHandler(int instance, bool error)
     xAssert(i);
     i->irq((int)error);
 }
+
+
+#ifndef I2C_USES_INTERRUPT
+bool lnTwoWire::multiWrite(int target, int nbSeqn,int *seqLength, uint8_t **seqData)
+{
+    volatile uint32_t stat1,stat0;
+    // Send start
+    
+    LN_I2C_Registers *adr=_d->adr;
+     lnI2CSession session(target,nbSeqn,seqLength,seqData);
+    _session=&session;
+    adr->CTL0|=LN_I2C_CTL0_START; // send start    
+    waitStat0BitSet(adr,LN_I2C_STAT0_SBSEND);
+    // Send address
+    adr->DATA=((target & 0x7F)<<1);
+    if(!waitStat0BitSet(adr,LN_I2C_STAT0_ADDSEND)) return false;
+    stat1=adr->STAT1;
+    
+    // wait for completion
+    while(1)
+    {
+           if(!waitStat0BitSet(adr,LN_I2C_STAT0_TBE)) xAssert(0);
+           if(sendNext())
+               continue;
+           break;
+    }
+    // wait for BTC
+    if(!waitStat0BitSet(adr,LN_I2C_STAT0_BTC)) return false;
+    // send stop
+    adr->CTL0|=LN_I2C_CTL0_STOP;  
+    if(!waitStat0BitClear(adr,LN_I2C_CTL0_STOP)) return false; 
+    return true;
+}
+#endif
 
 // EOF
 
