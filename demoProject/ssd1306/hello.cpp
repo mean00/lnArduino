@@ -22,7 +22,7 @@ void loop()
 {
   Logger("SSD1306 I2C demo...\n");
     
-  lnTwoWire *i2c=new lnTwoWire(0,SPEED);
+  lnI2C *i2c=new lnI2C(0,SPEED);
   i2c->begin(0x3c);
   OLED_lnGd32 *ssd1306=new OLED_lnGd32( *i2c, -1);
   ssd1306->begin();

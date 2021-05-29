@@ -18,5 +18,5 @@ INCLUDE_DIRECTORIES( ${SSD1306} )
 
 SET(LIBSSD ${SSD1306}/ssd1306_base.cpp ${SSD1306}/ssd1306_ex.cpp ${SSD1306}/ssd1306_i2c_lnGd32vf103.cpp)
         
-GENERATE_GD32_FIRMWARE(ws2812 hello.cpp ${LIBSSD} )       
+GENERATE_GD32_FIRMWARE(ssd1306 hello.cpp ${LIBSSD} )       
         

@@ -17,9 +17,6 @@ struct LN_I2C_Registersx
     uint32_t RT;        
 };
 
-volatile uint32_t *LN_I2C0_FMPCFG=(volatile uint32_t *)(LN_I2C0_ADR+0x90);
-volatile uint32_t *LN_I2C1_FMPCFG=(volatile uint32_t *)(LN_I2C1_ADR+0x90);
-
 typedef volatile LN_I2C_Registersx LN_I2C_Registers;
 
 // CTL0
