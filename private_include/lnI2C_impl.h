@@ -4,7 +4,7 @@
  */
 #pragma once
 #include "lnArduino.h"
-
+#include "lnDma.h"
 struct LN_I2C_DESCRIPTOR;
 
 
@@ -63,7 +63,9 @@ protected:
             void stopIrq();
             void startIrq();
             bool sendNext();
-           
+            bool initiateTx();
+            void dmaTxDone();
+            void setInterruptMode(bool eventEnabled, bool dmaEnabled,bool txEmptyEnabled);
 protected:  
     
             enum _I2C_TX
@@ -83,7 +85,8 @@ protected:
             bool                    _result;
             _I2C_TX                 _txState;
             lnI2CSession            *_session;
+            lnDMA                   _dmaTx;
 public:            
             void irq(int evt);            
-            
+            static void dmaTxDone_(void *c);
 };

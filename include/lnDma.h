@@ -12,13 +12,14 @@ public:
     
     enum DmaTransferType
     {
-        DMA_MEMORY_TO_PERIPH
+        DMA_MEMORY_TO_PERIPH,
+        DMA_PERIPH_TO_MEMORY
     };
     
                 lnDMA(DmaTransferType type, int dmaEngine, int dmaChannel, int sourceWith, int targetWidth);
                 ~lnDMA();
         void    attachCallback(doneCallback *cb, void *cookie);
-  
+        void    detachCallback();
         bool    doMemoryToPeripheralTransfer(int count, const uint16_t *source,const uint16_t *target,  bool repeat);
         void    setWordSize(int sourceWordSize, int targetWordSize);
         void    invokeCallback();

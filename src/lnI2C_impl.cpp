@@ -23,12 +23,15 @@ struct LN_I2C_DESCRIPTOR
     lnPin           _sda;
     LnIRQ           _irqEv;
     LnIRQ           _irqErr;
+    int             _dmaEngine;
+    int             _dmaChannelRx;
+    int             _dmaChannelTx;
 };
 
 static const LN_I2C_DESCRIPTOR i2c_descriptors[2]=
 {
-    {(LN_I2C_Registers *)LN_I2C0_ADR,PB6,PB7,LN_IRQ_I2C0_EV,LN_IRQ_I2C0_ER},
-    {(LN_I2C_Registers *)LN_I2C1_ADR,PB10,PB11,LN_IRQ_I2C1_EV,LN_IRQ_I2C1_ER}
+    {(LN_I2C_Registers *)LN_I2C0_ADR,PB6,PB7,LN_IRQ_I2C0_EV,LN_IRQ_I2C0_ER,0,6,5},
+    {(LN_I2C_Registers *)LN_I2C1_ADR,PB10,PB11,LN_IRQ_I2C1_EV,LN_IRQ_I2C1_ER,0,4,3}
 };
 
 #define LN_I2C_STAT0_ERROR_MASK (LN_I2C_STAT0_LOSTARB | LN_I2C_STAT0_AERR | LN_I2C_STAT0_BERR | LN_I2C_STAT0_OUERR)
@@ -36,6 +39,39 @@ static const LN_I2C_DESCRIPTOR i2c_descriptors[2]=
 
 
 lnTwoWire *irqHandler[2]={NULL,NULL};
+
+/**
+ * 
+ * @param eventEnabled
+ * @param dmaEnabled
+ * @param txEmptyEnabled
+ * @return 
+ */
+void lnTwoWire::setInterruptMode(bool eventEnabled, bool dmaEnabled,bool txEmptyEnabled)
+{
+    
+    uint32_t stat1=_d->adr->CTL1;
+        
+    if(dmaEnabled)
+    {
+        xAssert(!eventEnabled);
+        xAssert(!txEmptyEnabled);
+        stat1&=~(LN_I2C_CTL1_EVIE+LN_I2C_CTL1_BUFIE);
+        stat1|=LN_I2C_CTL1_DMAON; 
+    }else
+    {
+         xAssert(eventEnabled);
+         stat1&=~LN_I2C_CTL1_DMAON; 
+         
+         stat1|=LN_I2C_CTL1_EVIE;
+         if(txEmptyEnabled)
+             stat1|=LN_I2C_CTL1_BUFIE;
+         else
+             stat1&=~LN_I2C_CTL1_BUFIE;
+    }
+    _d->adr->CTL1=stat1;    
+}
+
 /**
  * 
  */
@@ -45,15 +81,13 @@ void lnTwoWire::startIrq()
     xAssert(irqHandler[_instance]==NULL);
     irqHandler[_instance]=this;
     
-    LN_I2C_Registers *adr=_d->adr;
     
-    uint32_t ctl1=adr->CTL1;
-    ctl1|=(LN_I2C_CTL1_ERRIE | LN_I2C_CTL1_EVIE );
-    ctl1&=~(LN_I2C_CTL1_BUFIE);
-    adr->CTL1=ctl1;
+    setInterruptMode(true,false,false); // event, no dma, no tx empty
     
-    uint32_t stat0=adr->STAT0;
-    uint32_t stat1=adr->STAT1;
+    uint32_t stat0=_d->adr->STAT0;
+    uint32_t stat1=_d->adr->STAT1;
+    
+    _dmaTx.attachCallback(dmaTxDone_,this);    
     
     lnEnableInterrupt(_d->_irqErr);
     lnEnableInterrupt(_d->_irqEv);
@@ -67,8 +101,9 @@ void lnTwoWire::stopIrq()
 {
     lnDisableInterrupt(_d->_irqErr);
     lnDisableInterrupt(_d->_irqEv);
-    _d->adr->CTL1&=~(LN_I2C_CTL1_ERRIE | LN_I2C_CTL1_EVIE | LN_I2C_CTL1_BUFIE);
-     irqHandler[_instance]=NULL;
+    _d->adr->CTL1&=~(LN_I2C_CTL1_EVIE+LN_I2C_CTL1_BUFIE+LN_I2C_CTL1_DMAON);
+    irqHandler[_instance]=NULL;
+    _dmaTx.detachCallback();
 }
 /**
  * 
@@ -121,7 +156,12 @@ bool  waitCTL0BitClear(LN_I2C_Registers *reg, uint32_t bit)
  * @param instance
  * @param speed
  */
-lnTwoWire::lnTwoWire(int instance, int speed)
+#define M(x) i2c_descriptors[instance].x
+
+
+lnTwoWire::lnTwoWire(int instance, int speed) : 
+    _dmaTx(lnDMA::DMA_MEMORY_TO_PERIPH,M(_dmaEngine),M(_dmaChannelTx),8,16)
+    //,_dmaRx(lnDMA::DMA_PERIPH_TO_MEMORY,M(_dmaEngine),M(_dmaChannelRx),8,8)
 {
     _instance=instance;
     _speed=speed;
@@ -280,7 +320,62 @@ bool lnTwoWire::read(int target,  int n, uint8_t *data)
 }
 /**
  * 
- * @return  true if we continue, false if all has been transferred
+ * @param c
+ */
+void lnTwoWire::dmaTxDone_(void *c)
+{
+    lnTwoWire *i=(lnTwoWire *)c;
+    i->dmaTxDone();
+}
+
+/**
+ * 
+ * @param c
+ */
+void lnTwoWire::dmaTxDone()
+{
+    
+    if(!initiateTx())
+    {
+        setInterruptMode(true,false,false);
+        _txState=I2C_TX_STOP;      
+        volatile uint32_t r=_d->adr->STAT0+_d->adr->STAT1;
+    }
+    // done !
+    
+}
+/**
+ * @return  true if we continue, false if the last one has been sent
+ * @return 
+ */
+bool lnTwoWire::initiateTx()
+{
+    if(!_session->nbTransaction) return false;  
+    if(_session->curTransaction>=_session->nbTransaction)
+    
+    _session->curIndex   =0; // we are starting a new sequence anyway
+    int     t=_session->curTransaction;
+    uint8_t *data=_session->transactionData[t];
+    int     size=_session->transactionSize[t];
+    
+    if(1 && size<3) 
+    {
+        setInterruptMode(true,false,true); // no DMA, tx interrupt
+        return sendNext(); // dont setup DMA transfer for small transfer
+    }
+    _dmaTx.setWordSize(8,16);    
+    // DMA ON
+     setInterruptMode(false,true,false); //  DMA, no tx interrupt, no event
+    _dmaTx.doMemoryToPeripheralTransfer(size, (uint16_t *)data, (uint16_t *)&(_d->adr->DATA),false);        
+    _session->curTransaction++;
+    _session->curIndex=0; // start next transaction
+    // all done!
+    return false;
+}
+
+/**
+ * 
+ * @return  true if we continue, false if the last one has been sent
  */
 bool lnTwoWire::sendNext()
 {    
@@ -288,19 +383,21 @@ bool lnTwoWire::sendNext()
     uint8_t *data=_session->transactionData[t];
     int     size=_session->transactionSize[t];
     
+    if(_session->curTransaction>=_session->nbTransaction)
+    {
+        _session->curIndex=0; // all done
+        return false;
+    }
+    
     _d->adr->DATA=data[_session->curIndex];
     _session->curIndex++;
     if(_session->curIndex<size) // next transaction
         return true;
     // next transaction
-    _session->curTransaction++;
-    if(_session->curTransaction<_session->nbTransaction)
-    {
-        _session->curIndex=0; // start next transaction
-        return true;
-    }
+    _session->curTransaction++;   
+    _session->curIndex=0;
     // all done!
-    return false;
+    return true;
 }
 
 /**
@@ -352,10 +449,9 @@ void lnTwoWire::irq(int evt)
                         return; // how to block that one ?
                       xAssert(0);
                   }
-                  v1=_d->adr->STAT1;// Clear bit
-                  _d->adr->CTL1|= LN_I2C_CTL1_BUFIE;
+                  v1=_d->adr->STAT1;// Clear bit                  
                   xAssert(_d->adr->STAT0 & LN_I2C_STAT0_TBE);
-                  if(!sendNext())
+                  if(!initiateTx())
                   {
                       _d->adr->CTL1&=~( LN_I2C_CTL1_BUFIE);
                       _txState=I2C_TX_END;

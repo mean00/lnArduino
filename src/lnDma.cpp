@@ -150,8 +150,16 @@ void lnDMA::attachCallback(doneCallback *cb, void *cookie)
 {
     _cb=cb;
     _cookie=cookie;
-
 }
+/**
+ * 
+ */
+void    lnDMA::detachCallback()
+{
+    _cb=NULL;
+    _cookie=NULL;
+}
+
 /**
  * 
  * @param count
