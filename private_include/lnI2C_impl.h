@@ -21,6 +21,11 @@ public:
         transactionData=dt;
         curTransaction=0;
         curIndex=0;
+        // sanity check
+        for(int i=0;i<nb;i++)
+        {
+            xAssert(sz[i]<65535);
+        }
     }
     int target;
     int nbTransaction;
@@ -75,6 +80,7 @@ protected:
                 I2C_TX_DATA=2,
                 I2C_TX_STOP=3,
                 I2C_TX_END=4,
+                I2C_TX_DATA_DMA=5
             };
     
             int _instance;

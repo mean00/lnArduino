@@ -34,6 +34,10 @@ static const LN_I2C_DESCRIPTOR i2c_descriptors[2]=
     {(LN_I2C_Registers *)LN_I2C1_ADR,PB10,PB11,LN_IRQ_I2C1_EV,LN_IRQ_I2C1_ER,0,4,3}
 };
 
+ int i2cIrqStat[2]={0,0};
+ int i2cIrqStats[2][5]={{0,0,0,0,0},{0,0,0,0,0}};
+ 
+
 #define LN_I2C_STAT0_ERROR_MASK (LN_I2C_STAT0_LOSTARB | LN_I2C_STAT0_AERR | LN_I2C_STAT0_BERR | LN_I2C_STAT0_OUERR)
 
 
@@ -334,15 +338,15 @@ void lnTwoWire::dmaTxDone_(void *c)
  */
 void lnTwoWire::dmaTxDone()
 {
-    
+    i2cIrqStats[_instance][4]++;
+    _session->curTransaction++;
     if(!initiateTx())
     {
-        setInterruptMode(true,false,false);
         _txState=I2C_TX_STOP;      
+        setInterruptMode(true,false,false); // event, no dma, no tx        
         volatile uint32_t r=_d->adr->STAT0+_d->adr->STAT1;
     }
-    // done !
-    
+    // done !    
 }
 /**
  * @return  true if we continue, false if the last one has been sent
@@ -350,27 +354,29 @@ void lnTwoWire::dmaTxDone()
  */
 bool lnTwoWire::initiateTx()
 {
-    if(!_session->nbTransaction) return false;  
     if(_session->curTransaction>=_session->nbTransaction)
+        return false;
     
     _session->curIndex   =0; // we are starting a new sequence anyway
     int     t=_session->curTransaction;
     uint8_t *data=_session->transactionData[t];
     int     size=_session->transactionSize[t];
     
-    if(1 && size<3) 
+    xAssert(size<=65535);
+    
+    if( size<3)  // plain interrupt
     {
-        setInterruptMode(true,false,true); // no DMA, tx interrupt
+        setInterruptMode(true,false,true); // event, no DMA, tx interrupt
+        _txState=I2C_TX_DATA;
         return sendNext(); // dont setup DMA transfer for small transfer
     }
-    _dmaTx.setWordSize(8,16);    
     // DMA ON
-     setInterruptMode(false,true,false); //  DMA, no tx interrupt, no event
+    _dmaTx.setWordSize(8,16);        
+    _txState=I2C_TX_DATA_DMA;
+     setInterruptMode(false,true,false); //   no event, DMA, no tx interrupt,    
     _dmaTx.doMemoryToPeripheralTransfer(size, (uint16_t *)data, (uint16_t *)&(_d->adr->DATA),false);        
-    _session->curTransaction++;
-    _session->curIndex=0; // start next transaction
     // all done!
-    return false;
+    return true;
 }
 
 /**
@@ -388,15 +394,13 @@ bool lnTwoWire::sendNext()
         _session->curIndex=0; // all done
         return false;
     }
-    
-    _d->adr->DATA=data[_session->curIndex];
-    _session->curIndex++;
-    if(_session->curIndex<size) // next transaction
-        return true;
-    // next transaction
-    _session->curTransaction++;   
-    _session->curIndex=0;
-    // all done!
+    if(_session->curIndex>=size) // next transaction ?
+    {
+            _session->curTransaction++;   
+            _session->curIndex=0;
+            return initiateTx();
+    }
+    _d->adr->DATA=data[_session->curIndex++];
     return true;
 }
 
@@ -411,6 +415,7 @@ bool lnTwoWire::sendNext()
 volatile uint32_t lastI2cStat;
 void lnTwoWire::irq(int evt)
 {
+    i2cIrqStat[_instance]++;
     xAssert(_session);
     switch(evt)
     {
@@ -436,17 +441,17 @@ void lnTwoWire::irq(int evt)
     volatile uint32_t v1;
     switch(_txState)
     {
-        case I2C_TX_START:                  
+        case I2C_TX_START:    
+                  i2cIrqStats[_instance][0]++;
                   xAssert(lastI2cStat&LN_I2C_STAT0_SBSEND);
                   _d->adr->DATA=((_session->target & 0x7F)<<1); 
                   _txState=I2C_TX_ADDR_SENT;
                   return;
                   break;
         case I2C_TX_ADDR_SENT:
+                  i2cIrqStats[_instance][1]++;
                   if(!lastI2cStat&LN_I2C_STAT0_ADDSEND)
-                  {
-                      if(lastI2cStat & LN_I2C_STAT0_BTC)
-                        return; // how to block that one ?
+                  {                     
                       xAssert(0);
                   }
                   v1=_d->adr->STAT1;// Clear bit                  
@@ -456,12 +461,11 @@ void lnTwoWire::irq(int evt)
                       _d->adr->CTL1&=~( LN_I2C_CTL1_BUFIE);
                       _txState=I2C_TX_END;
                   }
-                  else
-                      _txState=I2C_TX_DATA;
                   return;
                   break;
             
         case I2C_TX_DATA:
+                   i2cIrqStats[_instance][2]++;
                    xAssert(_d->adr->STAT0 & LN_I2C_STAT0_TBE);
                    if(!sendNext())
                    {
@@ -475,6 +479,7 @@ void lnTwoWire::irq(int evt)
                   return;
                   break;
         case I2C_TX_STOP:
+                    i2cIrqStats[_instance][3]++;
                     xAssert(lastI2cStat&LN_I2C_STAT0_BTC);
                     _d->adr->CTL0|=LN_I2C_CTL0_STOP;  
                     _txState=I2C_TX_END;
@@ -485,6 +490,10 @@ void lnTwoWire::irq(int evt)
                     return;
                     break;
         case I2C_TX_END:
+                    xAssert(0);
+                    return;
+                    break;
+        case I2C_TX_DATA_DMA:
                     xAssert(0);
                     return;
                     break;
