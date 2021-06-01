@@ -8,6 +8,7 @@ extern void loop();
 extern "C" void _init();
 void lnIrqSysInit();
 void lnExtiSysInit();
+void lnDmaSysInit();
 /**
  * 
  * @param 
@@ -47,6 +48,9 @@ int main()
     
     // Enable exti
     lnExtiSysInit();
+    
+    // init DMA
+    lnDmaSysInit();
     
 #warning FIXME FIXME FIXME
 #if 0    

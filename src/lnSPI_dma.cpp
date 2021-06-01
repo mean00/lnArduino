@@ -26,7 +26,8 @@ bool hwlnSPIClass::dmaWriteInternal(int wordSize,int nbTransfer, const uint8_t *
     // 1- Configure DMA
     txDma.attachCallback(exTxDone,this);    
     txDma.setWordSize(wordSize,wordSize);    
-    txDma.doMemoryToPeripheralTransfer(nbTransfer, (uint16_t *)data, (uint16_t *)&d->DATA,repeat);        
+    txDma.beginTransfer();
+    txDma.doMemoryToPeripheralTransferNoLock(nbTransfer, (uint16_t *)data, (uint16_t *)&d->DATA,repeat);        
     
     // 2- Configure SPI
     updateMode(d,false); // tx only
@@ -39,7 +40,8 @@ bool hwlnSPIClass::dmaWriteInternal(int wordSize,int nbTransfer, const uint8_t *
     senable();
     if(false==_done.take(100)) // 100 ms should be plenty enough!
         xAssert(0);
-    waitForCompletion();       
+    waitForCompletion(); 
+    txDma.endTransfer();
     csOff();    
     sdisable();
     updateDmaTX(d,false);

@@ -13,10 +13,23 @@
 static lnDMA *_lnDmas[2][7]={ {NULL,NULL,NULL,NULL,NULL,NULL,NULL},{NULL,NULL,NULL,NULL,NULL,NULL,NULL}};
 static const LnIRQ  _dmaIrqs[2][7]= { { z0(0),z0(1),z0(2), z0(3),z0(4),z0(5),z0(6)},{ z1(0),z1(1),z1(2),z1(3),z1(4),LN_IRQ_NONE,LN_IRQ_NONE}}; // Warning DMA CHANNEL5/6 is not available
 static const uint32_t _dmas[2]={LN_DMA0_ADR,LN_DMA1_ADR};
+static xMutex *dmaMutex[2][7];
 /**
  */
 
 DMA_struct *dma0=(DMA_struct *)LN_DMA0_ADR;
+
+/**
+ * 
+ */
+void lnDmaSysInit()
+{
+    for(int i=0;i<7;i++)
+    {
+        dmaMutex[0][i]=new xMutex;
+        dmaMutex[1][i]=new xMutex;
+    }
+}
 
 /**
  * 
@@ -71,40 +84,8 @@ lnDMA::lnDMA(DmaTransferType type, int dmaEngine, int dmaChannel, int sourceWidt
     _type=type;
     _irq=_dmaIrqs[dmaEngine][dmaChannel];
     
-    DMA_struct *d=(DMA_struct *)_dma;
-    DMA_channels *c=d->channels+_channelInt;
-    
-    
-    c->CNT&=LN_DMA_CHAN_KEEP_MASK; // disable
-    
-    // Clear interrupts & flags
-    uint32_t mask=0xf<<dmaChannel;
-    d->INTC|=mask;
-    
-    
-    uint32_t sw;
-    uint32_t source,target;
-    switch(type)
-    {
-        case DMA_MEMORY_TO_PERIPH:
-        {
-            source=memoryWidth(sourceWidth);
-            target=peripheralWidth(targetWidth);
-            _control|=source;
-            _control|=target;
-            _control|=LN_DMA_CHAN_DIR_M2P;
-            _control|=LN_DMA_CHAN_PRIO_HIGH;
-            break;
-        }
-        default:
-            xAssert(0);
-            break;                
-    }
-    _cb=NULL;
-    _cookie=NULL;
-    
-    if(_lnDmas[_dmaInt][_channelInt]) xAssert(0);
-    _lnDmas[_dmaInt][_channelInt]=this;  
+    _sourceWidth=sourceWidth;
+    _targetWidth=targetWidth;
 }
 /**
  * 
@@ -167,9 +148,81 @@ void    lnDMA::detachCallback()
  * @param repeat
  * @return 
  */
-bool lnDMA::doMemoryToPeripheralTransfer(int count, const uint16_t *source,const uint16_t *target,  bool repeat)
-{   
-    // clear pending bits
+extern uint32_t underInterrupt;
+/**
+ * 
+ */
+void lnDMA::beginTransfer()
+{
+    dmaMutex[_dmaInt][_channelInt]->lock();
+    // Ok now we can configure the dma
+    DMA_struct *d=(DMA_struct *)_dma;
+    DMA_channels *c=d->channels+_channelInt;
+    
+    
+    c->CNT&=LN_DMA_CHAN_KEEP_MASK; // disable
+    
+    // Clear interrupts & flags
+    uint32_t mask=0xf<<_channelInt;
+    d->INTC|=mask;
+    
+    
+    uint32_t sw;
+    uint32_t source,target;
+    switch(_type)
+    {
+        case DMA_MEMORY_TO_PERIPH:
+        {
+            source=memoryWidth(_sourceWidth);
+            target=peripheralWidth(_targetWidth);
+            _control|=source;
+            _control|=target;
+            _control|=LN_DMA_CHAN_DIR_M2P;
+            _control|=LN_DMA_CHAN_PRIO_HIGH;
+            break;
+        }
+        default:
+            xAssert(0);
+            break;                
+    }
+    
+    if(_lnDmas[_dmaInt][_channelInt]) xAssert(0);
+    _lnDmas[_dmaInt][_channelInt]=this;     
+}
+/**
+ * 
+ */
+void lnDMA::endTransfer()
+{
+     // Ok now we can configure the dma
+    DMA_struct *d=(DMA_struct *)_dma;
+    DMA_channels *c=d->channels+_channelInt;
+    
+    uint32_t control=c->CTL;    
+    control &=~LN_DMA_CHAN_ENABLE;
+    control &=~(LN_DMA_CHAN_ERRIE+LN_DMA_CHAN_TFTFIE);
+    c->CTL=control;
+    
+    _cb=NULL;
+    _cookie=NULL;
+    uint32_t mask=0xf<<_channelInt;
+    d->INTC|=mask;
+    _lnDmas[_dmaInt][_channelInt]=NULL;     
+    dmaMutex[_dmaInt][_channelInt]->unlock();
+}
+   
+
+/**
+ * 
+ * @param count
+ * @param source
+ * @param target
+ * @param repeat
+ * @return 
+ */
+bool lnDMA::doMemoryToPeripheralTransferNoLock(int count, const uint16_t *source,const uint16_t *target,  bool repeat)
+{
+     // clear pending bits
     DMA_struct *d=(DMA_struct *)_dma;
     d->INTC|=0xff<<_channelInt;
  
@@ -197,6 +250,7 @@ bool lnDMA::doMemoryToPeripheralTransfer(int count, const uint16_t *source,const
     lnEnableInterrupt(_irq);        
     return true;
 }
+
 /**
  * 
  */

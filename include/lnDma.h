@@ -4,6 +4,15 @@
  */
 #pragma once
 /**
+ * 
+ * \brief If you do a dma transfer from a task, you just call doMemoryToPeripheralTransferFromTask
+ * if you do a dma transfer from an interrupt, you MUST
+ * call beginTransfer() from the task, that will lock the DMA for you
+ * call doMemoryToPeripheralTransferFromInterrupt() from the task
+ * call endTransfer() when you will not use the dma any longer until the next begin
+ * 
+ * If you call doMemoryToPeripheralTransferFromTask from an interrupt it will assert
+ * 
  */
 class lnDMA
 {
@@ -20,7 +29,10 @@ public:
                 ~lnDMA();
         void    attachCallback(doneCallback *cb, void *cookie);
         void    detachCallback();
-        bool    doMemoryToPeripheralTransfer(int count, const uint16_t *source,const uint16_t *target,  bool repeat);
+        
+        bool    doMemoryToPeripheralTransferNoLock(int count, const uint16_t *source,const uint16_t *target,  bool repeat);
+        void    beginTransfer();
+        void    endTransfer();
         void    setWordSize(int sourceWordSize, int targetWordSize);
         void    invokeCallback();
 protected:
@@ -33,5 +45,7 @@ protected:
     doneCallback    *_cb;
     void            *_cookie;
     uint32_t        _control;
+    
+    int             _sourceWidth,_targetWidth;
     
 };

@@ -198,9 +198,11 @@ bool lnSerial::dmaTransmit(int size,uint8_t *buffer)
     enableTx(txDma);
     d->STAT&=~LN_USART_STAT_TC;
     _txDma.attachCallback(_dmaCallback,this);
-    _txDma.      doMemoryToPeripheralTransfer(size,(uint16_t *)buffer,(uint16_t *)&(d->DATA),false);            
+    _txDma.beginTransfer();
+    _txDma. doMemoryToPeripheralTransferNoLock(size,(uint16_t *)buffer,(uint16_t *)&(d->DATA),false);            
     EXIT_CRITICAL();
     _txDone.take();    
+    _txDma.endTransfer();
     _mutex.unlock();
     return true;
 }

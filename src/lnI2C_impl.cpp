@@ -254,9 +254,11 @@ bool lnTwoWire::multiWrite(int target, int nbSeqn,int *seqLength, uint8_t **seqD
     _txState=I2C_TX_START;
     stat1=_d->adr->STAT1;
     // enable interrupt
+    _dmaTx.beginTransfer();
     startIrq();
     adr->CTL0|=LN_I2C_CTL0_START; // send start    
     _sem.take();
+    _dmaTx.endTransfer();
     stopIrq();
     _session=NULL;
     if(_result)
@@ -374,7 +376,7 @@ bool lnTwoWire::initiateTx()
     _dmaTx.setWordSize(8,16);        
     _txState=I2C_TX_DATA_DMA;
      setInterruptMode(false,true,false); //   no event, DMA, no tx interrupt,    
-    _dmaTx.doMemoryToPeripheralTransfer(size, (uint16_t *)data, (uint16_t *)&(_d->adr->DATA),false);        
+    _dmaTx.doMemoryToPeripheralTransferNoLock(size, (uint16_t *)data, (uint16_t *)&(_d->adr->DATA),false);        
     // all done!
     return true;
 }
