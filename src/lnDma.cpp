@@ -17,7 +17,8 @@ static xMutex *dmaMutex[2][7];
 /**
  */
 
-DMA_struct *dma0=(DMA_struct *)LN_DMA0_ADR;
+DMA_struct *adma0=(DMA_struct *)LN_DMA0_ADR;
+DMA_struct *adma1=(DMA_struct *)LN_DMA1_ADR;
 
 /**
  * 
@@ -175,6 +176,7 @@ void lnDMA::beginTransfer()
         {
             source=memoryWidth(_sourceWidth);
             target=peripheralWidth(_targetWidth);
+            _control&=LN_DMA_CHAN_WIDTH_MASK;
             _control|=source;
             _control|=target;
             _control|=LN_DMA_CHAN_DIR_M2P;
