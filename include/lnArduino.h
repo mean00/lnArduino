@@ -19,7 +19,7 @@ extern "C"
 #include "event_groups.h"
    
 }
-#include "MapleFreeRTOS1000_pp.h"
+#include "lnFreeRTOS.h"
 #include "lnDebug.h"
 #include "lnGPIO.h"
 #include "lnRCU.h"
