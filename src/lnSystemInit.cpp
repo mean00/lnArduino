@@ -41,6 +41,7 @@ int main()
     // We need alternate functions too
     lnPeripherals::enable(pAF);
     lnPeripherals::enable(pDMA0);
+    lnPeripherals::enable(pDMA1);
     
     // I2C0 & 1
     lnPeripherals::enable(pI2C0);
@@ -51,6 +52,12 @@ int main()
     
     // init DMA
     lnDmaSysInit();
+    
+    
+    // Init SPI0/1/2
+    lnPeripherals::enable(pSPI0);
+    lnPeripherals::enable(pSPI1);
+    lnPeripherals::enable(pSPI2);
     
 #warning FIXME FIXME FIXME
 #if 0    
