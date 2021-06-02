@@ -5,13 +5,15 @@
 #pragma once
 /**
  * 
- * \brief If you do a dma transfer from a task, you just call doMemoryToPeripheralTransferFromTask
- * if you do a dma transfer from an interrupt, you MUST
+ * \brief If you do a dma transfer
+
  * call beginTransfer() from the task, that will lock the DMA for you
- * call doMemoryToPeripheralTransferFromInterrupt() from the task
- * call endTransfer() when you will not use the dma any longer until the next begin
- * 
- * If you call doMemoryToPeripheralTransferFromTask from an interrupt it will assert
+ * call doMemoryToPeripheralTransferFromInterrupt() from the task or the interrupt
+ * call endTransfer() when you will not use the dma any longer until the next begin()
+ * If you are starting a DMA from interrupt, you should do the begin() out of the interrupt and the end when that transfer is 100% done
+ * If you are starting a DMA from a task you can do begin()/ doMemoryToPeripheral/end() as many times as you want, that will leave
+ * the dma channel usable by another peripheral in between at the expense of more overhead
+ 
  * 
  */
 class lnDMA
