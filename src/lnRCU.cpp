@@ -23,7 +23,7 @@ static const RCU_Peripheral _peripherals[]=
     {        pNONE,          0,          0},
     {        pSPI0,          2,          LN_RCU_APB2_SPI0EN},
     {        pSPI1,          1,          LN_RCU_APB1_SPI1EN},
-    {        pSPI2,          1,          LN_RCU_APB1_SPI1EN},
+    {        pSPI2,          1,          LN_RCU_APB1_SPI2EN},
     {        pUART0,         2,          LN_RCU_APB2_USART0EN},
     {        pUART1,         1,          LN_RCU_APB1_USART1EN},
     {        pUART2,         1,          LN_RCU_APB1_USART2EN},
@@ -44,15 +44,17 @@ static const RCU_Peripheral _peripherals[]=
     {        pTIMER4,        1,          LN_RCU_APB1_TIMER4EN},
     {        pTIMER5,        1,          LN_RCU_APB1_TIMER5EN},
     {        pTIMER6,        1,          LN_RCU_APB1_TIMER6EN},
+            // PERIP        AHB/APB         APB         BIT        
     {        pADC0  ,        2,          LN_RCU_APB2_ADC0EN},
     {        pADC1  ,        2,          LN_RCU_APB2_ADC1EN},
-           // PERIP        AHB         APB         BIT    
+           
     {        pGPIOA,         2,          LN_RCU_APB2_PAEN},
     {        pGPIOB,         2,          LN_RCU_APB2_PBEN},
     {        pGPIOC,         2,          LN_RCU_APB2_PCEN},
     {        pGPIOD,         2,          LN_RCU_APB2_PDEN},
     {        pGPIOE,         2,          LN_RCU_APB2_PEEN},
     {        pAF,            2,          LN_RCU_APB2_AFEN},
+            // PERIP        AHB/APB         APB         BIT        
     {        pDMA0,          8,          LN_RCU_AHB_DMA0EN},
     {        pDMA1,          8,          LN_RCU_AHB_DMA1EN}
 };
@@ -75,7 +77,8 @@ static void _rcuAction(const Peripherals periph, int action)
                         arcu->APB1RST&= ~(o->enable); // not sure if it auto clears itself
                         break;
                 case 2: arcu->APB1EN |= o->enable;break;
-                case 3: arcu->APB1EN &=~o->enable;
+                case 3: arcu->APB1EN &=~o->enable;break;
+                default : xAssert(0);break;
             }            
             break;
         case 2: // APB2
@@ -86,7 +89,8 @@ static void _rcuAction(const Peripherals periph, int action)
                         arcu->APB2RST&=~( o->enable); // not sure if it auto clears itself
                         break;
                 case 2: arcu->APB2EN |= o->enable;break;
-                case 3: arcu->APB2EN &=~o->enable;
+                case 3: arcu->APB2EN &=~o->enable;break;
+                default : xAssert(0);break;
             }            
             break;
         case 8: // AHB
@@ -96,7 +100,8 @@ static void _rcuAction(const Peripherals periph, int action)
                         arcu->AHBRST&= ~(o->enable); // not sure if it auto clears itself
                         break;
                 case 2: arcu->AHBEN |= o->enable;break;
-                case 3: arcu->AHBEN &=~o->enable;
+                case 3: arcu->AHBEN &=~o->enable;break;
+                default : xAssert(0);break;
             }            
 
             break;
