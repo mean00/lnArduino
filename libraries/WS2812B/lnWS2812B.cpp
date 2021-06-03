@@ -1,10 +1,13 @@
 /*
  *  (C) 2021 MEAN00 fixounet@free.fr
  *  See license file
+ *  Each bit in the WS2812B stream becomes a byte
  * 
  */
 #include "lnArduino.h"
 #include "lnWS2812B.h"
+
+#define WS_PREAMBLE 4*24 // number of zero byte preamble
 
 /**
  * 
@@ -18,7 +21,7 @@ WS2812B::WS2812B(int nbLeds, hwlnSPIClass *s)
     _brightness=0xff;
     _ledsColor=new uint8_t[3*nbLeds];
     _ledsBrightness=new uint8_t[nbLeds];
-    int up=((nbLeds+3)&(~3))+2; // next multiple of 4 + add one before / one after
+    int up=((nbLeds+3)&(~3))+(WS_PREAMBLE+23)/24; // next multiple of 4 + add one before / one after
     _ledsColorSPI=new uint8_t[3*up*8]; // spi expansion    
     for(int i=0;i<nbLeds;i++)
     {
@@ -110,6 +113,7 @@ WS2812B::~WS2812B()
   */
  void WS2812B::update()
  {
+#if 0
      // If need be we change the first byte to lower the duration of the "HIGH" state
      // as the GD32 adds ~ 100 ns of extra high state
      uint8_t v=_ledsColorSPI[0];
@@ -125,7 +129,8 @@ WS2812B::~WS2812B()
             break;                            
      }
      _ledsColorSPI[0]=v;
-     _spi->dmaWrite(_nbLeds*3*8+24,_ledsColorSPI); // add a couple of zeros at the end
+#endif     
+     _spi->dmaWrite(_nbLeds*3*8+WS_PREAMBLE,_ledsColorSPI); // add a couple of zeros at the end
  }
 /**
  * 
@@ -172,7 +177,7 @@ static void convertOne(int color, int b16, uint8_t *target)
   */
 void         WS2812B::convert(int led)
 {
-    uint8_t *p=_ledsColorSPI+3*8*led;
+    uint8_t *p=_ledsColorSPI+3*8*led+WS_PREAMBLE;
     uint8_t *c=_ledsColor+led*3;
     
     int  b=(int)(_ledsBrightness[led])*(int)(_brightness);
