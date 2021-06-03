@@ -24,9 +24,9 @@ bool hwlnSPIClass::dmaWriteInternal(int wordSize,int nbTransfer, const uint8_t *
     if(!nbTransfer) return true;
     LN_SPI_Registers *d=(LN_SPI_Registers *)_adr;
     // 1- Configure DMA
-    txDma.attachCallback(exTxDone,this);    
-    txDma.setWordSize(wordSize,wordSize);    
     txDma.beginTransfer();
+    txDma.attachCallback(exTxDone,this);    
+    txDma.setWordSize(wordSize,wordSize);        
     txDma.doMemoryToPeripheralTransferNoLock(nbTransfer, (uint16_t *)data, (uint16_t *)&d->DATA,repeat);        
     
     // 2- Configure SPI
