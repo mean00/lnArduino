@@ -93,6 +93,13 @@ class hwlnSPIClass
     bool asyncTransfer(int nbBytes, uint8_t *dataOut, uint8_t *dataIn,lnSpiCallback *callback,void *cookie);
 
     void waitForCompletion(); // wait for everything to be COMPLETELY done
+    
+    //
+    
+    lnPin misoPin() const;
+    lnPin mosiPin() const;
+    lnPin clkPin() const;
+    
   protected:
     void setup();
     void csOn();

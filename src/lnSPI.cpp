@@ -123,6 +123,35 @@ hwlnSPIClass::hwlnSPIClass(int instance, int pinCs) : _internalSettings(1000000,
 }
 /**
  * 
+ * @return 
+ */
+lnPin hwlnSPIClass::misoPin() const
+{
+     const SpiDescriptor *s=spiDescriptor+_instance;
+     return s->miso;
+}
+
+/**
+ * 
+ * @return 
+ */
+lnPin hwlnSPIClass::mosiPin() const
+{
+     const SpiDescriptor *s=spiDescriptor+_instance;
+     return s->mosi;
+}
+
+/**
+ * 
+ * @return 
+ */
+lnPin hwlnSPIClass::clkPin() const
+{
+     const SpiDescriptor *s=spiDescriptor+_instance;
+     return s->clk;
+}
+/**
+ * 
  */
 hwlnSPIClass::~hwlnSPIClass()
 {
