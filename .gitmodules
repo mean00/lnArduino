@@ -7,3 +7,6 @@
 [submodule "libraries/simplerSSD1306"]
 	path = libraries/simplerSSD1306
 	url = https://github.com/mean00/simpler_SSD1306.git
+[submodule "gdbGD32_freeRTOS_support"]
+	path = gdbGD32_freeRTOS_support
+	url = git@github.com:mean00/FreeRTOS-GDB.git
