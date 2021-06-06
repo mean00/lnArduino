@@ -169,6 +169,8 @@ void lnSerial::txDmaCb()
     d->CTL0&=~( LN_USART_CTL0_TBIE +LN_USART_CTL0_TCIE);
     // clear TC
     d->STAT&=~(LN_USART_STAT_TC);
+    // clear DMA
+    d->CTL2&=~(LN_USART_CTL2_DMA_TX);
     _txState=txIdle;
     _txDone.give();
 }
@@ -192,15 +194,17 @@ bool lnSerial::dmaTransmit(int size,uint8_t *buffer)
 {
     //return true;
     LN_USART_Registers *d=(LN_USART_Registers *)_adr;
-    _mutex.lock();
+    _mutex.lock(); // lock uart
+    _txDma.beginTransfer(); // lock dma
     ENTER_CRITICAL();
     _txState=txTransmitting;   
     enableTx(txDma);
     d->STAT&=~LN_USART_STAT_TC;
     _txDma.attachCallback(_dmaCallback,this);
-    _txDma.beginTransfer();
-    _txDma. doMemoryToPeripheralTransferNoLock(size,(uint16_t *)buffer,(uint16_t *)&(d->DATA),false);            
     EXIT_CRITICAL();
+    
+    _txDma. doMemoryToPeripheralTransferNoLock(size,(uint16_t *)buffer,(uint16_t *)&(d->DATA),false);            
+    
     _txDone.take();    
     _txDma.endTransfer();
     _mutex.unlock();
