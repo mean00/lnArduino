@@ -460,8 +460,7 @@ void lnTwoWire::irq(int evt)
                   xAssert(_d->adr->STAT0 & LN_I2C_STAT0_TBE);
                   if(!initiateTx())
                   {
-                      _d->adr->CTL1&=~( LN_I2C_CTL1_BUFIE);
-                      _txState=I2C_TX_END;
+                      goto sendStop;
                   }
                   return;
                   break;
@@ -481,8 +480,10 @@ void lnTwoWire::irq(int evt)
                   return;
                   break;
         case I2C_TX_STOP:
-                    i2cIrqStats[_instance][3]++;
                     xAssert(lastI2cStat&LN_I2C_STAT0_BTC);
+sendStop:            
+                    i2cIrqStats[_instance][3]++;
+                    
                     _d->adr->CTL0|=LN_I2C_CTL0_STOP;  
                     _txState=I2C_TX_END;
                     lnDisableInterrupt(_d->_irqErr);
