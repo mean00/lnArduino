@@ -30,8 +30,8 @@ struct LN_I2C_DESCRIPTOR
 
 static const LN_I2C_DESCRIPTOR i2c_descriptors[2]=
 {
-    {(LN_I2C_Registers *)LN_I2C0_ADR,PB6,PB7,LN_IRQ_I2C0_EV,LN_IRQ_I2C0_ER,0,6,5},
-    {(LN_I2C_Registers *)LN_I2C1_ADR,PB10,PB11,LN_IRQ_I2C1_EV,LN_IRQ_I2C1_ER,0,4,3}
+    {(LN_I2C_Registers *)LN_I2C0_ADR,PB6,PB7,LN_IRQ_I2C0_EV,LN_IRQ_I2C0_ER,     0,6,5},
+    {(LN_I2C_Registers *)LN_I2C1_ADR,PB10,PB11,LN_IRQ_I2C1_EV,LN_IRQ_I2C1_ER,   0,4,3}
 };
 
  int i2cIrqStat[2]={0,0};
@@ -73,7 +73,7 @@ void lnTwoWire::setInterruptMode(bool eventEnabled, bool dmaEnabled,bool txEmpty
          else
              stat1&=~LN_I2C_CTL1_BUFIE;
     }
-    _d->adr->CTL1=stat1;    
+    _d->adr->CTL1=stat1|LN_I2C_CTL1_ERRIE;    
 }
 
 /**
