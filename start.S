@@ -72,7 +72,7 @@ vector_base:
 	.word I2C0_EV_IRQHandler  //UNHANDLED(50) //.word     unhandledException //I2C0_EV_IRQHandler
 	.word I2C0_ERR_IRQHandler  //UNHANDLED(51) //.word     unhandledException //I2C0_ER_IRQHandler
 	.word I2C1_EV_IRQHandler   //.word     unhandledException //I2C1_EV_IRQHandler
-	.word I2C0_ERR_IRQHandler //UNHANDLED(53) //.word     unhandledException //I2C1_ER_IRQHandler
+	.word I2C1_ERR_IRQHandler //UNHANDLED(53) //.word     unhandledException //I2C1_ER_IRQHandler
 	UNHANDLED(54) //.word     unhandledException //SPI0_IRQHandler
 	UNHANDLED(55) //.word     unhandledException //SPI1_IRQHandler
 	.word USART0_IRQHandler //.word     unhandledException-56 //USART0_IRQHandler
