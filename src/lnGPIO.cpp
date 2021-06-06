@@ -9,6 +9,8 @@
 static  LN_GPIO *gpio[5]={(LN_GPIO *)LN_GPIOA_ADR,(LN_GPIO *)LN_GPIOB_ADR,(LN_GPIO *)LN_GPIOC_ADR,(LN_GPIO *)LN_GPIOD_ADR,(LN_GPIO *)LN_GPIOE_ADR};
 
 static  LN_GPIO *gpioA=(LN_GPIO *)LN_GPIOA_ADR;
+static  LN_GPIO *gpioB=(LN_GPIO *)LN_GPIOB_ADR;
+static  LN_GPIO *gpioC=(LN_GPIO *)LN_GPIOC_ADR;
 
 /**
  * 
