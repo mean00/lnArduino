@@ -257,10 +257,15 @@ bool lnTwoWire::multiWrite(int target, int nbSeqn,int *seqLength, uint8_t **seqD
     _dmaTx.beginTransfer();
     startIrq();
     adr->CTL0|=LN_I2C_CTL0_START; // send start    
-    _sem.take();
+    bool r=_sem.take(100);
     _dmaTx.endTransfer();
     stopIrq();
     _session=NULL;
+    if(!r)
+    {
+        Logger("I2C write timeout\n");
+        return false;
+    }
     if(_result)
     {
         if(!waitCTL0BitClear(adr,LN_I2C_CTL0_STOP)) 
