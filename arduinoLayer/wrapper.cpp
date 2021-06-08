@@ -51,3 +51,12 @@ void delayMicroseconds(int wait)
     }
     
 }
+
+void     noInterrupts()
+{
+    ENTER_CRITICAL();
+}
+void     interrupts()
+{
+    EXIT_CRITICAL();
+}

@@ -10,7 +10,8 @@ extern uint64_t millis();
 extern uint64_t micros();
 extern void     delay(int ms);
 extern void     delayMicroseconds(int us);
-
+extern void     noInterrupts();
+extern void     interrupts();
 #define LOW 0
 #define HIGH 1
 #define boolean bool
