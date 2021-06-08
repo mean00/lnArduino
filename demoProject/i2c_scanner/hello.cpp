@@ -22,16 +22,15 @@ void loop()
 {
   Logger("ISC Scannner demo...\n");
     
-  lnTwoWire *i2c=new lnTwoWire(0,SPEED);
-  
-
+  lnI2C *i2c=new lnI2C(1,SPEED);   // USING I2C2!!
+  i2c->begin();
   while(1)
   {
-      for(int i=0x30;i<0x40;i++)
+      for(int i=01;i<127;i++)
       {
           xDelay(100);
           Logger("Scanning %d\n",i);
-          i2c->begin();
+          
           i2c->setAddress(i);
        //   while(1)
           {
