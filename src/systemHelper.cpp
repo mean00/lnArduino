@@ -7,14 +7,14 @@
 extern "C"
 {
 #include "riscv_encoding.h"
-//#include "n200_timer.h"
-//#include "n200_func.h"
-//#include "gd32vf103.h"
-    
 #include "FreeRTOS.h"
 }
 #include "systemHelper.h"
 
+extern "C" void do_assert(const char *a);
+
+/**
+ */
 
 
 extern "C" 
@@ -61,11 +61,22 @@ extern "C"
     }
     void __cxa_pure_virtual()
     {
-          deadEnd(0x2002);
+          do_assert("__cxa_pure_virtual");
     }
 
 }
 
+namespace std
+{
+    void __throw_out_of_range(const char  *a) //__throw_out_of_range
+    {
+        do_assert(a);
+    }
+    void __throw_length_error(const char  *a) //__throw_out_of_range
+    {
+        do_assert(a);
+    }
+}
 
 
 // EOF
