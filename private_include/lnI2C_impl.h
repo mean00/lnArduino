@@ -67,20 +67,33 @@ public:
 protected:
             void stopIrq();
             void startIrq();
+            void startRxIrq();            
             bool sendNext();
+            bool receiveNext();
             bool initiateTx();
             void dmaTxDone();
+            void dmaRxDone();
             void setInterruptMode(bool eventEnabled, bool dmaEnabled,bool txEmptyEnabled);
 protected:  
     
             enum _I2C_TX
             {
+                I2C_IDLE=0xff,
                 I2C_TX_START=0,
                 I2C_TX_ADDR_SENT=1,
                 I2C_TX_DATA=2,
                 I2C_TX_STOP=3,
                 I2C_TX_END=4,
-                I2C_TX_DATA_DMA=5
+                I2C_TX_DATA_DMA=5,
+                
+                
+                I2C_RX_START=8+I2C_TX_START, 
+                I2C_RX_ADDR_SENT=8+I2C_TX_ADDR_SENT,
+                I2C_RX_DATA=8+I2C_TX_DATA,
+                I2C_RX_STOP=I2C_TX_STOP+8,
+                I2C_RX_END=I2C_TX_END+8,
+                I2C_RX_DATA_DMA=8+I2C_TX_DATA_DMA,
+                
             };
     
             int _instance;
@@ -92,7 +105,9 @@ protected:
             _I2C_TX                 _txState;
             lnI2CSession            *_session;
             lnDMA                   _dmaTx;
+            lnDMA                   _dmaRx;
 public:            
             void irq(int evt);            
             static void dmaTxDone_(void *c);
+            static void dmaRxDone_(void *c);
 };

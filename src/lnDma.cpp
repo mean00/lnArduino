@@ -107,6 +107,15 @@ void    lnDMA::setWordSize(int sourceWordSize, int targetWordSize)
                 _control|=target;
             }
         break;
+        case DMA_PERIPH_TO_MEMORY:
+            {
+                source=memoryWidth(sourceWordSize);
+                target=peripheralWidth(targetWordSize);
+                _control&=LN_DMA_CHAN_WIDTH_MASK;
+                _control|=source;
+                _control|=target;
+            }
+        break;        
         default:
             xAssert(0);
             break;
@@ -180,6 +189,17 @@ void lnDMA::beginTransfer()
             _control|=source;
             _control|=target;
             _control|=LN_DMA_CHAN_DIR_M2P;
+            _control|=LN_DMA_CHAN_PRIO_HIGH;
+            break;
+        }
+        case DMA_PERIPH_TO_MEMORY:
+        {
+            source=memoryWidth(_sourceWidth);
+            target=peripheralWidth(_targetWidth);
+            _control&=LN_DMA_CHAN_WIDTH_MASK;
+            _control|=source;
+            _control|=target;
+            _control|=LN_DMA_CHAN_DIR_P2M;
             _control|=LN_DMA_CHAN_PRIO_HIGH;
             break;
         }
