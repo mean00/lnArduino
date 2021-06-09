@@ -433,7 +433,25 @@ bool lnTwoWire::sendNext()
  */
 bool lnTwoWire::receiveNext()
 {
-    xAssert(0);
+     int    t=_session->curTransaction;
+    uint8_t *data=_session->transactionData[t];
+    int     size=_session->transactionSize[t];
+    
+    if(_session->curTransaction>=_session->nbTransaction)
+    {
+        _session->curIndex=0; // all done
+        return false;
+    }
+    
+    data[_session->curIndex++]=_d->adr->DATA&0xff;
+    if(_session->curIndex>=size) // next transaction ?
+    {
+        _session->curTransaction++;   
+        _session->curIndex=0;
+        if(_session->curTransaction>=_session->nbTransaction)
+            return false;
+    }
+    return true;
 }
 /**
  * 
