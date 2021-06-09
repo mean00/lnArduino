@@ -8,7 +8,10 @@
 uint8_t   lnMcp23017::readRegister(int addr)
 {
     
-    
+    uint8_t a=addr;
+    if(!_i2c->write(1,&a)) return 0;
+    if(!_i2c->read(1,&a)) return 0;
+    return a;
 }
 /**
  * 
@@ -17,7 +20,11 @@ uint8_t   lnMcp23017::readRegister(int addr)
  */
 void      lnMcp23017::writeRegister(int addr, int value)
 {
-    
+    uint8_t a[2]={(uint8_t)addr,(uint8_t)value};
+    if(!_i2c-> write(2,a)) 
+    {
+        return ;
+    }
 }
 
 void lnMcp23017::cb_(int pin, void *a)
