@@ -63,6 +63,12 @@ extern "C"
     {
           do_assert("__cxa_pure_virtual");
     }
+    uint32_t core_exception_handler(unsigned long mcause, unsigned long sp)
+    {
+          do_assert("core_exception_handler");
+          return 0;
+    }
+
 
 }
 

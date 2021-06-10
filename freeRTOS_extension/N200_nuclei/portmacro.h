@@ -51,10 +51,10 @@ extern void lnSystemTimerTick();
 
 #define ECLIC_SetMth lnWriteMthDirect
 #define ECLIC_GetMth lnReadMthDirect
+#define __ECLIC_GetMth lnReadMthDirect
+#define __ECLIC_GetLevelIRQ(x) 0
 #define SysTimer_SetSWIRQ lnSystemTimerTriggerSwInterrupt
 #define SysTimer_ClearSWIRQ lnSystemTimerClearSwInterrupt
-#define ECLIC_DisableIRQ lnDisableInterrupt
-#define ECLIC_EnableIRQ lnEnableInterrupt 
 #define SysTick_Reload(x)   lnSystemTimerTick()
 #warning FIXME THIS IS INCORRECT
 #define __ECLIC_GetCfgNlbits() 4

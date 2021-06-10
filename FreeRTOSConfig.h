@@ -31,6 +31,9 @@
 // This is GD32/RISCV specific
 
 extern uint32_t SystemCoreClock;
+extern void do_assert(const char *a);
+#define configASSERT(a)  if(!(a)) {do_assert(#a);}
+
 
 #define configMTIME_BASE_ADDRESS    TIMER_CTRL_ADDR
 #define configMTIMECMP_BASE_ADDRESS (TIMER_CTRL_ADDR+8)
