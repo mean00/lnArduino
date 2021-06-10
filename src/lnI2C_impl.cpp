@@ -311,13 +311,13 @@ bool lnTwoWire::write(int target, int n, uint8_t *data)
  * @param data
  * @return 
  */
-bool lnTwoWire::read(int target,  int n, uint8_t *data)
+bool lnTwoWire::multiRead(int target, int nbSeqn,int *seqLength, uint8_t **seqData)
 {
-  volatile uint32_t stat1,stat0;
+     volatile uint32_t stat1,stat0;
     // Send start
     
     LN_I2C_Registers *adr=_d->adr;
-     lnI2CSession session(target,1,&n,&data);
+     lnI2CSession session(target,nbSeqn,seqLength,seqData);
     _session=&session;
 
     stat0=_d->adr->STAT0;
@@ -345,6 +345,17 @@ bool lnTwoWire::read(int target,  int n, uint8_t *data)
             _result=false;
     }
     return _result;
+}
+/**
+ * 
+ * @param target
+ * @param n
+ * @param data
+ * @return 
+ */
+bool lnTwoWire::read(int target,  int n, uint8_t *data)
+{
+    return lnTwoWire::multiRead(  target, 1,&n, &data);
 }
 /**
  * 

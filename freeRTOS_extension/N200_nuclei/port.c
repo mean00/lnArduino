@@ -594,8 +594,10 @@ __attribute__((weak)) void vPortSuppressTicksAndSleep(TickType_t xExpectedIdleTi
  * Setup the systick timer to generate the tick interrupts at the required
  * frequency.
  */
+#if 0 // MEANX
 __attribute__((weak)) void vPortSetupTimerInterrupt(void)
 {
+
     /* Calculate the constants required to configure the tick interrupt. */
 #if( configUSE_TICKLESS_IDLE == 1 )
     {
@@ -620,7 +622,9 @@ __attribute__((weak)) void vPortSetupTimerInterrupt(void)
     ECLIC_SetShvIRQ(SysTimerSW_IRQn, ECLIC_VECTOR_INTERRUPT);
     ECLIC_SetLevelIRQ(SysTimerSW_IRQn, configKERNEL_INTERRUPT_PRIORITY);
     ECLIC_EnableIRQ(SysTimerSW_IRQn);
+    
 }
+#endif // MEANX
 /*-----------------------------------------------------------*/
 
 /*-----------------------------------------------------------*/

@@ -63,6 +63,7 @@ public:
             bool write(int target, int n, uint8_t *data);
             bool multiWrite(int target, int nbSeqn,int *seqLength, uint8_t **data);
             bool read(int target,  int n, uint8_t *data);
+            bool multiRead(int target, int nbSeqn,int *seqLength, uint8_t **seqData);
             bool begin(int target=0);
 protected:
             void stopIrq();

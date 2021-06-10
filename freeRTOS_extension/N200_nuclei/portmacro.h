@@ -33,8 +33,35 @@
 extern "C" {
 #endif
 
-#include "nuclei_sdk_soc.h"
+//-------------------------------------------------
+// Translate nuclei calls to lnArduino calls    
+// MEANX
+//-------------------------------------------------
+#define STRINGIFY(s)            #s
+#include "riscv_encoding.h"
+#include "nmsis_gcc.h"
+#include "core_compatiable.h"    
+#include "core_feature_base.h"  
+    
+extern void lnWriteMthDirect(int val);
+extern int  lnReadMthDirect();
+extern void lnSystemTimerTriggerSwInterrupt();
+extern void lnSystemTimerClearSwInterrupt();
+extern void lnSystemTimerTick();    
 
+#define ECLIC_SetMth lnWriteMthDirect
+#define ECLIC_GetMth lnReadMthDirect
+#define SysTimer_SetSWIRQ lnSystemTimerTriggerSwInterrupt
+#define SysTimer_ClearSWIRQ lnSystemTimerClearSwInterrupt
+#define ECLIC_DisableIRQ lnDisableInterrupt
+#define ECLIC_EnableIRQ lnEnableInterrupt 
+#define SysTick_Reload(x)   lnSystemTimerTick()
+#warning FIXME THIS IS INCORRECT
+#define __ECLIC_GetCfgNlbits() 4
+#define __ECLIC_INTCTLBITS     4
+//-------------------------------------------------
+// /MEANX    
+//-------------------------------------------------
 /*-----------------------------------------------------------
  * Port specific definitions.
  *
