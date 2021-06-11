@@ -16,6 +16,17 @@
 #define ECLIC_CTLBIT_LOW   ((1<<(ECLIC_CTLBIT_SHIFT))-1)
 #define ECLIC_NB_SOURCES 87
 
+
+// Attribute [LEVEL1:LEVEL0][SHV] : 
+//      LEVEL: 
+//              0:0=LEVEL, 
+//              0:1=RISING EDGE, 
+//              1:0: FALLINGEDGE   
+//      SHV:
+//              0 non vectored
+//              1 vectored
+//
+
 void lnIrqSysInit()
 {
     // start from a clean state
@@ -32,10 +43,9 @@ void lnIrqSysInit()
     for(int i=0;i<ECLIC_NB_SOURCES;i++)
     {
         eclicIrqs[i].ie=0;  // default : disabled
-        eclicIrqs[i].control=ECLIC_CTLBIT_LOW;  // level 0 by default
         eclicIrqs[i].ip=0x0; 
-        eclicIrqs[i].attr=0; // Default : Level trigger + Non Vector mode
     }
+     
     
     
     // Switch to ECLIC mode
@@ -52,13 +62,16 @@ void lnIrqSysInit()
             :: "r"(tmp1),"r"(tmp2)
     ); 
   
-    
+    // Now reconfigure with real value
+    for(int i=0;i<ECLIC_NB_SOURCES;i++)
+    {
+        lnSetInterruptLevelDirect(i,1,false);
+        
+    }
     // Preconfigure timer & syscall
-    // these 2 are in vector mode
-     eclicIrqs[7].attr=0xc1;
-     eclicIrqs[3].attr=0xc1;
-     eclicIrqs[7].control=0x1f; // level 1
-     eclicIrqs[3].control=0x1f;    
+    // these 2 are in vector mode, lowest prio
+    lnSetInterruptLevelDirect(3,0,true);
+    lnSetInterruptLevelDirect(7,0,true);
     return;
 }
 
@@ -100,6 +113,22 @@ extern "C" void lnDisableInterruptDirect(int irq)
 void lnEnableInterrupt(const LnIRQ &irq)
 {   
     _enableDisable(true,irq);   
+}
+/**
+ * 
+ * @param irq
+ */
+void lnSetInterruptLevelDirect(int irq, int prio, bool vectored)
+{
+    LN_ECLIC_irq *iclic=eclicIrqs+irq;
+    bool attr=0;
+    if(vectored) attr|=1;
+    // Assume level interrupt (?)
+    iclic->attr=attr;
+    // control
+    //  4 bits then 1 1 1 1
+    // nlbits=4 => level = 4 bits, priority=0 bits
+    iclic->control=(prio<<ECLIC_CTLBIT_SHIFT)+ECLIC_CTLBIT_LOW;    
 }
 /**
  * 

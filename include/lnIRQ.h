@@ -75,3 +75,4 @@ LN_IRQ_LAST=LN_IRQ_USBFS
 
 void lnEnableInterrupt(const LnIRQ &irq);
 void lnDisableInterrupt(const LnIRQ &irq);
+void lnSetInterruptLevelDirect(int intr, int prio, bool vectored);
