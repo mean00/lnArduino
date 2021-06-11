@@ -65,7 +65,7 @@ bool  myMcp23017::begin()
     readRegister(MCP23017_GPIOA);
     readRegister(MCP23017_GPIOB);
     changed=false;       
-    xTaskCreate(myMcp23017::task,"mcp23017",500,NULL,2,NULL);    
+    xTaskCreate(myMcp23017::task,"mcp23017",500,this,2,NULL);    
     return true;
 }
 
