@@ -36,6 +36,12 @@
 
 #define portCONTEXT_SIZE    ( portRegNum * REGBYTES )
 
+.macro setUnderInterrupt x
+	li t1, \x
+	la t0, underInterrupt
+        sw t1,(t0)
+.endm
+
 .section    .text.entry
 .align 8
 
@@ -220,7 +226,7 @@ irq_entry:
     SAVE_CONTEXT
     /* Save the necessary CSR registers */
     SAVE_CSR_CONTEXT
-
+    setUnderInterrupt(1) // is this atomic enough ?
     /* This special CSR read/write operation, which is actually
      * claim the CLIC to find its pending highest ID, if the ID
      * is not 0, then automatically enable the mstatus.MIE, and
@@ -235,7 +241,7 @@ irq_entry:
     RESTORE_CSR_CONTEXT
     /* Restore the caller saving registers (context) */
     RESTORE_CONTEXT
-
+    setUnderInterrupt(0)
     /* Return to regular code */
     mret
 

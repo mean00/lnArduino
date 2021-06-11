@@ -27,9 +27,14 @@ void loop()
   
   lnMcp23017 *mcp=new lnMcp23017(i2c,PB5,0x20);
   mcp->begin();
+  bool onoff=false;
+  pinMode(LEDRED,OUTPUT);
   while(1)
   {
     
+      mcp->digitalWrite(0,onoff);
+      digitalWrite(LEDRED,onoff);
+      onoff=!onoff;
       xDelay(500);
   }
 }
