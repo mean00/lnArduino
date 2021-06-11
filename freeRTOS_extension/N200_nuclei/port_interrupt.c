@@ -19,4 +19,5 @@ void vPortSetupTimerInterrupt()
     portEXIT_CRITICAL();
 
     lnEnableInterruptDirect(ECLIC_IRQ_TIMER);
+    lnEnableInterruptDirect(ECLIC_IRQ_SFT);
 }
