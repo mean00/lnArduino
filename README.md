@@ -16,7 +16,7 @@ _What works for the moment :_
  * FreeRTOS
  * Spi transmit (DMA)
  * Serial transmit (DMA)
- * I2C Transmit (DMA)
+ * I2C Transmit (DMA) / Receive (Interrupt)
  * GPIO + interrupt
  * Onboard LCD support
 
