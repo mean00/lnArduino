@@ -15,10 +15,9 @@ class lnMcp23017  : public myMcp23017
         }
         uint8_t   readRegister(int addr);
         void      writeRegister(int addr, int value);
-        virtual bool      begin();
+virtual bool      begin();
     protected:
         lnI2C *_i2c;
         int    _irqPin;
- static void cb_(int pin,void *a);
             
 };

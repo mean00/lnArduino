@@ -45,92 +45,28 @@ public:
          * @param value
          */
   virtual void              digitalWrite(int pin, bool onoff);
+           bool             readOutput(int pin);
+           bool             readInput(int pin);
           void              registerClient(int mask, myMcpClient *client);
           virtual bool      begin();
           
  protected:
             virtual uint8_t   readRegister(int addr)=0;
             virtual void      writeRegister(int addr, int value)=0;
-            void              interrupt();
+            
   
             myMcp23017(int address)
             {
               _address=address;
             }
             
-            int      _address;
-            std::vector<myMcpClient *> clients;
+            int      _address;            
             int      inputMask;
             int      PortALatch;
             int      PortBValue;
             bool     changed;
             xBinarySemaphore _sem;
 
-            static void task(void *a);
-                   void run();
-                   void process();
-};
-/**
- */
-class myMcpClient
-{
-public:
-        myMcpClient(myMcp23017 *m)
-        {
-          mcp=m;
-          mask=0;
-        }        
-        virtual bool process(int pins,int state)=0;
-protected:
-        myMcp23017 *mcp;
-public:
-        int mask;
-};
-
-/**
- */
-class myMcpButtonInput : public myMcpClient
-{
-public:
-        myMcpButtonInput(myMcp23017 *mcp, int pin) ;
-        bool process(int pin, int state);
-        bool state()
-        {          
-          return _toggle;
-        }
-        bool changed()
-        {
-          bool r=_changed;
-          _changed=false;
-          return r;
-        }
-protected:
-        bool _toggle;
-        int  _pin;
-        bool _state;
-        bool _changed;
-  
-};
-
-
-/**
- */
-class myMcpRotaryEncoder : public myMcpClient
-{
-public:
-        myMcpRotaryEncoder(myMcp23017 *mcp, int pin1,int pin2) ;
-        bool process(int pin, int state);
-        int count()
-        {
-          noInterrupts();
-          int x= _count;
-          _count=0;
-          interrupts();
-          return x;
-        }
-protected:
-        int  _pin1,_pin2;
-        int  _count;
-        int  _state;
+    
 };
 
