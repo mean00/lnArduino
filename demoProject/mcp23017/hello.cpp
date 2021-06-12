@@ -34,6 +34,8 @@ void loop()
     
       mcp->digitalWrite(0,onoff);
       digitalWrite(LEDRED,onoff);
+      bool readBack=mcp->readOutput(0);
+      Logger("Set %d, read %d\n",onoff,readBack);
       onoff=!onoff;
       xDelay(500);
   }
