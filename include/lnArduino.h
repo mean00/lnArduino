@@ -25,6 +25,9 @@ extern "C"
 #include "lnRCU.h"
 #include "lnIRQ.h"
 #include "lnPeripherals.h"
+
+#include "lnPrintf.h"
+
 #define byte uint8_t 
 
 

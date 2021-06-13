@@ -5,5 +5,6 @@ MESSAGE(STATUS "ARDUINO_GD32_FREERTOS is ${ARDUINO_GD32_FREERTOS}")
         
 include(./arduino.cmake)
 include(./freeRTOS.cmake)
+include(./embeddedPrintf.cmake)
         
 add_subdirectory(src)
