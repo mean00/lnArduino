@@ -49,6 +49,7 @@ public:
            bool             readInput(int pin);
           void              registerClient(int mask, myMcpClient *client);
           virtual bool      begin();
+          bool              dumpRegisters();
           
  protected:
             virtual uint8_t   readRegister(int addr)=0;

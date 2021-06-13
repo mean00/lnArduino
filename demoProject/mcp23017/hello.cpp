@@ -35,8 +35,11 @@ void loop()
       mcp->digitalWrite(0,onoff);
       digitalWrite(LEDRED,onoff);
       bool readBack=mcp->readOutput(0);
-      Logger("Set %d, read %d\n",onoff,readBack);
+      bool readBack5=mcp->readOutput(5);
+      bool readIn=mcp->readInput(0);
+      Logger("Set %d, read %d,read 5:%d, input %d\n",onoff,readBack,readBack5,readIn);
       onoff=!onoff;
+    //  mcp->dumpRegisters();
       xDelay(500);
   }
 }

@@ -73,7 +73,8 @@ void      myMcp23017::digitalWrite(int pin, bool onoff)
  */
 bool          myMcp23017::readOutput(int pin)
 {
-    uint32_t portB= readRegister(MCP23017_OLATB);     
+    uint32_t portB= readRegister(MCP23017_OLATB);   
+ //   Logger("AllOut=%x\n",portB);
     return !!(portB & (1<<pin));    
 }
 /**
@@ -83,10 +84,26 @@ bool          myMcp23017::readOutput(int pin)
  */
 bool        myMcp23017::readInput(int pin)
 {
-    uint32_t portB= readRegister(MCP23017_OLATA);     
-    return !!(portB & (1<<pin));    
+    uint32_t portA= readRegister(MCP23017_GPIOA);     
+  //  Logger("All=%x\n",portA);
+    return !!(portA & (1<<pin));    
 }
-  
+/**
+ * 
+ * @return 
+ */
+bool        myMcp23017::dumpRegisters()
+{
+    uint8_t reg;
+  //  for(int i=0;i<27;i++)
+    for(int i=0;i<27;i++)
+    {
+        reg=readRegister(i);
+        Logger("Reg 0x%x : 0x%x\n  ",i,reg);
+    }
+    return true;
+}
+
 
 // EOF
 

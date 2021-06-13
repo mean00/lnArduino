@@ -8,10 +8,10 @@
 uint8_t   lnMcp23017::readRegister(int addr)
 {
     
-    uint8_t a=addr;
+    uint8_t a=addr,b;
     if(!_i2c->write(1,&a)) return 0;
-    if(!_i2c->read(1,&a)) return 0;
-    return a;
+    if(!_i2c->read(1,&b)) return 0;
+    return b;
 }
 /**
  * 
