@@ -10,3 +10,6 @@
 [submodule "gdbGD32_freeRTOS_support"]
 	path = gdbGD32_freeRTOS_support
 	url = git@github.com:mean00/FreeRTOS-GDB.git
+[submodule "embedded_printf"]
+	path = embedded_printf
+	url = https://github.com/mpaland/printf
