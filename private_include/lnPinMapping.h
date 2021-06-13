@@ -13,3 +13,4 @@ struct LN_PIN_MAPPING
     int timerChannel;    
 };
 
+extern const LN_PIN_MAPPING pinMappings[];
