@@ -29,3 +29,8 @@
 #define LN_I2C1_ADR     (0x40005800)
 #define LN_SYS_TIMER_ADR (0xd1000000)
 #define LN_EXTI_ADR     (0x40010400)
+
+#define LN_TIMER1_ADR   (0x40000000)
+#define LN_TIMER2_ADR   (0x40000400)
+#define LN_TIMER3_ADR   (0x40000800)
+#define LN_TIMER4_ADR   (0x40000C00)

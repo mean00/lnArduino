@@ -5,7 +5,10 @@
 #include "lnArduino.h"
 #include "lnTimer.h"
 #include "lnTimer_priv.h"
-
+uint32_t     *aTimer1=(uint32_t *)(LN_TIMER1_ADR);
+uint32_t     *aTimer2=(uint32_t *)(LN_TIMER2_ADR);
+uint32_t     *aTimer3=(uint32_t *)(LN_TIMER3_ADR);
+uint32_t     *aTimer4=(uint32_t *)(LN_TIMER4_ADR);
 /**
  * 
  * @param timer
