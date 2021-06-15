@@ -5,6 +5,8 @@
 #include "lnArduino.h"
 #include "lnTimer.h"
 #include "lnTimer_priv.h"
+#include "lnPinMapping.h"
+
 LN_Timers_Registers     *aTimer1=(LN_Timers_Registers *)(LN_TIMER1_ADR);
 LN_Timers_Registers     *aTimer2=(LN_Timers_Registers *)(LN_TIMER2_ADR);
 LN_Timers_Registers     *aTimer3=(LN_Timers_Registers *)(LN_TIMER3_ADR);
@@ -22,6 +24,26 @@ lnTimer::lnTimer(int timer,int channel)
     _timer=timer;
     _channel=channel;
 }
+/**
+ * 
+ * @param pin
+ */
+lnTimer::lnTimer(int pin)
+{
+    const LN_PIN_MAPPING *pins=pinMappings;
+    while(1)
+    {
+        xAssert(pins->pin!=-1);
+        if(pins->pin==pin)
+        {
+            _timer=pins->timer;
+            _channel=pins->timerChannel;
+            return;
+        }
+        pins++;
+    }
+}
+
 /**
  */
 lnTimer::~lnTimer()
@@ -54,7 +76,7 @@ void lnTimer::setTimerFrequency(int fqInHz)
  * @param timer
  * @param channel
  */
-void lnTimer::setPwmMode(int ratio)
+void lnTimer::setPwmMode(int ratio1024)
 {
   LN_Timers_Registers *t=aTimers[_timer-1];
   uint32_t chCtl=t->CHCTLs[_channel>>1] ;
@@ -65,9 +87,26 @@ void lnTimer::setPwmMode(int ratio)
   chCtl|=0<<LN_TIMER_CHTLs_OUTPUT_CHxMS_SHIFT(_channel);
   
   t->CHCTLs[_channel>>1]=chCtl;
-  
-  t->CHCTL2 |=(3)<<(_channel*4); // basic enable, active high
-  t->CHCVs[_channel] =512; // A/R
+    
+  t->CHCVs[_channel] =ratio1024; // A/R
+  t->CHCTL2 |=LN_TIMER_CHTL2_CHxP(_channel);
+}
+/**
+ * 
+ */
+void lnTimer::enable()
+{
+    LN_Timers_Registers *t=aTimers[_timer-1];
+    t->CHCTL2 |=LN_TIMER_CHTL2_CHxEN(_channel); // basic enable, active high
+}
+/**
+ * 
+ */
+void lnTimer::disable()
+{
+    LN_Timers_Registers *t=aTimers[_timer-1];
+    t->CHCTL2 &=~(LN_TIMER_CHTL2_CHxEN(_channel)); // basic enable, active high
+
 }
 
 /**

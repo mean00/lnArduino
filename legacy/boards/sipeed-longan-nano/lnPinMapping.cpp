@@ -74,4 +74,5 @@ const LN_PIN_MAPPING pinMappings[]=
     {  PD13,    -1,     -1,         -1              },
     {  PD14,    -1,     -1,         -1              },
     {  PD15,    -1,     -1,         -1              },
+    {  -1  ,    -1,     -1,         -1              },
 };

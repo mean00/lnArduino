@@ -89,8 +89,8 @@ typedef volatile LN_Timers_Registersx LN_Timers_Registers;
       
 
 //-------------- CHTL2 ---------
-#define LN_TIMER_CHTL2_CHxEN                (1<<(0+channel*4))     // Channel x captue/compare enable
-#define LN_TIMER_CHTL2_CHxP                 (1<<(1+channel*4))     // Channel x captue/compare polarity
+#define LN_TIMER_CHTL2_CHxEN(channel)                (1<<(0+channel*4))     // Channel x captue/compare enable
+#define LN_TIMER_CHTL2_CHxP(channel)                 (1<<(1+channel*4))     // Channel x captue/compare polarity
 
 
 // EOF
