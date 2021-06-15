@@ -22,10 +22,7 @@ struct LN_Timers_Registersx
     uint32_t PSC;       // 28
     uint32_t CAR;       // 2C
     uint32_t FILLER0;   // 30
-    uint32_t CHOCV;     // 34
-    uint32_t CH1CV;     // 38
-    uint32_t CH2CV;     // 3c
-    uint32_t CH3CV;     // 40
+    uint32_t CHCVs[4];     // 34 38 3c 40
     uint32_t FILLER1;   // 44
     uint32_t DMACFG;    // 48
     uint32_t DMATB;     // 4C

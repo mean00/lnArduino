@@ -40,17 +40,17 @@ void lnPinMode(const lnPin xpin, const GpioMode mode)
     uint32_t value;
     switch(mode)
     {
-        case lnPWM:             
-                                xAssert(lnPin->timer!=-1);
-                                // switch to Timer mode     
-                                lnTimer::setPwmMode(lnPin->timer, lnPin->timerChannel);
-                                break;
         case lnFLOATING:        value=LNGPIOSET(LN_CTL_MD_INPUT,LN_CTL_INPUT_FLOATING); break;
         case lnINPUT_PULLUP:    value=LNGPIOSET(LN_CTL_MD_INPUT,LN_CTL_INPUT_PP); break;
         case lnINPUT_PULLDOWN:  value=LNGPIOSET(LN_CTL_MD_INPUT,LN_CTL_INPUT_PP); break;
         
         case lnOUTPUT:          value=LNGPIOSET (LN_CTL_MD_OUTPUT,LN_CTL_OUTPUT_PP); break;
         case lnOUTPUT_OPEN_DRAIN:value=LNGPIOSET(LN_CTL_MD_OUTPUT,LN_CTL_OUTPUT_OD); break;
+        case lnPWM:             
+                                xAssert(lnPin->timer!=-1);                                
+                                
+                                //lnTimer::setPwmMode(lnPin->timer, lnPin->timerChannel);
+                                
         case lnALTERNATE_PP:    value=LNGPIOSET (LN_CTL_MD_OUTPUT,LN_CTL_OUTPUT_ALTERNAT_PP); break;
         case lnALTERNATE_OD:    value=LNGPIOSET (LN_CTL_MD_OUTPUT,LN_CTL_OUTPUT_ALTERNAT_OD); break;
         default:

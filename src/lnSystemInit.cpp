@@ -59,6 +59,12 @@ int main()
     lnPeripherals::enable(pSPI1);
     lnPeripherals::enable(pSPI2);
     
+    // Init Timer 1..4
+    lnPeripherals::enable(pTIMER1);
+    lnPeripherals::enable(pTIMER2);
+    lnPeripherals::enable(pTIMER3);
+    lnPeripherals::enable(pTIMER4);
+    
 #warning FIXME FIXME FIXME
 #if 0    
     // DMA TX for SPI0 (LCD)
