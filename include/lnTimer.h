@@ -3,6 +3,11 @@
 /**
  * \brief Careful all the channels of a given timer share the same frequency!
  * Max frequency is around 100 kHz in PWM mode !
+ * 
+ * 
+ * In all mode , after setup the channel is disabled
+ * You have to explicitely call timer->enable()
+ * 
  * @param timer
  * @param channel
  */
@@ -12,9 +17,11 @@ public:
              lnTimer(int timer,int channel);
              lnTimer(int pin);
     virtual ~lnTimer();
-        void setPwmMode(int ratio);
-        void setTimerFrequency(int fqInHz); // This program the timer fq with a tick of 1024
+        // PWM
+        void setPwmMode(int ratio1024);
+        void setTimerFrequency(int fqInHz); // This program the timer fq with a tick of 1024, i.e. internal fq is 1024* the given fq
         void setChannelRatio(int ratio1024); // Ratio=1024 => 100%, 512 => 50%, 0 => 0%
+        //
         void disable();
         void enable();
 protected:

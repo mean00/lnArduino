@@ -1,6 +1,5 @@
- # Arduino_gd32_freeRTOS
+ # lnArduino
 
-**VERY MUCH WORK IN PROGRESS**
 
 The aim of this project is to offer an Arduino style framework for the Longan Nano board.
 What are the differences ?  
@@ -18,6 +17,7 @@ _What works for the moment :_
  * Serial transmit (DMA)
  * I2C Transmit (DMA) / Receive (Interrupt)
  * GPIO + interrupt
+ * PWM support
  * Onboard LCD support
 
 
@@ -26,9 +26,8 @@ Symlink/copy the Arduino_gd32_freeRTOS folder under the demo folder
 Fill-in platformconfig.cmake to point to your toolchain (adjust flags if needed)
 mkdir build && cd build && cmake .. && make
 
+Very little is left from the original arduino/sdk
 
-
-Code from the longduino / gd32 libs are used internally for now, but they'll be removed as progress is done.
 
 The demoProject folder contains sample code to show the API.
 
