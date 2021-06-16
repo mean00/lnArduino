@@ -29,7 +29,7 @@ void loop()
     int ratio=1024;
     int step=128;
     
-    timer.setTimerFrequency(5000);
+    timer.setTimerFrequency(50*1000);
     timer.setPwmMode(ratio);
     timer.enable();
     

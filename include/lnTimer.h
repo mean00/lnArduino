@@ -2,6 +2,7 @@
 
 /**
  * \brief Careful all the channels of a given timer share the same frequency!
+ * Max frequency is around 100 kHz in PWM mode !
  * @param timer
  * @param channel
  */

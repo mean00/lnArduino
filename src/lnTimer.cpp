@@ -61,7 +61,8 @@ void lnTimer::setTimerFrequency(int fqInHz)
     Peripherals per=pTIMER1;
     per=(Peripherals)((int)per+_timer-1);
     uint32_t clock=lnPeripherals::getClock(per);
-    
+    // If ABP1 prescale=1, clock*=2 ???? see 5.2 in GD32VF103
+    clock=clock*2;
     // disable
     t->CTL0&=~LN_TIMER_CTL0_CEN;
     
