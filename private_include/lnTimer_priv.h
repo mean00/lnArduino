@@ -42,7 +42,7 @@ typedef volatile LN_Timers_Registersx LN_Timers_Registers;
 #define LN_TIMER_CTL0_DIR             (1<<4) // DIR 0=UP, 1=DOWN
 #define LN_TIMER_CTL0_CAM_SHIFT       (5)    // counter align mode
 #define LN_TIMER_CTL0_ARSE            (1<<7) // auto reload shadow 
-#define LN_TIMER_CTL0_CKDIR_SHIFT     (8)
+#define LN_TIMER_CTL0_CKDIV_SHIFT     (8)
 
 
 //-------------- CTL1 ---------

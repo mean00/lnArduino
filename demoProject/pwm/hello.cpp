@@ -27,13 +27,13 @@ void loop()
     
     
     int ratio=1024;
-    int step=-128;
+    int step=128;
     
     timer.setTimerFrequency(5000);
     timer.setPwmMode(ratio);
     timer.enable();
     
-    
+#if 0    
     int fq=100;
     timer.setPwmMode(512);
     while(1)
@@ -41,19 +41,20 @@ void loop()
         timer.setTimerFrequency(fq);
         Logger("Fq=%d\n",fq);
         fq=fq*10;
-        if(fq>=100000) fq=100;
+        if(fq>=100*1000) fq=100;
         vTaskDelay(100);
         digitalToggle(LED);
         onoff=!onoff;
         
     }
-    
+#endif    
     while(1)
     {
         Logger("Ratio=%d\n",ratio);
-        timer.setPwmMode(ratio);
-        ratio+=step;
+        timer.setChannelRatio(ratio);
         if(!ratio || ratio==1024) step=-step;
+        ratio+=step;
+       
         roundup++;
         vTaskDelay(100);
         digitalToggle(LED);

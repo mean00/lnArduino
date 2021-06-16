@@ -57,17 +57,34 @@ lnTimer::~lnTimer()
  */
 void lnTimer::setTimerFrequency(int fqInHz)
 {
+    LN_Timers_Registers *t=aTimers[_timer-1];
     Peripherals per=pTIMER1;
     per=(Peripherals)((int)per+_timer-1);
     uint32_t clock=lnPeripherals::getClock(per);
     
-    int divider=clock/(fqInHz*1024);
-    LN_Timers_Registers *t=aTimers[_timer-1];
+    // disable
+    t->CTL0&=~LN_TIMER_CTL0_CEN;
+    
+    int divider=(clock+fqInHz*512-1)/(fqInHz*1024);
+    int preDiv=0;
+    while(divider>65535)
+    {
+        preDiv++;
+        divider=divider/2;
+    }
+    if(preDiv>2) preDiv=2;
+    
+    uint32_t ctl0=t->CTL0;
+    ctl0&=~(3<<LN_TIMER_CTL0_CKDIV_SHIFT);
+    ctl0|=preDiv<<LN_TIMER_CTL0_CKDIV_SHIFT;
+    
+    if(!divider) divider=1;
     t->PSC=divider-1;
     // Set reload to 1024
     t->CAR=1024;
     // Enable with default value
-    t->CTL0=1;
+    ctl0|=LN_TIMER_CTL0_CEN;
+    t->CTL0=ctl0;
     
 }
 
@@ -89,7 +106,11 @@ void lnTimer::setPwmMode(int ratio1024)
   t->CHCTLs[_channel>>1]=chCtl;
     
   t->CHCVs[_channel] =ratio1024; // A/R
+#if 0  
   t->CHCTL2 |=LN_TIMER_CHTL2_CHxP(_channel);
+#else
+  t->CHCTL2 &=~(LN_TIMER_CHTL2_CHxP(_channel)); // active low
+#endif
 }
 /**
  * 
@@ -113,9 +134,10 @@ void lnTimer::disable()
  * 
  * @param ratioBy100
  */
-void lnTimer::setChannelRatio(int ratioBy100)
+void lnTimer::setChannelRatio(int ratio1024)
 {
-    xAssert(0);
+    LN_Timers_Registers *t=aTimers[_timer-1];
+    t->CHCVs[_channel] =ratio1024; // A/R
 }
 
 //EOF
