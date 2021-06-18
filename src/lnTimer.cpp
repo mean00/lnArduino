@@ -140,5 +140,24 @@ void lnTimer::setChannelRatio(int ratio1024)
     LN_Timers_Registers *t=aTimers[_timer-1];
     t->CHCVs[_channel] =ratio1024; // A/R
 }
-
+/**
+ * 
+ * @param ratio1024
+ */
+void lnTimer::singleShot(int durationMs, bool down)
+{
+    LN_Timers_Registers *t=aTimers[_timer-1];
+    xAssert(durationMs<1000);
+    disable();
+    setTimerFrequency(1000000);
+    setPwmMode(durationMs);
+    if(!down)
+        t->CHCTL2 |=LN_TIMER_CHTL2_CHxP(_channel); // by default on, it will be stopped when the timer is done
+    else
+        t->CHCTL2 &=~(LN_TIMER_CHTL2_CHxP(_channel));
+    enable();
+    xDelay(durationMs+10);
+    disable();
+    
+}
 //EOF

@@ -29,11 +29,19 @@ void loop()
     int ratio=1024;
     int step=128;
     
+    
+    while(1)
+    {
+    
+        timer.singleShot(1,false);
+        xDelay(1000);
+    }
+#if 0        
     timer.setTimerFrequency(50*1000);
     timer.setPwmMode(ratio);
     timer.enable();
     
-#if 0    
+
     int fq=100;
     timer.setPwmMode(512);
     while(1)
@@ -47,7 +55,8 @@ void loop()
         onoff=!onoff;
         
     }
-#endif    
+#endif  
+#if 0
     while(1)
     {
         Logger("Ratio=%d\n",ratio);
@@ -61,4 +70,5 @@ void loop()
         onoff=!onoff;
         
     }
+#endif
 }

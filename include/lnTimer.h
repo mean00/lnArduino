@@ -22,6 +22,7 @@ public:
         void setTimerFrequency(int fqInHz); // This program the timer fq with a tick of 1024, i.e. internal fq is 1024* the given fq
         void setChannelRatio(int ratio1024); // Ratio=1024 => 100%, 512 => 50%, 0 => 0%
         //
+        void singleShot(int durationMs, bool down=false);
         void disable();
         void enable();
 protected:
