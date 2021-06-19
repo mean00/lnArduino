@@ -11,6 +11,7 @@ struct LN_PIN_MAPPING
     int adc;
     int timer;
     int timerChannel;    
+    int dac;
 };
 
 extern const LN_PIN_MAPPING pinMappings[];

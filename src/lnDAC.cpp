@@ -7,9 +7,32 @@
 #include "lnDAC.h"
 #include "lnDAC_priv.h"
 #include "lnTimer.h"
+/**
+ */
+struct LN_DAC_DESCR
+{
+    lnPin pin;
+    int   dmaEngine;
+    int   dmaChannel;
+};
+// Timer 5 and 6 are a good fit
+const LN_DAC_DESCR lnDacDesc[2]=
+{
+    {PA4,1,2},
+    {PA5,1,3},
+};
 
 LN_DAC_Registers *adac=(LN_DAC_Registers *)LN_DAC_ADR;
 
+
+/**
+ * 
+ * @return 
+ */
+lnPin   lnDAC::pin()
+{
+    return lnDacDesc[_instance].pin;
+}
 /**
  * 
  * @param instance
@@ -40,7 +63,9 @@ void    lnDAC::disable()
 {
     adac->CTL&=~LN_DAC_CTL_ENABLE(_instance);
 }
-
+/**
+ * 
+ */
 void    lnDAC::simpleMode()
 {
     uint32_t ctl=adac->CTL;
