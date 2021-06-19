@@ -28,7 +28,9 @@ enum GpioMode
     lnOUTPUT_OPEN_DRAIN,
     lnALTERNATE_PP,
     lnALTERNATE_OD,
-    lnPWM
+    lnPWM,
+    lnADC_MODE,
+    lnDAC_MODE
 };
 typedef int lnPin;
 void lnPinMode(const lnPin pin, const GpioMode mode);

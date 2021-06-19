@@ -40,6 +40,9 @@ void lnPinMode(const lnPin xpin, const GpioMode mode)
     uint32_t value;
     switch(mode)
     {
+        case lnADC_MODE:
+        case lnDAC_MODE:
+                                value=LNGPIOSET(LN_CTL_MD_INPUT,LN_CTL_INPUT_ANALOG); break;    
         case lnFLOATING:        value=LNGPIOSET(LN_CTL_MD_INPUT,LN_CTL_INPUT_FLOATING); break;
         case lnINPUT_PULLUP:    value=LNGPIOSET(LN_CTL_MD_INPUT,LN_CTL_INPUT_PP); break;
         case lnINPUT_PULLDOWN:  value=LNGPIOSET(LN_CTL_MD_INPUT,LN_CTL_INPUT_PP); break;

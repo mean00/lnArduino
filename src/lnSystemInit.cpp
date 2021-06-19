@@ -64,6 +64,8 @@ int main()
     lnPeripherals::enable(pTIMER2);
     lnPeripherals::enable(pTIMER3);
     lnPeripherals::enable(pTIMER4);
+    // DAC
+     lnPeripherals::enable(pDAC);
     
 #warning FIXME FIXME FIXME
 #if 0    
