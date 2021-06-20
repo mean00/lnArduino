@@ -242,7 +242,7 @@ void lnDMA::endTransfer()
  * @param repeat
  * @return 
  */
-bool lnDMA::doMemoryToPeripheralTransferNoLock(int count, const uint16_t *source,const uint16_t *target,  bool repeat)
+bool lnDMA::doMemoryToPeripheralTransferNoLock(int count, const uint16_t *source,const uint16_t *target,  bool repeat,bool circular)
 {
      // clear pending bits
     DMA_struct *d=(DMA_struct *)_dma;
@@ -259,14 +259,22 @@ bool lnDMA::doMemoryToPeripheralTransferNoLock(int count, const uint16_t *source
     c->PADDR=(uint32_t)target;
     c->MADDR=(uint32_t)source;
     c->CNT=  (uint32_t)count;
-
-// fine tune + interrutps    
     if(!repeat)
-    {
         control|=LN_DMA_CHAN_MINCREASE; // increase address
+
+    
+    if(circular)
+    {
+        control|=LN_DMA_CHAN_CMEN; // replay the dma in a loop
+        control|=LN_DMA_CHAN_ERRIE; // error  interrupt
+        control&=~LN_DMA_CHAN_TFTFIE;
+    }else
+    {
+        control&=~LN_DMA_CHAN_CMEN; 
+        control|=LN_DMA_CHAN_ERRIE+LN_DMA_CHAN_TFTFIE; // error and transmit complete interrupt        
     }
         
-    control|=LN_DMA_CHAN_ERRIE+LN_DMA_CHAN_TFTFIE; // error and transmit complete interrupt
+    
     
     c->CTL=control|LN_DMA_CHAN_ENABLE; // GO!       
     lnEnableInterrupt(_irq);        

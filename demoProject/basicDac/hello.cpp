@@ -30,6 +30,12 @@ void loop()
       pinMode(PA5,mode);
     
       lnDAC *dac=new lnDAC(0); 
+      
+      dac->startDmaMode();
+      
+      
+      dac->doDma(100000);
+      xAssert(0);
       dac->simpleMode();
       dac->enable();
 

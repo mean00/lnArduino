@@ -6,7 +6,9 @@
 #include "lnPeripheral_priv.h"
 #include "lnDAC.h"
 #include "lnDAC_priv.h"
-#include "lnTimer.h"
+#include "lnBasicTimer.h"
+#include "lnDma.h"
+#include "math.h"
 /**
  */
 struct LN_DAC_DESCR
@@ -14,12 +16,14 @@ struct LN_DAC_DESCR
     lnPin pin;
     int   dmaEngine;
     int   dmaChannel;
+    int   basicTimer;
+    int   source;
 };
 // Timer 5 and 6 are a good fit
 const LN_DAC_DESCR lnDacDesc[2]=
 {
-    {PA4,1,2},
-    {PA5,1,3},
+    {PA4,1,2,0,LN_DAC_CTL_DTSEL_SOURCE_T5},
+    {PA5,1,3,1,LN_DAC_CTL_DTSEL_SOURCE_T6},
 };
 
 LN_DAC_Registers *adac=(LN_DAC_Registers *)LN_DAC_ADR;
@@ -37,7 +41,10 @@ lnPin   lnDAC::pin()
  * 
  * @param instance
  */
-lnDAC::lnDAC(int instance)
+lnDAC::lnDAC(int instance): _dma( lnDMA::DMA_MEMORY_TO_PERIPH, 
+                lnDacDesc[_instance].dmaEngine,
+                lnDacDesc[_instance].dmaChannel, 
+                16,32)
 {
     _instance=instance;
     disable();
@@ -76,6 +83,37 @@ void    lnDAC::simpleMode()
     adac->CTL=ctl;
     
 }
+/**
+ * 
+ */
+void    lnDAC::startDmaMode()
+{
+    _timer=new lnBasicTimer(_instance);
+    
+    
+    uint32_t ctl=adac->CTL;
+    ctl&=LN_DAC_CTL_DTSEL_MASK(_instance);
+    ctl|=LN_DAC_CTL_DTSEL(_instance,lnDacDesc[_instance].source);
+    ctl|=LN_DAC_CTL_DTEN(_instance);
+    //ctl|=LN_DAC_CTL_DBOFF(_instance);
+    ctl|=LN_DAC_CTL_DDMAEN0(_instance);
+    adac->CTL=ctl;    
+    _dma.beginTransfer();
+    
+    
+    
+}
+/**
+ * 
+ */
+void    lnDAC::stopDmaMode()
+{
+    
+    adac->CTL&=~LN_DAC_CTL_DDMAEN0(_instance);
+    _dma.endTransfer();
+    delete _timer;
+    _timer=NULL;
+}
 
 /**
  * 
@@ -85,4 +123,36 @@ void    lnDAC::setValue(int value)
 {
     adac->DATAS[_instance].DAC_R12DH=value;
     adac->SWT|=LN_DAC_SWT_ENABLE(_instance);
+}
+
+/**
+ * 
+ */
+void    lnDAC::doDma(int fq)
+{
+    _timer->setTimerFrequency(fq*64); // aim at 64 samples sine
+    uint32_t actualFq=_timer->getTimerFrequency();
+    int nbPoints=actualFq/fq;
+    Logger("In Fq=%d outFq=%d, # points=%d\n",fq,actualFq,nbPoints);
+
+    
+    uint16_t xsin[nbPoints];
+    for(int i=0;i<nbPoints;i++)
+    {
+        float angle=2.*M_PI;
+        angle/=(float)nbPoints;
+        angle*=(float)i;        
+        xsin[i]=2048.+2047.*sin(angle);
+    }       
+    
+    _dma.doMemoryToPeripheralTransferNoLock(nbPoints, (uint16_t *)xsin,(uint16_t *)&( adac->DATAS[_instance].DAC_R12DH),  false,true);
+    enable();
+    _timer->enable();
+    // now manually trigger it
+    while(1)
+    {
+       
+         xDelay(1);
+         
+    }
 }

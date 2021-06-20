@@ -6,6 +6,7 @@ ADD_LIBRARY(gd32_overlay STATIC  MapleFreeRTOS1000_pp.cpp systemAlloc.cpp lnDebu
                                  lnSystemInit.cpp lnRCU.cpp lnRCU_systemClock.cpp lnIRQ.cpp 
                                  lnI2C.cpp lnI2C_impl.cpp  
                                  lnSystemTimer.cpp lnDAC.cpp lnExti.cpp
+                                 lnBasicTimer.cpp
                                  lnTimer.cpp
                                  lnDAC.cpp
                                  ../legacy/boards/${GD32_BOARD}/lnPinMapping.cpp

@@ -64,6 +64,11 @@ int main()
     lnPeripherals::enable(pTIMER2);
     lnPeripherals::enable(pTIMER3);
     lnPeripherals::enable(pTIMER4);
+    
+    // Basic timer
+    lnPeripherals::enable(pTIMER5);
+    lnPeripherals::enable(pTIMER6);
+    
     // DAC
      lnPeripherals::enable(pDAC);
     

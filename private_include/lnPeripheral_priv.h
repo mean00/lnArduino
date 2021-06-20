@@ -35,4 +35,7 @@
 #define LN_TIMER3_ADR   (0x40000800)
 #define LN_TIMER4_ADR   (0x40000C00)
 
+#define LN_TIMER5_ADR   (0x40001000)
+#define LN_TIMER6_ADR   (0x40001400)
+
 #define LN_DAC_ADR      (0x40007400)

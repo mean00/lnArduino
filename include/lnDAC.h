@@ -12,6 +12,8 @@
  */
 
 #pragma once
+#include "lnDma.h"
+class lnBasicTimer;
 /**
  * 
  * @param instance
@@ -26,7 +28,14 @@ public:
    void    disable();
    void    simpleMode(); // call this if you just want to manually set the dac value
    void    setValue(int value); // 12 bits value 00..495
+   
+   
+   void    startDmaMode();
+   void    stopDmaMode();
+   void    doDma(int fq);
         
 protected:
         int _instance;
+        lnDMA _dma;
+        lnBasicTimer *_timer;
 };

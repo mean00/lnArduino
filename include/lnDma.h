@@ -32,7 +32,7 @@ public:
         void    attachCallback(doneCallback *cb, void *cookie);
         void    detachCallback();
         
-        bool    doMemoryToPeripheralTransferNoLock(int count, const uint16_t *source,const uint16_t *target,  bool repeat);
+        bool    doMemoryToPeripheralTransferNoLock(int count, const uint16_t *source,const uint16_t *target,  bool repeat,bool circularMode=false);
         void    beginTransfer();
         void    endTransfer();
         void    setWordSize(int sourceWordSize, int targetWordSize);
