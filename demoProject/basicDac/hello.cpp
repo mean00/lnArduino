@@ -57,7 +57,6 @@ void loop()
         xDelay(10);
     }
       
-      dac->doDma(30*1000);
       xAssert(0);
       dac->simpleMode();
       dac->enable();

@@ -40,7 +40,6 @@ public:
    void    startDmaMode(int fq);
    void    stopDmaMode();
    int     getDmaFrequency();
-   void    doDma(int fq);
    void    dmaWrite(int nbn,uint16_t *data,bool loop); // if loop is true it is a non blocking call, else it blocks 
    
    
