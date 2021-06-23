@@ -174,46 +174,4 @@ void    lnDAC::dmaWrite( int nbn,uint16_t *data,bool loop)
     dmaWriteInternal(nbn,data,loop);
 }
 
-#if 0
-void    lnDAC::doDma(int fq)
-{
-    _timer->setTimerFrequency(fq*100); // aim at 64 samples sine
-    uint32_t actualFq=_timer->getTimerFrequency();
-    
-    float pointFloat=(float)(actualFq+fq/2)/(float)fq;
-    int nbPoints=floor(pointFloat);
-    Logger("In Fq=%d outFq=%d, # points=%d pointsF=%f\n",fq,actualFq,nbPoints,pointFloat);
-
-    
-    uint16_t xsin[nbPoints];
-#if 1
-    for(int i=0;i<nbPoints;i++)
-    {
-        float angle=2.*M_PI;
-        angle/=(float)nbPoints;
-        angle*=(float)i;        
-        xsin[i]=2048.+2047.*sin(angle);
-    }
-#else
-   for(int i=0;i<nbPoints;i++)
-    {
-       if(i&1) xsin[i]=4095;
-       else xsin[i]=0;
-       
-   }
-
-#endif    
-    
-    _dma.doMemoryToPeripheralTransferNoLock(nbPoints, (uint16_t *)xsin,(uint16_t *)&( adac->DATAS[_instance].DAC_R12DH),  false,true);
-    enable();
-    _timer->enable();
-    // now manually trigger it
-    while(1)
-    {
-       
-         xDelay(1);
-         
-    }
-}
-#endif
 // EOF

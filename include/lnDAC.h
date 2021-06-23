@@ -9,6 +9,13 @@
  * setValue(xxx);
  * setValue(xxx);
  * 
+ * InDmaMode, the setup is :
+ * 
+ * startDmaMode(int fq) where fq is the sample frequency. The one you get can be
+ *    different !
+ * dmaWrite(nb,data,loop);   
+ * dmaWrite(nb,data,loop);   
+ * stopDmaMode();
  */
 
 #pragma once
@@ -34,12 +41,15 @@ public:
    void    stopDmaMode();
    int     getDmaFrequency();
    void    doDma(int fq);
-   void    dmaWrite(int nbn,uint16_t *data,bool loop);
-   void    dmaWrite(int psc, int car, int nb,uint16_t *data,bool loop)  ;
-    void   dmaDone();  
+   void    dmaWrite(int nbn,uint16_t *data,bool loop); // if loop is true it is a non blocking call, else it blocks 
    
    
-   static void dmaDone_(void *t);
+   
+public:
+   static void dmaDone_(void *t); // callback from interrupt
+protected:   
+   void    dmaDone();  
+
 protected:
     void    dmaWriteInternal(int nb, uint16_t *data, bool loop)    ;
         int _instance;
