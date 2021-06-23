@@ -30,12 +30,20 @@ public:
    void    setValue(int value); // 12 bits value 00..495
    
    
-   void    startDmaMode();
+   void    startDmaMode(int fq);
    void    stopDmaMode();
+   int     getDmaFrequency();
    void    doDma(int fq);
-        
+   void    dmaWrite(int nbn,uint16_t *data,bool loop);
+   void    dmaWrite(int psc, int car, int nb,uint16_t *data,bool loop)  ;
+    void   dmaDone();  
+   
+   
+   static void dmaDone_(void *t);
 protected:
+    void    dmaWriteInternal(int nb, uint16_t *data, bool loop)    ;
         int _instance;
         lnDMA _dma;
         lnBasicTimer *_timer;
+        xBinarySemaphore _dmaSem;
 };

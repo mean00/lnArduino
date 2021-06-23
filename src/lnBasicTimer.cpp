@@ -31,7 +31,19 @@ lnBasicTimer::~lnBasicTimer()
 {
     disable();
 }
-
+/**
+ * 
+ * @param prediv
+ * @param reload
+ */
+void lnBasicTimer::setTimerFrequency(int prediv, int reload)
+{
+   xAssert(prediv);
+   xAssert(reload);
+   LN_BTimers_Registers *t=aBTimers[_timer];
+   t->PSC=prediv-1;
+   t->CAR=reload-1;
+}
 /**
  * 
  * @param timer
@@ -55,10 +67,13 @@ void lnBasicTimer::setTimerFrequency(int fqInHz)
     t->CTL0 |=LN_BTIMER_CTL0_ARSE;
     
     uint32_t car=((int)divider)/psc;
-    
+    if(car) car--;
     if(psc) psc=psc-1;
     t->PSC=psc; 
-    t->CAR=car;     
+    
+    t->CAR=car;    
+    
+    Logger("PSC=%d CAR=%d  \n",psc+1,car+1);
     t->CTL1=(2<<4); // issue TRGO
 }
 /**
@@ -66,7 +81,7 @@ void lnBasicTimer::setTimerFrequency(int fqInHz)
 int lnBasicTimer::getTimerFrequency()
 {
       LN_BTimers_Registers *t=aBTimers[_timer];
-    int car=t->CAR;
+    int car=t->CAR+1;
     int div=t->PSC+1;
     Peripherals per=pTIMER5;
     per=(Peripherals)((int)per+_timer);

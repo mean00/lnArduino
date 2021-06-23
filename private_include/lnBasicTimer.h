@@ -18,6 +18,7 @@ public:
     virtual ~lnBasicTimer();
         // PWM
         void setTimerFrequency(int fqInHz); // This program the timer fq with a tick of 1024, i.e. internal fq is 1024* the given fq
+        void setTimerFrequency(int prediv, int reload); 
         int  getTimerFrequency();
         void disable();
         void enable();
