@@ -62,6 +62,11 @@ void loop()
     // init fonts
     lcd->setFontFamily(&FreeSans7pt7b,&FreeSans7pt7b,&FreeSans7pt7b);
     lcd->setFontSize(st7735::SmallFont);    
+    
+    lcd->fillScreen(0);
+    lcd->setTextColor(0xFFFF,0);
+    lcd->print(2,20,"Signal Generator");
+    
 #endif    
     Logger("Starting Signal Generator...\n");
     SignalGenerator *signal=new SignalGenerator(PA4,0);    
