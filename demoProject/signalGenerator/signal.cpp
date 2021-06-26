@@ -3,14 +3,6 @@
 #include "math.h"
 
 
-#if 0
-            enum SignalForm    
-            {
-                SignalSine=0,
-                SignalSquare=1,
-                SignalTriangle=2
-            };
-#endif
 /**
  * 
  * @param pin
