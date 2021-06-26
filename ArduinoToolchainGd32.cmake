@@ -7,7 +7,6 @@
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 #=============================================================================#
 MESSAGE(STATUS "Setting up GD32 arduino cmake environment")
-SET(ARDUINO_TOOLCHAIN_TOP ${CMAKE_SOURCE_DIR}/Arduino_gd32_freeRTOS CACHE INTERNAL "")
 
 include(${CMAKE_CURRENT_LIST_DIR}/../platformConfig.cmake)
 
@@ -43,7 +42,6 @@ set(CMAKE_CXX_COMPILER_WORKS    TRUE)
 #
 SET(GD32_BOARD_FLAG      -DGD32VF103C_START) # Longan nano ?
 SET(GD32_BOARD       sipeed-longan-nano CACHE INTERNAL "")
-SET(GD32_LDSCRIPT   ${ARDUINO_TOOLCHAIN_TOP}/legacy/boards/${GD32_BOARD}/ld.lds)
 
 #
 
@@ -67,13 +65,10 @@ SET(GD32_LD_FLAGS "-nostdlib ${GD32_SPECS} ")
 SET(GD32_LD_LIBS "-lm -lc -lgcc")
 #-lgd32_overlay  -lgd32Arduino -lgd32 -lFreeRTOS -lgd32_lowlevel  -lc -lm -lgd32 -lgcc -lc  -lgcc 
 #
-set(CMAKE_CXX_LINK_EXECUTABLE    "<CMAKE_CXX_COMPILER>   <CMAKE_CXX_LINK_FLAGS>  <LINK_FLAGS>  -T ${GD32_LDSCRIPT} -lgcc -Xlinker -print-memory-usage   -Wl,--start-group  <OBJECTS> <LINK_LIBRARIES> -Wl,--end-group  -Wl,-Map,<TARGET>.map   -o <TARGET> ${GD32_LD_FLAGS} ${GD32_LD_LIBS}")
+set(CMAKE_CXX_LINK_EXECUTABLE    "<CMAKE_CXX_COMPILER>   <CMAKE_CXX_LINK_FLAGS>  <LINK_FLAGS> -lgcc -Xlinker -print-memory-usage   -Wl,--start-group  <OBJECTS> <LINK_LIBRARIES> -Wl,--end-group  -Wl,-Map,<TARGET>.map   -o <TARGET> ${GD32_LD_FLAGS} ${GD32_LD_LIBS}")
 SET(CMAKE_EXECUTABLE_SUFFIX_C .elf)
 SET(CMAKE_EXECUTABLE_SUFFIX_CXX .elf)
 
-include_directories(${ARDUINO_GD32_FREERTOS}/legacy/GD32VF103_Firmware_Library/GD32VF103_standard_peripheral)
-include_directories(${ARDUINO_GD32_FREERTOS}/legacy/GD32VF103_Firmware_Library/GD32VF103_standard_peripheral/Include)
-include_directories(${ARDUINO_GD32_FREERTOS}/legacy/GD32VF103_Firmware_Library/RISCV/drivers)
 include_directories(${ARDUINO_GD32_FREERTOS}/legacy/boards/${GD32_BOARD}/)
 
 
