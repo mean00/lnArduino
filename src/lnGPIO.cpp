@@ -44,8 +44,14 @@ void lnPinMode(const lnPin xpin, const GpioMode mode)
         case lnDAC_MODE:
                                 value=LNGPIOSET(LN_CTL_MD_INPUT,LN_CTL_INPUT_ANALOG); break;    
         case lnFLOATING:        value=LNGPIOSET(LN_CTL_MD_INPUT,LN_CTL_INPUT_FLOATING); break;
-        case lnINPUT_PULLUP:    value=LNGPIOSET(LN_CTL_MD_INPUT,LN_CTL_INPUT_PP); break;
-        case lnINPUT_PULLDOWN:  value=LNGPIOSET(LN_CTL_MD_INPUT,LN_CTL_INPUT_PP); break;
+        case lnINPUT_PULLUP:    
+                                port->OCTL|=1<<pin;
+                                value=LNGPIOSET(LN_CTL_MD_INPUT,LN_CTL_INPUT_PULLUPPULLDOWN); 
+                                break;
+        case lnINPUT_PULLDOWN:  
+                                port->OCTL&=~(1<<pin);
+                                value=LNGPIOSET(LN_CTL_MD_INPUT,LN_CTL_INPUT_PULLUPPULLDOWN); 
+                                break;
         
         case lnOUTPUT:          value=LNGPIOSET (LN_CTL_MD_OUTPUT,LN_CTL_OUTPUT_PP); break;
         case lnOUTPUT_OPEN_DRAIN:value=LNGPIOSET(LN_CTL_MD_OUTPUT,LN_CTL_OUTPUT_OD); break;
