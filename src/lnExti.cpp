@@ -143,11 +143,12 @@ void lnExtiDisableInterrupt(const lnPin pin)
 void EXTI_IrqHandler(int maskS,int maskE)
 {
     /***/
+    uint32_t pending=aExiti->INTEN & aExiti->PD ;
     for(int i=maskS;i<=maskE;i++)
     {
          _lnExtidescriptor *d=_extiDesc+i;
          // is it pending & enabled ?
-         int pe=aExiti->INTEN & (aExiti->PD & (1<<i));
+         int pe=pending & (1<<i);
          if(!pe) continue;
          // yes, clear it
          aExiti->PD=1<<i;
