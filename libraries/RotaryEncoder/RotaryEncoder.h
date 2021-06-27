@@ -4,7 +4,6 @@
 #pragma once
 /**
  */
-class Rotary;
 enum WavDirection
 {
   WavNone=0,
@@ -35,11 +34,12 @@ public:
         void        rotaryInterrupt();
         void        pushInterrupt();
 protected:
-        Rotary       *_rotary;
         int          _count;
         int          _pinA,_pinB,_pinPush;
         int           _event;
         uint32_t      _lastRead;
         uint32_t      _down; // time down was detected
         xFastEventGroup   _events;
+        unsigned char _state;
+        int           process();
 };
