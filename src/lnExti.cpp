@@ -12,6 +12,9 @@ LN_EXTI_Register *aExiti=(LN_EXTI_Register *)LN_EXTI_ADR ;
 
 #define LN_EXTI_NB_SOURCES 19
 
+
+volatile uint32_t *AFIOEXTISS=(volatile uint32_t *)(LN_AFIO_ADR+8);
+
 /**
  */
 struct _lnExtidescriptor
@@ -67,6 +70,13 @@ void lnExtiAttachInterrupt(const lnPin pin, const lnEdge edge, lnExtiCallback cb
     d->cb=cb;
     d->cookie=cookie;
     
+    // Select source
+    uint32_t mask=AFIOEXTISS[source>>2];
+    uint32_t shift=4*(source&3);
+    mask&=~(0xf<<shift);
+    mask|=port<<shift;
+    AFIOEXTISS[source>>2]=mask;
+    
     // Program edge
     if(edge & 1) //Rising
     {
@@ -82,6 +92,8 @@ void lnExtiAttachInterrupt(const lnPin pin, const lnEdge edge, lnExtiCallback cb
     {
         aExiti->FTEN&=~(1<<source);
     }
+    
+    
     
 }
 /**
@@ -131,11 +143,11 @@ void lnExtiDisableInterrupt(const lnPin pin)
 void EXTI_IrqHandler(int maskS,int maskE)
 {
     /***/
-    for(int i=maskS;i<maskE;i++)
+    for(int i=maskS;i<=maskE;i++)
     {
          _lnExtidescriptor *d=_extiDesc+i;
          // is it pending & enabled ?
-         int pe=aExiti->INTEN & aExiti->PD & (1<<i);
+         int pe=aExiti->INTEN & (aExiti->PD & (1<<i));
          if(!pe) continue;
          // yes, clear it
          aExiti->PD=1<<i;

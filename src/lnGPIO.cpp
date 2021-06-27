@@ -101,8 +101,11 @@ void lnDigitalToggle(const lnPin pin)
  */
 bool lnDigitalRead(const lnPin pin)
 {
-    xAssert(0);
-    return false;
+    LN_GPIO *port=gpio[pin>>4];
+    int xpin=pin&0xf; 
+    
+    uint32_t v=port->ISTAT;
+    return !!(v&(1<<xpin));
 }
 // EOF
 
