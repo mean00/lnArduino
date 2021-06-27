@@ -38,5 +38,5 @@ void lnDigitalWrite(const lnPin pin, bool value);
 bool lnDigitalRead(const lnPin pin);
 void lnDigitalToggle(const lnPin pin);
 
-
+#include "lnExti.h"
 // EOF

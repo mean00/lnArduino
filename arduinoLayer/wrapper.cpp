@@ -25,7 +25,10 @@ void digitalToggle(int a)
 {
     lnDigitalToggle(a);
 }
-#warning FIXME micros is not working
+/**
+ * @brief micros
+ * @return
+ */
 uint64_t micros(void)
 {
     return lnGetUs();
