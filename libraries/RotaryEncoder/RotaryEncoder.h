@@ -24,7 +24,7 @@ public:
   };
   
   
-                    lnRotary(int pinA,int pinB, int pinPush );
+                    lnRotary(int pinPush,int pinA,int pinB );
         void        start();
         int         getCount();
         EVENTS      readEvent();

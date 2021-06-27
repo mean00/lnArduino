@@ -137,7 +137,7 @@ int lnRotary::process()
  }
 /**
  */
- lnRotary::lnRotary(int pinA,int pinB, int pinPush ) 
+ lnRotary::lnRotary( int pinPush,int pinA,int pinB ) 
  {
     current=this;
     _count=0;    
