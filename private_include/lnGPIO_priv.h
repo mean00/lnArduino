@@ -23,7 +23,11 @@ typedef volatile LN_GPIOx LN_GPIO;
 
 #define LN_CTL_INPUT_ANALOG         0
 #define LN_CTL_INPUT_FLOATING       1
-#define LN_CTL_INPUT_PP             2
+#define LN_CTL_INPUT_PULLUPPULLDOWN 2
+#define LN_OCTL_INPUT_PULLUP        1
+#define LN_OCTL_INPUT_PULLDOWN      0
+
+
 #define LN_CTL_OUTPUT_PP            0
 #define LN_CTL_OUTPUT_OD            1
 #define LN_CTL_OUTPUT_ALTERNAT_PP   2
