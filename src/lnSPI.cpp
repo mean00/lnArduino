@@ -378,6 +378,11 @@ void hwlnSPIClass::setup()
     d->STAT&=LN_SPI_STAT_MASK;
     
     d->CTL0|=LN_SPI_CTL0_MSTMODE;
+    // Drive the NSS by sw, pull it up
+    // there does not seem to be a way to completely disconnect NSS management
+    d->CTL0|=LN_SPI_CTL0_SWNSS;
+    d->CTL0|=LN_SPI_CTL0_SWNSSEN;
+    
     
     switch(_settings->bOrder)
     {
