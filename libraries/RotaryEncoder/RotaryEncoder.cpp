@@ -190,9 +190,9 @@ lnRotary::EVENTS      lnRotary::readEvent()
  * 
  * @return 
  */
-lnRotary::EVENTS      lnRotary::waitForEvent()
+lnRotary::EVENTS      lnRotary::waitForEvent(int timeout)
 {
-    return (EVENTS)_events.waitEvents(  SHORT_PRESS |     LONG_PRESS |    ROTARY_CHANGE);
+    return (EVENTS)_events.waitEvents(  SHORT_PRESS |     LONG_PRESS |    ROTARY_CHANGE,timeout);
 }
  // EOF
 

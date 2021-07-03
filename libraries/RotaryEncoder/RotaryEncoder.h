@@ -28,7 +28,7 @@ public:
         void        start();
         int         getCount();
         EVENTS      readEvent();
-        EVENTS      waitForEvent();
+        EVENTS      waitForEvent(int timeout=0); // timeout=0 => dont wait
         
 public:        
         void        rotaryInterrupt();
