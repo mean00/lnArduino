@@ -1,3 +1,5 @@
+LIST(APPEND CMAKE_MODULE_PATH ${ARDUINO_GD32_FREERTOS}/cmake)
+
 include( ${ARDUINO_GD32_FREERTOS}/freeRTOS_port_${LN_EXT}.cmake)
 
 include_directories(${ARDUINO_GD32_FREERTOS}/)
