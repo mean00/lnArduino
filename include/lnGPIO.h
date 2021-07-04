@@ -24,7 +24,6 @@ enum GpioMode
     lnINPUT_PULLUP,
     lnINPUT_PULLDOWN,
     lnOUTPUT,
-    OUTPUT=lnOUTPUT,
     lnOUTPUT_OPEN_DRAIN,
     lnALTERNATE_PP,
     lnALTERNATE_OD,
