@@ -76,6 +76,8 @@ void lnSimpleADC::readVcc()
     LN_ADC_Registers *adc=lnAdcDesc[_instance].registers;
     adc->CTL1 &=~LN_ADC_CTL1_ADCON;
     adc->RSQS[2]=17;  // VREF
+    
+    adc->CTL1|=LN_ADC_CTL1_TSVREN;
     adc->CTL1 |=LN_ADC_CTL1_ADCON;
     delayMicroseconds(10);
     //
@@ -88,6 +90,7 @@ void lnSimpleADC::readVcc()
     adc_vcc=adc->RDATA&0xfff;
     //
     adc->CTL1 &=~LN_ADC_CTL1_ADCON;
+    adc->CTL1&=~LN_ADC_CTL1_TSVREN;
     adc->RSQS[2]=adcChannel(_pin);
     adc->CTL1 |=LN_ADC_CTL1_ADCON;    
 }
@@ -104,7 +107,7 @@ void   lnSimpleADC:: setup()
     adc->CTL0=0;    
     // sw mode by default
     adc->CTL1|=LN_ADC_CTL1_ETSRC_SET(LN_ADC_CTL1_ETSRC_SOURCE_SW);
-    
+    adc->CTL1|=LN_ADC_CTL1_ETERC;;
   
     adc->SAMPT[0]=0;
     adc->SAMPT[1]=5; ; // 55.5 cycles
@@ -190,6 +193,31 @@ int     lnSimpleADC::simpleRead()
  */
 bool    lnSimpleADC::multiRead(int nbPins, lnPin *pins, int *output)
 {
-    return false;
+    
+    LN_ADC_Registers *adc=lnAdcDesc[_instance].registers;
+    xAssert(nbPins);
+    // set input
+    adc->CTL1 &=~LN_ADC_CTL1_ADCON;
+     
+    uint32_t rsq0=adc->RSQS[0];
+    rsq0&=~(0xf<<20);
+    rsq0|=(nbPins-1)<<20;
+    // set input, only one for now
+    xAssert(nbPins==1);
+    adc->RSQS[0]=rsq0;
+    
+    adc->RSQS[2]=adcChannel(pins[0]);
+    
+    
+    adc->CTL1 |=LN_ADC_CTL1_ADCON;
+    //
+    adc->CTL1|=LN_ADC_CTL1_SWRCST;
+    while( !((adc->STAT & LN_ADC_STAT_EOC)))
+    {
+        __asm__("nop");
+    }
+    // Retrieve data
+    output[0]=adc->RDATA & 0xfff;
+    return true;
 }
 // EOF

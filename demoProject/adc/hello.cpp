@@ -34,6 +34,8 @@ void loop()
       
       lnSimpleADC *adc=new lnSimpleADC(0,PA0);
       
+      pinMode(PA0,lnADC_MODE);
+      
       lnDAC *dac=new lnDAC(0); 
       
    
