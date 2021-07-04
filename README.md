@@ -19,6 +19,8 @@ _What works for the moment :_
  * GPIO + interrupt
  * PWM support
  * Onboard LCD support
+ * DAC (DMA) support
+ * very basic ADC support
 
 
 _How to build the examples :_
