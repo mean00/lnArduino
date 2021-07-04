@@ -4,7 +4,7 @@ include( ${ARDUINO_GD32_FREERTOS}/freeRTOS_port_${LN_EXT}.cmake)
 
 include_directories(${ARDUINO_GD32_FREERTOS}/)
 include_directories(${ARDUINO_GD32_FREERTOS}/include)
-include_directories(${ARDUINO_GD32_FREERTOS}/freeRTOS_extension)
+
 include_directories(${ARDUINO_GD32_FREERTOS}/FreeRTOS)
 include_directories(${ARDUINO_GD32_FREERTOS}/FreeRTOS/include)
 include_directories(${LN_FREERTOS_PORT})
