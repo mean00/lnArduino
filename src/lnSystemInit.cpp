@@ -72,6 +72,11 @@ int main()
     // DAC
      lnPeripherals::enable(pDAC);
     
+     // ADC
+     lnPeripherals::enable(pADC0);
+     lnPeripherals::enable(pADC1);
+    
+     
 #warning FIXME FIXME FIXME
 #if 0    
     // DMA TX for SPI0 (LCD)

@@ -154,3 +154,19 @@ void lnInitSystemClock()
     waitCfg0Bit(LN_RCU_CFG0_PLL_USED);
     
 }
+/**
+ * 
+ * @param divider
+ */
+void lnPeripherals::setAdcDivider(lnADC_DIVIDER divider)
+{
+    uint32_t val=arcu->CFG0;
+    
+    val&=~((3<<14)+(1<<28));
+    int r=(int)divider;
+    if(r&4)
+        val|=1<<28;
+    val|=(r&3)<<14;
+    arcu->CFG0=val;
+    
+}
