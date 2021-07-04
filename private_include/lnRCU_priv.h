@@ -93,7 +93,9 @@ typedef volatile LN_RCUx LN_RCU;
 #define LN_RCU_CFG0_SYSCLOCK_MASK (3)
 #define LN_RCU_CFG0_SYSCLOCK_PLL ( 1<<1)
 #define LN_RCU_CFG0_PLLSEL       ( 1<<16)
-
+#define LN_RCU_ADC_PRESCALER_MASK     (~((1<<28)+(3<<14)))
+#define LN_RCU_ADC_PRESCALER_HIGHBIT  (1<<28)
+#define LN_RCU_ADC_PRESCALER_LOWBIT(x) ((x&3)<<14)
 
 // CFG1
 #define LN_RCU_CFG1_PRED_CLOCKSEL   (1<<16)

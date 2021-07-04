@@ -1,6 +1,7 @@
 #include "lnArduino.h"
 #include "lnTimer.h"
 #include "lnDAC.h"
+#include "lnADC.h"
 #include "math.h"
 #define LED PA2
 #define PWM PB9
@@ -30,34 +31,12 @@ void loop()
       pinMode(PA4,mode);
       pinMode(PA5,mode);
     
+      
+      lnSimpleADC *adc=new lnSimpleADC(0,PA0);
+      
       lnDAC *dac=new lnDAC(0); 
       
-      int signalFrequency=30*1000;
-      
-      dac->startDmaMode(signalFrequency*100);
-      int actualFq=dac->getDmaFrequency();
-      
-    float pointFloat=(float)(actualFq+signalFrequency/2)/(float)signalFrequency;
-    int nbPoints=floor(pointFloat);
-    Logger("In Fq=%d outFq=%d, # points=%d pointsF=%f\n",signalFrequency,actualFq,nbPoints,pointFloat);
-    
-    uint16_t xsin[nbPoints];
-    for(int i=0;i<nbPoints;i++)
-    {
-        float angle=2.*M_PI;
-        angle/=(float)nbPoints;
-        angle*=(float)i;        
-        xsin[i]=2048.+2047.*sin(angle);
-    }
-      
-      
-    dac->dmaWrite(nbPoints,xsin,true);
-    while(1)
-    {
-        xDelay(10);
-    }
-      
-      xAssert(0);
+   
       dac->simpleMode();
       dac->enable();
 
@@ -66,6 +45,9 @@ void loop()
           dac->setValue(val);
           val++;
           val&=(1<<13)-1;
+          int read=adc->simpleRead();
+          Logger("DAC:%d ADC=%d\n",val,read);
+          xDelay(1000);
       }
     
 }

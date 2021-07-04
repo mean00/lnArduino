@@ -136,4 +136,20 @@ void lnPeripherals::disable(const Peripherals periph)
 }
 
 
+/**
+ * 
+ * @param divider
+ */
+void lnPeripherals::setAdcDivider(lnADC_DIVIDER divider)
+{
+    uint32_t val=arcu->CFG0;
+    
+    val&=LN_RCU_ADC_PRESCALER_MASK;
+    int r=(int)divider;
+    if(r&4)
+        val|=LN_RCU_ADC_PRESCALER_HIGHBIT;
+    val|=LN_RCU_ADC_PRESCALER_LOWBIT(r);
+    arcu->CFG0=val;
+    
+}
 // EOF

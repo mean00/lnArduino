@@ -21,10 +21,13 @@ public:
    bool    setPin(lnPin pin);
    int     simpleRead();      // do a basic sampling
    bool    multiRead(int nbPins, lnPin *pins, int *output); // read N pins in one go
+   
+   int      getVref();
 protected:
+    void    readVcc();
     void    setup();
     int     _instance;
     int     _pin;
-    int     _vcc;
+
 };
 // EOF

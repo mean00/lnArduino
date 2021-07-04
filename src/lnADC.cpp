@@ -23,6 +23,8 @@ struct LN_ADC_DESCR
 LN_ADC_Registers *aadc0=(LN_ADC_Registers *)LN_ADC0_ADR;
 LN_ADC_Registers *aadc1=(LN_ADC_Registers *)LN_ADC1_ADR;
 
+static int adc_vcc=0;
+
 // Timer 5 and 6 are a good fit
 const LN_ADC_DESCR lnAdcDesc[2]=
 {
@@ -69,6 +71,30 @@ static int adcChannel(lnPin pin)
 /**
  * 
  */
+void lnSimpleADC::readVcc()
+{
+    LN_ADC_Registers *adc=lnAdcDesc[_instance].registers;
+    adc->CTL1 &=~LN_ADC_CTL1_ADCON;
+    adc->RSQS[2]=17;  // VREF
+    adc->CTL1 |=LN_ADC_CTL1_ADCON;
+    delayMicroseconds(10);
+    //
+    adc->CTL1|=LN_ADC_CTL1_SWRCST;
+    while( !((adc->STAT & LN_ADC_STAT_EOC)))
+    {
+        __asm__("nop");
+    }
+    //
+    adc_vcc=adc->RDATA&0xfff;
+    //
+    adc->CTL1 &=~LN_ADC_CTL1_ADCON;
+    adc->RSQS[2]=adcChannel(_pin);
+    adc->CTL1 |=LN_ADC_CTL1_ADCON;    
+}
+
+/**
+ * 
+ */
 void   lnSimpleADC:: setup()
 {
     // Setup default value
@@ -81,7 +107,6 @@ void   lnSimpleADC:: setup()
     
   
     adc->SAMPT[0]=0;
-    adc->SAMPT[1]=0;
     adc->SAMPT[1]=5; ; // 55.5 cycles
     
     for(int i=0;i<4;i++)
@@ -94,7 +119,7 @@ void   lnSimpleADC:: setup()
         adc->RSQS[i]=0;
     
     adc->RSQS[2]=adcChannel(_pin);
-    adc->RSQS[0]=1<<20; // one channel
+    adc->RSQS[0]=0<<20; // one channel
     adc->ISQ=0;
     adc->OVRS=0;
     
@@ -116,22 +141,16 @@ void   lnSimpleADC:: setup()
     // read vcc
     if(!_instance)
     {
-        adc->CTL1 &=~LN_ADC_CTL1_ADCON;
-        adc->RSQS[2]=17;  // VREF
-        adc->CTL1 |=LN_ADC_CTL1_ADCON;
-        //
-        adc->CTL1|=LN_ADC_CTL1_SWRCST;
-        while( (adc->STAT & LN_ADC_STAT_EOC))
-        {
-            __asm__("nop");
-        }
-        //
-        _vcc=adc->RDATA&0xfff;
-        //
-        adc->CTL1 &=~LN_ADC_CTL1_ADCON;
-        adc->RSQS[2]=adcChannel(_pin);
-        adc->CTL1 |=LN_ADC_CTL1_ADCON;
+        readVcc();
     }
+}
+/**
+ * 
+ * @return 
+ */
+int lnSimpleADC::getVref()
+{
+    return adc_vcc;
 }
 /**
  * 
@@ -171,6 +190,6 @@ int     lnSimpleADC::simpleRead()
  */
 bool    lnSimpleADC::multiRead(int nbPins, lnPin *pins, int *output)
 {
-
+    return false;
 }
 // EOF
