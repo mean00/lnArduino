@@ -19,11 +19,13 @@ struct LN_ADC_DESCR
     
 };
 
+#define NB_VCC_AVERAGE 8
 
 LN_ADC_Registers *aadc0=(LN_ADC_Registers *)LN_ADC0_ADR;
 LN_ADC_Registers *aadc1=(LN_ADC_Registers *)LN_ADC1_ADR;
 
 static int adc_vcc=0;
+static float adc_volt=0.;
 
 // Timer 5 and 6 are a good fit
 const LN_ADC_DESCR lnAdcDesc[2]=
@@ -81,13 +83,26 @@ void lnSimpleADC::readVcc()
     adc->CTL1 |=LN_ADC_CTL1_ADCON;
     delayMicroseconds(10);
     //
-    adc->CTL1|=LN_ADC_CTL1_SWRCST;
-    while( !((adc->STAT & LN_ADC_STAT_EOC)))
+    adc_vcc=0;
+    adc_volt=0.;
+    for(int i=0;i<NB_VCC_AVERAGE;i++)
     {
-        __asm__("nop");
+        adc->CTL1|=LN_ADC_CTL1_SWRCST;
+        while( !((adc->STAT & LN_ADC_STAT_EOC)))
+        {
+            __asm__("nop");
+        }
+        //
+        adc_vcc+=adc->RDATA&0xfff;
     }
+    if(!adc_vcc) adc_vcc=1;
+    // compute voltage
+    adc_volt=1200.*4095.;
+    adc_volt*=(float)NB_VCC_AVERAGE;
+    adc_volt/=(float)adc_vcc;
+    
     //
-    adc_vcc=adc->RDATA&0xfff;
+    adc_vcc/=NB_VCC_AVERAGE;
     //
     adc->CTL1 &=~LN_ADC_CTL1_ADCON;
     adc->CTL1&=~LN_ADC_CTL1_TSVREN;
@@ -147,6 +162,15 @@ void   lnSimpleADC:: setup()
         readVcc();
     }
 }
+/**
+ * 
+ * @return 
+ */
+ float lnSimpleADC::getVcc()
+ {
+    return adc_volt;
+ }
+
 /**
  * 
  * @return 

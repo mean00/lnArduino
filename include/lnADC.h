@@ -22,7 +22,8 @@ public:
    int     simpleRead();      // do a basic sampling
    bool    multiRead(int nbPins, lnPin *pins, int *output); // read N pins in one go
    
-   int      getVref();
+   int      getVref(); // direct value
+   float    getVcc();  // Vcc value in mv
 protected:
     void    readVcc();
     void    setup();
