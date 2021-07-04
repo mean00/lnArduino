@@ -24,7 +24,7 @@ void loop()
     bool onoff=true;
     digitalWrite(LED,true);
     int roundup=0;
-
+#if 0
 //#define mode   LN_CTL_INPUT_ANALOG
 #define mode  lnDAC_MODE
     
@@ -51,5 +51,5 @@ void loop()
           Logger("DAC:%d ADC=%d\n",val,read);
           xDelay(1000);
       }
-    
+#endif    
 }

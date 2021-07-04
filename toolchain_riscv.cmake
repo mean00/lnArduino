@@ -7,6 +7,7 @@
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 #=============================================================================#
 MESSAGE(STATUS "Setting up GD32 arduino cmake environment")
+IF(NOT DEFINED LN_EXT)
 SET(LN_EXT riscv CACHE INTERNAL "")
 include(${CMAKE_CURRENT_LIST_DIR}/../platformConfig.cmake)
 
@@ -72,4 +73,5 @@ SET(CMAKE_EXECUTABLE_SUFFIX_CXX .elf)
 include_directories(${ARDUINO_GD32_FREERTOS}/legacy/boards/${GD32_BOARD}/)
 
 
-ADD_DEFINITIONS("-g3 -O1")
+ADD_DEFINITIONS("-g3 -O3 -Os")
+ENDIF()

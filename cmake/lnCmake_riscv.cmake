@@ -1,6 +1,6 @@
 
 MACRO(GENERATE_GD32_FIRMWARE target)
-    ADD_EXECUTABLE(${target}  ${AF_FOLDER}/start.S ${ARGN})
+    ADD_EXECUTABLE(${target}  ${AF_FOLDER}/riscv/start.S ${ARGN})
     TARGET_LINK_LIBRARIES(${target} ${USED_LIBS} ) # duplicates are NOT a mistake !
     TARGET_LINK_LIBRARIES(${target} embeddedPrintf gd32_overlay gd32Arduino   FreeRTOS  gd32_lowlevel c  c gcc ) # dupicates are NOT a mistake !
     TARGET_LINK_OPTIONS(${target}  PRIVATE "-T${AF_FOLDER}/legacy/boards/${GD32_BOARD}/ld.lds" )
