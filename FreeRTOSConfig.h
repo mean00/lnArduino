@@ -28,32 +28,12 @@
 #ifndef FREERTOS_CONFIG_H
 #define FREERTOS_CONFIG_H
 
-// This is GD32/RISCV specific
-
 extern uint32_t SystemCoreClock;
 extern void do_assert(const char *a);
 #define configASSERT(a)  if(!(a)) {do_assert(#a);}
 
 
-#define configMTIME_BASE_ADDRESS    TIMER_CTRL_ADDR
-#define configMTIMECMP_BASE_ADDRESS (TIMER_CTRL_ADDR+8)
-#define configISR_STACK_SIZE_WORDS              (200)
-#define configSUPPORT_DYNAMIC_ALLOCATION        1
-#define configSUPPORT_STATIC_ALLOCATION         0
-#define configPRIO_BITS                         (4UL)
-#define configLIBRARY_LOWEST_INTERRUPT_PRIORITY			0x1
-#define configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY	0xe
-#define configKERNEL_INTERRUPT_PRIORITY                 ( configLIBRARY_LOWEST_INTERRUPT_PRIORITY << (8 - configPRIO_BITS) )
-#define configMAX_SYSCALL_INTERRUPT_PRIORITY            ( configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY << (8 - configPRIO_BITS) )
-#define configCPU_CLOCK_HZ			( ( uint32_t ) SystemCoreClock) 
-#define configTICK_RATE_HZ			( ( TickType_t ) 1000 )
-#define configRTC_CLOCK_HZ                      ((uint32_t)TIMER_FREQ)
-
-//#define USER_MODE_TASKS 1 // this will use a ECALL to enable/disable interrupt, if not defined direct call
-//
-
-/* Library includes. */
-// MEANX Not needed for stm32duino #include "stm32f10x_lib.h"
+#include "freeRTOS_tuning.h"
 
 /*-----------------------------------------------------------
  * Application specific definitions.
@@ -66,13 +46,14 @@ extern void do_assert(const char *a);
  *
  * See http://www.freertos.org/a00110.html
  *----------------------------------------------------------*/
+#define configTICK_RATE_HZ			( ( TickType_t ) 1000 )
+#define configSUPPORT_DYNAMIC_ALLOCATION        1
+#define configSUPPORT_STATIC_ALLOCATION         0
 #define configUSE_DAEMON_TASK_STARTUP_HOOK      0
 #define configUSE_PREEMPTION                    1
 #define configUSE_IDLE_HOOK			0
 #define configUSE_TICK_HOOK			0 // MEANX
 #define configMAX_PRIORITIES                    ( 31 )
-#define configMINIMAL_STACK_SIZE                ( ( unsigned short ) 128 )
-#define configTOTAL_HEAP_SIZE                   ( ( size_t ) (  26 * 1024 ) ) 
 #define configAPPLICATION_ALLOCATED_HEAP        1
 #define configMAX_TASK_NAME_LEN                 ( 16 )
 #define configUSE_TRACE_FACILITY                0

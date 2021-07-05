@@ -2,7 +2,7 @@ IF(WIN32)
     SET(PLATFORM_TOOLCHAIN_SUFFIX ".exe")
 ENDIF(WIN32)
 
-IF(${LN_ARCH} STREQUAL "RISCV") # RISCV
+IF("${LN_ARCH}" STREQUAL "RISCV") # RISCV
   SET(PLATFORM_PREFIX riscv32-unknown-elf-)
   SET(PLATFORM_C_FLAGS "-march=rv32imac -mabi=ilp32 -mcmodel=medlow")
   IF(WIN32)    

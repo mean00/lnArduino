@@ -14,3 +14,4 @@ target_include_directories(FreeRTOS PRIVATE ${FOS}/include)
 target_include_directories(FreeRTOS PRIVATE ${LN_FREERTOS_PORT})
 target_include_directories(FreeRTOS PRIVATE ${CMAKE_SOURCE_DIR})
 
+include_directories(${ARDUINO_GD32_FREERTOS}/legacy/boards/${GD32_BOARD}/)
