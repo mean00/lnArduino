@@ -25,7 +25,7 @@ MEMORY
   rom (rx)  : ORIGIN = 0x08000000, LENGTH = 64K
 }
 /**
-    we allocate 2 pages at the end of the flash for eeprom
+    we allocate 4 kB at the end for the eeprom
 */
 PROVIDE(eeprom_size = 4*1024);
 PROVIDE(eeprom_begin = ORIGIN(rom) + LENGTH(rom)-eeprom_size);
@@ -82,11 +82,6 @@ PROVIDE(__msp_init = ORIGIN(ram) + LENGTH(ram));
 EXTERN(__start__)
 ENTRY(__start__)
 PROVIDE(__exc_reset = __start__);
-
-/* Heap boundaries, for libmaple */
-EXTERN(_lm_heap_start);
-EXTERN(_lm_heap_end);
-
 
 
 SECTIONS
