@@ -45,7 +45,7 @@ extern void do_assert(const char *a);
 #define configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY	0xe
 #define configKERNEL_INTERRUPT_PRIORITY                 ( configLIBRARY_LOWEST_INTERRUPT_PRIORITY << (8 - configPRIO_BITS) )
 #define configMAX_SYSCALL_INTERRUPT_PRIORITY            ( configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY << (8 - configPRIO_BITS) )
-#define configCPU_CLOCK_HZ			( ( uint32_t long ) SystemCoreClock) 
+#define configCPU_CLOCK_HZ			( ( uint32_t ) SystemCoreClock) 
 #define configTICK_RATE_HZ			( ( TickType_t ) 1000 )
 #define configRTC_CLOCK_HZ                      ((uint32_t)TIMER_FREQ)
 

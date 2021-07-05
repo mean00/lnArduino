@@ -6,9 +6,9 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this file,
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 #=============================================================================#
-MESSAGE(STATUS "Setting up GD32 riscv cmake environment")
+MESSAGE(STATUS "Setting up GD32/arm cmake environment")
 IF(NOT DEFINED LN_EXT)
-SET(LN_EXT riscv CACHE INTERNAL "")
+SET(LN_EXT arm CACHE INTERNAL "")
 include(${CMAKE_CURRENT_LIST_DIR}/../platformConfig.cmake)
 
 IF(NOT PLATFORM_TOOLCHAIN_PATH)
@@ -41,8 +41,7 @@ SET(CMAKE_CXX_COMPILER_ID "GNU" CACHE INTERNAL "")
 set(CMAKE_C_COMPILER_WORKS      TRUE)
 set(CMAKE_CXX_COMPILER_WORKS    TRUE)
 #
-SET(GD32_BOARD_FLAG      -DGD32VF103C_START) # Longan nano ?
-SET(GD32_BOARD       sipeed-longan-nano CACHE INTERNAL "")
+SET(GD32_BOARD       bluepill CACHE INTERNAL "")
 
 #
 
