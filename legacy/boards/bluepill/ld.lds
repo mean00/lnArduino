@@ -1,175 +1,263 @@
-OUTPUT_ARCH( "riscv" )
+/*
+ * libmaple linker script for "JTAG" builds.
+ *
+ * A "JTAG" build puts .text (and .rodata) in Flash, and
+ * .data/.bss/heap (of course) in SRAM, but links starting at the
+ * Flash and SRAM starting addresses (0x08000000 and 0x20000000
+ * respectively). This will wipe out a Maple bootloader if there's one
+ * on the board, so only use this if you know what you're doing.
+ *
+ * Of course, a "JTAG" build is perfectly usable for upload over SWD,
+ * the system memory bootloader, etc. The name is just a historical
+ * artifact.
+ */
 
-ENTRY( _start )
-
+/*
+ * This pulls in the appropriate MEMORY declaration from the right
+ * subdirectory of stm32/mem/ (the environment must call ld with the
+ * right include directory flags to make this happen). Boards can also
+ * use this file to use any of libmaple's memory-related hooks (like
+ * where the heap should live).
+ */
 MEMORY
-{ 
-	/* Run in FLASH */ 
-	flash (rxai!w) : ORIGIN = 0x08000000, LENGTH = 128k
-	ram   (wxa!ri) : ORIGIN = 0x20000000, LENGTH = 32K 
-
-	/* Run in RAM */ 
-/*	flash (rxai!w) : ORIGIN = 0x20000000, LENGTH = 24k
-	ram   (wxa!ri) : ORIGIN = 0x20006000, LENGTH = 8K
-*/	
+{
+  ram (rwx) : ORIGIN = 0x20000000, LENGTH = 20K
+  rom (rx)  : ORIGIN = 0x08000000, LENGTH = 64K
 }
+/**
+    we allocate 2 pages at the end of the flash for eeprom
+*/
+PROVIDE(eeprom_size = 4*1024);
+PROVIDE(eeprom_begin = ORIGIN(rom) + LENGTH(rom)-eeprom_size);
+/*
+ * Linker script for libmaple.
+ *
+ * Original author "lanchon" from ST forums, with modifications by LeafLabs.
+ */
+/* Provide memory region aliases for common.inc */
+REGION_ALIAS("REGION_TEXT", rom);
+REGION_ALIAS("REGION_DATA", ram);
+REGION_ALIAS("REGION_BSS", ram);
+REGION_ALIAS("REGION_RODATA", rom);
+REGION_ALIAS("REGION_EEPROM", rom);
+
+OUTPUT_FORMAT ("elf32-littlearm", "elf32-bigarm", "elf32-littlearm")
+
+/*
+ * Configure other libraries we want in the link.
+ *
+ * libgcc, libc, and libm are common across supported toolchains.
+ * However, some toolchains require additional archives which aren't
+ * present everywhere (e.g. ARM's gcc-arm-embedded releases).
+ *
+ * To hack around this, we let the build system specify additional
+ * archives by putting the right extra_libs.inc (in a directory under
+ * toolchains/) in our search path.
+ */
+GROUP(libgcc.a libc.a libm.a)
+GROUP(libnosys.a)
+
+/*
+ * These force the linker to search for vector table symbols.
+ *
+ * These symbols vary by STM32 family (and also within families).
+ * It's up to the build system to configure the link's search path
+ * properly for the target MCU.
+ */
+/*INCLUDE vector_symbols.inc*/
+
+/* STM32 vector table. */
+EXTERN(__stm32_vector_table)
+
+/* C runtime initialization function. */
+EXTERN(start_c)
+
+/* main entry point */
+EXTERN(main)
+
+/* Initial stack pointer value. */
+EXTERN(__msp_init)
+PROVIDE(__msp_init = ORIGIN(ram) + LENGTH(ram));
+/* Reset vector and chip reset entry point */
+EXTERN(__start__)
+ENTRY(__start__)
+PROVIDE(__exc_reset = __start__);
+
+/* Heap boundaries, for libmaple */
+EXTERN(_lm_heap_start);
+EXTERN(_lm_heap_end);
+
 
 
 SECTIONS
 {
-  __stack_size = DEFINED(__stack_size) ? __stack_size : 2K;
+    .text :
+      {
+        __text_start__ = .;
+        /*
+         * STM32 vector table.  Leave this here.  Yes, really.
+         */
+        *(.stm32.interrupt_vector)
 
+        /*
+         * Program code and vague linking
+         */
+        *(.text .text.* .gnu.linkonce.t.*)
+        *(.plt)
+        *(.gnu.warning)
+        *(.glue_7t) *(.glue_7) *(.vfp11_veneer)
 
-  .init           :
-  {
-    KEEP (*(SORT_NONE(.init)))
-  } >flash AT>flash 
+        *(.ARM.extab* .gnu.linkonce.armextab.*)
+        *(.gcc_except_table)
+        *(.eh_frame_hdr)
+        *(.eh_frame)
 
-  .ilalign         :
-  {
-    . = ALIGN(4);
-    PROVIDE( _ilm_lma = . );
-  } >flash AT>flash 
+        . = ALIGN(4);
+        KEEP(*(.init))
 
-  .ialign         :
-  {
-    PROVIDE( _ilm = . );
-  } >flash AT>flash 
+        . = ALIGN(4);
+        __preinit_array_start = .;
+        KEEP (*(.preinit_array))
+        __preinit_array_end = .;
 
-  .text           :
-  {
-    *(.rodata .rodata.*)  
-    *(.text.unlikely .text.unlikely.*)
-    *(.text.startup .text.startup.*)
-    *(.text .text.*)
-    *(.gnu.linkonce.t.*)
-  } >flash AT>flash 
+        . = ALIGN(4);
+        __init_array_start = .;
+        KEEP (*(SORT(.init_array.*)))
+        KEEP (*(.init_array))
+        __init_array_end = .;
 
-  .fini           :
-  {
-    KEEP (*(SORT_NONE(.fini)))
-  } >flash AT>flash 
+        . = ALIGN(0x4);
+        KEEP (*crtbegin.o(.ctors))
+        KEEP (*(EXCLUDE_FILE (*crtend.o) .ctors))
+        KEEP (*(SORT(.ctors.*)))
+        KEEP (*crtend.o(.ctors))
 
-  . = ALIGN(4);
+        . = ALIGN(4);
+        KEEP(*(.fini))
 
-  PROVIDE (__etext = .);
-  PROVIDE (_etext = .);/*0x80022c8*/
-  PROVIDE (etext = .);/*0x80022c8*/
-  PROVIDE( _eilm = . );
+        . = ALIGN(4);
+        __fini_array_start = .;
+        KEEP (*(.fini_array))
+        KEEP (*(SORT(.fini_array.*)))
+        __fini_array_end = .;
 
-  .preinit_array  :
-  {
-    PROVIDE_HIDDEN (__preinit_array_start = .);
-    KEEP (*(.preinit_array))
-    PROVIDE_HIDDEN (__preinit_array_end = .);
-  } >flash AT>flash 
+        KEEP (*crtbegin.o(.dtors))
+        KEEP (*(EXCLUDE_FILE (*crtend.o) .dtors))
+        KEEP (*(SORT(.dtors.*)))
+        KEEP (*crtend.o(.dtors))
+      } > REGION_TEXT
 
-  .init_array     :
-  {
-    PROVIDE_HIDDEN (__init_array_start = .);
-    KEEP (*(SORT_BY_INIT_PRIORITY(.init_array.*) SORT_BY_INIT_PRIORITY(.ctors.*)))
-    KEEP (*(.init_array EXCLUDE_FILE (*crtbegin.o *crtbegin?.o *crtend.o *crtend?.o ) .ctors))
-    PROVIDE_HIDDEN (__init_array_end = .);
-  } >flash AT>flash 
+    /*
+     * End of text
+     */
+    .text.align :
+      {
+        . = ALIGN(8);
+        __text_end__ = .;
+      } > REGION_TEXT
 
-  .fini_array     :
-  {
-    PROVIDE_HIDDEN (__fini_array_start = .);
-    KEEP (*(SORT_BY_INIT_PRIORITY(.fini_array.*) SORT_BY_INIT_PRIORITY(.dtors.*)))
-    KEEP (*(.fini_array EXCLUDE_FILE (*crtbegin.o *crtbegin?.o *crtend.o *crtend?.o ) .dtors))
-    PROVIDE_HIDDEN (__fini_array_end = .);
-  } >flash AT>flash 
+    /*
+     * .ARM.exidx exception unwinding; mandated by ARM's C++ ABI
+     */
+    __exidx_start = .;
+    .ARM.exidx :
+      {
+        *(.ARM.exidx* .gnu.linkonce.armexidx.*)
+      } > REGION_RODATA
+    __exidx_end = .;
 
-  .ctors          :
-  {
-    /* gcc uses crtbegin.o to find the start of
-       the constructors, so we make sure it is
-       first.  Because this is a wildcard, it
-       doesn't matter if the user does not
-       actually link against crtbegin.o; the
-       linker won't look for a file to match a
-       wildcard.  The wildcard also means that it
-       doesn't matter which directory crtbegin.o
-       is in.  */
-    KEEP (*crtbegin.o(.ctors))
-    KEEP (*crtbegin?.o(.ctors))
-    /* We don't want to include the .ctor section from
-       the crtend.o file until after the sorted ctors.
-       The .ctor section from the crtend file contains the
-       end of ctors marker and it must be last */
-    KEEP (*(EXCLUDE_FILE (*crtend.o *crtend?.o ) .ctors))
-    KEEP (*(SORT(.ctors.*)))
-    KEEP (*(.ctors))
-  } >flash AT>flash 
+    /*
+     * .data
+     */
+    .data :
+      {
+        __data_start__ = .;
+      	LONG(0)
+        . = ALIGN(8);
 
-  .dtors          :
-  {
-    KEEP (*crtbegin.o(.dtors))
-    KEEP (*crtbegin?.o(.dtors))
-    KEEP (*(EXCLUDE_FILE (*crtend.o *crtend?.o ) .dtors))
-    KEEP (*(SORT(.dtors.*)))
-    KEEP (*(.dtors))
-  } >flash AT>flash 
+        *(.got.plt) *(.got)
+        *(.data .data.* .gnu.linkonce.d.*)
 
-    . = ALIGN(4);
-    PROVIDE( _eilm = . );
+        . = ALIGN(8);
+        __data_end__ = .;
+      } > REGION_DATA AT> REGION_RODATA
 
-  .lalign         :
-  {
-    . = ALIGN(4);
-    PROVIDE( _data_lma = . );
-  } >flash AT>flash 
+    /*
+     * Read-only data
+     */
+    .rodata :
+      {
+        *(.rodata .rodata.* .gnu.linkonce.r.*)
+        /* .USER_FLASH: We allow users to allocate into Flash here */
+        *(.USER_FLASH)
+        /* ROM image configuration; for C startup */
+        . = ALIGN(4);
+        _lm_rom_img_cfgp = .;
+        LONG(LOADADDR(.data));
+        /*
+         * Heap: Linker scripts may choose a custom heap by overriding
+         * _lm_heap_start and _lm_heap_end. Otherwise, the heap is in
+         * internal SRAM, beginning after .bss, and growing towards
+         * the stack.
+         *
+         * I'm shoving these here naively; there's probably a cleaner way
+         * to go about this. [mbolivar]
+         */
+        _lm_heap_start = DEFINED(_lm_heap_start) ? _lm_heap_start : _end;
+        _lm_heap_end   = DEFINED(_lm_heap_end) ? _lm_heap_end : __msp_init;
+      } > REGION_RODATA
+    .eeprom eeprom_begin :
+      {
+        . = eeprom_size;
+      } > REGION_EEPROM
 
-  .dalign         :
-  {
-    . = ALIGN(4);
-    PROVIDE( _data = . );
-  } >ram AT>flash 
-  
-  
-  .data          :
-  {
-    *(.rdata) 
-   
-    *(.gnu.linkonce.r.*)
-    *(.data .data.*)
-    *(.gnu.linkonce.d.*)
-    . = ALIGN(8);
-    PROVIDE( __global_pointer$ = . + 0x800); 
-    *(.sdata .sdata.*)
-    *(.gnu.linkonce.s.*)
-    . = ALIGN(8);
-    *(.srodata.cst16)
-    *(.srodata.cst8)
-    *(.srodata.cst4)
-    *(.srodata.cst2)
-    *(.srodata .srodata.*)
-  } >ram AT>flash 
+    /*
+     * .bss
+     */
+    .bss :
+      {
+        . = ALIGN(8);
+        __bss_start__ = .;
+        *(.bss .bss.* .gnu.linkonce.b.*)
+        *(COMMON)
+        . = ALIGN (8);
+        __bss_end__ = .;
+        _end = __bss_end__;
+      } > REGION_BSS
 
-  . = ALIGN(4);
-  PROVIDE( _edata = . );
-  PROVIDE( edata = . );
+    /*
+     * Debugging sections
+     */
+    .stab 0 (NOLOAD) : { *(.stab) }
+    .stabstr 0 (NOLOAD) : { *(.stabstr) }
+    /* DWARF debug sections.
+     * Symbols in the DWARF debugging sections are relative to the beginning
+     * of the section so we begin them at 0.  */
+    /* DWARF 1 */
+    .debug          0 : { *(.debug) }
+    .line           0 : { *(.line) }
+    /* GNU DWARF 1 extensions */
+    .debug_srcinfo  0 : { *(.debug_srcinfo) }
+    .debug_sfnames  0 : { *(.debug_sfnames) }
+    /* DWARF 1.1 and DWARF 2 */
+    .debug_aranges  0 : { *(.debug_aranges) }
+    .debug_pubnames 0 : { *(.debug_pubnames) }
+    /* DWARF 2 */
+    .debug_info     0 : { *(.debug_info .gnu.linkonce.wi.*) }
+    .debug_abbrev   0 : { *(.debug_abbrev) }
+    .debug_line     0 : { *(.debug_line) }
+    .debug_frame    0 : { *(.debug_frame) }
+    .debug_str      0 : { *(.debug_str) }
+    .debug_loc      0 : { *(.debug_loc) }
+    .debug_macinfo  0 : { *(.debug_macinfo) }
+    /* SGI/MIPS DWARF 2 extensions */
+    .debug_weaknames 0 : { *(.debug_weaknames) }
+    .debug_funcnames 0 : { *(.debug_funcnames) }
+    .debug_typenames 0 : { *(.debug_typenames) }
+    .debug_varnames  0 : { *(.debug_varnames) }
 
-  PROVIDE( _fbss = . ); /*0X200052A0  0X200002A0*/
-  PROVIDE( __bss_start = . );
-  .bss            :
-  {
-    *(.sbss*)
-    *(.gnu.linkonce.sb.*)
-    *(.bss .bss.*)
-    *(.gnu.linkonce.b.*)
-    *(COMMON)
-    . = ALIGN(4);
-  } >ram AT>ram 
-
-  . = ALIGN(8);
-  PROVIDE( _end = . ); /*0X2000,0340*/
-  PROVIDE( end = . );
-
-  .stack ORIGIN(ram) + LENGTH(ram) - __stack_size :
-  {
-    PROVIDE( _heap_end = . ); 
-    . = __stack_size;  
-    PROVIDE( _sp = . ); 
-  } >ram AT>ram 
+    .note.gnu.arm.ident 0 : { KEEP (*(.note.gnu.arm.ident)) }
+    .ARM.attributes 0 : { KEEP (*(.ARM.attributes)) }
+    /DISCARD/ : { *(.note.GNU-stack) }
 }
+
