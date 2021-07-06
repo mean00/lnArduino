@@ -44,12 +44,56 @@
 
 #include <stddef.h>
 #include "lnArduino.h"
-extern void __libc_init_array(void);
+
 extern int  main(void);
 
+extern "C"
+{
+    void __libc_init_array(void);
+    /* The linker must ensure that these are at least 4-byte aligned. */
+    extern const char __data_start__, __data_end__;
+    extern const char __bss_start__, __bss_end__;
+    extern const char _lm_rom_img_cfgp;
+    
+    // stub
+    void _init(void) 
+    {
+    }
+    
+}
+
+
+
+/**
+ */
 extern "C" void  __attribute__((noreturn))  start_c(void)
 {
-   //  __libc_init_array();
+    uint32_t srcAdr= *(uint32_t *)(&_lm_rom_img_cfgp);
+    uint32_t *src = (uint32_t *)srcAdr;
+    uint32_t *dst = (uint32_t*)&__data_start__;
+
+    if (src != dst) 
+    {
+        // is it safe to use memcpy ?
+#if 1        
+        uint32_t *end = (uint32_t*)&__data_end__;
+        while (dst < end) 
+        {
+            *dst++ = *src++;
+        }
+#endif
+    }
+
+    /* Zero .bss. */
+    uint32_t *zstart = (uint32_t*)&__bss_start__;
+    uint32_t *zend = (uint32_t*)&__bss_end__;
+    while (zstart < zend) 
+    {
+        *zstart++ = 0;
+    }
+
+    /* Run initializers. */
+    __libc_init_array();
     main();
     xAssert(0);
     for (;;)
@@ -57,46 +101,5 @@ extern "C" void  __attribute__((noreturn))  start_c(void)
 
 }
 
-#if 0
-extern int main(int, char**);
 
-/* The linker must ensure that these are at least 4-byte aligned. */
-extern char __data_start__, __data_end__;
-extern char __bss_start__, __bss_end__;
-
-struct rom_img_cfg {
-    int *img_start;
-};
-
-extern char _lm_rom_img_cfgp;
-
-void __attribute__((noreturn)) start_c(void) {
-    struct rom_img_cfg *img_cfg = (struct rom_img_cfg*)&_lm_rom_img_cfgp;
-    int *src = img_cfg->img_start;
-    int *dst = (int*)&__data_start__;
-
-    /* Initialize .data, if necessary. */
-    if (src != dst) {
-        int *end = (int*)&__data_end__;
-        while (dst < end) {
-            *dst++ = *src++;
-        }
-    }
-
-    /* Zero .bss. */
-    dst = (int*)&__bss_start__;
-    while (dst < (int*)&__bss_end__) {
-        *dst++ = 0;
-    }
-
-    /* Run initializers. */
-    __libc_init_array();
-
-    /* Jump to main. */
-    main(0, 0, 0);
-
-    /* If exit is NULL, make sure we don't return. */
-    for (;;)
-        continue;
-}
-#endif
+// EOF

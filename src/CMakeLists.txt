@@ -5,6 +5,7 @@ ADD_LIBRARY(gd32_overlay STATIC  MapleFreeRTOS1000_pp.cpp systemAlloc.cpp lnDebu
                                  lnDma.cpp 
                                  lnSystemInit.cpp lnRCU.cpp lnRCU_systemClock.cpp 
                                  lnIRQ_${LN_EXT}.cpp 
+                                 lnRunTime_${LN_EXT}.cpp
                                  lnI2C.cpp lnI2C_impl.cpp  
                                  lnSystemTimer.cpp lnDAC.cpp lnExti.cpp
                                  lnBasicTimer.cpp

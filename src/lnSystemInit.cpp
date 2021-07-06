@@ -9,6 +9,7 @@ extern "C" void _init();
 void lnIrqSysInit();
 void lnExtiSysInit();
 void lnDmaSysInit();
+void lnRunTimeInit();
 /**
  * 
  * @param 
@@ -28,6 +29,8 @@ void initTask(void *)
  */
 int main()
 {
+    //
+    lnRunTimeInit();
     // Initialize system    
     lnInitSystemClock();
     //ECLIC init
@@ -91,3 +94,4 @@ int main()
     deadEnd(25);    
 }
 // EOF
+
