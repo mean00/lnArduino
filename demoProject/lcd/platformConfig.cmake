@@ -12,7 +12,7 @@ IF("${LN_ARCH}" STREQUAL "RISCV") # RISCV
   ENDIF(WIN32)
 ELSE()
    SET(PLATFORM_PREFIX arm-none-eabi-)
-   SET(PLATFORM_C_FLAGS " -mcpu=cortex-m3 -mthumb")
+   SET(PLATFORM_C_FLAGS " ")
    IF(WIN32)
       SET(PLATFORM_TOOLCHAIN_PATH  "/c/dev/arm83/bin")
    ELSE()

@@ -62,31 +62,26 @@ extern "C"
     
 }
 
-
-
 /**
+ * \fn start_c
+ * \brief Initialize ram & libc runtime before jumping into actual code
+ * careful the libc is not compltetely initialized here, some stuff doesnt work yet
  */
 extern "C" void  __attribute__((noreturn))  start_c(void)
 {
     uint32_t srcAdr= *(uint32_t *)(&_lm_rom_img_cfgp);
     uint32_t *src = (uint32_t *)srcAdr;
     uint32_t *dst = (uint32_t*)&__data_start__;
+    uint32_t *end = (uint32_t*)&__data_end__;
 
-    if (src != dst) 
+    while (dst < end) 
     {
-        // is it safe to use memcpy ?
-#if 1        
-        uint32_t *end = (uint32_t*)&__data_end__;
-        while (dst < end) 
-        {
             *dst++ = *src++;
-        }
-#endif
     }
-
+    
     /* Zero .bss. */
     uint32_t *zstart = (uint32_t*)&__bss_start__;
-    uint32_t *zend = (uint32_t*)&__bss_end__;
+    uint32_t *zend =   (uint32_t*)&__bss_end__;
     while (zstart < zend) 
     {
         *zstart++ = 0;

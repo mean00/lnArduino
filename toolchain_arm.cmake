@@ -56,14 +56,15 @@ MESSAGE(STATUS "GD32 C   compiler ${CMAKE_C_COMPILER}")
 MESSAGE(STATUS "GD32 C++ compiler ${CMAKE_CXX_COMPILER}")
 
 SET(GD32_SPECS  "--specs=nano.specs")
+SET(GD32_MCU "  -mcpu=cortex-m3 -mthumb  ")
+SET(GD32_LD_EXTRA "  -Wl,--unresolved-symbols=report-all -Wl,--warn-common -Wl,--warn-section-align ")
 #
-SET(GD32_C_FLAGS  "${GD32_SPECS}  ${PLATFORM_C_FLAGS} -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -fno-common ${GD32_BOARD_FLAG}")
+SET(GD32_C_FLAGS  "${GD32_SPECS}  ${PLATFORM_C_FLAGS} -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -fno-common ${GD32_BOARD_FLAG}  ${GD32_MCU}" CACHE INTERNAL "")
 SET(CMAKE_C_FLAGS "${GD32_C_FLAGS}")
 SET(CMAKE_CXX_FLAGS "${GD32_C_FLAGS}  -fno-rtti -fno-exceptions" ) 
 #
-SET(GD32_LD_FLAGS "-nostdlib ${GD32_SPECS} ")
-SET(GD32_LD_LIBS "-lm -lc -lgcc")
-#-lgd32_overlay  -lgd32Arduino -lgd32 -lFreeRTOS -lgd32_lowlevel  -lc -lm -lgd32 -lgcc -lc  -lgcc 
+SET(GD32_LD_FLAGS "-nostdlib ${GD32_SPECS} ${GD32_MCU} ${GD32_LD_EXTRA}" CACHE INTERNAL "")
+SET(GD32_LD_LIBS "-lm -lc -lgcc" CACHE INTERNAL "")
 #
 set(CMAKE_CXX_LINK_EXECUTABLE    "<CMAKE_CXX_COMPILER>   <CMAKE_CXX_LINK_FLAGS>  <LINK_FLAGS> -lgcc -Xlinker -print-memory-usage   -Wl,--start-group  <OBJECTS> <LINK_LIBRARIES> -Wl,--end-group  -Wl,-Map,<TARGET>.map   -o <TARGET> ${GD32_LD_FLAGS} ${GD32_LD_LIBS}")
 SET(CMAKE_EXECUTABLE_SUFFIX_C .elf)

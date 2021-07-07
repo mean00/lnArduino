@@ -7,25 +7,39 @@
 #include "lnRCU.h"
 #include "lnIRQ.h"
 #include "lnIRQ_arm_priv.h"
+#include "lnSCB_arm_priv.h"
 /**
  * 
  */
 
+#define LN_NB_INTERRUPT 68
+LN_SCB_Registers *aSCB=(LN_SCB_Registers *)0xE000ED00;
+static uint32_t interruptVector[LN_NB_INTERRUPT]  __attribute__((aligned(256)));
 
+extern "C" void xPortPendSVHandler();
+extern "C" void xPortSysTickHandler();
 
-// Attribute [LEVEL1:LEVEL0][SHV] : 
-//      LEVEL: 
-//              0:0=LEVEL, 
-//              0:1=RISING EDGE, 
-//              1:0: FALLINGEDGE   
-//      SHV:
-//              0 non vectored
-//              1 vectored
-//
-
+static void unsupportedInterrupt()
+{
+    xAssert(0);
+}
 void lnIrqSysInit()
 {
-   
+    //
+    uint32_t unsupported=(uint32_t )unsupportedInterrupt;
+    for(int i=0;i<LN_NB_INTERRUPT;i++)
+        interruptVector[i]=unsupported;
+    
+    // Hook in SVC
+    interruptVector[14]=(uint32_t)xPortPendSVHandler;
+    interruptVector[15]=(uint32_t)xPortSysTickHandler;
+    
+    // Hook basic interrupts
+    
+    
+    // Relocate vector to there    
+    aSCB->VTOR = (uint32_t)interruptVector;
+    __asm__ __volatile__("dsb sy") ;
     return;
 }
 
