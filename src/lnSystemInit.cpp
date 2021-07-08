@@ -10,6 +10,7 @@ void lnIrqSysInit();
 void lnExtiSysInit();
 void lnDmaSysInit();
 void lnRunTimeInit();
+void lnRunTimeInitPostPeripherals();
 /**
  * 
  * @param 
@@ -79,6 +80,8 @@ int main()
      lnPeripherals::enable(pADC0);
      lnPeripherals::enable(pADC1);
     
+     
+     lnRunTimeInitPostPeripherals();
      
 #warning FIXME FIXME FIXME
 #if 0    
