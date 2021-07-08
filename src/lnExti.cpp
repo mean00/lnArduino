@@ -7,6 +7,7 @@
 #include "lnExti.h"
 #include "lnExti_priv.h"
 #include "lnPeripheral_priv.h"
+#include "lnAFIO_priv.h"
 
 LN_EXTI_Register *aExiti=(LN_EXTI_Register *)LN_EXTI_ADR ;
 
@@ -138,6 +139,16 @@ void lnExtiDisableInterrupt(const lnPin pin)
     _lnExtidescriptor *d=_extiDesc+source;
     xAssert(port==d->port);
     aExiti->INTEN&=~(1<<source);
+}
+
+
+void lnExtiSWDOnly()
+{
+    LN_AFIO *afio=(LN_AFIO*)LN_AFIO_ADR;
+    uint32_t v=afio->PCF0;
+    v&=LN_AFIO_PCF0_SWJ_MASK;
+    v|=LN_AFIO_PCF0_SWJ_SET(2);
+    afio->PCF0=v;
 }
 
 void EXTI_IrqHandler(int maskS,int maskE)
