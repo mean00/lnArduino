@@ -1,6 +1,11 @@
 #include "lnArduino.h"
 
+
+#ifdef __arm__ 
+#define LED PC13
+#else
 #define LED PA2
+#endif
 
 void setup()
 {
@@ -10,11 +15,12 @@ void setup()
 /**
  * 
  */
+int roundup=0;
 void loop()
 {
     bool onoff=true;
     digitalWrite(LED,true);
-    int roundup=0;
+    
     while(1)
     {
         roundup++;
