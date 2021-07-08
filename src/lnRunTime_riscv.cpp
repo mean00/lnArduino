@@ -5,5 +5,11 @@ void lnRunTimeInit()
 
 
 }
+
+void lnRunTimeInitPostPeripherals()
+{
+    
+}
+
 // EOF
 
