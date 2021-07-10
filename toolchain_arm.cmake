@@ -64,22 +64,24 @@ ELSE()
 ENDIF()
 
 
-SET(GD32_LD_EXTRA "  -Wl,--unresolved-symbols=report-all -Wl,--warn-common -Wl,--warn-section-align ")
+SET(GD32_LD_EXTRA "  -Wl,--unresolved-symbols=report-all -Wl,--warn-common -Wl,--warn-section-align " CACHE INTERNAL "")
 #
 SET(GD32_C_FLAGS  "${GD32_SPECS}  ${PLATFORM_C_FLAGS} -DLN_ARCH=LN_ARCH_ARM  -Werror=return-type -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -fno-common ${GD32_BOARD_FLAG}  ${GD32_MCU}" CACHE INTERNAL "")
-SET(CMAKE_C_FLAGS "${GD32_C_FLAGS}")
-SET(CMAKE_ASM_FLAGS "${GD32_C_FLAGS}")
-SET(CMAKE_CXX_FLAGS "${GD32_C_FLAGS}  -fno-rtti -fno-exceptions" ) 
+SET(CMAKE_C_FLAGS "${GD32_C_FLAGS}" CACHE INTERNAL "")
+SET(CMAKE_ASM_FLAGS "${GD32_C_FLAGS}" CACHE INTERNAL "")
+SET(CMAKE_CXX_FLAGS "${GD32_C_FLAGS}  -fno-rtti -fno-exceptions" CACHE INTERNAL "") 
 #
 SET(GD32_LD_FLAGS "-nostdlib ${GD32_SPECS} ${GD32_MCU} ${GD32_LD_EXTRA}" CACHE INTERNAL "")
 SET(GD32_LD_LIBS "-lm -lc -lgcc" CACHE INTERNAL "")
 #
-set(CMAKE_CXX_LINK_EXECUTABLE    "<CMAKE_CXX_COMPILER>   <CMAKE_CXX_LINK_FLAGS>  <LINK_FLAGS> -lgcc -Xlinker -print-memory-usage   -Wl,--start-group  <OBJECTS> <LINK_LIBRARIES> -Wl,--end-group  -Wl,-Map,<TARGET>.map   -o <TARGET> ${GD32_LD_FLAGS} ${GD32_LD_LIBS}")
-SET(CMAKE_EXECUTABLE_SUFFIX_C .elf)
-SET(CMAKE_EXECUTABLE_SUFFIX_CXX .elf)
+set(CMAKE_CXX_LINK_EXECUTABLE    "<CMAKE_CXX_COMPILER>   <CMAKE_CXX_LINK_FLAGS>  <LINK_FLAGS> -lgcc -Xlinker -print-memory-usage   -Wl,--start-group  <OBJECTS> <LINK_LIBRARIES> -Wl,--end-group  -Wl,-Map,<TARGET>.map   -o <TARGET> ${GD32_LD_FLAGS} ${GD32_LD_LIBS}" CACHE INTERNAL "")
+SET(CMAKE_EXECUTABLE_SUFFIX_C .elf CACHE INTERNAL "")
+SET(CMAKE_EXECUTABLE_SUFFIX_CXX .elf CACHE INTERNAL "")
 
 include_directories(${ARDUINO_GD32_FREERTOS}/legacy/boards/${GD32_BOARD}/)
 
 
 ADD_DEFINITIONS("-g3 -O1 ")
-ENDIF()
+
+
+ENDIF(NOT DEFINED LN_EXT)

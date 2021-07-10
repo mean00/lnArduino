@@ -8,19 +8,19 @@
 
 struct LN_RCUx
 {
-    uint32_t CTL;
-    uint32_t CFG0;
-    uint32_t INT;
-    uint32_t APB2RST;
-    uint32_t APB1RST;
-    uint32_t AHBEN;
-    uint32_t APB2EN;
-    uint32_t APB1EN;
-    uint32_t BDCTL;
-    uint32_t RSTCLK;
-    uint32_t AHBRST;
-    uint32_t CFG1;
-    uint32_t DSV;
+    uint32_t CTL;       // CR
+    uint32_t CFG0;      // CFGR
+    uint32_t INT;       // CIR
+    uint32_t APB2RST;   // APB2RSTR
+    uint32_t APB1RST;   // APB1RSTR
+    uint32_t AHBEN;     // AHBENR
+    uint32_t APB2EN;    // APB2ENR
+    uint32_t APB1EN;    // APB1ENR
+    uint32_t BDCTL;     // BDCR
+    uint32_t RSTCLK;    // CSR
+    uint32_t AHBRST;    // AHBRSTR
+    uint32_t CFG1;      // CFGR2
+    uint32_t DSV;       // N/A
 };
 typedef volatile LN_RCUx LN_RCU;    
 

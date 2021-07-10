@@ -114,11 +114,12 @@ void lnInitSystemClock()
     volatile uint32_t *control=&(arcu->CTL);
     volatile uint32_t *cfg0=&(arcu->CFG0);
     
+    
     {
+        // Start internal oscillator
+        arcu->INT=0;    // No interrupt        
         *control=LN_RCU_CTL_IRC8MEN;     // Enable internal 8 Mhz oscillator
-        *cfg0=0;         // select 8Mhz as source for sysclock
-        *control=LN_RCU_CTL_IRC8MEN;     // Enable internal 8 Mhz oscillator
-        arcu->INT=0;    // No interrupt
+        *cfg0=0;                         // select 8Mhz as source for sysclock
         arcu->CFG1=0;   // PLL pre divider not set
     }
     {
@@ -127,13 +128,15 @@ void lnInitSystemClock()
         waitControlBit(LN_RCU_CTL_HXTASTB); // Wait Xtal stable
     }
     {
+        // start PLL...
+        *control|=LN_RCU_CTL_PLLEN;
+        waitControlBit(LN_RCU_CTL_PLLSTB); // Wait Xtal stable
+    }
+    
+    {
         // Set HXTAL as source for PLL <<
         *cfg0=LN_RCU_CFG0_PLLSEL;
-#if 0        
-        setPll(27,2); // 8*27/2=108 Mhz
-#else
         setPll(9,1); // 8*9/1=72 Mhz
-#endif        
     }
     // Setup AHB...
     // AHB is Xtal:1, divider value=0
@@ -149,10 +152,7 @@ void lnInitSystemClock()
     a&=~(7<<8);
     a|=4<<8;        // APB1 is AHB/2
     *cfg0=a;
-    
-    // Enable PLL and wait for it to be stable
-    *control|=LN_RCU_CTL_PLLEN;
-    waitControlBit(LN_RCU_CTL_PLLSTB);
+      
     
     // then switch to PLL as clock source
     uint32_t src=*cfg0;
