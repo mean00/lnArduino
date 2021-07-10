@@ -60,6 +60,11 @@ static void waitCfg0Bit(int mask)
 #define CLOCK_XTAL_VALUE      8 // 8mhz quartz
 #define CLOCK_TARGET_SYSCLOCK 108 // 108 Mhz
 #define CLOCK_TARGET_PREDIV   2
+
+//{CTL = 0x38683, CFG0 = 0x400, CIR = 0x0, APB2RSTR = 0x0, APB1RSTR = 0x0, AHBENR = 0x14, APB2ENR = 0x0, APB1ENR = 0x0, BDCR = 0x18, CSR = 0x1c000000}
+//{CTL = 0x38683, CFG0 = 0x1d0400, CIR = 0x0, APB2RSTR = 0x0, APB1RSTR = 0x0, AHBENR = 0x14, APB2ENR = 0x0, APB1ENR = 0x0, BDCR = 0x18, CSR = 0x1c000000}
+//{CTL = 0x3038683, CFG0 = 0x1d0400, CIR = 0x0, APB2RSTR = 0x0, APB1RSTR = 0x0, AHBENR = 0x14, APB2ENR = 0x0, APB1ENR = 0x0, BDCR = 0x18, CSR = 0x1c000000}
+
 /**
  * 
  * @param multiplier
@@ -98,9 +103,9 @@ static void setPll(int multiplier, int predivider)
                 
     // enable pll1 & pll2, wait for stabilization
     *control |= LN_RCU_CTL_PLL1EN;
-    waitControlBit(LN_RCU_CTL_PLL1STB);
+  //  waitControlBit(LN_RCU_CTL_PLL1STB);
     *control |= LN_RCU_CTL_PLL2EN;
-    waitControlBit(LN_RCU_CTL_PLL2STB);    
+  //  waitControlBit(LN_RCU_CTL_PLL2STB);    
 }
 
 //
@@ -124,7 +129,11 @@ void lnInitSystemClock()
     {
         // Set HXTAL as source for PLL <<
         *cfg0=LN_RCU_CFG0_PLLSEL;
+#if 0        
         setPll(27,2); // 8*27/2=108 Mhz
+#else
+        setPll(9,1); // 8*9/1=72 Mhz
+#endif        
     }
     // Setup AHB...
     // AHB is Xtal:1, divider value=0
