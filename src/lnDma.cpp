@@ -158,7 +158,7 @@ void    lnDMA::detachCallback()
  * @param repeat
  * @return 
  */
-extern uint32_t underInterrupt;
+
 /**
  * 
  */

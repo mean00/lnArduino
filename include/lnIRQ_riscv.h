@@ -72,5 +72,5 @@ LN_IRQ_USBFS               ,     /*!< USBFS global interrupt                    
 LN_IRQ_LAST=LN_IRQ_USBFS
 };
 
-
+extern uint32_t underInterrupt;
 void lnSetInterruptLevelDirect(int intr, int prio, bool vectored);

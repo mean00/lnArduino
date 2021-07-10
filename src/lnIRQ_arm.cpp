@@ -55,6 +55,8 @@ void lnIrqSetPriority(LnIRQ irq, int prio )
     }
     anvic->IP[irq]=p;   
 }
+extern "C" void USART0_IRQHandler ();
+extern "C" void USART1_IRQHandler ();
 
 /**
  * \fn lnIrqSysInit
@@ -82,6 +84,9 @@ void lnIrqSysInit()
     interruptVector[LN_VECTOR_OFFSET+LN_IRQ_PENDSV]=(uint32_t)xPortPendSVHandler;  // 16-2    14
     interruptVector[LN_VECTOR_OFFSET+LN_IRQ_SVCALL]=(uint32_t)vPortSVCHandler;     // 16-5    11
     interruptVector[LN_VECTOR_OFFSET+LN_IRQ_SYSTICK]=(uint32_t)xPortSysTickHandler;// 16-1    15
+    
+    interruptVector[LN_VECTOR_OFFSET+LN_IRQ_USART0]=(uint32_t)USART0_IRQHandler;// 16-1    15
+    interruptVector[LN_VECTOR_OFFSET+LN_IRQ_USART1]=(uint32_t)USART1_IRQHandler;
     
     // Relocate vector to there    
     aSCB->VTOR = (uint32_t)interruptVector;

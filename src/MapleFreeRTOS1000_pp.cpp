@@ -5,7 +5,8 @@
  */
 
 #include "MapleFreeRTOS1000_pp.h"
-uint32_t underInterrupt=0;
+#include "lnIRQ.h"
+
 #define  fos_ms2tick(ms) (((ms)+portTICK_PERIOD_MS-1)/portTICK_PERIOD_MS)
 
 extern "C"

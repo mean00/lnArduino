@@ -15,7 +15,8 @@
 #define ECLIC_CTLBIT_SHIFT (8-ECLIC_CTLBIT) // # number of low bits
 #define ECLIC_CTLBIT_LOW   ((1<<(ECLIC_CTLBIT_SHIFT))-1)
 #define ECLIC_NB_SOURCES 87
-
+ 
+uint32_t underInterrupt=0;
 
 // Attribute [LEVEL1:LEVEL0][SHV] : 
 //      LEVEL: 
