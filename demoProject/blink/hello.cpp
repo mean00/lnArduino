@@ -27,6 +27,6 @@ void loop()
         vTaskDelay(500);
         digitalToggle(LED);
         onoff=!onoff;
-        Logger("*\n");
+      //  Logger("*\n");
     }
 }

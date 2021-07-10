@@ -70,6 +70,12 @@ static void waitCfg0Bit(int mask)
  * @param multiplier
  * @param predivider
  */
+
+static const int Multipliers[10]={
+    0,0,0,0, // 0 1 2 3
+    2,3,4,5,6,7 // 4 5 6 7 8 9
+};
+
 static void setPll(int multiplier, int predivider)
 {
     volatile uint32_t *control=&(arcu->CTL);
@@ -78,34 +84,16 @@ static void setPll(int multiplier, int predivider)
     
     uint32_t c0=*cfg0;
     
-    int pllMultiplier=multiplier;
+    int pllMultiplier=Multipliers[multiplier];
     
     SystemCoreClock=(CLOCK_XTAL_VALUE*multiplier*1000000)/predivider;
     
     
-    // Set PLL multiplier
-    pllMultiplier--;
-    c0&=~((0xf)<<18);
-    c0&=~((0x1)<<29);
-    c0|=(pllMultiplier&0x0f)<<18; // PLL Multiplier, ignore MSB
-    c0|=(((pllMultiplier&0x10))>>4)<<29;
+    // Set PLL multiplier    
+    c0&=~((0xf)<<18);    
+    c0|=((pllMultiplier)&0x0f)<<18; // PLL Multiplier, ignore MSB        
+    c0 |=LN_RCU_CFG0_PLLSEL;
     *cfg0=c0;
-    
-         
-    // Set PLL1 & PLL2
-    uint32_t c1=0;            
-    c1&=~LN_RCU_CFG1_PRED_CLOCKSEL; // 0-> XTAL is source for PREDV0
-    c1|=LN_RCU_CFG1_PREDV0_DIV(1); // divide by 2
-    c1|=LN_RCU_CFG1_PREDV1_DIV(1); // divide by 2
-    c1|=LN_RCU_CFG1_PLL1_MUL(15);  // multipy by 20
-    c1|=LN_RCU_CFG1_PLL2_MUL(15);  // multipy by 20
-    *cfg1=c1;
-                
-    // enable pll1 & pll2, wait for stabilization
-    *control |= LN_RCU_CTL_PLL1EN;
-  //  waitControlBit(LN_RCU_CTL_PLL1STB);
-    *control |= LN_RCU_CTL_PLL2EN;
-  //  waitControlBit(LN_RCU_CTL_PLL2STB);    
 }
 
 //
@@ -114,18 +102,14 @@ void lnInitSystemClock()
     volatile uint32_t *control=&(arcu->CTL);
     volatile uint32_t *cfg0=&(arcu->CFG0);
     
-    
-    {
-        // Start internal oscillator
-        arcu->INT=0;    // No interrupt        
-        *control=LN_RCU_CTL_IRC8MEN;     // Enable internal 8 Mhz oscillator
-        *cfg0=0;                         // select 8Mhz as source for sysclock
-        arcu->CFG1=0;   // PLL pre divider not set
-    }
+       
     {
         // start crystal...
         *control|=LN_RCU_CTL_HXTALEN;
         waitControlBit(LN_RCU_CTL_HXTASTB); // Wait Xtal stable
+    }
+     {
+        setPll(CLOCK_TARGET_SYSCLOCK/CLOCK_XTAL_VALUE,CLOCK_TARGET_PREDIV); // 8*9/1=72 Mhz        
     }
     {
         // start PLL...
@@ -133,14 +117,9 @@ void lnInitSystemClock()
         waitControlBit(LN_RCU_CTL_PLLSTB); // Wait Xtal stable
     }
     
-    {
-        // Set HXTAL as source for PLL <<
-        *cfg0=LN_RCU_CFG0_PLLSEL;
-        setPll(CLOCK_TARGET_SYSCLOCK/CLOCK_XTAL_VALUE,CLOCK_TARGET_PREDIV); // 8*9/1=72 Mhz
-    }
+   
     // Setup AHB...
-    // AHB is Xtal:1, divider value=0
-    
+    // AHB is Xtal:1, divider value=0    
     // APB2=AHB/1
     uint32_t a=*cfg0;
     a&=~((0xf)<<4); // AHB PRESCALER CLEAR
@@ -151,16 +130,11 @@ void lnInitSystemClock()
     // APB1=AHB/2, divider value=4
     a&=~(7<<8);
     a|=4<<8;        // APB1 is AHB/2
-    *cfg0=a;
-      
+    *cfg0=a;          
     
-    // then switch to PLL as clock source
-    uint32_t src=*cfg0;
-    src&=~(LN_RCU_CFG0_SYSCLOCK_MASK); // clear source
-    src|=LN_RCU_CFG0_SYSCLOCK_PLL; // set PLL as source
-    *cfg0=src;
-    
-    waitCfg0Bit(LN_RCU_CFG0_PLL_USED);
-    
+    // now switch system clock to pll
+    a&=~(LN_RCU_CFG0_SYSCLOCK_MASK);
+    a|=LN_RCU_CFG0_SYSCLOCK_PLL;
+    *cfg0=a;       
 }
 // EOF

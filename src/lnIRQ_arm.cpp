@@ -34,12 +34,12 @@ volatile LN_NVIC *anvic=(LN_NVIC *)0xE000E100;
 static void unsupportedInterrupt()
 {
     curInterrupt=aSCB->ICSR;
-    curLnInterrupt=(LnIRQ)curInterrupt;
+    curLnInterrupt=(LnIRQ)(curInterrupt+LN_VECTOR_OFFSET);
     __asm__  ("bkpt 1");  
     xAssert(0);
 }
 #define LN_MSP_SIZE_UINT32  128
-static uint32_t msp[LN_MSP_SIZE_UINT32]  __attribute__((aligned(8)));  // 512 bytes for msp
+static uint32_t msp[LN_MSP_SIZE_UINT32]  __attribute__((aligned(8)));  // 128*4=512 bytes for msp
 
 void lnIrqSetPriority(LnIRQ irq, int prio )
 {
@@ -55,9 +55,6 @@ void lnIrqSetPriority(LnIRQ irq, int prio )
     }
     anvic->IP[irq]=p;   
 }
-
-
-
 
 /**
  * \fn lnIrqSysInit
@@ -75,11 +72,11 @@ void lnIrqSysInit()
     anvic->ICER.data[2]=0xffffffffUL;
     anvic->ICER.data[3]=0xffffffffUL; 
     
-    // Set priority to 15 for all interrupt
+    // Set priority to 14 for all interrupts
     for(int i=LN_IRQ_MEMMANAGE;i<LN_IRQ_ARM_LAST;i++)
         lnIrqSetPriority((LnIRQ)i,0xe);
     
-    // Hook in SVC
+    // Hook in SVC & friends
     interruptVector[0]=(uint32_t)&(msp[LN_MSP_SIZE_UINT32-1]);
     interruptVector[1]=(uint32_t)deadEnd;
     interruptVector[LN_VECTOR_OFFSET+LN_IRQ_PENDSV]=(uint32_t)xPortPendSVHandler;  // 16-2    14
