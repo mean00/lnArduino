@@ -3,7 +3,8 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/../private_include)
 ADD_LIBRARY(gd32_overlay STATIC  MapleFreeRTOS1000_pp.cpp systemAlloc.cpp lnDebug.cpp lnSerial.cpp lnGPIO.cpp 
                                  lnSPI.cpp lnSPI_dma.cpp 
                                  lnDma.cpp 
-                                 lnSystemInit.cpp lnRCU.cpp lnRCU_systemClock.cpp 
+                                 lnSystemInit.cpp lnRCU.cpp 
+                                 lnRCU_systemClock_${LN_EXT}.cpp 
                                  lnIRQ_${LN_EXT}.cpp 
                                  lnRunTime_${LN_EXT}.cpp
                                  lnI2C.cpp lnI2C_impl.cpp  
