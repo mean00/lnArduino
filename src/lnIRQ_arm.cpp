@@ -33,8 +33,8 @@ volatile LN_NVIC *anvic=(LN_NVIC *)0xE000E100;
  */
 static void unsupportedInterrupt()
 {
-    curInterrupt=aSCB->ICSR;
-    curLnInterrupt=(LnIRQ)(curInterrupt+LN_VECTOR_OFFSET);
+    curInterrupt=aSCB->ICSR &0xff;
+    curLnInterrupt=(LnIRQ)(curInterrupt-LN_VECTOR_OFFSET);
     __asm__  ("bkpt 1");  
     xAssert(0);
 }
@@ -43,7 +43,7 @@ static uint32_t msp[LN_MSP_SIZE_UINT32]  __attribute__((aligned(8)));  // 128*4=
 
 void lnIrqSetPriority(LnIRQ irq, int prio )
 {
-    int p=prio&0xf<<4;
+    int p=(prio&0xf)<<4;
     if(irq<LN_IRQ_WWDG) // Non IRQ
     {       
         // 2's complmenet
@@ -75,8 +75,8 @@ void lnIrqSysInit()
     anvic->ICER.data[3]=0xffffffffUL; 
     
     // Set priority to 14 for all interrupts
-    for(int i=LN_IRQ_MEMMANAGE;i<LN_IRQ_ARM_LAST;i++)
-        lnIrqSetPriority((LnIRQ)i,0xe);
+    for(int i=LN_IRQ_WWDG;i<LN_IRQ_ARM_LAST;i++)
+        lnIrqSetPriority((LnIRQ)i,6);
     
     // Hook in SVC & friends
     interruptVector[0]=(uint32_t)&(msp[LN_MSP_SIZE_UINT32-1]);
