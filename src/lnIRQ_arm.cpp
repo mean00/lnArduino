@@ -15,7 +15,7 @@
  */
 
 #define LN_NB_INTERRUPT 68
-#define LN_VECTOR_OFFSET 13
+#define LN_VECTOR_OFFSET 16
 
 LN_SCB_Registers *aSCB=(LN_SCB_Registers *)0xE000ED00;
 static uint32_t interruptVector[LN_NB_INTERRUPT]  __attribute__((aligned(256)));
@@ -77,14 +77,14 @@ void lnIrqSysInit()
     
     // Set priority to 15 for all interrupt
     for(int i=LN_IRQ_MEMMANAGE;i<LN_IRQ_ARM_LAST;i++)
-        lnIrqSetPriority((LnIRQ)i,0xf);
+        lnIrqSetPriority((LnIRQ)i,0xe);
     
     // Hook in SVC
     interruptVector[0]=(uint32_t)&(msp[LN_MSP_SIZE_UINT32-1]);
     interruptVector[1]=(uint32_t)deadEnd;
-    interruptVector[LN_VECTOR_OFFSET+LN_IRQ_PENDSV]=(uint32_t)xPortPendSVHandler;
-    interruptVector[LN_VECTOR_OFFSET+LN_IRQ_SVCALL]=(uint32_t)vPortSVCHandler;
-    interruptVector[LN_VECTOR_OFFSET+LN_IRQ_SYSTICK]=(uint32_t)xPortSysTickHandler;
+    interruptVector[LN_VECTOR_OFFSET+LN_IRQ_PENDSV]=(uint32_t)xPortPendSVHandler;  // 16-2    14
+    interruptVector[LN_VECTOR_OFFSET+LN_IRQ_SVCALL]=(uint32_t)vPortSVCHandler;     // 16-5    11
+    interruptVector[LN_VECTOR_OFFSET+LN_IRQ_SYSTICK]=(uint32_t)xPortSysTickHandler;// 16-1    15
     
     // Relocate vector to there    
     aSCB->VTOR = (uint32_t)interruptVector;
