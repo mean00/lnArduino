@@ -56,11 +56,19 @@ MESSAGE(STATUS "GD32 C   compiler ${CMAKE_C_COMPILER}")
 MESSAGE(STATUS "GD32 C++ compiler ${CMAKE_CXX_COMPILER}")
 
 SET(GD32_SPECS  "--specs=nano.specs")
-SET(GD32_MCU "  -mcpu=cortex-m3 -mthumb  ")
+
+IF( "${LN_MCU}" STREQUAL "M3")
+    SET(GD32_MCU "  -mcpu=cortex-m3 -mthumb  -march=armv7-m ")
+ELSE()
+    MESSAGE(FATAL_ERROR "Unsupported MCU : only M3 is supported (works for M0+) : ${LN_MCU}")
+ENDIF()
+
+
 SET(GD32_LD_EXTRA "  -Wl,--unresolved-symbols=report-all -Wl,--warn-common -Wl,--warn-section-align ")
 #
-SET(GD32_C_FLAGS  "${GD32_SPECS}  ${PLATFORM_C_FLAGS} -DLN_ARCH='ARM' -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -fno-common ${GD32_BOARD_FLAG}  ${GD32_MCU}" CACHE INTERNAL "")
+SET(GD32_C_FLAGS  "${GD32_SPECS}  ${PLATFORM_C_FLAGS} -DLN_ARCH=LN_ARCH_ARM  -Werror=return-type -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -fno-common ${GD32_BOARD_FLAG}  ${GD32_MCU}" CACHE INTERNAL "")
 SET(CMAKE_C_FLAGS "${GD32_C_FLAGS}")
+SET(CMAKE_ASM_FLAGS "${GD32_C_FLAGS}")
 SET(CMAKE_CXX_FLAGS "${GD32_C_FLAGS}  -fno-rtti -fno-exceptions" ) 
 #
 SET(GD32_LD_FLAGS "-nostdlib ${GD32_SPECS} ${GD32_MCU} ${GD32_LD_EXTRA}" CACHE INTERNAL "")
@@ -73,5 +81,5 @@ SET(CMAKE_EXECUTABLE_SUFFIX_CXX .elf)
 include_directories(${ARDUINO_GD32_FREERTOS}/legacy/boards/${GD32_BOARD}/)
 
 
-ADD_DEFINITIONS("-g3 -O3 -Os")
+ADD_DEFINITIONS("-g3 -O1 ")
 ENDIF()
