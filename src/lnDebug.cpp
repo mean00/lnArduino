@@ -6,7 +6,7 @@
 #include "lnArduino.h"
 #include "stdarg.h"
 #include "lnSerial.h"
-#define LOGGER_USE_DMA 1
+//#define LOGGER_USE_DMA 1
 lnSerial *serial0=NULL;
 
 static char buffer[1024];
