@@ -58,8 +58,8 @@ static void waitCfg0Bit(int mask)
 
 
 #define CLOCK_XTAL_VALUE      8 // 8mhz quartz
-#define CLOCK_TARGET_SYSCLOCK 108 // 108 Mhz
-#define CLOCK_TARGET_PREDIV   2
+#define CLOCK_TARGET_SYSCLOCK 72 // 108 Mhz
+#define CLOCK_TARGET_PREDIV   1
 
 //{CTL = 0x38683, CFG0 = 0x400, CIR = 0x0, APB2RSTR = 0x0, APB1RSTR = 0x0, AHBENR = 0x14, APB2ENR = 0x0, APB1ENR = 0x0, BDCR = 0x18, CSR = 0x1c000000}
 //{CTL = 0x38683, CFG0 = 0x1d0400, CIR = 0x0, APB2RSTR = 0x0, APB1RSTR = 0x0, AHBENR = 0x14, APB2ENR = 0x0, APB1ENR = 0x0, BDCR = 0x18, CSR = 0x1c000000}
@@ -136,7 +136,7 @@ void lnInitSystemClock()
     {
         // Set HXTAL as source for PLL <<
         *cfg0=LN_RCU_CFG0_PLLSEL;
-        setPll(9,1); // 8*9/1=72 Mhz
+        setPll(CLOCK_TARGET_SYSCLOCK/CLOCK_XTAL_VALUE,CLOCK_TARGET_PREDIV); // 8*9/1=72 Mhz
     }
     // Setup AHB...
     // AHB is Xtal:1, divider value=0
