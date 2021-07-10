@@ -90,6 +90,7 @@ enum LnIRQ
     LN_IRQ_DMA1_Channel2       ,   // 58 
     LN_IRQ_DMA1_Channel3    ,  //  59 +13 =72
     LN_IRQ_DMA1_Channel4    ,
+    LN_IRQ_ARM_LAST
 
 };
 

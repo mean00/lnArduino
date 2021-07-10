@@ -5,19 +5,16 @@
 #pragma once
 #include "lnArduino.h"
 
-#if 0
-#if LN_ARCH == RISCV
+
+
+#if LN_ARCH == LN_ARCH_RISCV
     #include "lnIRQ_riscv.h"
 #else
-    #if LN_ARCH == ARM
+    #if LN_ARCH == LN_ARCH_ARM
         #include "lnIRQ_arm.h"
     #else
         #error UNSUPPORTED ARCH
     #endif
-#endif
-#else
-
- #include "lnIRQ_arm.h"
 #endif
 
 
