@@ -59,7 +59,7 @@ SET(GD32_SPECS  "--specs=nano.specs")
 SET(GD32_MCU "  -mcpu=cortex-m3 -mthumb  ")
 SET(GD32_LD_EXTRA "  -Wl,--unresolved-symbols=report-all -Wl,--warn-common -Wl,--warn-section-align ")
 #
-SET(GD32_C_FLAGS  "${GD32_SPECS}  ${PLATFORM_C_FLAGS} -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -fno-common ${GD32_BOARD_FLAG}  ${GD32_MCU}" CACHE INTERNAL "")
+SET(GD32_C_FLAGS  "${GD32_SPECS}  ${PLATFORM_C_FLAGS} -DLN_ARCH='ARM' -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -fno-common ${GD32_BOARD_FLAG}  ${GD32_MCU}" CACHE INTERNAL "")
 SET(CMAKE_C_FLAGS "${GD32_C_FLAGS}")
 SET(CMAKE_CXX_FLAGS "${GD32_C_FLAGS}  -fno-rtti -fno-exceptions" ) 
 #

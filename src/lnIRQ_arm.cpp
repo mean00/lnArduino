@@ -8,21 +8,41 @@
 #include "lnIRQ.h"
 #include "lnIRQ_arm_priv.h"
 #include "lnSCB_arm_priv.h"
+#include "lnNVIC_arm_priv.h"
+#include "lnIRQ_arm.h"
 /**
  * 
  */
 
 #define LN_NB_INTERRUPT 68
+#define LN_VECTOR_OFFSET 13
+
 LN_SCB_Registers *aSCB=(LN_SCB_Registers *)0xE000ED00;
 static uint32_t interruptVector[LN_NB_INTERRUPT]  __attribute__((aligned(256)));
 
 extern "C" void xPortPendSVHandler();
 extern "C" void xPortSysTickHandler();
+extern "C" void vPortSVCHandler();
 
+static  volatile uint32_t curInterrupt;
+static  volatile LnIRQ   curLnInterrupt;
+
+volatile LN_NVIC *anvic=(LN_NVIC *)0xE000E100;
+/**
+ * \fn unsupportedInterrupt
+ */
 static void unsupportedInterrupt()
 {
+    curInterrupt=aSCB->ICSR;
+    curLnInterrupt=(LnIRQ)curInterrupt;
+    __asm__  ("bkpt 1");  
     xAssert(0);
 }
+#define LN_MSP_SIZE_UINT32  128
+static uint32_t msp[LN_MSP_SIZE_UINT32]  __attribute__((aligned(8)));  // 512 bytes for msp
+/**
+ * \fn lnIrqSysInit
+ */
 void lnIrqSysInit()
 {
     //
@@ -30,9 +50,18 @@ void lnIrqSysInit()
     for(int i=0;i<LN_NB_INTERRUPT;i++)
         interruptVector[i]=unsupported;
     
+    // by default disable everything
+    anvic->ICER.data[0]=0xffffffffUL;
+    anvic->ICER.data[1]=0xffffffffUL;
+    anvic->ICER.data[2]=0xffffffffUL;
+    anvic->ICER.data[3]=0xffffffffUL; 
+    
     // Hook in SVC
-    interruptVector[14]=(uint32_t)xPortPendSVHandler;
-    interruptVector[15]=(uint32_t)xPortSysTickHandler;
+    interruptVector[0]=(uint32_t)&(msp[LN_MSP_SIZE_UINT32-1]);
+    interruptVector[1]=(uint32_t)deadEnd;
+    interruptVector[LN_VECTOR_OFFSET+LN_IRQ_PENDSV]=(uint32_t)xPortPendSVHandler;
+    interruptVector[LN_VECTOR_OFFSET+LN_IRQ_SVCALL]=(uint32_t)vPortSVCHandler;
+    interruptVector[LN_VECTOR_OFFSET+LN_IRQ_SYSTICK]=(uint32_t)xPortSysTickHandler;
     
     // Hook basic interrupts
     
@@ -43,27 +72,22 @@ void lnIrqSysInit()
     return;
 }
 
-void _enableDisable(bool enableDisable, const LnIRQ &irq)
+void _enableDisable(bool enableDisable, const LnIRQ &zirq)
 {
-  
-}
-/**
- * 
- * @param irq
- */
-extern "C" void lnEnableInterruptDirect(int irq)
-{   
+    int irq=(int)zirq;
     
+    xAssert(irq>0) ;
+    
+    int offset=irq/32;
+    int bit=irq&31;
+    if(enableDisable)
+    {
+        anvic->ISER.data[offset]=1<<bit;
+    }else
+    {
+        anvic->ICER.data[offset]=1<<bit;
+    }
 }
-/**
- * 
- * @param irq
- */
-extern "C" void lnDisableInterruptDirect(int irq)
-{   
-   
-}
-
 /**
  * 
  * @param per
@@ -117,6 +141,7 @@ I2C_IRQ(1)
 
 extern "C" void deadEnd(int code)
 {
+    __asm__  ("bkpt 1");  
     // No interrrupt
     ENTER_CRITICAL();
     while(1)
