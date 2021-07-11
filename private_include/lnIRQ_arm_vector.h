@@ -1,3 +1,7 @@
+/*
+ *  (C) 2021 MEAN00 fixounet@free.fr
+ *  See license file
+ */
 #pragma once
 
 #define VEC(x) ((uint32_t)x)
@@ -76,7 +80,7 @@ VEC(DMA1_Channel0_IRQHandler), /*LN_IRQ_DMA1_Channel0       !< DMA1 channel0 glo
 VEC(DMA1_Channel1_IRQHandler), /*LN_IRQ_DMA1_Channel1       !< DMA1 channel1 global interrupt                           */
 VEC(DMA1_Channel2_IRQHandler), /*LN_IRQ_DMA1_Channel2       !< DMA1 channel2 global interrupt                           */
 VEC(DMA1_Channel3_IRQHandler), /*LN_IRQ_DMA1_Channel3       !< DMA1 channel3 global interrupt                           */
-VEC(DMA1_Channel4_IRQHandler), /*LN_IRQ_DMA1_Channel4       !< DMA1 channel3 global interrupt                           */
+VEC(DMA1_Channel4_IRQHandler), /*LN_IRQ_DMA1_Channel4       !< DMA1 channel4 global interrupt                           */
 VEC(unsupported), /*LN_IRQ_CAN1_TX             !< CAN1 TX interrupt                                        */
 VEC(unsupported), /*LN_IRQ_CAN1_RX0            !< CAN1 RX0 interrupt                                       */
 VEC(unsupported), /*LN_IRQ_CAN1_RX1            !< CAN1 RX1 interrupt                                       */
