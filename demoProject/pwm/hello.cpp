@@ -1,7 +1,13 @@
 #include "lnArduino.h"
 #include "lnTimer.h"
+
+#ifdef __arm__ 
+#define LED PC13
+#else
 #define LED PA2
-#define PWM PB9
+#endif
+
+#define PWM_PIN PB9
 #define TIMER 3
 #define CHANNEL 3
 
@@ -22,21 +28,24 @@ void loop()
     digitalWrite(LED,true);
     int roundup=0;
     
-    pinMode(PWM,lnALTERNATE_PP);    
-    lnTimer timer(PWM);
+    lnPinMode(PWM_PIN,lnALTERNATE_PP);    
+    lnTimer timer(PWM_PIN);
     
-    
+    Logger("PWM on pin %d\n", PWM_PIN );
     int ratio=1024;
     int step=128;
     
-    
+#if 0    
     while(1)
     {
     
         timer.singleShot(1,false);
+        digitalToggle(LED);
         xDelay(1000);
     }
-#if 0        
+#endif
+#if 1
+    Logger("Shifting frequency\n");
     timer.setTimerFrequency(50*1000);
     timer.setPwmMode(ratio);
     timer.enable();
