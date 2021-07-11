@@ -154,6 +154,10 @@ extern "C"
   extern   void EXTI5_9_IRQHandler();
   extern   void EXTI10_15_IRQHandler();
 }
+/**
+ * 
+ * @param code
+ */
 extern "C" void deadEnd(int code)
 {
     __asm__  ("bkpt 1");  
