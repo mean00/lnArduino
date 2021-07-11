@@ -53,10 +53,10 @@ VEC(unsupported), /*LN_IRQ_TIMER0_Channel      !< 40 TIMER0 channel capture comp
 VEC(unsupported), /*LN_IRQ_TIMER1              !< TIMER1 interrupt                                         */
 VEC(unsupported), /*LN_IRQ_TIMER2              !< TIMER2 interrupt                                         */
 VEC(unsupported), /*LN_IRQ_TIMER3              !< TIMER3 interrupts                                        */
-VEC(unsupported), /*LN_IRQ_I2C0_EV             !< I2C0 event interrupt                                     */
-VEC(unsupported), /*LN_IRQ_I2C0_ER             !< I2C0 error interrupt                                     */
-VEC(unsupported), /*LN_IRQ_I2C1_EV             !< I2C1 event interrupt                                     */
-VEC(unsupported), /*LN_IRQ_I2C1_ER             !< I2C1 error interrupt                                     */
+VEC(I2C0_EV_IRQHandler), /*LN_IRQ_I2C0_EV             !< I2C0 event interrupt                                     */
+VEC(I2C0_ERR_IRQHandler), /*LN_IRQ_I2C0_ER             !< I2C0 error interrupt                                     */
+VEC(I2C1_EV_IRQHandler), /*LN_IRQ_I2C1_EV             !< I2C1 event interrupt                                     */
+VEC(I2C1_ERR_IRQHandler), /*LN_IRQ_I2C1_ER             !< I2C1 error interrupt                                     */
 VEC(unsupported), /*LN_IRQ_SPI0                !< SPI0 interrupt                                           */
 VEC(unsupported), /*LN_IRQ_SPI1                !< SPI1 interrupt                                           */
 VEC(USART0_IRQHandler), /*LN_IRQ_USART0              !< 50 USART0 interrupt                                         */
