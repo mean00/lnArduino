@@ -55,43 +55,15 @@ void lnIrqSetPriority(LnIRQ irq, int prio )
     }
     anvic->IP[irq]=p;   
 }
+
+typedef void LnInterruptFunction(void);
+
 extern "C" void USART0_IRQHandler ();
 extern "C" void USART1_IRQHandler ();
 
-/**
- * \fn lnIrqSysInit
- */
-void lnIrqSysInit()
+void lnSetIrqHandler(LnIRQ irq, LnInterruptFunction *func)
 {
-    //
-    uint32_t unsupported=(uint32_t )unsupportedInterrupt;
-    for(int i=0;i<LN_NB_INTERRUPT;i++)
-        interruptVector[i]=unsupported;
-    
-    // by default disable everything
-    anvic->ICER.data[0]=0xffffffffUL;
-    anvic->ICER.data[1]=0xffffffffUL;
-    anvic->ICER.data[2]=0xffffffffUL;
-    anvic->ICER.data[3]=0xffffffffUL; 
-    
-    // Set priority to 14 for all interrupts
-    for(int i=LN_IRQ_WWDG;i<LN_IRQ_ARM_LAST;i++)
-        lnIrqSetPriority((LnIRQ)i,6);
-    
-    // Hook in SVC & friends
-    interruptVector[0]=(uint32_t)&(msp[LN_MSP_SIZE_UINT32-1]);
-    interruptVector[1]=(uint32_t)deadEnd;
-    interruptVector[LN_VECTOR_OFFSET+LN_IRQ_PENDSV]=(uint32_t)xPortPendSVHandler;  // 16-2    14
-    interruptVector[LN_VECTOR_OFFSET+LN_IRQ_SVCALL]=(uint32_t)vPortSVCHandler;     // 16-5    11
-    interruptVector[LN_VECTOR_OFFSET+LN_IRQ_SYSTICK]=(uint32_t)xPortSysTickHandler;// 16-1    15
-    
-    interruptVector[LN_VECTOR_OFFSET+LN_IRQ_USART0]=(uint32_t)USART0_IRQHandler;// 16-1    15
-    interruptVector[LN_VECTOR_OFFSET+LN_IRQ_USART1]=(uint32_t)USART1_IRQHandler;
-    
-    // Relocate vector to there    
-    aSCB->VTOR = (uint32_t)interruptVector;
-    __asm__ __volatile__("dsb sy") ;
-    return;
+     interruptVector[LN_VECTOR_OFFSET+(int)irq]=(uint32_t)func;
 }
 
 void _enableDisable(bool enableDisable, const LnIRQ &zirq)
@@ -171,6 +143,65 @@ extern "C" void deadEnd(int code)
         // blink red light...
         
     }
-}        
+}       
+
+
+
+/**
+ * \fn lnIrqSysInit
+ */
+void lnIrqSysInit()
+{
+    //
+    uint32_t unsupported=(uint32_t )unsupportedInterrupt;
+    for(int i=0;i<LN_NB_INTERRUPT;i++)
+        interruptVector[i]=unsupported;
+    
+    // by default disable everything
+    anvic->ICER.data[0]=0xffffffffUL;
+    anvic->ICER.data[1]=0xffffffffUL;
+    anvic->ICER.data[2]=0xffffffffUL;
+    anvic->ICER.data[3]=0xffffffffUL; 
+    
+    // Set priority to 14 for all interrupts
+    for(int i=LN_IRQ_WWDG;i<LN_IRQ_ARM_LAST;i++)
+        lnIrqSetPriority((LnIRQ)i,6);
+    
+    // Hook in SVC & friends
+    interruptVector[0]=(uint32_t)&(msp[LN_MSP_SIZE_UINT32-1]);
+    interruptVector[1]=(uint32_t)deadEnd;
+    
+    lnSetIrqHandler(LN_IRQ_PENDSV,xPortPendSVHandler);
+    lnSetIrqHandler(LN_IRQ_SVCALL,vPortSVCHandler);
+    lnSetIrqHandler(LN_IRQ_SYSTICK,xPortSysTickHandler);
+    
+    lnSetIrqHandler(LN_IRQ_USART0,USART0_IRQHandler);
+    lnSetIrqHandler(LN_IRQ_USART1,USART1_IRQHandler);
+    
+#define SET_DMA(dma,chan)    lnSetIrqHandler(LN_IRQ_DMA##dma##_Channel##chan , DMA##dma##_Channel##chan##_IRQHandler)
+    
+    SET_DMA(0,0);
+    SET_DMA(0,1);
+    SET_DMA(0,2);
+    SET_DMA(0,3);
+    SET_DMA(0,4);
+    SET_DMA(0,5);
+    SET_DMA(0,6);
+    SET_DMA(1,0);
+    SET_DMA(1,1);
+    SET_DMA(1,2);
+    SET_DMA(1,3);
+    SET_DMA(1,4);
+
+
+    
+    // Relocate vector to there    
+    aSCB->VTOR = (uint32_t)interruptVector;
+    __asm__ __volatile__("dsb sy") ;
+    return;
+}
+
+
 // EOF
+
 
