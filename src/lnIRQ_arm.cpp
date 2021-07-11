@@ -192,8 +192,6 @@ void lnIrqSysInit()
     SET_DMA(1,2);
     SET_DMA(1,3);
     SET_DMA(1,4);
-
-
     
     // Relocate vector to there    
     aSCB->VTOR = (uint32_t)interruptVector;
