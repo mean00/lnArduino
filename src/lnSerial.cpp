@@ -20,14 +20,15 @@ struct UsartMapping
     uint32_t dmaEngine;
     int      dmaTxChannel;
     LnIRQ    irq;
+    lnPin    tx;
+    lnPin    rx; 
+    Peripherals periph;
 };
-static const UsartMapping usartMapping[5]=
+static const UsartMapping usartMapping[3]=
 {
-    {LN_USART0_ADR, 0,3,LN_IRQ_USART0},
-    {LN_USART1_ADR, 0,6,LN_IRQ_USART1},
-    {LN_USART2_ADR, 0,1,LN_IRQ_USART2},
-    {LN_USART3_ADR, 1,4,LN_IRQ_UART3},
-    {LN_USART4_ADR, 0,7,LN_IRQ_UART4},
+    {LN_USART0_ADR, 0,3,LN_IRQ_USART0,PA9,PA10,pUART0},
+    {LN_USART1_ADR, 0,6,LN_IRQ_USART1,PA2,PA3,pUART1},
+    {LN_USART2_ADR, 0,1,LN_IRQ_USART2,PB10,PB11,pUART2},
 };
 /**
  * 
@@ -76,12 +77,15 @@ bool lnSerial::setSpeed(int speed)
 bool lnSerial::init()
 {
     LN_USART_Registers *d=(LN_USART_Registers *)_adr;
+    const UsartMapping *e=usartMapping+_instance;
     switch(_instance)
     {
         case 0:
-            lnPeripherals::enable(pUART0);
-            lnPinMode(PA9,lnALTERNATE_PP);
-            lnPinMode(PA10,lnFLOATING);
+        case 1:
+        case 2:
+            lnPinMode(e->tx,lnALTERNATE_PP);
+            lnPinMode(e->rx,lnFLOATING);
+            lnPeripherals::enable(e->periph);            
             break;
         default:
             xAssert(0);
@@ -149,10 +153,10 @@ bool lnSerial::transmit(int size,uint8_t *buffer)
     _cur=buffer+1;
     // Clear TC
     d->STAT&=~(LN_USART_STAT_TC);
-    // enable TB interrupt    
-    enableTx(txInterrupt);
     // send 1st byte
     d->DATA=(uint32_t )buffer[0];
+    // enable TB interrupt    
+    enableTx(txInterrupt);    
     EXIT_CRITICAL();
     _txDone.take();    
     _mutex.unlock();
@@ -210,21 +214,25 @@ bool lnSerial::dmaTransmit(int size,uint8_t *buffer)
     _mutex.unlock();
     return true;
 }
+ 
 /**
  * 
  */
+volatile int serialRound=0;
 void lnSerial::_interrupt(void)
 {
+    serialRound++;
     LN_USART_Registers *d=(LN_USART_Registers *)_adr;
+    volatile int stat=d->STAT;
+    volatile int ctl0=d->CTL0;
     switch(_txState)
     {
         case txTransmitting:
-             xAssert(d->STAT & LN_USART_STAT_TBE) ;
+             xAssert(stat & LN_USART_STAT_TBE) ;
              d->DATA=(uint32_t )*_cur;
             _cur++;
             if(_cur==_tail)
-            {
-                
+            {                
                 d->CTL0|=LN_USART_CTL0_TCIE;
                 d->CTL0&=~(LN_USART_CTL0_TBIE ) ; // only let the Transmission complete bit
                 _txState=txLast;              
@@ -232,7 +240,7 @@ void lnSerial::_interrupt(void)
             return;
             break;
         case txLast:
-             xAssert(d->STAT & LN_USART_STAT_TC) ;
+             xAssert(stat & LN_USART_STAT_TC) ;
              d->CTL0&=~( LN_USART_CTL0_TBIE +LN_USART_CTL0_TCIE);
              d->STAT&=~(LN_USART_STAT_TC);
             _txState=txIdle;
