@@ -141,7 +141,7 @@ int lnRotary::process()
  {
     current=this;
     _count=0;    
-    _event=NONE;
+    _event=EVENT_NONE;
     _down=0;
     _lastRead=0;    
     _pinA=pinA;

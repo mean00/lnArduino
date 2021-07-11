@@ -4,20 +4,12 @@
 #pragma once
 /**
  */
-enum WavDirection
-{
-  WavNone=0,
-  WavLeft,
-  WavRight
-};
-/**
- */
 class lnRotary
 {
 public:
   enum EVENTS
   {
-    NONE=0,
+    EVENT_NONE=0,
     SHORT_PRESS=1,
     LONG_PRESS=2,
     ROTARY_CHANGE=4
