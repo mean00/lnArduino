@@ -81,7 +81,9 @@ static void setPll(int multiplier, int predivider)
     int pllMultiplier=multiplier;
     
     SystemCoreClock=(CLOCK_XTAL_VALUE*multiplier*1000000)/predivider;
-    
+    _rcuClockApb1=SystemCoreClock/2;
+    _rcuClockApb2=SystemCoreClock;
+
     
     // Set PLL multiplier
     pllMultiplier--;
