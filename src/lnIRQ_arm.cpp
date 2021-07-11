@@ -10,6 +10,7 @@
 #include "lnSCB_arm_priv.h"
 #include "lnNVIC_arm_priv.h"
 #include "lnIRQ_arm.h"
+
 /**
  * 
  */
@@ -28,6 +29,11 @@ static  volatile uint32_t curInterrupt;
 static  volatile LnIRQ   curLnInterrupt;
 
 volatile LN_NVIC *anvic=(LN_NVIC *)0xE000E100;
+
+#define LN_MSP_SIZE_UINT32  128
+static uint32_t msp[LN_MSP_SIZE_UINT32]  __attribute__((aligned(8)));  // 128*4=512 bytes for msp
+
+
 /**
  * \fn unsupportedInterrupt
  */
@@ -38,9 +44,11 @@ static void unsupportedInterrupt()
     __asm__  ("bkpt 1");  
     xAssert(0);
 }
-#define LN_MSP_SIZE_UINT32  128
-static uint32_t msp[LN_MSP_SIZE_UINT32]  __attribute__((aligned(8)));  // 128*4=512 bytes for msp
-
+/**
+ * 
+ * @param irq
+ * @param prio
+ */
 void lnIrqSetPriority(LnIRQ irq, int prio )
 {
     int p=(prio&0xf)<<4;
@@ -56,16 +64,12 @@ void lnIrqSetPriority(LnIRQ irq, int prio )
     anvic->IP[irq]=p;   
 }
 
-typedef void LnInterruptFunction(void);
 
-extern "C" void USART0_IRQHandler ();
-extern "C" void USART1_IRQHandler ();
-
-void lnSetIrqHandler(LnIRQ irq, LnInterruptFunction *func)
-{
-     interruptVector[LN_VECTOR_OFFSET+(int)irq]=(uint32_t)func;
-}
-
+/**
+ * 
+ * @param enableDisable
+ * @param zirq
+ */
 void _enableDisable(bool enableDisable, const LnIRQ &zirq)
 {
     int irq=(int)zirq;
@@ -98,6 +102,13 @@ void lnDisableInterrupt(const LnIRQ &irq)
 {
      _enableDisable(false,irq);
 }
+//
+// Forward declaration of interrupt handlers
+//
+
+extern "C" void USART0_IRQHandler ();
+extern "C" void USART1_IRQHandler ();
+extern "C" void USART2_IRQHandler ();
 
 
 #define DMA_IRQ(d,c) extern "C" void DMA##d##_Channel##c##_IRQHandler(void) { dmaIrqHandler(d,c);}
@@ -133,6 +144,16 @@ void i2cIrqHandler(int instance, bool error);
 I2C_IRQ(0)
 I2C_IRQ(1)
 
+extern "C"
+{
+  extern   void EXTI0_IRQHandler()   ;
+  extern   void EXTI1_IRQHandler() ;
+  extern   void EXTI2_IRQHandler() ;
+  extern   void EXTI3_IRQHandler() ;
+  extern   void EXTI4_IRQHandler() ;
+  extern   void EXTI5_9_IRQHandler();
+  extern   void EXTI10_15_IRQHandler();
+}
 extern "C" void deadEnd(int code)
 {
     __asm__  ("bkpt 1");  
@@ -145,18 +166,14 @@ extern "C" void deadEnd(int code)
     }
 }       
 
-
+#define unsupported unsupportedInterrupt
+#include "lnIRQ_arm_vector.h"
 
 /**
  * \fn lnIrqSysInit
  */
 void lnIrqSysInit()
 {
-    //
-    uint32_t unsupported=(uint32_t )unsupportedInterrupt;
-    for(int i=0;i<LN_NB_INTERRUPT;i++)
-        interruptVector[i]=unsupported;
-    
     // by default disable everything
     anvic->ICER.data[0]=0xffffffffUL;
     anvic->ICER.data[1]=0xffffffffUL;
@@ -167,39 +184,9 @@ void lnIrqSysInit()
     for(int i=LN_IRQ_WWDG;i<LN_IRQ_ARM_LAST;i++)
         lnIrqSetPriority((LnIRQ)i,6);
     
-    // Hook in SVC & friends
-    interruptVector[0]=(uint32_t)&(msp[LN_MSP_SIZE_UINT32-1]);
-    interruptVector[1]=(uint32_t)deadEnd;
-    
-    lnSetIrqHandler(LN_IRQ_PENDSV,xPortPendSVHandler);
-    lnSetIrqHandler(LN_IRQ_SVCALL,vPortSVCHandler);
-    lnSetIrqHandler(LN_IRQ_SYSTICK,xPortSysTickHandler);
-    
-    lnSetIrqHandler(LN_IRQ_USART0,USART0_IRQHandler);
-    lnSetIrqHandler(LN_IRQ_USART1,USART1_IRQHandler);
-    
-#define SET_DMA(dma,chan)    lnSetIrqHandler(LN_IRQ_DMA##dma##_Channel##chan , DMA##dma##_Channel##chan##_IRQHandler)
-    
-    SET_DMA(0,0);
-    SET_DMA(0,1);
-    SET_DMA(0,2);
-    SET_DMA(0,3);
-    SET_DMA(0,4);
-    SET_DMA(0,5);
-    SET_DMA(0,6);
-    SET_DMA(1,0);
-    SET_DMA(1,1);
-    SET_DMA(1,2);
-    SET_DMA(1,3);
-    SET_DMA(1,4);
-    
     // Relocate vector to there    
-    aSCB->VTOR = (uint32_t)interruptVector;
+    aSCB->VTOR = (uint32_t)LnVectorTable;
     __asm__ __volatile__("dsb sy") ;
     return;
 }
-
-
 // EOF
-
-
