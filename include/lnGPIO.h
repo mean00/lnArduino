@@ -20,11 +20,11 @@ enum
  */
 enum GpioMode
 {
-    lnFLOATING,
-    lnINPUT_PULLUP,
-    lnINPUT_PULLDOWN,
-    lnOUTPUT,
-    lnOUTPUT_OPEN_DRAIN,
+    lnFLOATING=0,
+    lnINPUT_PULLUP=2,
+    lnINPUT_PULLDOWN=3,
+    lnOUTPUT=1,
+    lnOUTPUT_OPEN_DRAIN=4,
     lnALTERNATE_PP,
     lnALTERNATE_OD,
     lnPWM,

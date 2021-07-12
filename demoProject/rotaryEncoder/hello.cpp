@@ -2,15 +2,7 @@
 #include "lnExti.h"
 #include "RotaryEncoder.h"
 
-
-#ifdef __arm__ 
-    #define LED PC13
-#else
-    #define LED PA2
-#endif
-
-lnPin pin=-1;
-xBinarySemaphore *sem;
+#define LED LN_SYSTEM_LED
 
 
 void setup()
@@ -27,6 +19,7 @@ void loop()
     rotary=new lnRotary(PB5,PB6,PB7);
     rotary->start();
     int val=0;
+    Logger("Starting Rotary Encoder...\n");
     while(1)
     {
         lnRotary::EVENTS  ev=rotary->waitForEvent(2000);

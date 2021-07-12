@@ -147,9 +147,9 @@ int lnRotary::process()
     _pinA=pinA;
     _pinB=pinB;
     _pinPush=pinPush;
-    pinMode(_pinA,lnINPUT_PULLUP); 
-    pinMode(_pinB,lnINPUT_PULLUP); 
-    pinMode(_pinPush,lnINPUT_PULLUP);
+    lnPinMode(_pinA,lnINPUT_PULLUP); 
+    lnPinMode(_pinB,lnINPUT_PULLUP); 
+    lnPinMode(_pinPush,lnINPUT_PULLUP);
     _state = R_START;
     
  }
@@ -160,9 +160,9 @@ int lnRotary::process()
  void        lnRotary::start()
  {
     noInterrupts(); 
-    lnExtiAttachInterrupt(_pinA, LN_EDGE_BOTH,myInterrupt,this);
-    lnExtiAttachInterrupt(_pinB,LN_EDGE_BOTH, myInterrupt,this);
-    lnExtiAttachInterrupt(_pinPush,LN_EDGE_BOTH,myPushInterrupt, this );
+    lnExtiAttachInterrupt(_pinA,    LN_EDGE_BOTH,myInterrupt,this);
+    lnExtiAttachInterrupt(_pinB,    LN_EDGE_BOTH, myInterrupt,this);
+    lnExtiAttachInterrupt(_pinPush, LN_EDGE_BOTH,myPushInterrupt, this );
     lnExtiEnableInterrupt(_pinA);
     lnExtiEnableInterrupt(_pinB);
     lnExtiEnableInterrupt(_pinPush);

@@ -74,3 +74,6 @@ LN_IRQ_LAST=LN_IRQ_USBFS
 
 extern uint32_t underInterrupt;
 void lnSetInterruptLevelDirect(int intr, int prio, bool vectored);
+
+
+#define LN_SYSTEM_LED PA2
