@@ -57,7 +57,7 @@ extern "C" void lnSystemTimerClearSwInterrupt()
  * 
  * @return 
  */
-extern "C" uint64_t lnGetUs()
+uint64_t lnGetUs64()
 {    
     uint32_t high;
     uint32_t low;
@@ -78,5 +78,25 @@ extern "C" uint64_t lnGetUs()
     tick=(tick*16)/tickPerUs16;
     return tick;    
 }
+uint32_t lnGetUs()
+{    
+    uint32_t high;
+    uint32_t low;
 
+
+    while(1)
+    {
+        high= lnSysTimer->MTIME_HI;
+        low=  lnSysTimer->MTIME_LO;
+        uint32_t high2=lnSysTimer->MTIME_HI;
+        if(high==high2)
+        {
+            break;
+        }
+    }
+    uint64_t tick=(((uint64_t)high)<<32)+low;
+    // convert tick to us
+    tick=(tick*16)/tickPerUs16;
+    return tick;    
+}
 // EOF
