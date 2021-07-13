@@ -38,7 +38,8 @@ extern "C"
 #include "lnPeripherals.h"
 
 #include "lnPrintf.h"
+#include "lnSystemTime.h"
 
-#define byte uint8_t 
+
 
 

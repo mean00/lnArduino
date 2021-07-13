@@ -8,7 +8,7 @@
 extern "C" uint32_t xTickCount;
 extern "C" uint64_t get_timer_value();
 extern "C" uint32_t SystemCoreClock ;
-extern "C" uint64_t lnGetUs();
+
 
 void pinMode(uint8_t a, uint8_t b)
 {
@@ -60,15 +60,7 @@ void delay(int  dwMs)
  */
 void delayMicroseconds(int wait)
 {
-    uint64_t target=lnGetUs()+wait;
-    while(1)
-    {
-        uint64_t vw=lnGetUs();
-        if(vw>target) 
-            return;
-        __asm__("nop"::);
-    }
-    
+    lnDelayUs(wait);
 }
 
 void     noInterrupts()

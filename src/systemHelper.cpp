@@ -11,6 +11,7 @@ extern "C"
 }
 #include "systemHelper.h"
 
+#include "lnSystemTime.h"
 extern "C" void do_assert(const char *a);
 
 /**
@@ -84,6 +85,17 @@ namespace std
     }
 }
 
-
+void lnDelayUs(int wait)
+{
+    uint64_t target=lnGetUs()+wait;
+    while(1)
+    {
+        uint64_t vw=lnGetUs();
+        if(vw>target) 
+            return;
+        __asm__("nop"::);
+    }
+    
+}
 // EOF
 
