@@ -71,10 +71,19 @@ void loop()
     xDelay(50);
     digitalWrite(PINRST,HIGH);
     
-    gd32ST7735 *lcd=new gd32ST7735(SCREEN_WIDTH,SCREEN_HEIGHT,spi,PINDC,PINCS);
+    gd32ST7735 *lcd=new gd32ST7735(SCREEN_WIDTH,SCREEN_HEIGHT,spi,PINDC,PINCS,0,0);
     lcd->init();
     lcd->setRotation(1);
     lcd->fillScreen(0);
+#if 1
+    while(1)
+    {
+        lcd->fillScreen(0xff<<6);
+        xDelay(1000);
+        lcd->fillScreen(0);
+        xDelay(1000);
+    }
+#endif    
     
     lcd->drawRLEBitmap(PNP_width,PNP_height,0,0,0x1f<<6,0x1f<<11,PNP);
     
