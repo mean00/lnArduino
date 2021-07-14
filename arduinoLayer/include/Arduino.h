@@ -35,3 +35,5 @@ extern void     interrupts();
 #define HIGH 1
 #define boolean bool
 #define PROGMEM
+
+#define byte uint8_t
