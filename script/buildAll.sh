@@ -10,9 +10,10 @@ echo "********* FAIL ***********"
 echo "********* FAIL ***********"
 exit 4
 }
-
+export CUR=$PWD
 for i in `ls ../demoProject/`;
 do
+    cd $CUR
     echo "___________________________________"
     echo "$ARCH:$MCU => $i"
     echo "___________________________________"
