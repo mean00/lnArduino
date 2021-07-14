@@ -53,6 +53,10 @@ void setup()
     Logger("Should be %d x 1000 : %d->%d,delta=%d  \n",WAIT,usBefore,usAfter,(int)(usAfter-usBefore));
     
 }
+
+// M3 @ 112 Mhz Multiply =44, refresh=6 ms
+// M4 @ 112 Mhz Multiply =9, refresh=6 ms
+
 /**
  */
 volatile float fff=0;
