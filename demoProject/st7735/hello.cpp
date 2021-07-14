@@ -55,13 +55,14 @@ void setup()
 }
 /**
  */
+volatile float fff=0;
 void loop()
 {
     Logger("Entering main app...\n");
    
     hwlnSPIClass *spi=new hwlnSPIClass(0,-1);
     spi->begin();
-    lnSPISettings transaction(30*1000*1000, SPI_MSBFIRST, SPI_MODE0,-1);
+    lnSPISettings transaction(60*1000*1000, SPI_MSBFIRST, SPI_MODE0,-1);
     spi->beginTransaction(transaction);
     // Reset LCD
     pinMode(PINRST,OUTPUT);
@@ -75,6 +76,18 @@ void loop()
     lcd->init();
     lcd->setRotation(1);
     lcd->fillScreen(0);
+    
+    { // M3=~ 12, M4=~ 
+        int before=lnGetUs();
+        fff=3.14;
+        for(int i=0;i<100;i++)
+        {
+            fff=fff*fff;
+        }
+        int after=lnGetUs();
+        Logger("Multiply = %d \n",after-before);       
+        xDelay(1000);
+    }
 #if 1
     while(1)
     {
