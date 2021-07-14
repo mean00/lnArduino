@@ -74,9 +74,10 @@ static void waitCfg0Bit(int mask)
  * @param predivider
  */
 
-static const int Multipliers[10]={
-    0,0,0,0, // 0 1 2 3
-    2,3,4,5,6,7 // 4 5 6 7 8 9
+static const int Multipliers[]={
+    0,0,0,1,     // 0 1 2 3
+    2,3,4,5,6,7, // 4 5 6 7 8 9
+    8,9,10,11,12,13 // 10 11 12 13 14 15
 };
 
 static void setPll(int multiplier, int predivider)
