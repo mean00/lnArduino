@@ -43,7 +43,12 @@ set(CMAKE_CXX_COMPILER_WORKS    TRUE)
 #
 SET(GD32_BOARD       bluepill CACHE INTERNAL "")
 
-#
+# Speed
+
+IF(NOT DEFINED LN_MCU_SPEED)
+    SET(LN_MCU_SPEED 72000000)
+ENDIF()
+SET(LN_MCU_SPEED ${LN_MCU_SPEED} CACHE INTERNAL "")
 
 set(CMAKE_C_COMPILER   ${PLATFORM_TOOLCHAIN_PATH}/${PLATFORM_PREFIX}gcc${TOOLCHAIN_SUFFIX} CACHE PATH "" FORCE)
 set(CMAKE_ASM_COMPILER ${PLATFORM_TOOLCHAIN_PATH}/${PLATFORM_PREFIX}gcc${TOOLCHAIN_SUFFIX} CACHE PATH "" FORCE)
@@ -60,13 +65,18 @@ SET(GD32_SPECS  "--specs=nano.specs")
 IF( "${LN_MCU}" STREQUAL "M3")
     SET(GD32_MCU "  -mcpu=cortex-m3 -mthumb  -march=armv7-m ")
 ELSE()
-    MESSAGE(FATAL_ERROR "Unsupported MCU : only M3 is supported (works for M0+) : ${LN_MCU}")
+    IF( "${LN_MCU}" STREQUAL "M4")
+        SET(GD32_MCU "-mcpu=cortex-m4  -mfloat-abi=hard -mfpu=fpv4-sp-d16  -mthumb -DLN_USE_FPU=1")        
+     ELSE()
+         MESSAGE(FATAL_ERROR "Unsupported MCU : only M3 is supported (works for M0+) : ${LN_MCU}")
+     ENDIF()
 ENDIF()
 
+SET(G32_DEBUG_FLAGS "-g3 -O1 " CACHE INTERNAL "")
 
 SET(GD32_LD_EXTRA "  -Wl,--unresolved-symbols=report-all -Wl,--warn-common -Wl,--warn-section-align " CACHE INTERNAL "")
 #
-SET(GD32_C_FLAGS  "${GD32_SPECS}  ${PLATFORM_C_FLAGS} -DLN_ARCH=LN_ARCH_ARM  -Werror=return-type -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -fno-common ${GD32_BOARD_FLAG}  ${GD32_MCU}" CACHE INTERNAL "")
+SET(GD32_C_FLAGS  "${GD32_SPECS}  ${PLATFORM_C_FLAGS} ${G32_DEBUG_FLAGS} -DLN_ARCH=LN_ARCH_ARM  -Werror=return-type -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -fno-common ${GD32_BOARD_FLAG}  ${GD32_MCU}" CACHE INTERNAL "")
 SET(CMAKE_C_FLAGS "${GD32_C_FLAGS}" CACHE INTERNAL "")
 SET(CMAKE_ASM_FLAGS "${GD32_C_FLAGS}" CACHE INTERNAL "")
 SET(CMAKE_CXX_FLAGS "${GD32_C_FLAGS}  -fno-rtti -fno-exceptions" CACHE INTERNAL "") 
@@ -81,7 +91,10 @@ SET(CMAKE_EXECUTABLE_SUFFIX_CXX .elf CACHE INTERNAL "")
 include_directories(${ARDUINO_GD32_FREERTOS}/legacy/boards/${GD32_BOARD}/)
 
 
-ADD_DEFINITIONS("-g3 -O1 ")
 
+
+MESSAGE(STATUS "MCU Architecture ${LN_ARCH}")
+MESSAGE(STATUS "MCU Type         ${LN_MCU}")
+MESSAGE(STATUS "MCU Speed        ${LN_MCU_SPEED}")
 
 ENDIF(NOT DEFINED LN_EXT)

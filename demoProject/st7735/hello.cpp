@@ -80,7 +80,10 @@ void loop()
     {
         lcd->fillScreen(0xff<<6);
         xDelay(1000);
+        int before=lnGetUs();
         lcd->fillScreen(0);
+        int after=lnGetUs();
+        Logger("Refresh = %d \n",after-before);       
         xDelay(1000);
     }
 #endif    

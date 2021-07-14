@@ -60,9 +60,9 @@ static void waitCfg0Bit(int mask)
 }
 
 
-#define CLOCK_XTAL_VALUE      8 // 8mhz quartz
-#define CLOCK_TARGET_SYSCLOCK 72 // 108 Mhz
-#define CLOCK_TARGET_PREDIV   1
+#define CLOCK_XTAL_VALUE        8 // 8mhz quartz
+#define CLOCK_TARGET_SYSCLOCK   (LN_MCU_SPEED/(1000*1000))  // 108 Mhz
+#define CLOCK_TARGET_PREDIV     1
 
 //{CTL = 0x38683, CFG0 = 0x400, CIR = 0x0, APB2RSTR = 0x0, APB1RSTR = 0x0, AHBENR = 0x14, APB2ENR = 0x0, APB1ENR = 0x0, BDCR = 0x18, CSR = 0x1c000000}
 //{CTL = 0x38683, CFG0 = 0x1d0400, CIR = 0x0, APB2RSTR = 0x0, APB1RSTR = 0x0, AHBENR = 0x14, APB2ENR = 0x0, APB1ENR = 0x0, BDCR = 0x18, CSR = 0x1c000000}
