@@ -103,6 +103,15 @@ static void setPll(int multiplier, int predivider)
 //
 void lnInitSystemClock()
 {
+#ifdef LN_USE_FPU   
+     uint32_t    *cpacr=(uint32_t *) 0xE000ED88;
+     uint32_t v=cpacr[0];
+     v|=0xF<<20;
+     cpacr[0]=v;
+#endif
+
+
+    
     volatile uint32_t *control=&(arcu->CTL);
     volatile uint32_t *cfg0=&(arcu->CFG0);
     
