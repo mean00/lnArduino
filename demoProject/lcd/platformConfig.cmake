@@ -20,3 +20,4 @@ ELSE()
       SET(PLATFORM_TOOLCHAIN_PATH "/home/fx/Arduino_stm32/arm-gcc-2020q4/bin")
    ENDIF()
 ENDIF()
+
