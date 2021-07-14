@@ -1,11 +1,13 @@
 
 SET(AF_FOLDER  ${CMAKE_SOURCE_DIR}/Arduino_gd32_freeRTOS/)
-include(./mcuSelect.cmake)
+
+list(APPEND CMAKE_TRY_COMPILE_PLATFORM_VARIABLES LN_ARCH="ARM")
 SET(CMAKE_TOOLCHAIN_FILE ${AF_FOLDER}/lnArduino.cmake)
 cmake_minimum_required(VERSION 3.0)
 
-PROJECT(Hello_gd32_freetos C CXX ASM)
+PROJECT(Hello_gd32_freetos NONE) # the NONE is very important !
 
+enable_language(C CXX ASM) # this is important too!
 include_directories(${CMAKE_SOURCE_DIR})        
 add_subdirectory(${AF_FOLDER})
 

@@ -1,7 +1,9 @@
 
 SET(AF_FOLDER  ${CMAKE_SOURCE_DIR}/Arduino_gd32_freeRTOS/)
 
-SET(CMAKE_TOOLCHAIN_FILE ${AF_FOLDER}/ArduinoToolchainGd32.cmake)
+include(./mcuSelect.cmake)
+SET(CMAKE_TOOLCHAIN_FILE ${AF_FOLDER}/lnArduino.cmake)
+
 
 cmake_minimum_required(VERSION 3.0)
 

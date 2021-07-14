@@ -20,7 +20,7 @@
 #define PINDC PB0
 #define PINCS PB2
 #define PINRST PB1
-
+#define byte uint8_t
 /**
  * 
  */
