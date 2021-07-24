@@ -108,7 +108,16 @@ bool xBinarySemaphore::take(int timeoutMs)
  */
 xTask::xTask(const char *name,  int priority, int taskSize)
 {
-    BaseType_t er=xTaskCreate(xTask::Trampoline,name,taskSize, this,priority,&_taskHandle);
+    _priority=priority;
+    _taskSize=taskSize;
+    _name=name;
+}
+/**
+ * 
+ */
+void xTask::start()
+{
+    BaseType_t er=xTaskCreate(xTask::Trampoline,_name,_taskSize, this,_priority,&_taskHandle);
     xAssert(er==pdPASS);    
 }
 /**

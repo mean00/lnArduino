@@ -31,6 +31,7 @@ class xTask
 public:
                         xTask(const char *name,  int priority=3, int taskSize=100);
                 virtual ~xTask();
+                void    start();
                 virtual void run()=0; // Put your code here
                 static void Trampoline(void *param)
                 {
@@ -40,6 +41,9 @@ public:
 
 protected:
                 TaskHandle_t    _taskHandle;
+                const char      *_name;
+                int             _priority;
+                int             _taskSize;                
 };
 /**
  * 
