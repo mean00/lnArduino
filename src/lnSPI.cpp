@@ -459,6 +459,13 @@ void hwlnSPIClass::setSpeed(int speed)
     _internalSettings.speed=speed;
     setup();
 }
+
+int hwlnSPIClass::getPeripheralClock()
+{
+    Peripherals p=(Peripherals)(pSPI0+_instance);
+    return lnPeripherals::getClock(p);    
+}
+
 // EOF
 
 

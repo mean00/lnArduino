@@ -95,6 +95,8 @@ class hwlnSPIClass
     void waitForCompletion(); // wait for everything to be COMPLETELY done
     
     //
+    int getInstance() {return _instance;}
+    int getPeripheralClock();
     
     lnPin misoPin() const;
     lnPin mosiPin() const;
