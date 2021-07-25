@@ -10,7 +10,9 @@
 
 
 LN_FMC *aFMC=(LN_FMC *)LN_FMC_ADR;
-
+/**
+ * 
+ */
 class autoNoInterrupt
 {
 public:
@@ -24,17 +26,24 @@ public:
         }
 };
 
-
+/**
+ * \fn unlock
+ * \brief unlock the flash controller so we can write/erase
+ */
 static void unlock()
 {
     // is it busy  ?
-    xAssert(!(aFMC->STAT&LN_FMC_STAT_BUSY));
-    if(!(aFMC->CTL  & LN_FMC_CTL_LK)) return; // already unlocked
-    //
+    xAssert(!(aFMC->STAT&LN_FMC_STAT_BUSY));    // should NOT be !
+    if(!(aFMC->CTL  & LN_FMC_CTL_LK)) return;   // already unlocked ? nothing to do
+    // send unlock sequence
     aFMC->KEY=0x45670123;
     aFMC->KEY=0xCDEF89AB;
+    // verify it is unlocked
     xAssert(!(aFMC->CTL  & LN_FMC_CTL_LK));
 }
+/**
+ * \fn wait till the busy bit disdappear
+ */
 static void waitNotBusy()
 {
     // is it busy  ?
@@ -54,12 +63,14 @@ static void waitNotBusy()
 bool lnFMC::erase(const uint32_t startAddress, int sizeInKBytes)
 {
     uint32_t adr=startAddress;
-    // Check alignment
+    // Check we target an area within the flash (up to 256 kB)
     xAssert(adr>=0x800*0x10000);
     xAssert(adr<(0x800*0x10000+256*1024));
-    xAssert(!(adr & ((1<<10)-1))); // 1 kB aligned
+    // check the start address is 1 kB aligned
+    xAssert(!(adr & ((1<<10)-1))); 
     autoNoInterrupt noInt;
     unlock();
+    // Erase each page
     for(int i=0;i<sizeInKBytes;i++)
     {
         aFMC->CTL|=LN_FMC_CTL_PER;
@@ -86,7 +97,7 @@ bool lnFMC::write(const uint32_t startAddress, const uint8_t *data, int sizeInBy
     autoNoInterrupt noInt;
     unlock();
     
-    // if not aligned
+    // if not aligned at the beginning
     if(adr&1)
     {
         // it is the high byte of the PREVIOUS adr
@@ -102,7 +113,7 @@ bool lnFMC::write(const uint32_t startAddress, const uint8_t *data, int sizeInBy
         sizeInBytes--;
         data++;
     }
-    // do 16 bytes aligned write
+    // do N 16 bytes aligned write
     uint16_t  *adr16=(uint16_t *)adr;
     int nbWord=sizeInBytes/2;
     for(int i=0;i<nbWord;i++)
@@ -114,7 +125,7 @@ bool lnFMC::write(const uint32_t startAddress, const uint8_t *data, int sizeInBy
           adr16++;
           data+=2;
     }
-
+    // not aligned at the end ?
     if(sizeInBytes&1)
     {
         // it is the low byte of the NEXT adr
@@ -129,6 +140,4 @@ bool lnFMC::write(const uint32_t startAddress, const uint8_t *data, int sizeInBy
     }
     return true;
 }
-
-
 // EOF
