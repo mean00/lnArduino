@@ -1,7 +1,6 @@
 
 SET(AF_FOLDER  ${CMAKE_SOURCE_DIR}/Arduino_gd32_freeRTOS/)
-
-list(APPEND CMAKE_TRY_COMPILE_PLATFORM_VARIABLES LN_ARCH="ARM")
+include(./mcuSelect.cmake)
 SET(CMAKE_TOOLCHAIN_FILE ${AF_FOLDER}/lnArduino.cmake)
 cmake_minimum_required(VERSION 3.0)
 

@@ -37,6 +37,9 @@
 #define LN_ADC0_ADR      (0x40012400)
 #define LN_ADC1_ADR      (0x40012800)
 
+//
+#define LN_FMC_ADR      (0x40022000)
+
 
 //--------------------------------
 
