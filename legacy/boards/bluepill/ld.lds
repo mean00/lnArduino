@@ -22,7 +22,8 @@
 MEMORY
 {
   ram (rwx) : ORIGIN = 0x20000000, LENGTH = 20K
-  rom (rx)  : ORIGIN = 0x08000000, LENGTH = 128K
+  rom (rx)  : ORIGIN = 0x08000000, LENGTH = 128K-4K
+  e2prom (rx)  : ORIGIN = 0x08000000+124K, LENGTH = 4K
 }
 /**
     we allocate 4 kB at the end for the eeprom
@@ -39,7 +40,7 @@ REGION_ALIAS("REGION_TEXT", rom);
 REGION_ALIAS("REGION_DATA", ram);
 REGION_ALIAS("REGION_BSS", ram);
 REGION_ALIAS("REGION_RODATA", rom);
-REGION_ALIAS("REGION_EEPROM", rom);
+REGION_ALIAS("REGION_EEPROM", e2prom);
 
 OUTPUT_FORMAT ("elf32-littlearm", "elf32-bigarm", "elf32-littlearm")
 
