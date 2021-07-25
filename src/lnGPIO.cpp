@@ -27,16 +27,9 @@ void lnPinMode(const lnPin xpin, const GpioMode mode)
     const LN_PIN_MAPPING *lnPin=pinMappings+xpin;
     xAssert(lnPin->pin==xpin);
     int pin=xpin&0xf;
-    
+    int fullPin=pin;
     volatile uint32_t *CTL;
-    if(pin>7)
-    {
-        CTL=&(port->CTL1);
-        pin&=7;
-    }else
-    {
-        CTL=&(port->CTL0);
-    }
+   
     uint32_t value;
     switch(mode)
     {
@@ -45,11 +38,11 @@ void lnPinMode(const lnPin xpin, const GpioMode mode)
                                 value=LNGPIOSET(LN_CTL_MD_INPUT,LN_CTL_INPUT_ANALOG); break;    
         case lnFLOATING:        value=LNGPIOSET(LN_CTL_MD_INPUT,LN_CTL_INPUT_FLOATING); break;
         case lnINPUT_PULLUP:    
-                                port->OCTL|=1<<pin;
+                                port->BOP=1<<pin;
                                 value=LNGPIOSET(LN_CTL_MD_INPUT,LN_CTL_INPUT_PULLUPPULLDOWN); 
                                 break;
         case lnINPUT_PULLDOWN:  
-                                port->OCTL&=~(1<<pin);
+                                port->BOP=1<<(16+pin);
                                 value=LNGPIOSET(LN_CTL_MD_INPUT,LN_CTL_INPUT_PULLUPPULLDOWN); 
                                 break;
         
@@ -65,6 +58,14 @@ void lnPinMode(const lnPin xpin, const GpioMode mode)
         default:
             xAssert(0);
             break;
+    }
+    if(pin>7)
+    {
+        CTL=&(port->CTL1);
+        pin&=7;
+    }else
+    {
+        CTL=&(port->CTL0);
     }
     uint32_t ref=*CTL;
     ref&=~(0Xf<<(pin*4));
