@@ -87,8 +87,21 @@ bool lnFMC::write(const uint32_t startAddress, const uint8_t *data, int sizeInBy
     unlock();
     
     // if not aligned
-#warning todo
-    xAssert(!(adr&1));
+    if(adr&1)
+    {
+        // it is the high byte of the PREVIOUS adr
+        uint8_t *previous=(uint8_t *)adr;
+        previous--;
+        uint16_t data16=(data[0]<<8)+previous[0];
+        // write it
+        aFMC->CTL|=LN_FMC_CTL_PG;
+        *(uint16_t *)previous=(uint32_t )data16;
+        waitNotBusy();
+        //
+        adr++;
+        sizeInBytes--;
+        data++;
+    }
     // do 16 bytes aligned write
     uint16_t  *adr16=(uint16_t *)adr;
     int nbWord=sizeInBytes/2;
@@ -101,10 +114,20 @@ bool lnFMC::write(const uint32_t startAddress, const uint8_t *data, int sizeInBy
           adr16++;
           data+=2;
     }
-    sizeInBytes&=1;
-#warning todo
-    xAssert(!sizeInBytes);
-    return false;
+
+    if(sizeInBytes&1)
+    {
+        // it is the low byte of the NEXT adr
+        uint8_t *next=(uint8_t *)adr16;
+       
+        uint16_t data16=(data[0])+(0xff<<8); // we let the other byte as is
+        // write it
+        aFMC->CTL|=LN_FMC_CTL_PG;
+        *(uint16_t *)next=(uint32_t )data16;
+        waitNotBusy();
+        //
+    }
+    return true;
 }
 
 
