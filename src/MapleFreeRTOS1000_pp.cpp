@@ -128,6 +128,7 @@ xTask::~xTask()
 {
   xAssert(0);
 }
+#if 0
 /**
  * 
  */
@@ -198,6 +199,7 @@ uint32_t    xEventGroup::readEvents(uint32_t maskInt) // it is also cleared auto
      return ev;
 
 }
+#endif
 //--------------------------------
 /**
  * 
