@@ -30,17 +30,28 @@ WS2812B::WS2812B(int nbLeds, hwlnSPIClass *s)
         _ledsColor[3*i+2]=0;
         _ledsBrightness[i]=255;        
     }
-    memset(  _ledsColorSPI,0,3*up*8);
-    
+    memset(  _ledsColorSPI,0,3*up*8);    
 }
 /**
  * 
  */
 void WS2812B::begin()
 {
+    int div;
     xAssert(_spi);
     _spi->begin();
-    _spi->setSpeed(108000000/16);
+    // Grab the SPI speed
+    int clock=_spi->getPeripheralClock();
+    switch(clock)
+    {
+        case 128000000:     div=19;break;
+        case 108000000:     div=16;break;
+        case 96000000:      div=14;break;
+        case 72000000:
+        default:            
+                            div=8;break;
+    }
+    _spi->setSpeed(clock/div);
     _spi->setDataMode(SPI_MODE1);
 }
 
@@ -60,8 +71,7 @@ WS2812B::~WS2812B()
  void   WS2812B::setGlobalBrightness(int value)
  {
      _brightness=value;
-     convertAll();
-         
+     convertAll();         
  }
  /**
   * 
