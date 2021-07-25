@@ -27,7 +27,6 @@ void lnPinMode(const lnPin xpin, const GpioMode mode)
     const LN_PIN_MAPPING *lnPin=pinMappings+xpin;
     xAssert(lnPin->pin==xpin);
     int pin=xpin&0xf;
-    int fullPin=pin;
     volatile uint32_t *CTL;
    
     uint32_t value;
