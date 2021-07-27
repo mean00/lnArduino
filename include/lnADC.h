@@ -20,7 +20,7 @@ public:
    lnPin   pin();
    bool    setPin(lnPin pin);
    int     simpleRead();      // do a basic sampling
-   bool    multiRead(int nbPins, lnPin *pins, int *output); // read N pins in one go
+   bool    pollingMultiRead(int nbPins, lnPin *pins, int *output); // read N pins in one go POLLING
    
    int      getVref(); // direct value
    float    getVcc();  // Vcc value in mv

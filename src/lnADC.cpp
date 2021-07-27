@@ -205,7 +205,7 @@ bool    lnSimpleADC::setPin(lnPin pin)
 int     lnSimpleADC::simpleRead()
 {
     int value;
-    if(!multiRead(1,&_pin,&value)) return -1;
+    if(!pollingMultiRead(1,&_pin,&value)) return -1;
     return value;
 }
 /**
@@ -215,33 +215,33 @@ int     lnSimpleADC::simpleRead()
  * @param output
  * @return 
  */
-bool    lnSimpleADC::multiRead(int nbPins, lnPin *pins, int *output)
+bool    lnSimpleADC::pollingMultiRead(int nbPins, lnPin *pins, int *output)
 {
-    
+    xAssert(nbPins<=5);
     LN_ADC_Registers *adc=lnAdcDesc[_instance].registers;
     xAssert(nbPins);
-    // set input
+    // adc Off
     adc->CTL1 &=~LN_ADC_CTL1_ADCON;
-     
-    uint32_t rsq0=adc->RSQS[0];
-    rsq0&=~(0xf<<20);
-    rsq0|=(nbPins-1)<<20;
-    // set input, only one for now
-    xAssert(nbPins==1);
-    adc->RSQS[0]=rsq0;
     
-    adc->RSQS[2]=adcChannel(pins[0]);
+    // 1 sample => 0
+    adc->RSQS[0]=0;
     
-    
-    adc->CTL1 |=LN_ADC_CTL1_ADCON;
-    //
-    adc->CTL1|=LN_ADC_CTL1_SWRCST;
-    while( !((adc->STAT & LN_ADC_STAT_EOC)))
+    for(int i=0;i<nbPins;i++)
     {
-        __asm__("nop");
+        uint32_t rsq2=adcChannel(pins[i]);
+        adc->RSQS[2]=rsq2;        
+        adc->CTL1|=LN_ADC_CTL1_ADCON;
+        adc->CTL1|=LN_ADC_CTL1_SWRCST;
+        while( !((adc->STAT & LN_ADC_STAT_EOC)))
+        {
+            __asm__("nop");
+        }
+        int data=adc->RDATA ;
+        Logger("Chan : %d dat=0x%x \n",i,data);
+        // Retrieve data
+        output[i]=data&0xfff;
+        adc->CTL1 &=~LN_ADC_CTL1_ADCON;            
     }
-    // Retrieve data
-    output[0]=adc->RDATA & 0xfff;
     return true;
 }
 // EOF
