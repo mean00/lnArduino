@@ -220,27 +220,21 @@ bool    lnSimpleADC::pollingMultiRead(int nbPins, lnPin *pins, int *output)
     xAssert(nbPins<=5);
     LN_ADC_Registers *adc=lnAdcDesc[_instance].registers;
     xAssert(nbPins);
-    // adc Off
-    adc->CTL1 &=~LN_ADC_CTL1_ADCON;
-    
+    // adc Off    
     // 1 sample => 0
     adc->RSQS[0]=0;
-    
     for(int i=0;i<nbPins;i++)
     {
         uint32_t rsq2=adcChannel(pins[i]);
         adc->RSQS[2]=rsq2;        
-        adc->CTL1|=LN_ADC_CTL1_ADCON;
         adc->CTL1|=LN_ADC_CTL1_SWRCST;
         while( !((adc->STAT & LN_ADC_STAT_EOC)))
         {
             __asm__("nop");
         }
         int data=adc->RDATA ;
-        Logger("Chan : %d dat=0x%x \n",i,data);
         // Retrieve data
         output[i]=data&0xfff;
-        adc->CTL1 &=~LN_ADC_CTL1_ADCON;            
     }
     return true;
 }
