@@ -117,4 +117,18 @@ typedef volatile LN_ADC_Registersx LN_ADC_Registers;
 #define LN_ADC_OVRS_DRES_MASK          (~(0x3<<12)) // ADC resolution
 #define LN_ADC_OVRS_DRES_SET(x)        ((x<<12)) 
 
+struct LN_ADC_DESCR
+{
+    int   dmaEngine;
+    int   dmaChannel;
+    LN_ADC_Registers *registers;
+    
+};
+
+
+extern LN_ADC_Registers *aadc0;
+extern LN_ADC_Registers *aadc1;
+
+extern const LN_ADC_DESCR lnAdcDesc[];
+
 // EOF

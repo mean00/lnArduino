@@ -9,10 +9,32 @@
 #include "lnDma.h"
 class lnBasicTimer;
 /**
+ */
+class lnBaseAdc
+{
+public:
+                    lnBaseAdc(int instance)
+                    {
+                        _instance=instance;
+                    }
+                    ~lnBaseAdc()
+                    {
+
+                    }
+            int      getVref(); // direct value
+            float    getVcc();  // Vcc value in mv
+protected:
+            void     readVcc();
+    virtual void     setup();
+    static int       adcChannel(lnPin pin);
+            int      _instance;
+};
+
+/**
  * 
  * @param instance
  */
-class lnSimpleADC
+class lnSimpleADC : public lnBaseAdc
 {
 public:
             lnSimpleADC(int instance, lnPin pin);
@@ -30,5 +52,23 @@ protected:
     int     _instance;
     int     _pin;
 
+};
+/**
+ * 
+ * @param instance
+ */
+class lnTimingAdc
+{
+public:
+            lnTimingAdc(int instance);
+   virtual  ~lnTimingAdc();
+   bool     multiRead(int fq, int nbSamplePerChannel, int nbPins, lnPin *pins, int *output); // read N pins in one go POLLING
+   
+   int      getVref(); // direct value
+   float    getVcc();  // Vcc value in mv
+protected:
+    void    readVcc();
+    void    setup();
+    int     _instance;
 };
 // EOF

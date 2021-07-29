@@ -15,6 +15,8 @@ ADD_LIBRARY(gd32_overlay STATIC  MapleFreeRTOS1000_pp.cpp systemAlloc.cpp lnDebu
                                  lnStopWatch.cpp
                                  lnDAC.cpp
                                  lnADC.cpp
+                                 lnADC_base.cpp
+                                 lnADC_timing.cpp
                                  lnFMC.cpp
                                  ../legacy/boards/${GD32_BOARD}/lnPinMapping.cpp
                     )
