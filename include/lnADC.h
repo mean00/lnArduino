@@ -57,18 +57,19 @@ protected:
  * 
  * @param instance
  */
-class lnTimingAdc
+class lnTimingAdc : public lnBaseAdc
 {
 public:
             lnTimingAdc(int instance);
    virtual  ~lnTimingAdc();
-   bool     multiRead(int fq, int nbSamplePerChannel, int nbPins, lnPin *pins, int *output); // read N pins in one go POLLING
-   
-   int      getVref(); // direct value
-   float    getVcc();  // Vcc value in mv
-protected:
-    void    readVcc();
-    void    setup();
-    int     _instance;
+   bool     setSource(int timer, int channel,int fq);
+   bool     multiRead(int nbSamplePerChannel, int nbPins, lnPin *pins, int *output); // read N pins in one go POLLING
+public:
+    static void    dmaDone_(void *foo);
+protected:   
+    void    dmaDone();
+    int     _timer,_channel,_fq;
+    lnDMA   _dma;
+    xBinarySemaphore _dmaSem;
 };
 // EOF

@@ -52,8 +52,11 @@ void loop()
         dac0->setValue(500);
         dac1->setValue(3500);   
         delay(10);
-        adc->multiRead(1000,SAMPLE_PER_CHANNEL,2,pins,output);
+        memset(output,0,2*SAMPLE_PER_CHANNEL*sizeof(int));
+        adc->setSource(3,3,1000);
+        adc->multiRead(SAMPLE_PER_CHANNEL,2,pins,output);
         Logger("500:3500 PA0: %d PA1 :%d \n",output[0],output[1]);
+        
         for(int i=0;i<SAMPLE_PER_CHANNEL;i++)
         {
             xAssert(output[0+2*i]<900) ;
@@ -63,7 +66,10 @@ void loop()
         dac0->setValue(3500);
         dac1->setValue(500);
         delay(10);
-        adc->multiRead(1000,SAMPLE_PER_CHANNEL,2,pins,output);
+        memset(output,0,2*SAMPLE_PER_CHANNEL*sizeof(int));
+        adc->setSource(3,3,1000);
+        adc->multiRead(SAMPLE_PER_CHANNEL,2,pins,output);
+
         Logger("3500:500 PA0: %d PA1 :%d \n",output[0],output[1]);        
         for(int i=0;i<SAMPLE_PER_CHANNEL;i++)
         {

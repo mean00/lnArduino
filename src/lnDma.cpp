@@ -280,7 +280,62 @@ bool lnDMA::doMemoryToPeripheralTransferNoLock(int count, const uint16_t *source
     lnEnableInterrupt(_irq);        
     return true;
 }
+/**
+ * 
+ * @param count
+ * @param target
+ * @param source
+ * @param repeat
+ * @param circularMode
+ * @return 
+ */
+bool    lnDMA::doPeripheralToMemoryTransferNoLock(int count, const uint16_t *target,const uint16_t *source,  bool repeat,bool circularMode)
+{
+#warning !!!!!!!!!!!!!!!!!!!!!
+    #warning !!!!!!!!!!!!!!!!!!!!!
+#warning !!!!!!!!!!!!!!!!!!!!!
+#warning !!!!!!!!!!!!!!!!!!!!!#warning !!!!!!!!!!!!!!!!!!!!!#warning !!!!!!!!!!!!!!!!!!!!!
+#warning !!!!!!!!!!!!!!!!!!!!!
+#warning !!!!!!!!!!!!!!!!!!!!!
+#warning !!!!!!!!!!!!!!!!!!!!!
 
+
+     // clear pending bits
+    DMA_struct *d=(DMA_struct *)_dma;
+    d->INTC|=0xff<<_channelInt;
+ 
+    DMA_channels *c=d->channels+_channelInt;
+    uint32_t control=c->CTL;    
+    control&=LN_DMA_CHAN_KEEP_MASK;
+
+    c->CTL=control; // also disable
+    
+    control|=_control; // base configuration
+
+    c->PADDR=(uint32_t)target;
+    c->MADDR=(uint32_t)source;
+    c->CNT=  (uint32_t)count;
+    if(!repeat)
+        control|=LN_DMA_CHAN_MINCREASE; // increase address
+
+    
+    if(circularMode)
+    {
+        control|=LN_DMA_CHAN_CMEN; // replay the dma in a loop
+        control|=LN_DMA_CHAN_ERRIE; // error  interrupt
+        control&=~LN_DMA_CHAN_TFTFIE;
+    }else
+    {
+        control&=~LN_DMA_CHAN_CMEN; 
+        control|=LN_DMA_CHAN_ERRIE+LN_DMA_CHAN_TFTFIE; // error and transmit complete interrupt        
+    }
+        
+    
+    
+    c->CTL=control|LN_DMA_CHAN_ENABLE; // GO!       
+    lnEnableInterrupt(_irq);        
+    return true;
+}
 /**
  * 
  */
