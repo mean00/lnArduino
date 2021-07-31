@@ -23,15 +23,21 @@ lnTimingAdc::lnTimingAdc(int instance)  : lnBaseAdc(instance), _dma( lnDMA::DMA_
     _timer=-1;
     _channel=-1;
     _fq=-1;
+
 }
 /**
  * 
  */
 lnTimingAdc::~lnTimingAdc()
 {
-    
 }
-
+/**
+ * 
+ * @param timer
+ * @param channel
+ * @param fq
+ * @return 
+ */
 bool     lnTimingAdc::setSource( int timer, int channel, int fq)
 {
     LN_ADC_Registers *adc=lnAdcDesc[_instance].registers;
@@ -90,7 +96,7 @@ bool     lnTimingAdc::multiRead( int nbSamplePerChannel, int nbPins, lnPin *pins
     // Program DMA
     _dma.beginTransfer();
     _dma.attachCallback(lnTimingAdc::dmaDone_,this);
-    _dma.doPeripheralToMemoryTransferNoLock(nbSamplePerChannel*nbPins, (uint16_t *)output,(uint16_t *)&( adc->RDATA),  true,false);
+    _dma.doPeripheralToMemoryTransferNoLock(nbSamplePerChannel*nbPins, (uint16_t *)output,(uint16_t *)&( adc->RDATA),  false);
     //
     _dmaSem.take();
     // go !

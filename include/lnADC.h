@@ -71,5 +71,6 @@ protected:
     int     _timer,_channel,_fq;
     lnDMA   _dma;
     xBinarySemaphore _dmaSem;
+    lnBasicTimer *_timerClock;
 };
 // EOF
