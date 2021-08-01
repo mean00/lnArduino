@@ -57,20 +57,22 @@ protected:
  * 
  * @param instance
  */
+class lnAdcTimer;
 class lnTimingAdc : public lnBaseAdc
 {
 public:
-            lnTimingAdc(int instance);
-   virtual  ~lnTimingAdc();
-   bool     setSource(int timer, int channel,int fq);
-   bool     multiRead(int nbSamplePerChannel, int nbPins, lnPin *pins, int *output); // read N pins in one go POLLING
+                lnTimingAdc(int instance);
+   virtual      ~lnTimingAdc();
+   bool         setSource(int timer, int channel,int fq,int nbPins, lnPin *pins);
+   bool         multiRead(int nbSamplePerChannel, int *output); // read N pins in one go POLLING
 public:
     static void    dmaDone_(void *foo);
 protected:   
-    void    dmaDone();
-    int     _timer,_channel,_fq;
-    lnDMA   _dma;
+    void        dmaDone();
+    int         _timer,_channel,_fq;
+    lnDMA       _dma;
     xBinarySemaphore _dmaSem;
-    lnBasicTimer *_timerClock;
+    lnAdcTimer *_adcTimer;
+    int         _nbPins;
 };
 // EOF

@@ -160,4 +160,42 @@ void lnTimer::singleShot(int durationMs, bool down)
     disable();
     
 }
+
+//--
+void lnAdcTimer::setTimerFrequency(int fqInHz)
+{
+    LN_Timers_Registers *t=aTimers[_timer-1];
+    Peripherals per=pTIMER1;
+    per=(Peripherals)((int)per+_timer-1);
+    uint32_t clock=lnPeripherals::getClock(per);
+    // If ABP1 prescale=1, clock*=2 ???? see 5.2 in GD32VF103
+    clock=clock*2;
+    // disable
+    t->CTL0&=~LN_TIMER_CTL0_CEN;
+    
+    int divider=clock/(fqInHz*1024);
+    int preDiv=0;
+    while(divider>65535)
+    {
+        preDiv++;
+        divider=divider/2;
+    }
+    if(preDiv>2) preDiv=2;
+    
+    uint32_t ctl0=t->CTL0;
+    ctl0&=~(3<<LN_TIMER_CTL0_CKDIV_SHIFT);
+    ctl0|=preDiv<<LN_TIMER_CTL0_CKDIV_SHIFT;
+    
+    if(!divider) divider=1;
+    t->PSC=divider-1;
+    // Set reload to 1024
+    t->CAR=1024;
+    // Enable with default value
+    ctl0|=LN_TIMER_CTL0_CEN;
+    t->CTL0=ctl0;
+    
+    //---x-- ~ PWM
+    setPwmMode(512);
+    
+}
 //EOF

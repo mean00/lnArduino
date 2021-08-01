@@ -25,8 +25,25 @@ public:
         void singleShot(int durationMs, bool down=false);
         void disable();
         void enable();
+        int  timer() {return _timer;}
+        int  channel() {return _channel;}
 protected:
         int _timer,  _channel;
 
 };
+/**
+ * /!\ Changing the frequency alters ALL channels
+ * @param timer
+ * @param channel
+ * @return 
+ */
+class lnAdcTimer : public lnTimer
+{
+public:
+        lnAdcTimer(int timer,int channel) : lnTimer(timer, channel)
+        {
 
+        }    
+        // this is a single pulse timer
+        void setTimerFrequency(int fqInHz); 
+};
