@@ -86,6 +86,40 @@ bool     lnTimingAdc::setSource( int timer, int channel, int fq,int nbPins, lnPi
     adc->RSQS[2]=rsq2;    
     //
     adc->CTL0|=LN_ADC_CTL0_SM; // scan mode
+    
+    // set clock divider as needed
+    uint32_t adcClock=lnPeripherals::getClock(pADC0); // ADC1 does not support DMA/Timing
+    int divider=adcClock/fq; // nb of clock ticks per conversion
+    divider>>8; // divide by 256, max conversion cycles +239.5+12.5 ~ 256
+    
+    lnADC_DIVIDER clockDivider=lnADC_CLOCK_DIV_BY_2;
+    
+#define SET_DIVIDER(x)     if(divider>x) \
+                            { \
+                                clockDivider=lnADC_CLOCK_DIV_BY_##x; \
+                                divider/=x; \
+                            }
+
+    SET_DIVIDER(16) 
+    else
+        SET_DIVIDER(8)
+        else 
+            SET_DIVIDER(4)
+    lnPeripherals::setAdcDivider(clockDivider);
+    
+    uint32_t conversionCycle=0;
+    // now # of cycles
+    if(divider>239) conversionCycle=7;
+    else if(divider>70) conversionCycle=6;
+        else if(divider>28) conversionCycle=3;
+            else if(divider>7) conversionCycle=1;
+        
+    uint32_t  smtp=0;
+    for(int i=0;i<_nbPins;i++)
+    {
+        smtp |=conversionCycle<<(3*i);
+    }        
+    adc->SAMPT[1]=smtp;
     // go !
     adc->CTL1|=LN_ADC_CTL1_ADCON;
     return true;

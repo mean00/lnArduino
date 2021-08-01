@@ -194,8 +194,16 @@ void lnAdcTimer::setTimerFrequency(int fqInHz)
     ctl0|=LN_TIMER_CTL0_CEN;
     t->CTL0=ctl0;
     
-    //---x-- ~ PWM
-    setPwmMode(512);
-    
+    uint32_t chCtl=t->CHCTLs[_channel>>1] ;
+  
+    chCtl&=~(7<<LN_TIMER_CHTLs_OUTPUT_CHxCOMCTL_SHIFT(_channel));
+    chCtl&=~(3<<LN_TIMER_CHTLs_OUTPUT_CHxMS_SHIFT(_channel));
+    chCtl|=6<<LN_TIMER_CHTLs_OUTPUT_CHxCOMCTL_SHIFT(_channel); // PWM
+    chCtl|=0<<LN_TIMER_CHTLs_OUTPUT_CHxMS_SHIFT(_channel);
+
+    t->CHCTLs[_channel>>1]=chCtl;
+
+    t->CHCVs[_channel] =512; // A/R
+    t->CHCTL2 &=~(LN_TIMER_CHTL2_CHxP(_channel)); // active low
 }
 //EOF

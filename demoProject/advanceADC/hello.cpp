@@ -18,7 +18,7 @@ void setup()
  */
 #define TIMER_ID 3
 #define TIMER_CHANNEL 3
-#define FREQUENCY 500
+#define FREQUENCY (50*1000)
 #define TIMER_PIN PB9
 
 int val;
@@ -78,14 +78,14 @@ void loop()
     }
     }
 #endif    
-    
+    adc->setSource(TIMER_ID,TIMER_CHANNEL,FREQUENCY,2,pins);
     while(1)
     {
         dac0->setValue(500);
         dac1->setValue(3500);   
         delay(10);
         memset(output,0,2*SAMPLE_PER_CHANNEL*sizeof(int));
-        adc->setSource(TIMER_ID,TIMER_CHANNEL,FREQUENCY,2,pins);
+        
         adc->multiRead(SAMPLE_PER_CHANNEL,output);
         Logger("500:3500 PA0: %d PA1 :%d \n",output[0],output[1]);
         
