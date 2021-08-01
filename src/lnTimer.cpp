@@ -173,26 +173,15 @@ void lnAdcTimer::setTimerFrequency(int fqInHz)
     // disable
     t->CTL0&=~LN_TIMER_CTL0_CEN;
     
-    int divider=clock/(10*fqInHz);
-    int preDiv=0;
-    while(divider>65535)
-    {
-        preDiv++;
-        divider=divider/2;
-    }
-    if(preDiv>2) preDiv=2;
+    int divider=clock/(fqInHz);
     
-    uint32_t ctl0=t->CTL0;
-    ctl0&=~(3<<LN_TIMER_CTL0_CKDIV_SHIFT);
-    ctl0|=preDiv<<LN_TIMER_CTL0_CKDIV_SHIFT;
+    int intDiv=divider/65536;
+    int fracDiv=divider & 65535;
     
-    if(!divider) divider=1;
-    t->PSC=divider-1;
-    // Set reload to 1024
-    t->CAR=9;
-    // Enable with default value
-    ctl0|=LN_TIMER_CTL0_CEN;
-    t->CTL0=ctl0;
+    if(!intDiv) intDiv=1;
+    t->PSC=intDiv-1;
+    // Set reload to 0
+    t->CAR=fracDiv-1;
     
     uint32_t chCtl=t->CHCTLs[_channel>>1] ;
   
@@ -203,7 +192,12 @@ void lnAdcTimer::setTimerFrequency(int fqInHz)
 
     t->CHCTLs[_channel>>1]=chCtl;
 
-    t->CHCVs[_channel] =1; // A/R
+    t->CHCVs[_channel] =2; // A/R
     t->CHCTL2 &=~(LN_TIMER_CHTL2_CHxP(_channel)); // active low
+    // Enable with default value
+    uint32_t ctl0=t->CTL0;
+    ctl0|=LN_TIMER_CTL0_CEN;
+    t->CTL0=ctl0;
+
 }
 //EOF

@@ -18,7 +18,7 @@ void setup()
  */
 #define TIMER_ID 3
 #define TIMER_CHANNEL 3
-#define FREQUENCY (60*1000)
+#define FREQUENCY (1*1000*1000)
 #define TIMER_PIN PB9
 
 int val;
