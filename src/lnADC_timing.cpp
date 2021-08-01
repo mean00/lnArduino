@@ -154,11 +154,13 @@ bool     lnTimingAdc::multiRead( int nbSamplePerChannel,  int *output)
     LN_ADC_Registers *adc=lnAdcDesc[_instance].registers;       
     xAssert(_fq>0);
     // Program DMA
+    noInterrupts();
     _dma.beginTransfer();
     _dma.attachCallback(lnTimingAdc::dmaDone_,this);
     _dma.doPeripheralToMemoryTransferNoLock(nbSamplePerChannel*_nbPins, (uint16_t *)output,(uint16_t *)&( adc->RDATA),  false);
     // go !
     adc->CTL1|=LN_ADC_CTL1_DMA;
+    interrupts();
     _adcTimer->enable();    
     _dmaSem.take();
     _adcTimer->disable();

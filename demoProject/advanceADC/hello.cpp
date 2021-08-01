@@ -18,7 +18,7 @@ void setup()
  */
 #define TIMER_ID 3
 #define TIMER_CHANNEL 3
-#define FREQUENCY (50*1000)
+#define FREQUENCY (60*1000)
 #define TIMER_PIN PB9
 
 int val;
@@ -83,7 +83,7 @@ void loop()
     {
         dac0->setValue(500);
         dac1->setValue(3500);   
-        delay(10);
+        delay(2);
         memset(output,0,2*SAMPLE_PER_CHANNEL*sizeof(int));
         
         adc->multiRead(SAMPLE_PER_CHANNEL,output);
@@ -99,10 +99,10 @@ void loop()
             xAssert(output[1+2*i]>2800) ;
 #endif
         }
-        delay(500);
+        delay(2);
         dac0->setValue(3500);
         dac1->setValue(500);
-        delay(10);
+        delay(2);
         memset(output,0,2*SAMPLE_PER_CHANNEL*sizeof(int));        
         adc->multiRead(SAMPLE_PER_CHANNEL,output);
 
@@ -117,7 +117,7 @@ void loop()
             xAssert(output[1+2*i]<1000) ;
 #endif            
         }
-        delay(500);
+        delay(20);
 
     }
 }
