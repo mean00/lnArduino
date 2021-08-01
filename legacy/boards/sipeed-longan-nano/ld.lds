@@ -5,14 +5,17 @@ ENTRY( _start )
 MEMORY
 { 
 	/* Run in FLASH */ 
-	flash (rxai!w) : ORIGIN = 0x08000000, LENGTH = 128k
-	ram   (wxa!ri) : ORIGIN = 0x20000000, LENGTH = 32K 
+	ram   (rwx)  : ORIGIN = 0x20000000, LENGTH = 32K 
+	flash (rx)   : ORIGIN = 0x08000000, LENGTH = 128k-4k
+    e2prom (rx)  : ORIGIN = 0x08000000+124K, LENGTH = 4K
 
-	/* Run in RAM */ 
-/*	flash (rxai!w) : ORIGIN = 0x20000000, LENGTH = 24k
-	ram   (wxa!ri) : ORIGIN = 0x20006000, LENGTH = 8K
-*/	
 }
+/**
+    we allocate 4 kB at the end for the eeprom
+*/
+PROVIDE(eeprom_size = 4*1024);
+PROVIDE(eeprom_begin = ORIGIN(flash) + LENGTH(flash)-eeprom_size);
+REGION_ALIAS("REGION_EEPROM", e2prom);
 
 
 SECTIONS
@@ -172,4 +175,10 @@ SECTIONS
     . = __stack_size;  
     PROVIDE( _sp = . ); 
   } >ram AT>ram 
+
+  .eeprom eeprom_begin :
+      {
+        . = eeprom_size;
+      } > REGION_EEPROM AT > REGION_EEPROM
+
 }
