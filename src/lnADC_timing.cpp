@@ -76,7 +76,7 @@ bool     lnTimingAdc::setSource( int timer, int channel, int fq,int nbPins, lnPi
     _adcTimer->setTimerFrequency(fq);
     
     // add our channel(s)
-    adc->RSQS[0]=((uint32_t)nbPins)<<20;
+    adc->RSQS[0]=((uint32_t)(nbPins-1))<<20;
     xAssert(_nbPins<6);
     uint32_t rsq2=0;
     for(int i=0;i<_nbPins;i++)
@@ -84,6 +84,8 @@ bool     lnTimingAdc::setSource( int timer, int channel, int fq,int nbPins, lnPi
         rsq2 |=(adcChannel(pins[i])<<(5*i));
     }
     adc->RSQS[2]=rsq2;    
+    //
+    adc->CTL0|=LN_ADC_CTL0_SM; // scan mode
     // go !
     adc->CTL1|=LN_ADC_CTL1_ADCON;
     return true;

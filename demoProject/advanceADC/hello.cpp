@@ -16,9 +16,12 @@ void setup()
 /**
  * 
  */
+#define TIMER_ID 3
+#define TIMER_CHANNEL 3
+#define FREQUENCY 500
+#define TIMER_PIN PB9
 
-
-      int val;
+int val;
 void loop()
 {
     bool onoff=true;
@@ -47,34 +50,72 @@ void loop()
     int output[2*SAMPLE_PER_CHANNEL];
     lnPin pins[2]={PA0,PA1};
     
+    lnPinMode(TIMER_PIN,lnPWM);
+
+
+#if 0
+    {    
+    lnAdcTimer pwm(TIMER_ID,TIMER_CHANNEL);
+    pwm.setTimerFrequency(1000);
+    pwm.enable();
+    while(1)
+    {
+        xDelay(10);
+    }
+    }
+#endif    
+
+    
+#if 0
+    {
+    lnTimer pwm(TIMER_ID,TIMER_CHANNEL);
+    pwm.setTimerFrequency(1000);
+    pwm.setPwmMode(512);
+    pwm.enable();
+    while(1)
+    {
+        xDelay(10);
+    }
+    }
+#endif    
+    
     while(1)
     {
         dac0->setValue(500);
         dac1->setValue(3500);   
         delay(10);
         memset(output,0,2*SAMPLE_PER_CHANNEL*sizeof(int));
-        adc->setSource(3,3,1000);
-        adc->multiRead(SAMPLE_PER_CHANNEL,2,pins,output);
+        adc->setSource(TIMER_ID,TIMER_CHANNEL,FREQUENCY,2,pins);
+        adc->multiRead(SAMPLE_PER_CHANNEL,output);
         Logger("500:3500 PA0: %d PA1 :%d \n",output[0],output[1]);
         
         for(int i=0;i<SAMPLE_PER_CHANNEL;i++)
         {
-            xAssert(output[0+2*i]<900) ;
-            xAssert(output[1+2*i]>3000) ;
+#if 0
+            Logger(" 500 : %d \n",output[0+2*i]);
+            Logger("3500 : %d \n",output[1+2*i]);
+#else            
+            xAssert(output[0+2*i]<1000) ;
+            xAssert(output[1+2*i]>2800) ;
+#endif
         }
         delay(500);
         dac0->setValue(3500);
         dac1->setValue(500);
         delay(10);
-        memset(output,0,2*SAMPLE_PER_CHANNEL*sizeof(int));
-        adc->setSource(3,3,1000);
-        adc->multiRead(SAMPLE_PER_CHANNEL,2,pins,output);
+        memset(output,0,2*SAMPLE_PER_CHANNEL*sizeof(int));        
+        adc->multiRead(SAMPLE_PER_CHANNEL,output);
 
         Logger("3500:500 PA0: %d PA1 :%d \n",output[0],output[1]);        
         for(int i=0;i<SAMPLE_PER_CHANNEL;i++)
         {
-            xAssert(output[0+2*i]>3000) ;
-            xAssert(output[1+2*i]<900) ;
+#if 0            
+            Logger("3500 : %d \n",output[0+2*i]);
+            Logger(" 500 : %d \n",output[1+2*i]);
+#else            
+            xAssert(output[0+2*i]>2800) ;
+            xAssert(output[1+2*i]<1000) ;
+#endif            
         }
         delay(500);
 
