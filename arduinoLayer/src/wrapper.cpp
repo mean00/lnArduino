@@ -16,7 +16,7 @@ void pinMode(uint8_t a, uint8_t b)
     {
         case  INPUT:         lnPinMode(a,lnFLOATING);break;
         case  OUTPUT:        lnPinMode(a,lnOUTPUT);break;
-        case INPUT_PULLUP:   lnPinMode(a,lnINPUT_PULLUP);break;            
+        case  INPUT_PULLUP:  lnPinMode(a,lnINPUT_PULLUP);break;            
         default:
             xAssert(0);
             break;
