@@ -64,9 +64,9 @@ public:
                 lnTimingAdc(int instance);
    virtual      ~lnTimingAdc();
    bool         setSource(int timer, int channel,int fq,int nbPins, lnPin *pins);
-   bool         multiRead(int nbSamplePerChannel, int *output); // read N pins in one go POLLING
+   bool         multiRead(int nbSamplePerChannel, uint16_t *output); // read N pins in one go POLLING
 public:
-    static void    dmaDone_(void *foo);
+    static void dmaDone_(void *foo);
 protected:   
     void        dmaDone();
     int         _timer,_channel,_fq;
