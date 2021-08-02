@@ -18,8 +18,9 @@ void setup()
  */
 #define TIMER_ID 3
 #define TIMER_CHANNEL 3
-#define FREQUENCY (1*1000*1000)
+#define FREQUENCY (50*1000)
 #define TIMER_PIN PB9
+#define TYPE  uint16_t
 
 int val;
 void loop()
@@ -47,7 +48,7 @@ void loop()
     Logger("Connect PA4 and PA0\n");
     Logger("Connect PA5 and PA1\n");
 #define SAMPLE_PER_CHANNEL 10    
-    int output[2*SAMPLE_PER_CHANNEL];
+    TYPE output[2*SAMPLE_PER_CHANNEL];
     lnPin pins[2]={PA0,PA1};
     
     lnPinMode(TIMER_PIN,lnPWM);
@@ -83,40 +84,41 @@ void loop()
     {
         dac0->setValue(500);
         dac1->setValue(3500);   
-        delay(2);
-        memset(output,0,2*SAMPLE_PER_CHANNEL*sizeof(int));
+        delay(10);
+        memset(output,0,2*SAMPLE_PER_CHANNEL*sizeof(TYPE));
         
-        adc->multiRead(SAMPLE_PER_CHANNEL,output);
+        adc->multiRead(SAMPLE_PER_CHANNEL,(uint16_t *)output);
         Logger("500:3500 PA0: %d PA1 :%d \n",output[0],output[1]);
         
         for(int i=0;i<SAMPLE_PER_CHANNEL;i++)
         {
-#if 0
-            Logger(" 500 : %d \n",output[0+2*i]);
-            Logger("3500 : %d \n",output[1+2*i]);
-#else            
-            xAssert(output[0+2*i]<1000) ;
-            xAssert(output[1+2*i]>2800) ;
-#endif
+            if(output[0+2*i]>1000)
+            {
+                Logger(" PA0 %d : too big : %d \n",i,output[0+2*i]);
+            }
+            if(output[1+2*i]<288)
+            {
+                Logger(" PA1 %d : too small : %d \n",i,output[1+2*i]);
+            }
         }
-        delay(2);
+        delay(10);
         dac0->setValue(3500);
         dac1->setValue(500);
-        delay(2);
-        memset(output,0,2*SAMPLE_PER_CHANNEL*sizeof(int));        
-        adc->multiRead(SAMPLE_PER_CHANNEL,output);
+        delay(10);
+        memset(output,0,2*SAMPLE_PER_CHANNEL*sizeof(TYPE));        
+        adc->multiRead(SAMPLE_PER_CHANNEL,(uint16_t *)output);
 
         Logger("3500:500 PA0: %d PA1 :%d \n",output[0],output[1]);        
         for(int i=0;i<SAMPLE_PER_CHANNEL;i++)
         {
-#if 0            
-            Logger("3500 : %d \n",output[0+2*i]);
-            Logger(" 500 : %d \n",output[1+2*i]);
-#else            
-            xAssert(output[0+2*i]>2800) ;
-            xAssert(output[1+2*i]<1000) ;
-#endif            
-        }
+            if(output[1+2*i]>1000)
+            {
+                Logger("PA1 %d : too big : %d \n",i,output[1+2*i]);
+            }
+            if(output[0+2*i]<288)
+            {
+                Logger("PA0 %d : too small : %d \n",i,output[0+2*i]);
+            }        }
         delay(20);
 
     }
