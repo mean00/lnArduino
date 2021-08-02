@@ -109,8 +109,8 @@ void    lnDMA::setWordSize(int sourceWordSize, int targetWordSize)
         break;
         case DMA_PERIPH_TO_MEMORY:
             {
-                source=memoryWidth(sourceWordSize);
-                target=peripheralWidth(targetWordSize);
+                source=peripheralWidth(sourceWordSize);                
+                target=memoryWidth(targetWordSize);
                 _control&=LN_DMA_CHAN_WIDTH_MASK;
                 _control|=source;
                 _control|=target;
@@ -194,8 +194,8 @@ void lnDMA::beginTransfer()
         }
         case DMA_PERIPH_TO_MEMORY:
         {
-            source=memoryWidth(_sourceWidth);
-            target=peripheralWidth(_targetWidth);
+            source=peripheralWidth (_sourceWidth);
+            target=memoryWidth(_targetWidth);
             _control&=LN_DMA_CHAN_WIDTH_MASK;
             _control|=source;
             _control|=target;
@@ -301,9 +301,8 @@ bool    lnDMA::doPeripheralToMemoryTransferNoLock(int count, const uint16_t *tar
 
     c->CTL=control; // also disable
     
-    control|=_control; // base configuration
+    control=_control; // base configuration
 
-    control|=LN_DMA_CHAN_DIR_P2M;
     
     c->PADDR=(uint32_t)source;
     c->MADDR=(uint32_t)target;
