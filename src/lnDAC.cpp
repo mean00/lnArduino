@@ -79,7 +79,7 @@ void    lnDAC::simpleMode()
     ctl&=LN_DAC_CTL_DTSEL_MASK(_instance);
     ctl|=LN_DAC_CTL_DTSEL(_instance,LN_DAC_CTL_DTSEL_SOURCE_SW);
     ctl|=LN_DAC_CTL_DTEN(_instance);
-    ctl|=LN_DAC_CTL_DBOFF(_instance);
+    //ctl|=LN_DAC_CTL_DBOFF(_instance);
     adac->CTL=ctl;    
 }
 /**
