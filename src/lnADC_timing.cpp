@@ -18,7 +18,8 @@
  * 
  * @param instance
  */
-lnTimingAdc::lnTimingAdc(int instance)  : lnBaseAdc(instance), _dma( lnDMA::DMA_PERIPH_TO_MEMORY,   lnAdcDesc[_instance].dmaEngine, lnAdcDesc[_instance].dmaChannel,  32,16)
+lnTimingAdc::lnTimingAdc(int instance)  : lnBaseAdc(instance), 
+        _dma( lnDMA::DMA_PERIPH_TO_MEMORY,   lnAdcDesc[_instance].dmaEngine, lnAdcDesc[_instance].dmaChannel,  32,16)
 {
     xAssert(instance==0); // we need DMA so only ADC0
     _timer=-1;
@@ -26,7 +27,6 @@ lnTimingAdc::lnTimingAdc(int instance)  : lnBaseAdc(instance), _dma( lnDMA::DMA_
     _fq=-1;
     _adcTimer=NULL;
     _nbPins=-1;
-
 }
 /**
  * 
@@ -52,6 +52,8 @@ bool     lnTimingAdc::setSource( int timer, int channel, int fq,int nbPins, lnPi
     _timer=timer;
     int source=-1;
     int timerId=-1,timerChannel=-1;
+    
+    lnBaseAdc::setup();
     
 #define SETTIM(c,a,b) case a*10+b: source=LN_ADC_CTL1_ETSRC_SOURCE_##c;timerId=a;timerChannel=b;break;
     switch(_timer*10+_channel)
@@ -149,18 +151,16 @@ void lnTimingAdc::dmaDone()
  * @param output
  * @return 
  */
-bool     lnTimingAdc::multiRead( int nbSamplePerChannel,  int *output) 
+bool     lnTimingAdc::multiRead( int nbSamplePerChannel,  uint16_t *output) 
 {
     LN_ADC_Registers *adc=lnAdcDesc[_instance].registers;       
     xAssert(_fq>0);
     // Program DMA
-    noInterrupts();
     _dma.beginTransfer();
     _dma.attachCallback(lnTimingAdc::dmaDone_,this);
     _dma.doPeripheralToMemoryTransferNoLock(nbSamplePerChannel*_nbPins, (uint16_t *)output,(uint16_t *)&( adc->RDATA),  false);
     // go !
     adc->CTL1|=LN_ADC_CTL1_DMA;
-    interrupts();
     _adcTimer->enable();    
     _dmaSem.take();
     _adcTimer->disable();
