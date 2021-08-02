@@ -43,7 +43,7 @@ typedef volatile LN_DAC_Registersx LN_DAC_Registers;
 #define LN_DAC_CTL_DTSEL_SOURCE_EXTI9 (6)
 
 #define LN_DAC_CTL_ENABLE(dac)             (1<<(0+16*dac)) // dac enable
-#define LN_DAC_CTL_DBOFF(dac)              (1<<(1+16*dac)) // dact enable
+#define LN_DAC_CTL_DBOFF(dac)              (1<<(1+16*dac)) // output buffer disable
 #define LN_DAC_CTL_DTEN(dac)               (1<<(2+16*dac)) // Trigger enable
 #define LN_DAC_CTL_DDMAEN0(dac)            (1<<(12+16*dac)) // dact enable
 #define LN_DAC_CTL_DTSEL(dac,source)       (source<<(3+16*dac)) // dact enable
@@ -52,7 +52,7 @@ typedef volatile LN_DAC_Registersx LN_DAC_Registers;
 
 //-------------- SWT ---------
 
-#define LN_DAC_SWT_ENABLE(dac)             (1<<(dac)) // 
+#define LN_DAC_SWT_ENABLE(dac)             (1<<(dac)) // software trigger
 
 // EOF
 
