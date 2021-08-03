@@ -167,7 +167,7 @@ bool     lnTimingAdc::multiRead( int nbSamplePerChannel,  uint16_t *output)
     // cleanup
     adc->CTL1&=~LN_ADC_CTL1_DMA;
     _dma.endTransfer();    
-    return false;
+    return true;
 }
 
 // EOF
