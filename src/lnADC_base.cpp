@@ -46,11 +46,14 @@ int lnBaseAdc::adcChannel(lnPin pin)
 void lnBaseAdc::readVcc()
 {
     LN_ADC_Registers *adc=lnAdcDesc[_instance].registers;
-    adc->CTL1 &=~LN_ADC_CTL1_ADCON;
-    adc->RSQS[2]=17;  // VREF
-    
+    //adc->CTL1 &=~LN_ADC_CTL1_ADCON;
     adc->CTL1|=LN_ADC_CTL1_TSVREN;
-    adc->CTL1 |=LN_ADC_CTL1_ADCON;
+    adc->RSQS[2]=17;  // VREF    
+    adc->RSQS[0]=0;  // VREF
+    adc->SAMPT[1]=LN_ADC_SAMPT_239_5; 
+    
+    
+    //adc->CTL1 |=LN_ADC_CTL1_ADCON;
     delayMicroseconds(10);
     //
     adc_vcc=0;
@@ -74,9 +77,9 @@ void lnBaseAdc::readVcc()
     //
     adc_vcc/=NB_VCC_AVERAGE;
     //
-    adc->CTL1 &=~LN_ADC_CTL1_ADCON;
+    //adc->CTL1 &=~LN_ADC_CTL1_ADCON;
     adc->CTL1&=~LN_ADC_CTL1_TSVREN;
-    adc->CTL1 |=LN_ADC_CTL1_ADCON;    
+    //adc->CTL1 |=LN_ADC_CTL1_ADCON;    
 }
 
 /**
@@ -94,7 +97,7 @@ void   lnBaseAdc:: setup()
     adc->CTL1|=LN_ADC_CTL1_ETERC;;
   
     adc->SAMPT[0]=0;
-    adc->SAMPT[1]=5; ; // 55.5 cycles
+    adc->SAMPT[1]=LN_ADC_SAMPT_239_5; 
     
     for(int i=0;i<4;i++)
         adc->IOFF[i]=0;
@@ -120,6 +123,10 @@ void   lnBaseAdc:: setup()
     delayMicroseconds(10);
     // reset calibration
     adc->CTL1|=LN_ADC_CTL1_RSTCLB;
+    while(adc->CTL1&LN_ADC_CTL1_RSTCLB)
+    {
+        __asm__("nop");
+    }
     adc->CTL1|=LN_ADC_CTL1_CLB;
     while(adc->CTL1&LN_ADC_CTL1_CLB)
     {

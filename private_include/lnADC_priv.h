@@ -25,6 +25,15 @@ struct LN_ADC_Registersx
 
 typedef volatile LN_ADC_Registersx LN_ADC_Registers;
 
+#define LN_ADC_SAMPT_1_5    0
+#define LN_ADC_SAMPT_7_5    1
+#define LN_ADC_SAMPT_13_5   2
+#define LN_ADC_SAMPT_28_5   3
+#define LN_ADC_SAMPT_41_5   4
+#define LN_ADC_SAMPT_55_5   5
+#define LN_ADC_SAMPT_71_5   6
+#define LN_ADC_SAMPT_239_5  7
+
 // STAT
 #define LN_ADC_STAT_WDE              (1<<0) // watchdog flag
 #define LN_ADC_STAT_EOC              (1<<1) // end of conversion
