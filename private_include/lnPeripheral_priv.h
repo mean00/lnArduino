@@ -54,4 +54,11 @@
 #define LN_GPIOC_ADR    (0x40011000)
 #define LN_GPIOD_ADR    (0x40011400)
 #define LN_GPIOE_ADR    (0x40011800)
+
+
+// RISCV
+
 #define LN_ECLIC_ADR    (0xd2000000)
+
+// ARM
+#define LN_ARM_SCB_ADR  (0xE000ED00)

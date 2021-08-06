@@ -5,7 +5,7 @@
 #include "lnArduino.h"
 #include "lnRCU.h"
 #include "lnRCU_priv.h"
-
+#include "lnCpuID.h"
 
 extern LN_RCU *arcu;
 // 
@@ -104,14 +104,7 @@ static void setPll(int multiplier, int predivider)
 //
 void lnInitSystemClock()
 {
-#ifdef LN_USE_FPU   
-     uint32_t    *cpacr=(uint32_t *) 0xE000ED88;
-     uint32_t v=cpacr[0];
-     v|=0xF<<20;
-     cpacr[0]=v;
-#endif
-
-
+    lnCpuID::identify();
     
     volatile uint32_t *control=&(arcu->CTL);
     volatile uint32_t *cfg0=&(arcu->CFG0);
@@ -145,6 +138,17 @@ void lnInitSystemClock()
     a&=~(7<<8);
     a|=4<<8;        // APB1 is AHB/2
     *cfg0=a;          
+    
+    
+    // it it is a STM32 chip, increase flash wait state
+    if(lnCpuID::vendor()==lnCpuID::LN_MCU_STM32)
+    {
+        int ws=0;
+        if(CLOCK_TARGET_SYSCLOCK>48) ws=2;
+        else if(CLOCK_TARGET_SYSCLOCK>24) ws=1;
+        
+        *(uint32_t *)0x40022000=0x30+ws; // enable prefetch
+    }
     
     // now switch system clock to pll
     a&=~(LN_RCU_CFG0_SYSCLOCK_MASK);
