@@ -432,7 +432,7 @@ void hwlnSPIClass::setup()
         }
     }       
     d->CTL0|=psc<<3;
-    updateMode(0,false); // Tx only by default    
+    updateMode(d,false); // Tx only by default    
 }
 /**
  * 
