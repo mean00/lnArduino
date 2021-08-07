@@ -16,7 +16,7 @@ SET( NVM ${AF_FOLDER}/libraries/NeVerMind)
 include_directories(${NVM})
 include_directories(${NVM}/gd32)
 
-SET(NVM_SRC ${NVM}/nvmCore.cpp  ${NVM}/gd32/nvmCore_gd32.cpp)        
+SET(NVM_SRC ${NVM}/nvmCore.cpp  ${NVM}/gd32/nvm_gd32.cpp)        
         
 GENERATE_GD32_FIRMWARE(hello hello.cpp ${NVM_SRC})        
 
