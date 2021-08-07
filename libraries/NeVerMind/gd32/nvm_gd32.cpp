@@ -7,18 +7,22 @@
 
 #include "nvm_gd32.h"
 
-extern const  uint32_t eeprom_begin;
-extern const  uint32_t eeprom_size;
-const uint32_t eepromBaseAddress=(uint32_t )&eeprom_begin;
-const uint32_t eepromSize=(uint32_t )&eeprom_size;
+extern "C"
+{
+extern const uint32_t eeprom_begin,eeprom_size;
+}
+
+#define EEPROM_BEGIN ((uint32_t )&eeprom_begin)
+#define EEPROM_SIZE  ((uint32_t )&eeprom_size)
+
 
 /**
  * 
  * @param nbSectors
  */
-lnNvmGd32::lnNvmGd32() : lnNvm(eeprom_size/LN_NVM_SECTOR_SIZE)
+lnNvmGd32::lnNvmGd32() : lnNvm(EEPROM_SIZE/LN_NVM_SECTOR_SIZE)
 {
-    _baseAddress=eepromBaseAddress;
+    _baseAddress=EEPROM_BEGIN;
     
 }
 /**
@@ -35,7 +39,7 @@ lnNvmGd32::~lnNvmGd32()
  */
 bool lnNvmGd32::eraseSector(int sector)
 {
-    xAssert(_baseAddress==eepromBaseAddress);
+    xAssert(_baseAddress==EEPROM_BEGIN);
     xAssert(sector<_nbSectors);
     return lnFMC::erase(_baseAddress+sector*1*LN_NVM_SECTOR_SIZE,LN_NVM_SECTOR_SIZE/1024);
 }
@@ -49,7 +53,7 @@ bool lnNvmGd32::eraseSector(int sector)
  */
 bool lnNvmGd32::writeSector(int sector, int offset, int size, uint8_t *data)
 {
-    xAssert(_baseAddress==eepromBaseAddress);
+    xAssert(_baseAddress==EEPROM_BEGIN);
     xAssert(sector<_nbSectors);
     return lnFMC::write(_baseAddress+sector*1*LN_NVM_SECTOR_SIZE+offset,data,size);
 }
@@ -63,7 +67,7 @@ bool lnNvmGd32::writeSector(int sector, int offset, int size, uint8_t *data)
  */
 bool lnNvmGd32::readSector(int sector, int offset, int size, uint8_t *data)
 {
-    xAssert(_baseAddress==eepromBaseAddress);
+    xAssert(_baseAddress==EEPROM_BEGIN);
     xAssert(sector<_nbSectors);
     uint8_t *adr=(uint8_t *)(_baseAddress+sector*1*LN_NVM_SECTOR_SIZE+offset);
     memcpy(data,adr,size);
@@ -76,7 +80,7 @@ bool lnNvmGd32::readSector(int sector, int offset, int size, uint8_t *data)
  */
 bool lnNvmGd32::verifyErase(int sector)
 {
-    xAssert(_baseAddress==eepromBaseAddress);
+    xAssert(_baseAddress==EEPROM_BEGIN);
     xAssert(sector<_nbSectors);
     uint8_t *adr=(uint8_t *)(_baseAddress+sector*1*LN_NVM_SECTOR_SIZE);
     for(int i=0;i<LN_NVM_SECTOR_SIZE;i++)

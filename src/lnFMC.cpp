@@ -38,6 +38,7 @@ static void unlock()
     // send unlock sequence
     aFMC->KEY=0x45670123;
     aFMC->KEY=0xCDEF89AB;
+    delayMicroseconds(100);
     // verify it is unlocked
     xAssert(!(aFMC->CTL  & LN_FMC_CTL_LK));
 }
@@ -78,8 +79,26 @@ bool lnFMC::erase(const uint32_t startAddress, int sizeInKBytes)
         aFMC->CTL|=LN_FMC_CTL_START;
         waitNotBusy();
         adr+=1024;
+        aFMC->CTL&=~LN_FMC_CTL_PER;
     }
+    
     return true;
+}
+
+static bool checkWriting()
+{
+    uint32_t stat=aFMC->STAT;
+       
+        aFMC->CTL&=~LN_FMC_CTL_PG;
+       if(stat & (LN_FMC_STAT_PG_ERR+LN_FMC_STAT_WP_ERR))
+       {
+           aFMC->STAT=LN_FMC_STAT_PG_ERR+LN_FMC_STAT_WP_ERR;
+           return false;
+       }
+       aFMC->STAT=LN_FMC_STAT_WP_ENDF;
+       if(!(stat & LN_FMC_STAT_WP_ENDF))
+           return false;
+       return true;
 }
 /**
  * 
@@ -108,6 +127,7 @@ bool lnFMC::write(const uint32_t startAddress, const uint8_t *data, int sizeInBy
         aFMC->CTL|=LN_FMC_CTL_PG;
         *(uint16_t *)previous=(uint32_t )data16;
         waitNotBusy();
+        if(!checkWriting()) return false;
         //
         adr++;
         sizeInBytes--;
@@ -122,6 +142,7 @@ bool lnFMC::write(const uint32_t startAddress, const uint8_t *data, int sizeInBy
           aFMC->CTL|=LN_FMC_CTL_PG;
           *adr16=data16;
           waitNotBusy();
+          if(!checkWriting()) return false;
           adr16++;
           data+=2;
     }
@@ -136,6 +157,7 @@ bool lnFMC::write(const uint32_t startAddress, const uint8_t *data, int sizeInBy
         aFMC->CTL|=LN_FMC_CTL_PG;
         *(uint16_t *)next=(uint32_t )data16;
         waitNotBusy();
+        if(!checkWriting()) return false;
         //
     }
     return true;
