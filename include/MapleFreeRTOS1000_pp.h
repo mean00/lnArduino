@@ -93,6 +93,29 @@ protected:
         SemaphoreHandle_t _handle;
 };
 
+
+/**
+ * 
+ * @param tex
+ */
+class xAutoMutex
+{
+public:    
+    xAutoMutex(xMutex *tex)
+    {
+        _tex=tex;
+        _tex->lock();
+    }
+    ~xAutoMutex()
+    {
+        _tex->unlock();
+        _tex=NULL;
+    }
+protected:    
+    xMutex *_tex;
+};
+
+
 void xDelay(int ms);
 
 extern "C" 
