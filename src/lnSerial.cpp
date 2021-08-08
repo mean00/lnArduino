@@ -172,7 +172,7 @@ void lnSerial::txDmaCb()
     // disable TC & TBE
     d->CTL0&=~( LN_USART_CTL0_TBIE +LN_USART_CTL0_TCIE);
     // clear TC
-    d->STAT&=~(LN_USART_STAT_TC);
+    // nope d->STAT&=~(LN_USART_STAT_TC);
     // clear DMA
     d->CTL2&=~(LN_USART_CTL2_DMA_TX);
     _txState=txIdle;
@@ -211,6 +211,15 @@ bool lnSerial::dmaTransmit(int size,uint8_t *buffer)
     
     _txDone.take();    
     _txDma.endTransfer();
+    
+    // Wait busy bit to clear out
+    while(!(d->STAT & LN_USART_STAT_TC))
+    {
+        __asm__("nop"::);
+    }
+    d->STAT&=~(LN_USART_STAT_TC);
+
+    
     _mutex.unlock();
     return true;
 }
