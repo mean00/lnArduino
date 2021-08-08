@@ -70,15 +70,15 @@ void TestNvm()
 void loop()
 {
    lnNvmGd32 nvm;
-   nvm.format();
-   delay(5000);
+  // nvm.format();
+  // delay(5000);
    Logger("Starting...\n");
    if(!nvm.begin())
    {
        nvm.format();
    }
    
-   for(int roundx=0;roundx<40;roundx++)
+   for(int roundx=0;roundx<40*3;roundx++)
    {
        Logger("Round %d  \n",roundx);
        InitNvm(nvm);
