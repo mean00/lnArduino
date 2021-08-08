@@ -17,32 +17,41 @@ void setup()
  * 
  */
 
-#define TAIST(x) {if(!(x)) Logger("FAILURE of %s at line \n",#x,__LINE__);return;}
+void stop()
+{
+    Logger("** FAILURE ** \n");
+    while(1)
+    {
+        delay(40);
+    }
+}
+
+#define TAIST(x) {bool result=x;if(!result) {Logger("FAILURE of %s at line \n",#x,__LINE__);stop();return;}}
 
       int val;
       
 void InitNvm(lnNvmGd32 &nvm)
 {
     
-    uint8_t v=1;
+   uint8_t v=1;
    TAIST(nvm.write(1,1,&v));
    v=0;
    
-   nvm.dumpEntries(0);
+   nvm.dumpEntries(-1);
    
    TAIST(nvm.read(1,1,&v));
    TAIST(v==1);
 
    v=2;
    TAIST(nvm.write(1,1,&v));
-   nvm.dumpEntries(0);
+   nvm.dumpEntries(-1);
    v=0;
    TAIST(nvm.read(1,1,&v));
    TAIST(v==2);
 
    v=3;
    TAIST(nvm.write(1,1,&v));
-   nvm.dumpEntries(0);
+   nvm.dumpEntries(-1);
    v=0;
    TAIST(nvm.read(1,1,&v));
    TAIST(v==3);
@@ -61,15 +70,18 @@ void TestNvm()
 void loop()
 {
    lnNvmGd32 nvm;
-   //nvm.format();
-   //delay(5000);
+ //  nvm.format();
+ //  delay(5000);
+   Logger("Starting...\n");
    if(!nvm.begin())
    {
        nvm.format();
    }
+   
    for(int roundx=0;roundx<40;roundx++)
    {
-        InitNvm(nvm);
+       Logger("Round %d  \n",roundx);
+       InitNvm(nvm);
    }
 
  

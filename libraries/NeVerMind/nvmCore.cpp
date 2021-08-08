@@ -6,11 +6,19 @@
 #include "nvmCore.h"
 #include "nvmCore_internal.h"
 
-#if 1
+#if 0
     #define VERBOSE Logger
 #else
-    #define  VERBOSE(x) {}
+    #define  VERBOSE(...) {}
 #endif
+
+
+#if 1
+    #define INFO Logger
+#else
+    #define  INFO(...) {}
+#endif
+
 /**
  * 
  * @param nbSectors
@@ -19,7 +27,12 @@ lnNvm::lnNvm(int nbSectors)
 {
     _nbSectors=nbSectors;
     _currentSector=NVM_INVALID_SECTOR;
+    _readIndex=0;
+    _writeIndex=0;
 }
+
+#define LN_NVM_ALLONES 0xffff
+
 /**
  * 
  */
@@ -48,10 +61,54 @@ bool lnNvm::begin()
         return false;    
     }
     _currentSector=sec;
+    sanityCheck();
     return true;
 }
-
-
+/**
+ */
+bool lnNvm::sanityCheck()
+{
+    if(_currentSector==NVM_INVALID_SECTOR) return false;
+    INFO("Starting sanity Check\n");
+    int offset=4;    
+    LN_NVM_ENTRY entry;
+    bool run=true;
+    int processed=0;
+    bool valid=false;
+    while(run && offset<(LN_NVM_SECTOR_SIZE-8-2))
+    {
+        if(!readSector(_currentSector,offset,8,(uint8_t *)&entry)) 
+        {
+            run=false;
+            continue;
+        }
+        int roundup=(entry.size+1)&0xfe;
+        if(LN_NVM_ALLONES==entry.id)
+        {
+            run=false;
+            valid=true;
+            break;
+        }
+        if(entry.size>LN_NVM_MAX_PAYLOAD)
+        {
+            VERBOSE("Payload exceeded %x :%d \n",offset,entry.size);
+            run=false;
+            continue;
+        }
+      
+        offset=offset+8+roundup;      
+        processed++;        
+        
+    }
+    if(valid==true)
+    {
+        INFO("Write ok\n");
+        _writeIndex=offset;
+    }    
+    _readIndex=offset;
+    INFO("read Offset =0x%x \n",_readIndex);    
+    return true;     
+}
 /**
  * Prepare sector 0
  * @return 
@@ -94,11 +151,11 @@ bool lnNvm::findEntry(int id, uint32_t &offset, LN_NVM_ENTRY &entry)
         {
             return false;
         } 
-        if(entry.id==0xffff) return false;
+        if(LN_NVM_ALLONES==entry.id) return false;
         int roundup=(entry.size+1)&0xfe;
         if(roundup>LN_NVM_MAX_PAYLOAD)
             return false;  
-        if(entry.state!=0 && entry.state!=0xffff)
+        if(entry.state!=0 && entry.state!=LN_NVM_ALLONES)
         {
             Logger("Broken entry at offset 0x%x\n",offset);
             return false;
@@ -108,7 +165,7 @@ bool lnNvm::findEntry(int id, uint32_t &offset, LN_NVM_ENTRY &entry)
             offset+=8+roundup;
             continue;
         }      
-        if(entry.state==0xffff) // valid
+        if(LN_NVM_ALLONES==entry.state) // valid
             return true;
         // invalid
          offset+=8+roundup;
@@ -158,12 +215,12 @@ bool lnNvm::getWriteAddress(uint32_t &offset)
         {
             return false;
         } 
-        if(entry.id==0xffff && entry.size==0xffff) return true; // got it
+        if(LN_NVM_ALLONES==entry.id && LN_NVM_ALLONES==entry.size) return true; // got it
         if(entry.size>LN_NVM_MAX_PAYLOAD) return false;
         int roundup=(entry.size+1)&0xfe;
         if(roundup>LN_NVM_MAX_PAYLOAD)
             return false;  
-        if(entry.state!=0 && entry.state!=0xffff)
+        if(entry.state!=0 && entry.state!=LN_NVM_ALLONES)
         {
             Logger("Broken entry at offset 0x%x\n",offset);
             return false;
@@ -184,34 +241,61 @@ bool lnNvm::getWriteAddress(uint32_t &offset)
  */
 bool lnNvm::write(int id, int size, uint8_t *data)
 {
-    if(_currentSector==NVM_INVALID_SECTOR) return false;
+    if(_currentSector==NVM_INVALID_SECTOR)
+    {
+        INFO("Write  : invalid sector\n");
+        return false;
+    }
+    if(_writeIndex<=0)
+    {
+        INFO("Cannot write\n");
+        return false;
+    }
     uint32_t oldOffset;
     LN_NVM_ENTRY entry;    
     bool hasOldEntry=findEntry(id, oldOffset, entry);
-    uint32_t writeAddress;
-    
-    
-    if(!getWriteAddress(writeAddress)) return false;
     
     // 
-    if((writeAddress+8+size)>=(LN_NVM_SECTOR_SIZE)*9/10)
-    {
-        if(!garbageCollection()) return false;
-        if(!getWriteAddress(writeAddress)) return false;
-    }
     int roundup=(size+1)&0xfe;
+    if((_writeIndex+8+roundup)>=(LN_NVM_SECTOR_SIZE)*9/10)
+    {
+        if(!garbageCollection())
+        {
+            INFO("Garbage collection failed \n");
+            return false;
+        }
+        if(!sanityCheck())
+        {
+            INFO("getWriteAddress  failed \n");
+            return false;
+        }
+    }
+    
     entry.id=id;
     entry.size=size;
-    entry.state=0xffff;
-    entry.tag=0xffff;
-    if(!writeSector(_currentSector,writeAddress,8,(uint8_t *)&entry)) return false;
-    if(!writeSector(_currentSector,writeAddress+8,roundup,data)) return false;
-    
+    entry.state=LN_NVM_ALLONES;
+    entry.tag=LN_NVM_ALLONES;
+    if(!writeSector(_currentSector,_writeIndex,8,(uint8_t *)&entry)) 
+    {
+        _writeIndex=0;
+        return false;
+    }
+    if(!writeSector(_currentSector,_writeIndex+8,roundup,data)) 
+    {
+        _writeIndex=0;
+        return false;
+    }
+    _writeIndex+=8+roundup;
     if(hasOldEntry)
     {
         uint16_t v=0;
-        if(!writeSector(_currentSector,oldOffset+4,2,(uint8_t *)&v)) return false; // invalidate old entry
+        if(!writeSector(_currentSector,oldOffset+LN_NVM_STATE_OFFSET,2,(uint8_t *)&v)) 
+        {
+            INFO("Erasing old value failed \n");
+            return false; // invalidate old entry
+        }
     }
+    INFO("OK\n");
     return true;
 }
 
@@ -259,9 +343,9 @@ LN_NVM_SECTOR_STATE lnNvm::getSectorState(int sector)
     uint16_t a,b;
     if(!readSector(sector,0,2,(uint8_t *)&a)) return Nvm_Error;
     if(!readSector(sector,2,2,(uint8_t *)&b)) return Nvm_Error;
-    if(a==0 && b==0xffff) return Nvm_Prep;
-    if(a==0 && b==0x00) return Nvm_Active;
-    if(a==0xffff && b==0xffff) return Nvm_Erased;
+    if(0==a && LN_NVM_ALLONES==b) return Nvm_Prep;
+    if(0==a && 0==b) return Nvm_Active;
+    if(LN_NVM_ALLONES==a && LN_NVM_ALLONES==b) return Nvm_Erased;
     return Nvm_Erased;
 }
 /**
@@ -290,7 +374,7 @@ bool lnNvm::garbageCollection()
             continue;
         }
         int roundup=(entry.size+1)&0xfe;
-        if(entry.id==0xffff)
+        if(LN_NVM_ALLONES==entry.id)
         {
             VERBOSE("End of scan at offset %x  \n",offset);
             run=false;
@@ -302,7 +386,7 @@ bool lnNvm::garbageCollection()
             run=false;
             continue;
         }
-        if(entry.state!=0xffff)
+        if(entry.state!=LN_NVM_ALLONES)
         {
             VERBOSE("Invalid entry at %x  :%x  \n",offset,entry.state);
             offset=offset+8+roundup;
@@ -317,12 +401,13 @@ bool lnNvm::garbageCollection()
         VERBOSE("Found valid entry %d  \n",entry.id);        
         offset=offset+8+roundup;
         // Write
-        entry.state=0xffff;
+        entry.state=LN_NVM_ALLONES;
         if(!writeSector(otherSector,writeOffset,8,(uint8_t *)&entry))
         {
             run=false;
             continue;
         }
+        INFO("Garbage collecint id=%d  \n",entry.id);
         writeOffset+=8;
         if(!writeSector(otherSector,writeOffset,roundup,tmp))
         {
@@ -334,10 +419,14 @@ bool lnNvm::garbageCollection()
         
     }
     Logger("Garbage collecting done %d entries processed\n",processed);
+    INFO("Switching to sector %d  \n",otherSector);
     if(!setSectorState(otherSector,Nvm_Active)) return false;
     int previousCurrent=_currentSector;
+    
+    INFO("Erasing old  sector %d  \n",previousCurrent);
     _currentSector=otherSector;
     eraseSector(previousCurrent);
+    INFO("New current sector= %d   \n",_currentSector);
     Logger("Garbage collecting ok\n");
     return true;    
 }
@@ -345,7 +434,7 @@ bool lnNvm::garbageCollection()
  */
 bool lnNvm::dumpEntries(int sector)
 {
-
+    if(sector==-1) sector=_currentSector;
     bool run=true;
     int processed=0;
     int offset=4;
@@ -356,19 +445,22 @@ bool lnNvm::dumpEntries(int sector)
         {
             return false;
         } 
-        if(entry.id==0xffff) return false;
+        if(LN_NVM_ALLONES==entry.id) return false;
         int roundup=(entry.size+1)&0xfe;
         if(roundup>LN_NVM_MAX_PAYLOAD)
             return false;  
-        if(entry.state!=0 && entry.state!=0xffff)
+        if(entry.state!=0 && entry.state!=LN_NVM_ALLONES)
         {
             Logger("Broken entry at offset 0x%x\n",offset);
             return false;
         }
-        Logger("Offset=%x  \n",offset);
-        Logger("ID    =%x  \n",entry.id);
-        Logger("size  =%x  \n",entry.size);
-        Logger("state =%x  \n",entry.state);
+         if(entry.state==LN_NVM_ALLONES)
+         {
+            Logger("Offset=%x  \n",offset);
+            Logger("ID    =%x  \n",entry.id);
+            Logger("size  =%x  \n",entry.size);
+            Logger("state =%x  \n",entry.state);
+         }
         // invalid
          offset+=8+roundup;
          continue;

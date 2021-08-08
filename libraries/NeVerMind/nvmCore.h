@@ -26,6 +26,7 @@ struct LN_NVM_ENTRY
     uint16_t tag;
 };
 
+#define LN_NVM_STATE_OFFSET 4
 
 /**
  * 
@@ -48,7 +49,8 @@ protected:
     int     _nbSectors;
     int     _currentSector;
     xMutex  _mutex;
-    int     _writeIndex;
+    int     _writeIndex; 
+    int     _readIndex;
     
     
     virtual bool eraseSector(int sector)=0;
@@ -66,6 +68,7 @@ protected:
     
     bool        findEntry(int id, uint32_t &offset, LN_NVM_ENTRY &entry);
     bool        getWriteAddress(uint32_t &address);
+    bool        sanityCheck();
     
 };
 // EOF
