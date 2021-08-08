@@ -70,8 +70,8 @@ void TestNvm()
 void loop()
 {
    lnNvmGd32 nvm;
- //  nvm.format();
- //  delay(5000);
+   nvm.format();
+   delay(5000);
    Logger("Starting...\n");
    if(!nvm.begin())
    {

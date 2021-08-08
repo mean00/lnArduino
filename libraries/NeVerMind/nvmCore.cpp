@@ -253,7 +253,7 @@ bool lnNvm::write(int id, int size, uint8_t *data)
     }
     uint32_t oldOffset;
     LN_NVM_ENTRY entry;    
-    bool hasOldEntry=findEntry(id, oldOffset, entry);
+  
     
     // 
     int roundup=(size+1)&0xfe;
@@ -266,11 +266,16 @@ bool lnNvm::write(int id, int size, uint8_t *data)
         }
         if(!sanityCheck())
         {
-            INFO("getWriteAddress  failed \n");
+            INFO("sanityCheck  failed \n");
+            return false;
+        }
+        if(_writeIndex<=0) 
+        {
+             INFO("sanityCheck (2)  failed \n");
             return false;
         }
     }
-    
+    bool hasOldEntry=findEntry(id, oldOffset, entry);
     entry.id=id;
     entry.size=size;
     entry.state=LN_NVM_ALLONES;
@@ -366,7 +371,7 @@ bool lnNvm::garbageCollection()
     int processed=0;
     int writeOffset=4;
     VERBOSE("Garbage collecting\n");
-    while(run && offset<(LN_NVM_SECTOR_SIZE-8-2))
+    while(run && offset<(_writeIndex))
     {
         if(!readSector(_currentSector,offset,8,(uint8_t *)&entry)) 
         {
@@ -386,7 +391,7 @@ bool lnNvm::garbageCollection()
             run=false;
             continue;
         }
-        if(entry.state!=LN_NVM_ALLONES)
+        if(LN_NVM_ALLONES!=entry.state)
         {
             VERBOSE("Invalid entry at %x  :%x  \n",offset,entry.state);
             offset=offset+8+roundup;
@@ -398,7 +403,7 @@ bool lnNvm::garbageCollection()
             run=false;
             continue;
         }
-        VERBOSE("Found valid entry %d  \n",entry.id);        
+        INFO("Found valid entry %d  \n",entry.id);        
         offset=offset+8+roundup;
         // Write
         entry.state=LN_NVM_ALLONES;
@@ -407,7 +412,7 @@ bool lnNvm::garbageCollection()
             run=false;
             continue;
         }
-        INFO("Garbage collecint id=%d  \n",entry.id);
+        INFO("Garbage collected id=%d  \n",entry.id);
         writeOffset+=8;
         if(!writeSector(otherSector,writeOffset,roundup,tmp))
         {
