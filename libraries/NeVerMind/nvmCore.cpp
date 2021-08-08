@@ -160,7 +160,7 @@ bool lnNvm::findEntry(int id, uint32_t &offset, LN_NVM_ENTRY &entry)
             Logger("Broken entry at offset 0x%x\n",offset);
             return false;
         }
-        if(id!=entry.id || entry.state==0)
+        if(id!=entry.id || entry.state==0 || entry.validated!=0)
         {
             offset+=8+roundup;
             continue;
@@ -279,13 +279,20 @@ bool lnNvm::write(int id, int size, uint8_t *data)
     entry.id=id;
     entry.size=size;
     entry.state=LN_NVM_ALLONES;
-    entry.tag=LN_NVM_ALLONES;
+    entry.validated=LN_NVM_ALLONES;
     if(!writeSector(_currentSector,_writeIndex,8,(uint8_t *)&entry)) 
     {
         _writeIndex=0;
         return false;
     }
     if(!writeSector(_currentSector,_writeIndex+8,roundup,data)) 
+    {
+        _writeIndex=0;
+        return false;
+    }
+    // fully written we can write validated too
+    uint16_t vd=0;
+     if(!writeSector(_currentSector,_writeIndex+LN_NVM_VALIDATED_OFFSET,2,(uint8_t *)&vd)) 
     {
         _writeIndex=0;
         return false;
@@ -391,7 +398,7 @@ bool lnNvm::garbageCollection()
             run=false;
             continue;
         }
-        if(LN_NVM_ALLONES!=entry.state)
+        if(LN_NVM_ALLONES!=entry.state || 0!=entry.validated)
         {
             VERBOSE("Invalid entry at %x  :%x  \n",offset,entry.state);
             offset=offset+8+roundup;
@@ -412,14 +419,24 @@ bool lnNvm::garbageCollection()
             run=false;
             continue;
         }
+                
         INFO("Garbage collected id=%d  \n",entry.id);
-        writeOffset+=8;
-        if(!writeSector(otherSector,writeOffset,roundup,tmp))
+        
+        if(!writeSector(otherSector,writeOffset+8,roundup,tmp))
         {
             run=false;
             continue;
         }
-        writeOffset+=roundup;
+        
+        // Validate it
+         uint16_t vd=0;
+        if(!writeSector(otherSector,writeOffset+LN_NVM_VALIDATED_OFFSET,2,(uint8_t *)&vd)) 
+        {
+            run=false;
+            continue;
+        }
+        
+        writeOffset+=8+roundup;
         processed++;        
         
     }

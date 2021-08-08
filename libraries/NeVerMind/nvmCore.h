@@ -23,10 +23,11 @@ struct LN_NVM_ENTRY
     uint16_t id;
     uint16_t size;
     uint16_t state; // ff active 0  inactive
-    uint16_t tag;
+    uint16_t validated;
 };
 
-#define LN_NVM_STATE_OFFSET 4
+#define LN_NVM_STATE_OFFSET     4
+#define LN_NVM_VALIDATED_OFFSET 6
 
 /**
  * 
