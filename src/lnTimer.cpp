@@ -119,6 +119,8 @@ void lnTimer::setPwmMode(int ratio1024)
 void lnTimer::enable()
 {
     LN_Timers_Registers *t=aTimers[_timer-1];
+    t->CNT=0;
+    // ?? t->SWEV |= LN_TIMER_SWEVG_UPG;
     t->CHCTL2 |=LN_TIMER_CHTL2_CHxEN(_channel); // basic enable, active high
 }
 /**
@@ -147,18 +149,19 @@ void lnTimer::setChannelRatio(int ratio1024)
 void lnTimer::singleShot(int durationMs, bool down)
 {
     LN_Timers_Registers *t=aTimers[_timer-1];
-    xAssert(durationMs<1000);
+    xAssert(durationMs<=100);
+   // noInterrupts();
     disable();
-    setTimerFrequency(1000000);
-    setPwmMode(durationMs);
-    if(!down)
+    setTimerFrequency(8); // 1024 ticks =  125 ms, 1 tick=0.122 ms
+    setPwmMode(durationMs*8);  // 
+    if(down)
         t->CHCTL2 |=LN_TIMER_CHTL2_CHxP(_channel); // by default on, it will be stopped when the timer is done
     else
         t->CHCTL2 &=~(LN_TIMER_CHTL2_CHxP(_channel));
     enable();
+    //interrupts();
     xDelay(durationMs+10);
-    disable();
-    
+    disable();    
 }
 
 //--
