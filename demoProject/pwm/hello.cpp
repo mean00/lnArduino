@@ -7,8 +7,8 @@
 #define LED PA2
 #endif
 
-#define PWM_PIN PB9
-#define TIMER 3
+#define PWM_PIN PB1
+#define TIMER 2
 #define CHANNEL 3
 
 void setup()
