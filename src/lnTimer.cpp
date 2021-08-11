@@ -119,6 +119,7 @@ void lnTimer::setPwmMode(int ratio1024)
 void lnTimer::enable()
 {
     LN_Timers_Registers *t=aTimers[_timer-1];
+    t->CNT = 0 ;
     t->CHCTL2 |=LN_TIMER_CHTL2_CHxEN(_channel); // basic enable, active high
 }
 /**
