@@ -20,6 +20,14 @@ void setup()
  * 
  */
 
+void pulse(lnTimer *t, int duration)
+{
+        Logger("duration=%d\n",duration);
+        t->setPwmMode(duration*8);
+        t->enable();
+        xDelay(duration+10);
+        t->disable();
+}
 
 
 void loop()
@@ -44,7 +52,7 @@ void loop()
         xDelay(1000);
     }
 #endif
-#if 1
+#if 0
     Logger("Shifting frequency\n");
     timer.setTimerFrequency(50*1000);
     timer.setPwmMode(ratio);
@@ -55,7 +63,9 @@ void loop()
     timer.setPwmMode(512);
     while(1)
     {
+        timer.disable();
         timer.setTimerFrequency(fq);
+        timer.enable();
         Logger("Fq=%d\n",fq);
         fq=fq*10;
         if(fq>=100*1000) fq=100;
@@ -64,12 +74,33 @@ void loop()
         onoff=!onoff;
         
     }
-#endif  
+#endif 
+
+
+#if 1
+    timer.setTimerFrequency(8);
+    timer.disable();
+    int duration=10;
+    while(1)
+    {
+        
+        Logger("duration=%d\n",duration);
+        pulse(&timer,duration);
+        duration+=10;
+        if(duration>100) duration-=100;
+        delay(1000);
+        digitalToggle(LED);
+        
+    }
+#endif
+ 
 #if 0
+    timer.setTimerFrequency(8);
+    timer.enable();
     while(1)
     {
         Logger("Ratio=%d\n",ratio);
-        timer.setChannelRatio(ratio);
+        timer.setPwmMode(ratio);
         if(!ratio || ratio==1024) step=-step;
         ratio+=step;
        
