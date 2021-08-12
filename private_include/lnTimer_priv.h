@@ -84,13 +84,27 @@ typedef volatile LN_Timers_Registersx LN_Timers_Registers;
 #define LN_TIMER_SWEVG_UPG                (1<<(6))            // Generate update event
 #define LN_TIMER_SWEVG_CHxG(channel)     (1<<(1+channel))     // Channel capture/compare event generation
 //-------------- CHTL0/1 ---------
-// Channel 0/1 => CHCTL0, 2/3  CHECK
-#define LN_TIMER_CHTLs_OUTPUT_CHxMS_SHIFT(channel)  (8*(channel&1)) // MODE_SELECTION
-#define LN_TIMER_CHTLs_OUTPUT_CHxFEN_ENABLE(channel)  (1<<(8*(channel&1)+2))
-#define LN_TIMER_CHTLs_OUTPUT_CHxSEN(channel)   (1<<(8*(channel&1)+3)) //SHADOW_ENABLE
-#define LN_TIMER_CHTLs_OUTPUT_CHxCOMCTL_SHIFT(channel)  (8*(channel&1)+4) //COMPARE_CONTROL
-#define LN_TIMER_CHTLs_OUTPUT_CHxCOMCEN         (1<<(8*(channel&1)+7)) //COMPARE_CLEAR_ENABLE
-      
+// /!\ these are unshifted value
+
+#define LN_TIME_CHCTL0_MS_OUPUT             (0)
+#define LN_TIME_CHCTL0_MS_MASK              (~(3))
+
+#define LN_TIME_CHCTL0_EN                   (1<<2)
+#define LN_TIME_CHCTL0_SEN                  (1<<3)
+#define LN_TIME_CHCTL0_CEN                  (1<<7)
+
+#define LN_CHCTL_MODE(x)        ((x)<<4)
+
+#define LN_TIME_CHCTL0_CTL_MASK             (~(7<<4))
+#define LN_TIME_CHCTL0_CTL_TIMING           LN_CHCTL_MODE(0)
+#define LN_TIME_CHCTL0_CTL_SET              LN_CHCTL_MODE(1)
+#define LN_TIME_CHCTL0_CTL_CLEAR            LN_CHCTL_MODE(2)
+#define LN_TIME_CHCTL0_CTL_TOGGLE           LN_CHCTL_MODE(3)
+#define LN_TIME_CHCTL0_CTL_FORCE_LOW        LN_CHCTL_MODE(4)
+#define LN_TIME_CHCTL0_CTL_FORCE_HIGH       LN_CHCTL_MODE(5)
+#define LN_TIME_CHCTL0_CTL_PWM0             LN_CHCTL_MODE(6)
+#define LN_TIME_CHCTL0_CTL_PWM1             LN_CHCTL_MODE(7)
+
 
 //-------------- CHTL2 ---------
 #define LN_TIMER_CHTL2_CHxEN(channel)                (1<<(0+channel*4))     // Channel x captue/compare enable

@@ -23,6 +23,7 @@ public:
         void setChannelRatio(int ratio1024); // Ratio=1024 => 100%, 512 => 50%, 0 => 0%
         //
         void singleShot(int durationMs, bool down=false);
+        void setForceState(bool forceHigh=false);
         void disable();
         void enable();
         int  timer() {return _timer;}

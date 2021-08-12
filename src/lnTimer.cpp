@@ -13,6 +13,16 @@ LN_Timers_Registers     *aTimer3=(LN_Timers_Registers *)(LN_TIMER3_ADR);
 LN_Timers_Registers     *aTimer4=(LN_Timers_Registers *)(LN_TIMER4_ADR);
 
 
+#define READ_CHANNEL_CTL(channel)       (  t->CHCTLs[channel>>1])>>(8*(channel&1))
+#define WRITE_CHANNEL_CTL(channel,val)  \
+    { \
+        int shift=8*(channel&1); \
+        uint32_t r=t->CHCTLs[(channel)>>1]; \
+        r&=0xff<<shift; \
+        r|=(val&0xff)<<shift; \
+        t->CHCTLs[channel>>1]=r; \
+    }
+
 LN_Timers_Registers *aTimers[4]={(LN_Timers_Registers *)(LN_TIMER1_ADR),(LN_Timers_Registers *)(LN_TIMER2_ADR),(LN_Timers_Registers *)(LN_TIMER3_ADR),(LN_Timers_Registers *)(LN_TIMER4_ADR)};
 /**
  * 
@@ -97,14 +107,15 @@ void lnTimer::setTimerFrequency(int fqInHz)
 void lnTimer::setPwmMode(int ratio1024)
 {
   LN_Timers_Registers *t=aTimers[_timer-1];
-  uint32_t chCtl=t->CHCTLs[_channel>>1] ;
+  uint32_t chCtl=READ_CHANNEL_CTL(_channel);
   
-  chCtl&=~(7<<LN_TIMER_CHTLs_OUTPUT_CHxCOMCTL_SHIFT(_channel));
-  chCtl&=~(3<<LN_TIMER_CHTLs_OUTPUT_CHxMS_SHIFT(_channel));
-  chCtl|=6<<LN_TIMER_CHTLs_OUTPUT_CHxCOMCTL_SHIFT(_channel); // PWM
-  chCtl|=0<<LN_TIMER_CHTLs_OUTPUT_CHxMS_SHIFT(_channel);
+    chCtl&=LN_TIME_CHCTL0_CTL_MASK;
+    chCtl|=LN_TIME_CHCTL0_CTL_PWM1;
+    chCtl&=LN_TIME_CHCTL0_MS_MASK;
+    chCtl|=LN_TIME_CHCTL0_MS_OUPUT;
   
-  t->CHCTLs[_channel>>1]=chCtl;
+  WRITE_CHANNEL_CTL(_channel,chCtl)
+
     
   t->CHCVs[_channel] =ratio1024; // A/R
 #if 0  
@@ -186,14 +197,16 @@ void lnAdcTimer::setTimerFrequency(int fqInHz)
     // Set reload to 0
     t->CAR=fracDiv-1;
     
-    uint32_t chCtl=t->CHCTLs[_channel>>1] ;
+    uint32_t chCtl=READ_CHANNEL_CTL(_channel);
   
-    chCtl&=~(7<<LN_TIMER_CHTLs_OUTPUT_CHxCOMCTL_SHIFT(_channel));
-    chCtl&=~(3<<LN_TIMER_CHTLs_OUTPUT_CHxMS_SHIFT(_channel));
-    chCtl|=6<<LN_TIMER_CHTLs_OUTPUT_CHxCOMCTL_SHIFT(_channel); // PWM
-    chCtl|=0<<LN_TIMER_CHTLs_OUTPUT_CHxMS_SHIFT(_channel);
-
-    t->CHCTLs[_channel>>1]=chCtl;
+    
+    chCtl&=LN_TIME_CHCTL0_CTL_MASK;
+    chCtl|=LN_TIME_CHCTL0_CTL_PWM1;
+    chCtl&=LN_TIME_CHCTL0_MS_MASK;
+    chCtl|=LN_TIME_CHCTL0_MS_OUPUT;
+    
+    WRITE_CHANNEL_CTL(_channel,chCtl)
+    
 
     t->CHCVs[_channel] =2; // A/R
     t->CHCTL2 &=~(LN_TIMER_CHTL2_CHxP(_channel)); // active low
