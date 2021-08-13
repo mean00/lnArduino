@@ -23,10 +23,11 @@ void setup()
 void pulse(lnTimer *t, int duration)
 {
         Logger("duration=%d\n",duration);
-        t->setPwmMode(duration*8);
-        t->enable();
-        xDelay(duration+10);
-        t->disable();
+        lnPinMode(PWM_PIN,lnALTERNATE_PP);   
+        t->singleShot(duration); // off by 2%
+        digitalWrite(PWM_PIN,0);
+        lnPinMode(PWM_PIN,lnOUTPUT);
+    
 }
 
 
@@ -59,7 +60,7 @@ void loop()
     timer.enable();
     
 
-    int fq=100;
+    int fq=1000;
     timer.setPwmMode(512);
     while(1)
     {
@@ -80,15 +81,15 @@ void loop()
 #if 1
     timer.setTimerFrequency(8);
     timer.disable();
-    int duration=10;
+    int duration=5;
     while(1)
     {
         
         Logger("duration=%d\n",duration);
         pulse(&timer,duration);
-        duration+=10;
+        //duration+=10;
         if(duration>100) duration-=100;
-        delay(1000);
+        delay(200);
         digitalToggle(LED);
         
     }

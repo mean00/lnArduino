@@ -93,10 +93,6 @@ void lnTimer::setTimerFrequency(int fqInHz)
     t->PSC=divider-1;
     // Set reload to 1024
     t->CAR=1024;
-    // Enable with default value
-    ctl0|=LN_TIMER_CTL0_CEN;
-    t->CTL0=ctl0;
-    
 }
 
 /**
@@ -130,9 +126,11 @@ void lnTimer::setPwmMode(int ratio1024)
 void lnTimer::enable()
 {
     LN_Timers_Registers *t=aTimers[_timer-1];
+    t->CTL0&=~LN_TIMER_CTL0_CEN;
     t->CNT=0;
     // ?? t->SWEV |= LN_TIMER_SWEVG_UPG;
     t->CHCTL2 |=LN_TIMER_CHTL2_CHxEN(_channel); // basic enable, active high
+    t->CTL0|=LN_TIMER_CTL0_CEN;
 }
 /**
  * 
@@ -141,6 +139,8 @@ void lnTimer::disable()
 {
     LN_Timers_Registers *t=aTimers[_timer-1];
     t->CHCTL2 &=~(LN_TIMER_CHTL2_CHxEN(_channel)); // basic enable, active high
+    t->CTL0&=~LN_TIMER_CTL0_CEN;
+    t->CNT=0;
 
 }
 
@@ -210,10 +210,6 @@ void lnAdcTimer::setTimerFrequency(int fqInHz)
 
     t->CHCVs[_channel] =2; // A/R
     t->CHCTL2 &=~(LN_TIMER_CHTL2_CHxP(_channel)); // active low
-    // Enable with default value
-    uint32_t ctl0=t->CTL0;
-    ctl0|=LN_TIMER_CTL0_CEN;
-    t->CTL0=ctl0;
-
+    
 }
 //EOF
