@@ -176,7 +176,7 @@ void lnTimer::singleShot(int durationMs, bool down)
     enable();
     //interrupts();
     //xDelay(durationMs+40);
-    xDelay(40);
+    xDelay(99);
     disable();    
     //t->CTL0&=~LN_TIMER_CTL0_SPM;
 }
