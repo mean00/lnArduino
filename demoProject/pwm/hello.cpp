@@ -45,6 +45,18 @@ void loop()
     int step=128;
     
 #if 0    
+    timer.setTimerFrequency(8);
+    timer.setPwmMode(5*85);
+    timer.enable();
+    while(1)
+    {
+        digitalToggle(LED);
+        xDelay(1000);
+    }
+#endif    
+    
+    
+#if 0    
     while(1)
     {
     
@@ -106,7 +118,7 @@ void loop()
         ratio+=step;
        
         roundup++;
-        vTaskDelay(100);
+        vTaskDelay(400);
         digitalToggle(LED);
         onoff=!onoff;
         

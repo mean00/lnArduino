@@ -163,16 +163,22 @@ void lnTimer::singleShot(int durationMs, bool down)
     xAssert(durationMs<=100);
    // noInterrupts();
     disable();
-    setTimerFrequency(8); // 1024 ticks =  125 ms, 1 tick=0.122 ms
-    setPwmMode(durationMs*8);  // 
-    if(down)
-        t->CHCTL2 |=LN_TIMER_CHTL2_CHxP(_channel); // by default on, it will be stopped when the timer is done
-    else
-        t->CHCTL2 &=~(LN_TIMER_CHTL2_CHxP(_channel));
+    setTimerFrequency(8); // 1024 ticks =  125 ms, 1 tick=0.122 ms    
+    
+    uint32_t chCtl=READ_CHANNEL_CTL(_channel);
+    chCtl&=LN_TIME_CHCTL0_MS_MASK;
+    chCtl|=LN_TIME_CHCTL0_MS_OUPUT;
+    chCtl&=LN_TIME_CHCTL0_CTL_MASK;
+    chCtl|=LN_TIME_CHCTL0_CTL_PWM0;  
+    WRITE_CHANNEL_CTL(_channel,chCtl)
+    t->CHCVs[_channel] =durationMs*8; // A/R
+   // t->CHCTL2 |=LN_TIMER_CHTL2_CHxP(_channel); // by default on, it will be stopped when the timer is done
     enable();
     //interrupts();
-    xDelay(durationMs+10);
+    //xDelay(durationMs+40);
+    xDelay(40);
     disable();    
+    //t->CTL0&=~LN_TIMER_CTL0_SPM;
 }
 
 //--
