@@ -171,14 +171,13 @@ void lnTimer::singleShot(int durationMs, bool down)
     chCtl&=LN_TIME_CHCTL0_CTL_MASK;
     chCtl|=LN_TIME_CHCTL0_CTL_PWM0;  
     WRITE_CHANNEL_CTL(_channel,chCtl)
-    t->CHCVs[_channel] =durationMs*8; // A/R
-   // t->CHCTL2 |=LN_TIMER_CHTL2_CHxP(_channel); // by default on, it will be stopped when the timer is done
+    t->CHCVs[_channel] =durationMs*8; // A/R    
     enable();
-    //interrupts();
-    //xDelay(durationMs+40);
-    xDelay(99);
+    xDelay(95);
     disable();    
-    //t->CTL0&=~LN_TIMER_CTL0_SPM;
+    chCtl&=LN_TIME_CHCTL0_CTL_MASK;
+    chCtl|=LN_TIME_CHCTL0_CTL_FORCE_LOW;  
+    
 }
 
 //--
