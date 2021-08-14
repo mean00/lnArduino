@@ -1,21 +1,16 @@
 #include "lnArduino.h"
 #include "lnTimer.h"
 
-#ifdef __arm__ 
-#define LED PC13
-#else
-#define LED PA2
-#endif
+
+#define LED LN_SYSTEM_LED
 
 #define PWM_PIN PB1
-#define TIMER 2
-#define CHANNEL 3
 
 void setup()
 {
-    pinMode(LED,OUTPUT);
-    
+    pinMode(LED,OUTPUT);    
 }
+int xduration=5;
 /**
  * 
  */
@@ -91,19 +86,14 @@ void loop()
 
 
 #if 1
-    timer.setTimerFrequency(8);
-    timer.disable();
-    int duration=5;
+    
     while(1)
     {
         
-        Logger("duration=%d\n",duration);
-        pulse(&timer,duration);
-        //duration+=10;
-        if(duration>100) duration-=100;
-        delay(200);
-        digitalToggle(LED);
-        
+        Logger("duration=%d\n",xduration);
+        pulse(&timer,xduration);
+        delay(100);
+        digitalToggle(LED);       
     }
 #endif
  

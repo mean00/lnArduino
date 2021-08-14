@@ -75,7 +75,7 @@ bool     lnTimingAdc::setSource( int timer, int channel, int fq,int nbPins, lnPi
     //
     if(_adcTimer) delete _adcTimer;
     _adcTimer=new lnAdcTimer(timerId, timerChannel);
-    _adcTimer->setTimerFrequency(fq);
+    _adcTimer->setPwmFrequency(fq);
     
     // add our channel(s)
     adc->RSQS[0]=((uint32_t)(nbPins-1))<<20;
@@ -139,7 +139,7 @@ void lnTimingAdc::dmaDone_(void *t)
  * 
  */
 void lnTimingAdc::dmaDone()
-{
+{ 
     _dmaSem.give();
 }
 /**

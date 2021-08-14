@@ -19,7 +19,7 @@ public:
     virtual ~lnTimer();
         // PWM
         void setPwmMode(int ratio1024);
-        void setTimerFrequency(int fqInHz); // This program the timer fq with a tick of 1024, i.e. internal fq is 1024* the given fq
+        void setPwmFrequency(int fqInHz); // This program the timer fq with a tick of 1024, i.e. internal fq is 1024* the given fq
         void setChannelRatio(int ratio1024); // Ratio=1024 => 100%, 512 => 50%, 0 => 0%
         //
         void singleShot(int durationMs, bool down=false);
@@ -30,6 +30,7 @@ public:
         int  channel() {return _channel;}
 protected:
         int _timer,  _channel;
+        void setTickFrequency(int fqInHz);
 
 };
 /**
@@ -46,5 +47,5 @@ public:
 
         }    
         // this is a single pulse timer
-        void setTimerFrequency(int fqInHz); 
+        void setPwmFrequency(int fqInHz); 
 };
