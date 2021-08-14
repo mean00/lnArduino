@@ -238,7 +238,7 @@ void lnTimer::singleShot(int durationMs, bool down)
     t->CTL0|=LN_TIMER_CTL0_CEN;
     t->CHCTL2 |=LN_TIMER_CHTL2_CHxEN(_channel); // basic enable, active high
     interrupts();
-    xDelay(99/SPEEDUP);
+    xDelay(durationMs+10);
     disable();        
 }
 
