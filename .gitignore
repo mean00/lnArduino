@@ -1,6 +1,7 @@
 *.sw*
 *.*~
 nbproject/*
+nbproject
 build/*
 build
 *.rej
