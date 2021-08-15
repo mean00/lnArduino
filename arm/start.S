@@ -48,7 +48,7 @@
         .type __start__, %function
 __start__:
         .fnstart
-        ldr r1,=__msp_init
+        ldr r1,=__msp_init-4
         mov sp,r1
         ldr r1,=start_c
         bx r1
