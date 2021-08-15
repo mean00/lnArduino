@@ -162,18 +162,54 @@ extern "C"
 extern "C" void deadEnd(int code)
 {
     static int lastErrorCode;
+    __asm__("cpsid if");  // disable interrupt
+    lastErrorCode=code;
     __asm__  ("bkpt 1");  
     // No interrrupt
-    ENTER_CRITICAL();
-    lastErrorCode=code;
+    
     while(1)
     {
         // blink red light...
-        
+        __asm__("nop");
+        __asm__("nop"); // do something to avoid deadlock
     }
-}       
+}    
+// https://developer.arm.com/documentation/dui0552/a/the-cortex-m3-processor/exception-model/exception-entry-and-return
+// https://interrupt.memfault.com/blog/arm-cortex-m-exceptions-and-nvic
 
-#define IRQ_STUBS(name,code) extern "C" void name() __attribute__((used)) ; extern "C" void name()   {    deadEnd(code);}  
+struct registerStack
+{
+    uint32_t R0,R1,R2,R3,R12,LR,PC,xPSR;
+};
+volatile registerStack *crashStructure;
+
+extern "C" void crashHandler2(void *sp)  __attribute__((used)) __attribute__((naked ));
+void crashHandler2(void *sp)  
+{
+    crashStructure=(registerStack *)sp;
+     __asm__("cpsid if    \n" );
+     deadEnd(0x90);
+}
+
+
+void crashHandler(int code)  __attribute__((used)) __attribute__((naked ));
+
+// https://www.freertos.org/Debugging-Hard-Faults-On-Cortex-M-Microcontrollers.html   
+#define IRQ_STUBS(name,code) extern "C" void name() __attribute__((used)) __attribute__((naked )); extern "C" void name()   \
+{ \
+    __asm__ \
+    ( \
+        " tst lr, #4                                                \n" \
+        " ite eq                                                    \n" \
+        " mrseq r0, msp                                             \n" \
+        " mrsne r0, psp                                             \n" \
+        " ldr r2, handler2_address_const"#name"                     \n" \
+        " bx r2                                                     \n" \
+        " handler2_address_const"#name": .word crashHandler2    \n" ::  \
+    ); \
+}
+           
+
 
 /**
  * 
