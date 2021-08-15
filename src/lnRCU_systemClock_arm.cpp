@@ -80,7 +80,7 @@ static const int Multipliers[]={
     8,9,10,11,12,13 // 10 11 12 13 14 15
 };
 
-static void setPll(int multiplier, int predivider)
+static void setPll(int multiplier, int predivider, bool external)
 {
     volatile uint32_t *control=&(arcu->CTL);
     volatile uint32_t *cfg0=&(arcu->CFG0);
@@ -97,7 +97,10 @@ static void setPll(int multiplier, int predivider)
     // Set PLL multiplier    
     c0&=~((0xf)<<18);    
     c0|=((pllMultiplier)&0x0f)<<18; // PLL Multiplier, ignore MSB        
-    c0 |=LN_RCU_CFG0_PLLSEL;
+    if(external)
+        c0 |=LN_RCU_CFG0_PLLSEL;
+    else
+        c0 &=~LN_RCU_CFG0_PLLSEL;
     *cfg0=c0;
 }
 
@@ -108,22 +111,25 @@ void lnInitSystemClock()
     
     volatile uint32_t *control=&(arcu->CTL);
     volatile uint32_t *cfg0=&(arcu->CFG0);
-    
-       
+#ifndef LN_USE_INTERNAL_CLOCK       
     {
         // start crystal...
         *control|=LN_RCU_CTL_HXTALEN;
         waitControlBit(LN_RCU_CTL_HXTASTB); // Wait Xtal stable
     }
      {
-        setPll(CLOCK_TARGET_SYSCLOCK/CLOCK_XTAL_VALUE,CLOCK_TARGET_PREDIV); // 8*9/1=72 Mhz        
+        setPll(CLOCK_TARGET_SYSCLOCK/CLOCK_XTAL_VALUE,CLOCK_TARGET_PREDIV,true); // 8*9/1=72 Mhz        
     }
     {
         // start PLL...
         *control|=LN_RCU_CTL_PLLEN;
         waitControlBit(LN_RCU_CTL_PLLSTB); // Wait Xtal stable
     }
-    
+#else
+    setPll(CLOCK_TARGET_SYSCLOCK/CLOCK_XTAL_VALUE,CLOCK_TARGET_PREDIV,false); // 8*9/1=72 Mhz        
+    *control|=LN_RCU_CTL_PLLEN;
+    waitControlBit(LN_RCU_CTL_PLLSTB); // Wait Xtal stable
+#endif    
    
     // Setup AHB...
     // AHB is Xtal:1, divider value=0    

@@ -1,0 +1,13 @@
+
+LN_ARCH
+    ARM
+        LN_MCU M3 or M4 +FP
+    RISCV
+        LN_MCU VF103
+
+LN_MCU_FLASH_SIZE : Total flash size , default is 128 kB for riscV, 64 kB for arm
+LN_MCU_RAM_SIZE   : Total Ram size, default is 32kB for riscv, 20 kB for arm
+LN_MCU_EEPROM_SIZE : # of 1024 bytes sector reserved for non volatile memory default is 2
+
+Optional :
+LN_USE_INTERNAL_CLOCK (ARM) : Set that to true to use the internal 8 Mhz oscillator

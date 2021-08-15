@@ -24,7 +24,9 @@ ADD_LIBRARY(gd32_overlay STATIC  MapleFreeRTOS1000_pp.cpp systemAlloc.cpp lnDebu
 ADD_LIBRARY(gd32_lowlevel STATIC  systemHelper.cpp lnStubs.cpp)
 
 TARGET_COMPILE_DEFINITIONS(gd32_overlay PRIVATE LN_MCU_SPEED=${LN_MCU_SPEED})
-                                     
+IF(LN_USE_INTERNAL_CLOCK)                                     
+        TARGET_COMPILE_DEFINITIONS(gd32_overlay PRIVATE LN_USE_INTERNAL_CLOCK)
+ENDIF(LN_USE_INTERNAL_CLOCK)                                     
                                          
 
         
