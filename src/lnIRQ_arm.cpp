@@ -161,15 +161,41 @@ extern "C"
  */
 extern "C" void deadEnd(int code)
 {
+    static int lastErrorCode;
     __asm__  ("bkpt 1");  
     // No interrrupt
     ENTER_CRITICAL();
+    lastErrorCode=code;
     while(1)
     {
         // blink red light...
         
     }
 }       
+
+#define IRQ_STUBS(name,code) extern "C" void name() __attribute__((used)) ; extern "C" void name()   {    deadEnd(code);}  
+
+/**
+ * 
+ * @param code
+ */
+
+IRQ_STUBS(RTC_IrqHandler,0x21);
+IRQ_STUBS(WDG_IrqHandler,0x22);
+IRQ_STUBS(Tamper_IrqHandler,0x23);
+IRQ_STUBS(RCU_IrqHandler,0x24);
+IRQ_STUBS(FMC_IrqHandler,0x25);
+IRQ_STUBS(HardFault_IrqHandler,0x26);
+IRQ_STUBS(NMI_IrqHandler,0x27);
+IRQ_STUBS(MemManage_IrqHandler,0x28);
+IRQ_STUBS(BusFault_IrqHandler,0x29);
+IRQ_STUBS(UsageFault_IrqHandler,0x2a);
+IRQ_STUBS(DebugMon_IrqHandler,0x2b);
+
+
+
+
+
 
 #define unsupported unsupportedInterrupt
 #include "lnIRQ_arm_vector.h"

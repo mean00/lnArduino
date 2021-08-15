@@ -9,29 +9,29 @@
 static const uint32_t LnVectorTable[]  __attribute__((aligned(256)))
 ={
 VEC(&msp[LN_MSP_SIZE_UINT32-1]), /* 0 LN_IRQ_MSI=-13, */
-VEC(__start__),         /*1 LN_IRQ_RESET                                                                           */
-VEC(unsupported),       /*2 LN_IRQ_NMI                                                                           */
-VEC(unsupported),       /*3 LN_IRQ_HARDFAULT                                                                           */
-VEC(unsupported),       /*4 LN_IRQ_MEMMANAGE                                                                           */
-VEC(unsupported),       /*5 LN_IRQ_BUSFAULT                                                                           */
-VEC(unsupported),       /*6 LN_IRQ_USAGEFAULT                                                                           */
+VEC(__start__),       /*1 LN_IRQ_RESET                                                                           */
+VEC(NMI_IrqHandler),       /*2 LN_IRQ_NMI                                                                           */
+VEC(HardFault_IrqHandler),       /*3 LN_IRQ_HARDFAULT                                                                           */
+VEC(MemManage_IrqHandler),       /*4 LN_IRQ_MEMMANAGE                                                                           */
+VEC(BusFault_IrqHandler),       /*5 LN_IRQ_BUSFAULT                                                                           */
+VEC(UsageFault_IrqHandler),       /*6 LN_IRQ_USAGEFAULT                                                                           */
 VEC(unsupported),       /*7 LN_IRQ_RESERVED                                                                           */
 VEC(unsupported),       /*8 LN_IRQ_RESERVED2                                                                           */
 VEC(unsupported),       /*9 LN_IRQ_RESERVED3                                                                           */
 VEC(unsupported),       /*10 LN_IRQ_RESERVED4                                                                           */
 VEC(vPortSVCHandler),   /*11 LN_IRQ_SVCALL                                                                           */
-VEC(unsupported),       /*12 LN_IRQ_DEBUGMON                                                                           */
+VEC(DebugMon_IrqHandler),       /*12 LN_IRQ_DEBUGMON                                                                           */
 VEC(unsupported),       /*13 LN_IRQ_RESERVED5                                                                           */
 VEC(xPortPendSVHandler),/*14 LN_IRQ_PENDSV                                                                           */
 VEC(xPortSysTickHandler),/*15 LN_IRQ_SYSTICK                                                                           */
 
 /* REAL IRQS */
-VEC(unsupported), /*LN_IRQ_WDGT               !< window watchDog timer interrupt                          */
+VEC(WDG_IrqHandler), /*LN_IRQ_WDGT               !< window watchDog timer interrupt                          */
 VEC(unsupported), /*LN_IRQ_LVD                 !< LVD through EXTI line detect interrupt                   */
-VEC(unsupported), /*LN_IRQ_TAMPER              !< tamper through EXTI line detect                          */
-VEC(unsupported), /*LN_IRQ_RTC                 !< RTC alarm interrupt                                      */
-VEC(unsupported), /*LN_IRQ_FMC                 !< FMC interrupt                                            */
-VEC(unsupported), /*LN_IRQ_RCU_CTC             !< RCU and CTC interrupt                                    */
+VEC(Tamper_IrqHandler), /*LN_IRQ_TAMPER              !< tamper through EXTI line detect                          */
+VEC(RTC_IrqHandler), /*LN_IRQ_RTC                 !< RTC alarm interrupt                                      */
+VEC(FMC_IrqHandler), /*LN_IRQ_FMC                 !< FMC interrupt                                            */
+VEC(RCU_IrqHandler), /*LN_IRQ_RCU_CTC             !< RCU and CTC interrupt                                    */
 VEC(EXTI0_IRQHandler), /*LN_IRQ_EXTI0               !< EXTI line 0 interrupts                                   */
 VEC(EXTI1_IRQHandler), /*LN_IRQ_EXTI1               !< 20 EXTI line 1 interrupts                                   */
 VEC(EXTI2_IRQHandler), /*LN_IRQ_EXTI2               !< EXTI line 2 interrupts                                   */
@@ -67,7 +67,7 @@ VEC(USART0_IRQHandler), /*LN_IRQ_USART0              !< 50 USART0 interrupt     
 VEC(USART1_IRQHandler), /*LN_IRQ_USART1              !< USART1 interrupt                                         */
 VEC(USART2_IRQHandler), /*LN_IRQ_USART2              !< USART2 interrupt                                         */
 VEC(EXTI10_15_IRQHandler), /*LN_IRQ_EXTI10_15           !< EXTI[15:10] interrupts                                   */
-VEC(unsupported), /*LN_IRQ_RTC_ALARM           !< RTC alarm interrupt EXTI                                 */
+VEC(RTC_IrqHandler), /*LN_IRQ_RTC_ALARM           !< RTC alarm interrupt EXTI                                 */
 VEC(unsupported), /*LN_IRQ_USBFS_WKUP          !< USBFS wakeup interrupt                                   */
 VEC(unsupported), /*LN_IRQ_EXMC                !< EXMC global interrupt                                    */
 VEC(unsupported), /*LN_IRQ_TIMER4              !< 57 TIMER4 global interrupt                                  */
