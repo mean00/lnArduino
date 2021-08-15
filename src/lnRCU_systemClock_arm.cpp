@@ -179,6 +179,7 @@ void lnInitSystemClock()
         waitControlBit(LN_RCU_CTL_HXTASTB); // Wait Xtal stable
         inputClock=CLOCK_XTAL_VALUE;
         useExternalClock=true;
+    }
 #else
         inputClock=8/2; // HSI is divided by 2
         useExternalClock=false;
