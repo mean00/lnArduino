@@ -6,11 +6,12 @@
 
 struct LN_PIN_MAPPING
 {
-    int pin;
-    int adc;
-    int timer;
-    int timerChannel;    
-    int dac;
+    int8_t pin;
+    int8_t adc;
+    int8_t timer;
+    int8_t timerChannel;    
+    int8_t dac;
+    int8_t filler;
 };
 
 extern const LN_PIN_MAPPING pinMappings[];
