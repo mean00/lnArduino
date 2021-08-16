@@ -28,6 +28,13 @@ void initTask(void *)
  * 
  * @return 
  */
+
+void resetMe(const Peripherals periph)
+{
+     lnPeripherals::enable(periph);
+     lnPeripherals::reset(periph);
+}
+
 int main()
 {
     //
@@ -38,18 +45,18 @@ int main()
     lnIrqSysInit();
     
     // The LEDs are all on GPIO A
-    lnPeripherals::enable(pGPIOA);
-    lnPeripherals::enable(pGPIOB);
-    lnPeripherals::enable(pGPIOC);
+    resetMe(pGPIOA);
+    resetMe(pGPIOB);
+    resetMe(pGPIOC);
         
     // We need alternate functions too
-    lnPeripherals::enable(pAF);
-    lnPeripherals::enable(pDMA0);
-    lnPeripherals::enable(pDMA1);
+    resetMe(pAF);
+    resetMe(pDMA0);
+    resetMe(pDMA1);
     
     // I2C0 & 1
-    lnPeripherals::enable(pI2C0);
-    lnPeripherals::enable(pI2C1);
+    resetMe(pI2C0);
+    resetMe(pI2C1);
     
     // Enable exti
     lnExtiSysInit();
@@ -59,26 +66,26 @@ int main()
     
     
     // Init SPI0/1/2
-    lnPeripherals::enable(pSPI0);
-    lnPeripherals::enable(pSPI1);
-    lnPeripherals::enable(pSPI2);
+    resetMe(pSPI0);
+    resetMe(pSPI1);
+    resetMe(pSPI2);
     
     // Init Timer 1..4
-    lnPeripherals::enable(pTIMER1);
-    lnPeripherals::enable(pTIMER2);
-    lnPeripherals::enable(pTIMER3);
-    lnPeripherals::enable(pTIMER4);
+    resetMe(pTIMER1);
+    resetMe(pTIMER2);
+    resetMe(pTIMER3);
+    resetMe(pTIMER4);
     
     // Basic timer
-    lnPeripherals::enable(pTIMER5);
-    lnPeripherals::enable(pTIMER6);
+    resetMe(pTIMER5);
+    resetMe(pTIMER6);
     
     // DAC
-     lnPeripherals::enable(pDAC);
+     resetMe(pDAC);
     
      // ADC
-     lnPeripherals::enable(pADC0);
-     lnPeripherals::enable(pADC1);
+     resetMe(pADC0);
+     resetMe(pADC1);
     
      
      lnRunTimeInitPostPeripherals();
