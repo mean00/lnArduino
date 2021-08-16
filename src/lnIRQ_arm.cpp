@@ -24,7 +24,7 @@ static uint32_t interruptVector[LN_NB_INTERRUPT]  __attribute__((aligned(256)));
 extern "C" void xPortPendSVHandler();
 extern "C" void xPortSysTickHandler();
 extern "C" void vPortSVCHandler();
-extern "C" void __start__();
+extern "C" void __exc_reset();
 
 static  volatile uint32_t curInterrupt;
 static  volatile LnIRQ   curLnInterrupt;

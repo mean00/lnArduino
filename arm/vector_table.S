@@ -34,7 +34,7 @@
 
 __stm32_vector_table:
 /* CM3 core interrupts */
-	.long	__msp_init
+	.long	__msp_init-4
 	.long	__exc_reset
 
 	.size	__stm32_vector_table, . - __stm32_vector_table

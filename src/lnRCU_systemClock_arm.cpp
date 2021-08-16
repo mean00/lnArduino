@@ -152,7 +152,7 @@ void lnInitSystemClock()
     enableDisableClock(LN_CLOCK_IRC8,true);
     // Switch SYS clock to IRC8
     uint32_t sysClock=arcu->CFG0;
-    sysClock&=LN_RCU_CFG0_SYSCLOCK_MASK; //  0 is IRC8
+    sysClock&=~LN_RCU_CFG0_SYSCLOCK_MASK; //  0 is IRC8
     arcu->CFG0=sysClock;
     while(1)
     {

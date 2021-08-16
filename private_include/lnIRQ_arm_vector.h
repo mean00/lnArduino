@@ -9,7 +9,7 @@
 static const uint32_t LnVectorTable[]  __attribute__((aligned(256)))
 ={
 VEC(&msp[LN_MSP_SIZE_UINT32-1]), /* 0 LN_IRQ_MSI=-13, */
-VEC(__start__),       /*1 LN_IRQ_RESET                                                                           */
+VEC(__exc_reset),       /*1 LN_IRQ_RESET                                                                           */
 VEC(NMI_IrqHandler),       /*2 LN_IRQ_NMI                                                                           */
 VEC(HardFault_IrqHandler),       /*3 LN_IRQ_HARDFAULT                                                                           */
 VEC(MemManage_IrqHandler),       /*4 LN_IRQ_MEMMANAGE                                                                           */
