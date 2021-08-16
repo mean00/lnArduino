@@ -164,9 +164,7 @@ extern "C" void deadEnd(int code)
     static int lastErrorCode;
     __asm__("cpsid if");  // disable interrupt
     lastErrorCode=code;
-    __asm__  ("bkpt 1");  
-    // No interrrupt
-    
+    __asm__  ("bkpt 1");      
     while(1)
     {
         // blink red light...
@@ -182,16 +180,26 @@ struct registerStack
     uint32_t R0,R1,R2,R3,R12,LR,PC,xPSR;
 };
 volatile registerStack *crashStructure;
-
+/**
+ * 
+ * @param sp
+ */
 extern "C" void crashHandler2(void *sp)  __attribute__((used)) __attribute__((naked ));
+/**
+ * 
+ * @param sp
+ */
 void crashHandler2(void *sp)  
 {
     crashStructure=(registerStack *)sp;
-     __asm__("cpsid if    \n" );
-     deadEnd(0x90);
+    __asm__("cpsid if    \n" );
+    deadEnd(0x90);
 }
 
-
+/**
+ * 
+ * @param code
+ */
 void crashHandler(int code)  __attribute__((used)) __attribute__((naked ));
 
 // https://www.freertos.org/Debugging-Hard-Faults-On-Cortex-M-Microcontrollers.html   
@@ -208,9 +216,6 @@ void crashHandler(int code)  __attribute__((used)) __attribute__((naked ));
         " handler2_address_const"#name": .word crashHandler2    \n" ::  \
     ); \
 }
-           
-
-
 /**
  * 
  * @param code
@@ -227,11 +232,6 @@ IRQ_STUBS(MemManage_IrqHandler,0x28);
 IRQ_STUBS(BusFault_IrqHandler,0x29);
 IRQ_STUBS(UsageFault_IrqHandler,0x2a);
 IRQ_STUBS(DebugMon_IrqHandler,0x2b);
-
-
-
-
-
 
 #define unsupported unsupportedInterrupt
 #include "lnIRQ_arm_vector.h"
