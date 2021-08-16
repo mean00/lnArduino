@@ -225,6 +225,13 @@ bool hwlnSPIClass::writeInternal(int sz, int data)
     LN_SPI_Registers *d=(LN_SPI_Registers *)_adr;
     updateDataSize(d,sz);
     updateMode(d,false);
+    
+    if(d->STAT & LN_SPI_STAT_CONFERR )
+    {
+        Logger("Conf Error\n");
+        return false;
+    }
+    
     senable();
     csOn();
     while (stxBusy()) 
@@ -373,9 +380,10 @@ void hwlnSPIClass::setup()
     LN_SPI_Registers *d=(LN_SPI_Registers *)_adr;
     xAssert(_settings);
     sdisable();
+    d->STAT&=LN_SPI_STAT_MASK;
     d->CTL0&=LN_SPI_CTL0_MASK;
     d->CTL1&=LN_SPI_CTL1_MASK;
-    d->STAT&=LN_SPI_STAT_MASK;
+    
     
     d->CTL0|=LN_SPI_CTL0_MSTMODE;
     // Drive the NSS by sw, pull it up

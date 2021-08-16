@@ -21,6 +21,7 @@ int nbSkipped=0;
 
 bool hwlnSPIClass::dmaWriteInternal(int wordSize,int nbTransfer, const uint8_t *data,bool repeat)
 {
+    bool r=true;
     if(!nbTransfer) return true;
     LN_SPI_Registers *d=(LN_SPI_Registers *)_adr;
     // 1- Configure DMA
@@ -35,17 +36,28 @@ bool hwlnSPIClass::dmaWriteInternal(int wordSize,int nbTransfer, const uint8_t *
     updateDmaTX(d,true); // activate DMA
 
     // 3- Go!
-    csOn();    
+    
     nbReq++;    
+    if(d->STAT & LN_SPI_STAT_CONFERR )
+    {
+        txDma.endTransfer();
+        Logger("Conf Error\n");
+        return false;
+    }    
+    csOn();    
     senable();
     if(false==_done.take(100)) // 100 ms should be plenty enough!
-        xAssert(0);
-    waitForCompletion(); 
+    {
+        r=false;
+    }else
+    {
+        waitForCompletion(); 
+    }
     txDma.endTransfer();
     csOff();    
     sdisable();
     updateDmaTX(d,false);
-    return true;
+    return r;
 }
 
 /**
