@@ -24,6 +24,10 @@ bool hwlnSPIClass::dmaWriteInternal(int wordSize,int nbTransfer, const uint8_t *
     bool r=true;
     if(!nbTransfer) return true;
     LN_SPI_Registers *d=(LN_SPI_Registers *)_adr;
+    
+    // that will clear errror
+    updateMode(d,false); // tx only
+    
     // 1- Configure DMA
     txDma.beginTransfer();
     txDma.attachCallback(exTxDone,this);    

@@ -49,6 +49,7 @@ void updateMode(LN_SPI_Registers *d,bool rxTx)
     {   // Tx Only: unidirectional, transmit only, 
         reg|=LN_SPI_CTL0_BDOEN | LN_SPI_CTL0_BDEN;
     }
+    volatile uint32_t s=d->STAT;
     d->CTL0=reg;
 
 }
