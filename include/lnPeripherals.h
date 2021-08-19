@@ -39,6 +39,7 @@ enum Peripherals
             pGPIOE,
             pAF,
             pDMA0,
-            pDMA1
+            pDMA1,
+            pUSB
     };
 // EOF
