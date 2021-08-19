@@ -96,8 +96,10 @@ static void _rcuAction(const Peripherals periph, int action)
         case 8: // AHB
             switch(action)
             {
-                case 1: arcu->AHBRST|= o->enable;
-                        arcu->AHBRST&= ~(o->enable); // not sure if it auto clears itself
+                case 1:
+                        // We can only reset USB
+                        if(periph==pUSB) xAssert(0);
+                        // else just ignore
                         break;
                 case 2: arcu->AHBEN |= o->enable;break;
                 case 3: arcu->AHBEN &=~o->enable;break;
