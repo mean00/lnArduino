@@ -123,7 +123,7 @@ bool     lnTimingAdc::setSource( int timer, int channel, int fq,int nbPins, lnPi
     }        
     adc->SAMPT[1]=smtp;
     // go !
-    adc->CTL1|=LN_ADC_CTL1_ADCON;
+    adc->CTL1|=LN_ADC_CTL1_ADCON+LN_ADC_CTL1_CTN;
     return true;
 }
 /**
