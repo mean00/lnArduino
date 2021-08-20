@@ -1,5 +1,6 @@
 
 #include "lnArduino.h"
+#include "lnPeripheral_priv.h"
 
 uint8_t ucHeap[configTOTAL_HEAP_SIZE];
 
@@ -31,8 +32,9 @@ void initTask(void *)
 
 void resetMe(const Peripherals periph)
 {
-     lnPeripherals::enable(periph);
-     lnPeripherals::reset(periph);
+    lnPeripherals::reset(periph);
+    lnPeripherals::enable(periph);
+     
 }
 
 int main()
@@ -88,16 +90,8 @@ int main()
      resetMe(pADC1);
     
      
-     lnRunTimeInitPostPeripherals();
+    lnRunTimeInitPostPeripherals();
      
-#warning FIXME FIXME FIXME
-#if 0    
-    // DMA TX for SPI0 (LCD)
-    DMA_CHCTL(LN_DMA0_ADR, 2) = (uint32_t)(DMA_PRIORITY_HIGH | DMA_CHXCTL_DIR); 
-    // DMA TX for usart0
-    DMA_CHCTL(LN_DMA0_ADR, 4) = (uint32_t)(DMA_PRIORITY_HIGH | DMA_CHXCTL_DIR); 
-    //
-#endif    
     // Start freertos
     xTaskCreate(initTask,"entryTask",500,NULL,2,NULL);    
     vTaskStartScheduler();      
