@@ -14,22 +14,11 @@
  * @param nbLeds
  * @param s
  */
-WS2812B::WS2812B(int nbLeds, hwlnSPIClass *s)
+WS2812B::WS2812B(int nbLeds, hwlnSPIClass *s) : WS2812B_base(nbLeds)
 {
-    _nbLeds=nbLeds;
     _spi=s;
-    _brightness=0xff;
-    _ledsColor=new uint8_t[3*nbLeds];
-    _ledsBrightness=new uint8_t[nbLeds];
     int up=((nbLeds+3)&(~3))+(WS_PREAMBLE+23)/24; // next multiple of 4 + add one before / one after
     _ledsColorSPI=new uint8_t[3*up*8]; // spi expansion    
-    for(int i=0;i<nbLeds;i++)
-    {
-        _ledsColor[3*i+0]=0;
-        _ledsColor[3*i+1]=0;
-        _ledsColor[3*i+2]=0;
-        _ledsBrightness[i]=255;        
-    }
     memset(  _ledsColorSPI,0,3*up*8);    
 }
 /**
@@ -61,8 +50,6 @@ WS2812B::~WS2812B()
 {
 #define XCLR(x)     delete [] x;x=NULL;
     XCLR(_ledsColorSPI);
-    XCLR(_ledsBrightness);
-    XCLR(_ledsColor);
 }
 /**
  * 
@@ -70,7 +57,7 @@ WS2812B::~WS2812B()
  */
  void   WS2812B::setGlobalBrightness(int value)
  {
-     _brightness=value;
+     WS2812B_base::setGlobalBrightness(value);
      convertAll();         
  }
  /**
@@ -81,16 +68,7 @@ WS2812B::~WS2812B()
   */
  void   WS2812B::setColor(int r,int g, int b)
  {
-     uint8_t *pr=_ledsColor;
-     uint8_t *pg=_ledsColor+1;
-     uint8_t *pb=_ledsColor+2;
-     for(int i=0;i<_nbLeds;i++)
-     {
-            *pr=r;
-            *pg=g;
-            *pb=b;
-            pr+=3;pb+=3;pg+=3;
-     }
+     WS2812B_base::setColor(r,g,b);
      convertAll();
  }
  /**
@@ -102,10 +80,7 @@ WS2812B::~WS2812B()
   */
  void   WS2812B::setLedColor(int led, int r,int g, int b)
  {
-      uint8_t *p=_ledsColor+led*3;
-      p[0]=g;
-      p[1]=r;
-      p[2]=b;
+      WS2812B_base::setLedColor(led,r,g,b);
       convert(led);
  }
  /**
@@ -115,7 +90,7 @@ WS2812B::~WS2812B()
   */
  void   WS2812B::setLedBrightness(int led, int brightness)
  {
-     _ledsBrightness[led]=brightness;
+     WS2812B_base::setLedBrightness(led,brightness);
      convert(led);     
  }
  /**
@@ -123,23 +98,6 @@ WS2812B::~WS2812B()
   */
  void WS2812B::update()
  {
-#if 0
-     // If need be we change the first byte to lower the duration of the "HIGH" state
-     // as the GD32 adds ~ 100 ns of extra high state
-     uint8_t v=_ledsColorSPI[0];
-     switch(v)
-     {
-         case (0x1f<<3):
-            v=0x1e<<3;
-            break;                    
-         case (0x7<<5):
-            v=0x6<<5;
-            break;
-         default:
-            break;                            
-     }
-     _ledsColorSPI[0]=v;
-#endif     
      _spi->dmaWrite(_nbLeds*3*8+WS_PREAMBLE,_ledsColorSPI); // add a couple of zeros at the end
  }
 /**
