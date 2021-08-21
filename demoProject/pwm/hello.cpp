@@ -4,7 +4,7 @@
 
 #define LED LN_SYSTEM_LED
 
-#define PWM_PIN PB1
+#define PWM_PIN PB0
 
 void setup()
 {
@@ -39,8 +39,8 @@ void loop()
     int ratio=1024;
     int step=128;
     
-#if 0    
-    timer.setTimerFrequency(8);
+#if 1    
+    timer.setPwmFrequency(10000);
     timer.setPwmMode(5*85);
     timer.enable();
     while(1)
@@ -85,7 +85,7 @@ void loop()
 #endif 
 
 
-#if 1
+#if 0
     
     while(1)
     {

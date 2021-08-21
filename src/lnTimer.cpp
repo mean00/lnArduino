@@ -145,6 +145,22 @@ void lnTimer::setTickFrequency(int fqInHz)
     if(!divider) divider=1;
     t->PSC=divider-1;
 }
+
+void lnTimer::setMode(lnTimerMode mode)
+{
+    LN_Timers_Registers *t=aTimers[_timer-1];
+    uint32_t chCtl=READ_CHANNEL_CTL(_channel);
+    chCtl&=LN_TIME_CHCTL0_CTL_MASK;
+    switch(mode) 
+    {
+        case lnTimerModePwm1 : chCtl|=LN_TIME_CHCTL0_CTL_PWM1;break;
+        default: xAssert(0);break;
+    }
+    chCtl&=LN_TIME_CHCTL0_MS_MASK;
+    chCtl|=LN_TIME_CHCTL0_MS_OUPUT;
+    WRITE_CHANNEL_CTL(_channel,chCtl)
+}
+
 /**
  * 
  * @param timer
@@ -153,15 +169,9 @@ void lnTimer::setTickFrequency(int fqInHz)
 void lnTimer::setPwmMode(int ratio1024)
 {
   LN_Timers_Registers *t=aTimers[_timer-1];
-  uint32_t chCtl=READ_CHANNEL_CTL(_channel);
   
-    chCtl&=LN_TIME_CHCTL0_CTL_MASK;
-    chCtl|=LN_TIME_CHCTL0_CTL_PWM1;
-    chCtl&=LN_TIME_CHCTL0_MS_MASK;
-    chCtl|=LN_TIME_CHCTL0_MS_OUPUT;
   
-  WRITE_CHANNEL_CTL(_channel,chCtl)
-
+  setMode(lnTimerModePwm1);
     
   t->CHCVs[_channel] =ratio1024; // A/R
 #if 0  

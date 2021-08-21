@@ -242,7 +242,7 @@ void lnDMA::endTransfer()
  * @param repeat
  * @return 
  */
-bool lnDMA::doMemoryToPeripheralTransferNoLock(int count, const uint16_t *source,const uint16_t *target,  bool repeat,bool circular)
+bool lnDMA::doMemoryToPeripheralTransferNoLock(int count, const uint16_t *source,const uint16_t *target,  bool repeat,bool circular,bool  bothInterrupts)
 {
      // clear pending bits
     DMA_struct *d=(DMA_struct *)_dma;
@@ -267,11 +267,19 @@ bool lnDMA::doMemoryToPeripheralTransferNoLock(int count, const uint16_t *source
     {
         control|=LN_DMA_CHAN_CMEN; // replay the dma in a loop
         control|=LN_DMA_CHAN_ERRIE; // error  interrupt
-        control&=~LN_DMA_CHAN_TFTFIE;
+        if(bothInterrupts)
+        {
+            control |=LN_DMA_CHAN_TFTFIE+LN_DMA_CHAN_HTFIE;
+        }else
+        {
+            control&=~LN_DMA_CHAN_TFTFIE;
+        }
     }else
     {
         control&=~LN_DMA_CHAN_CMEN; 
         control|=LN_DMA_CHAN_ERRIE+LN_DMA_CHAN_TFTFIE; // error and transmit complete interrupt        
+        if(bothInterrupts)
+            control|=LN_DMA_CHAN_HTFIE;
     }
         
     
@@ -289,7 +297,7 @@ bool lnDMA::doMemoryToPeripheralTransferNoLock(int count, const uint16_t *source
  * @param circularMode
  * @return 
  */
-bool    lnDMA::doPeripheralToMemoryTransferNoLock(int count, const uint16_t *target,const uint16_t *source,  bool circularMode)
+bool    lnDMA::doPeripheralToMemoryTransferNoLock(int count, const uint16_t *target,const uint16_t *source,  bool circular,bool bothInterrupts)
 {
      // clear pending bits
     DMA_struct *d=(DMA_struct *)_dma;
@@ -310,15 +318,23 @@ bool    lnDMA::doPeripheralToMemoryTransferNoLock(int count, const uint16_t *tar
 
     control|=LN_DMA_CHAN_MINCREASE; // increase address
     
-    if(circularMode)
+    if(circular)
     {
         control|=LN_DMA_CHAN_CMEN; // replay the dma in a loop
         control|=LN_DMA_CHAN_ERRIE; // error  interrupt
-        control&=~LN_DMA_CHAN_TFTFIE;
+        if(bothInterrupts)
+        {
+            control |=LN_DMA_CHAN_TFTFIE+LN_DMA_CHAN_HTFIE;
+        }else
+        {
+            control&=~LN_DMA_CHAN_TFTFIE;
+        }
     }else
     {
         control&=~LN_DMA_CHAN_CMEN; 
         control|=LN_DMA_CHAN_ERRIE+LN_DMA_CHAN_TFTFIE; // error and transmit complete interrupt        
+        if(bothInterrupts)
+            control|=LN_DMA_CHAN_HTFIE;
     }
     c->CTL=control|LN_DMA_CHAN_ENABLE; // GO!       
     lnEnableInterrupt(_irq);        

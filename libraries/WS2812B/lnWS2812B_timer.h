@@ -14,7 +14,7 @@
 class WS2812B_timer : public WS2812B_base, public lnDmaTimerCallback
 {
 public:
-                    WS2812B_timer(int nbLeds, int pin);
+                    WS2812B_timer(int nbLeds, lnPin pin);
         virtual     ~WS2812B_timer();
         
              void   begin(); // call this first
@@ -22,6 +22,7 @@ public:
              bool   timerCallback(bool half);
 
 protected:
+            lnPin        _pin;
             lnDmaTimer   *_timer;
             uint16_t      _timerPwmValue[48]; 
             uint16_t      _one,_zero;

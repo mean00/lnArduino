@@ -6,294 +6,53 @@
 #include "lnTimer.h"
 #include "lnTimer_priv.h"
 #include "lnPinMapping.h"
-#if 0
-LN_Timers_Registers     *aTimer1=(LN_Timers_Registers *)(LN_TIMER1_ADR);
-LN_Timers_Registers     *aTimer2=(LN_Timers_Registers *)(LN_TIMER2_ADR);
-LN_Timers_Registers     *aTimer3=(LN_Timers_Registers *)(LN_TIMER3_ADR);
-LN_Timers_Registers     *aTimer4=(LN_Timers_Registers *)(LN_TIMER4_ADR);
 
+extern LN_Timers_Registers *aTimers[4];
 
-#define READ_CHANNEL_CTL(channel)       (  t->CHCTLs[channel>>1])>>(8*(channel&1))
-#define WRITE_CHANNEL_CTL(channel,val)  \
-    { \
-        int shift=8*(channel&1); \
-        uint32_t r=t->CHCTLs[(channel)>>1]; \
-        r&=0xff<<shift; \
-        r|=(val&0xff)<<shift; \
-        t->CHCTLs[channel>>1]=r; \
-    }
-
-LN_Timers_Registers *aTimers[4]={(LN_Timers_Registers *)(LN_TIMER1_ADR),(LN_Timers_Registers *)(LN_TIMER2_ADR),(LN_Timers_Registers *)(LN_TIMER3_ADR),(LN_Timers_Registers *)(LN_TIMER4_ADR)};
-/**
- * 
- * @param timer
- * @param channel
- */
-lnTimer::lnTimer(int timer,int channel)
-{
-    _timer=timer;
-    _channel=channel;
-}
-/**
- * 
- * @param pin
- */
-lnTimer::lnTimer(int pin)
-{
-    const LN_PIN_MAPPING *pins=pinMappings;
-    while(1)
-    {
-        xAssert(pins->pin!=-1);
-        if(pins->pin==pin)
-        {
-            _timer=pins->timer;
-            _channel=pins->timerChannel;
-            return;
-        }
-        pins++;
-    }
-}
-
-/**
- */
-lnTimer::~lnTimer()
-{
-    
-}
-
-/**
- * 
- * @param timer
- */
-void lnTimer::setPwmFrequency(int fqInHz)
-{
-//--
-  LN_Timers_Registers *t=aTimers[_timer-1];
-    Peripherals per=pTIMER1;
-    per=(Peripherals)((int)per+_timer-1);
-    uint32_t clock=lnPeripherals::getClock(per);
-    // If ABP1 prescale=1, clock*=2 ???? see 5.2 in GD32VF103
-    // disable
-    t->CTL0&=~LN_TIMER_CTL0_CEN;
-    
-    int divider=(clock+(fqInHz*512))/(fqInHz*1024);
-    divider*=2;
-    int preDiv=2;  
-    while(divider>65535)
-    {
-        preDiv=preDiv*2;
-        divider=divider/2;
-    }
-    if(preDiv>8) preDiv=8;
-    
-    //
-    lnADC_DIVIDER adcDiv;
-    switch(preDiv)
-    {
-        switch(preDiv)
-        {
-            case 2:  adcDiv=lnADC_CLOCK_DIV_BY_2;break;
-            case 4:  adcDiv=lnADC_CLOCK_DIV_BY_4;break;
-            case 8:  adcDiv=lnADC_CLOCK_DIV_BY_8;break;
-            default: xAssert(0);break;
-        }
-    }
-    lnPeripherals::setAdcDivider(adcDiv);
-    uint32_t ctl0=t->CTL0;    
-    if(!divider) divider=1;
-    t->PSC=divider-1;    
-    t->CAR=1024;
-}
-/**
- * 
- * @param fqInHz
- */
-void lnTimer::setTickFrequency(int fqInHz)
-{
-    LN_Timers_Registers *t=aTimers[_timer-1];
-    Peripherals per=pTIMER1;
-    per=(Peripherals)((int)per+_timer-1);
-    uint32_t clock=lnPeripherals::getClock(per);
-    // If ABP1 prescale=1, clock*=2 ???? see 5.2 in GD32VF103
-    // disable
-    t->CTL0&=~LN_TIMER_CTL0_CEN;
-    
-    int divider=(clock+fqInHz/2)/(fqInHz);
-    divider*=2;
-    int preDiv=2;  
-    while(divider>65535)
-    {
-        preDiv=preDiv*2;
-        divider=divider/2;
-    }
-    if(preDiv>8) preDiv=8;
-    
-    //
-    lnADC_DIVIDER adcDiv;
-    switch(preDiv)
-    {
-        switch(preDiv)
-        {
-            case 2:  adcDiv=lnADC_CLOCK_DIV_BY_2;break;
-            case 4:  adcDiv=lnADC_CLOCK_DIV_BY_4;break;
-            case 8:  adcDiv=lnADC_CLOCK_DIV_BY_8;break;
-            default: xAssert(0);break;
-        }
-    }
-    lnPeripherals::setAdcDivider(adcDiv);
-    uint32_t ctl0=t->CTL0;    
-    if(!divider) divider=1;
-    t->PSC=divider-1;
-}
-/**
- * 
- * @param timer
- * @param channel
- */
-void lnTimer::setPwmMode(int ratio1024)
-{
-  LN_Timers_Registers *t=aTimers[_timer-1];
-  uint32_t chCtl=READ_CHANNEL_CTL(_channel);
-  
-    chCtl&=LN_TIME_CHCTL0_CTL_MASK;
-    chCtl|=LN_TIME_CHCTL0_CTL_PWM1;
-    chCtl&=LN_TIME_CHCTL0_MS_MASK;
-    chCtl|=LN_TIME_CHCTL0_MS_OUPUT;
-  
-  WRITE_CHANNEL_CTL(_channel,chCtl)
-
-    
-  t->CHCVs[_channel] =ratio1024; // A/R
-#if 0  
-  t->CHCTL2 |=LN_TIMER_CHTL2_CHxP(_channel);
-#else
-  t->CHCTL2 &=~(LN_TIMER_CHTL2_CHxP(_channel)); // active low
-#endif
-}
-/**
- * 
- */
-void lnTimer::enable()
-{
-    LN_Timers_Registers *t=aTimers[_timer-1];
-    t->CTL0&=~LN_TIMER_CTL0_CEN;
-    t->CNT=0;
-    // ?? t->SWEV |= LN_TIMER_SWEVG_UPG;
-    t->CHCTL2 |=LN_TIMER_CHTL2_CHxEN(_channel); // basic enable, active high
-    t->CTL0|=LN_TIMER_CTL0_CEN;
-}
-/**
- * 
- */
-void lnTimer::disable()
-{
-    LN_Timers_Registers *t=aTimers[_timer-1];
-    t->CHCTL2 &=~(LN_TIMER_CHTL2_CHxEN(_channel)); // basic enable, active high
-    t->CTL0&=~LN_TIMER_CTL0_CEN;
-    t->CNT=0;
-    uint32_t chCtl=READ_CHANNEL_CTL(_channel);
-    chCtl&=LN_TIME_CHCTL0_CTL_MASK;
-    chCtl|=LN_TIME_CHCTL0_CTL_FORCE_LOW;  
-    WRITE_CHANNEL_CTL(_channel,chCtl)
-}
-
-/**
- * 
- * @param ratioBy100
- */
-void lnTimer::setChannelRatio(int ratio1024)
-{
-    LN_Timers_Registers *t=aTimers[_timer-1];
-    t->CHCVs[_channel] =ratio1024; // A/R
-}
-/**
- * 
- * @param ratio1024
- */
-#if 0
-#define SPEEDUP 10
-#else
-#define SPEEDUP 1
-#endif
-void lnTimer::singleShot(int durationMs, bool down)
-{
-    LN_Timers_Registers *t=aTimers[_timer-1];
-    xAssert(durationMs<=100);
-   // noInterrupts();
-    disable();
-    setTickFrequency(10*1000*SPEEDUP); // 1 tick=1ms
-    t->CAR=10000;
-    t->CNT=0;
-    
-    uint32_t chCtl=READ_CHANNEL_CTL(_channel);
-    chCtl&=LN_TIME_CHCTL0_MS_MASK;
-    chCtl|=LN_TIME_CHCTL0_MS_OUPUT;
-    chCtl&=LN_TIME_CHCTL0_CTL_MASK;
-    chCtl|=LN_TIME_CHCTL0_CTL_PWM0;  
-    WRITE_CHANNEL_CTL(_channel,chCtl)
-    t->CHCVs[_channel] =durationMs*10; // high then low when timer elapsed
-    noInterrupts();
-    //t->CTL0|=LN_TIMER_CTL0_SPM; // sign
-    t->CNT=t->CAR-2;
-    t->CTL0|=LN_TIMER_CTL0_CEN;
-    t->CHCTL2 |=LN_TIMER_CHTL2_CHxEN(_channel); // basic enable, active high
-    interrupts();
-    xDelay(durationMs+10);
-    disable();        
-}
-
-//--
-void lnAdcTimer::setPwmFrequency(int fqInHz)
-{
-    LN_Timers_Registers *t=aTimers[_timer-1];
-    Peripherals per=pTIMER1;
-    per=(Peripherals)((int)per+_timer-1);
-    uint32_t clock=lnPeripherals::getClock(per);
-    // If ABP1 prescale=1, clock*=2 ???? see 5.2 in GD32VF103
-    clock=clock*2;
-    // disable
-    t->CTL0&=~LN_TIMER_CTL0_CEN;
-    
-    int divider=clock/(fqInHz);
-    
-    int intDiv=divider/65536;
-    int fracDiv=divider & 65535;
-    
-    if(!intDiv) intDiv=1;
-    t->PSC=intDiv-1;
-    // Set reload to 0
-    t->CAR=fracDiv-1;
-    
-    uint32_t chCtl=READ_CHANNEL_CTL(_channel);
-  
-    
-    chCtl&=LN_TIME_CHCTL0_CTL_MASK;
-    chCtl|=LN_TIME_CHCTL0_CTL_PWM1;
-    chCtl&=LN_TIME_CHCTL0_MS_MASK;
-    chCtl|=LN_TIME_CHCTL0_MS_OUPUT;
-    
-    WRITE_CHANNEL_CTL(_channel,chCtl)
-    
-
-    t->CHCVs[_channel] =2; // A/R
-    t->CHCTL2 &=~(LN_TIMER_CHTL2_CHxP(_channel)); // active low
-    
-}
-#endif
 /**
  * 
  * @param pin
  */
 lnDmaTimer::lnDmaTimer(int pin) : lnTimer(pin)
 {
-
+    const LN_PIN_MAPPING *pins=pinMappings;
+    int dmaChannel=-1;
+    int dmaEngine=-1;
+    _timer=-1;
+    while(1)
+    {
+        xAssert(pins->pin!=-1); //t2c1
+        if(pins->pin==pin)
+        {
+            _timer=pins->timer;
+            _channel=pins->timerChannel;
+            break;
+        }
+        pins++;
+    }
+    if(_timer==-1) xAssert(0);
+    switch(_timer*10+_channel)
+    {
+        case 02:     dmaChannel=5;dmaEngine=0;break;
+        case 22:     dmaChannel=2;dmaEngine=0;break;
+        default:     xAssert(0);break;
+        
+    }
+    
+    dmaChannel=5;
+    dmaEngine=0;            
+    _dma=new lnDMA(lnDMA::DMA_MEMORY_TO_PERIPH,dmaEngine,dmaChannel,16,16);
 }
 /**
  * 
  */
 lnDmaTimer:: ~lnDmaTimer()
 {
-
+    if(_dma)
+    {
+        delete _dma;
+        _dma=NULL;
+    }
 }
 /**
  * 
@@ -302,7 +61,11 @@ lnDmaTimer:: ~lnDmaTimer()
  */
 bool    lnDmaTimer::pwmSetup(int frequency)
 {
-    return false;
+    LN_Timers_Registers *t=aTimers[_timer-1];
+    setTickFrequency(frequency);
+    _rollover=t->CAR+1;
+    setMode(lnTimerModePwm1);
+    return true;
 }
 /**
  * 
@@ -319,7 +82,28 @@ int     lnDmaTimer::rollover()
  */
 bool    lnDmaTimer::attachDmaCallback(lnDmaTimerCallback *cb)
 {
-    return false;
+    _cb=cb;
+    return true;
+}
+/**
+ * 
+ * @param nbSample
+ * @param data
+ * @return 
+ */
+
+
+static void _dmaCallback(void *c)
+{
+    lnDmaTimer *t=(lnDmaTimer *)c;
+    t->dmaInterrupt();
+}
+/**
+ * 
+ */
+void lnDmaTimer::dmaInterrupt()
+{
+    xAssert(0);
 }
 /**
  * 
@@ -328,7 +112,47 @@ bool    lnDmaTimer::attachDmaCallback(lnDmaTimerCallback *cb)
  * @return 
  */
 bool    lnDmaTimer::start(int nbSample, uint16_t *data)
-{
+{   
+    LN_Timers_Registers *t=aTimers[_timer-1];
+    
+    _dma->beginTransfer(); // lock dma
+    _dma->attachCallback(_dmaCallback,this);
+    // circular, no repeat, both interrupt
+    _dma->doMemoryToPeripheralTransferNoLock(nbSample,(uint16_t *)data,(uint16_t *)&(t->CHCVs[_channel]),false,true,true);                
+    // PWM mode 1
+    t->CHCVs[_channel]=_rollover/2;
+    enable();
+    while(1)
+    {
+        xDelay(100);
+    }
+    _dma->endTransfer();
     return false;
 }
+/**
+ * 
+ * @param fq
+ * @return 
+ */
+  bool    lnDmaTimer::setTickFrequency(int fqInHz)
+  {        
+    LN_Timers_Registers *t=aTimers[_timer-1];
+    Peripherals per=pTIMER1;
+    per=(Peripherals)((int)per+_timer-1);
+    uint32_t clock=lnPeripherals::getClock(per);
+    // If ABP1 prescale=1, clock*=2 ???? see 5.2 in GD32VF103
+    // disable
+    t->CTL0&=~LN_TIMER_CTL0_CEN;
+   
+    int divider=(clock+fqInHz/2)/(fqInHz);
+    divider*=2;
+
+#warning FIXME we assume no prescaler needed
+    t->PSC=0;
+
+    if(!divider) divider=1;
+    t->CAR=divider-1;
+    return true;
+  }
+
 // EOF

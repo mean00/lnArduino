@@ -1,5 +1,12 @@
 #pragma once
+#include "lnDma.h"
 
+
+enum lnTimerMode
+{
+    lnTimerModePwm0,
+    lnTimerModePwm1
+};
 /**
  * \brief Careful all the channels of a given timer share the same frequency!
  * Max frequency is around 100 kHz in PWM mode !
@@ -31,6 +38,7 @@ public:
 protected:
         int _timer,  _channel;
         void setTickFrequency(int fqInHz);
+        void setMode(lnTimerMode mode);
 
 };
 
@@ -64,7 +72,10 @@ class lnDmaTimerCallback
 public:
         virtual bool timerCallback(bool half)=0; // return true if we continue, zero if we stop
 };
-
+/**
+ * 
+ * @param pin
+ */
 class lnDmaTimer : public lnTimer
 {
 public:
@@ -74,8 +85,12 @@ public:
         int     rollover();
         bool    attachDmaCallback(lnDmaTimerCallback *cb);
         bool    start(int nbSample, uint16_t *data);
+        bool    setTickFrequency(int fq);
 protected:
         lnDmaTimerCallback *_cb;
         int _rollover;
+        lnDMA *_dma;
+public:        
+        void dmaInterrupt();
 };
 

@@ -17,16 +17,16 @@
  */
 WS2812B_timer::WS2812B_timer(int nbLeds, int pin) : WS2812B_base(nbLeds)
 {
+   _pin=pin;
    _timer=new lnDmaTimer(pin);
-   
-    
 }
 /**
  * 
  */
 void WS2812B_timer::begin()
 {
-   if(!_timer->pwmSetup(5000000))  // at least 6 ticks @ 0.83 Mhz =>  ~ 5 Mhz       
+    lnPinMode(_pin,lnPWM);
+   if(!_timer->pwmSetup(830000)) 
    {
        xAssert(0);
    }
@@ -73,6 +73,8 @@ void WS2812B_timer::convertRgb(int hilow, uint8_t *rgb)
     convertRgb(false,_ledsColor);
     convertRgb(true,_ledsColor+3);
     // start PWM 
+    _timer->start(48,_timerPwmValue);
+    
  }
 /**
  * 
