@@ -4,7 +4,7 @@
 
 #define LED LN_SYSTEM_LED
 
-#define PWM_PIN PB0
+#define PWM_PIN PA7
 
 void setup()
 {

@@ -98,7 +98,7 @@ hwlnSPIClass::hwlnSPIClass(int instance, int pinCs) : _internalSettings(1000000,
     _callback=NULL;
     _instance=instance;
     _settings=NULL;
-    
+    lnPeripherals::enable((Peripherals)(pSPI0+instance));
     xAssert(instance<3);
     const SpiDescriptor *s=spiDescriptor+instance;
     

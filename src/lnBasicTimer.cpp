@@ -19,6 +19,7 @@ LN_BTimers_Registers *aBTimers[2]={(LN_BTimers_Registers *)(LN_TIMER5_ADR),(LN_B
  */
 lnBasicTimer::lnBasicTimer(int timer)
 {
+    lnPeripherals::enable((Peripherals)(pTIMER5+timer));
     _timer=timer;
     LN_BTimers_Registers *t=aBTimers[_timer];
     t->DMAINTEN=0;

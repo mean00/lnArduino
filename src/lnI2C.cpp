@@ -12,6 +12,7 @@
 
 lnI2C::lnI2C(int instance, int speed)
 {
+    lnPeripherals::enable((Peripherals)(pI2C0+instance));
     lnTwoWire *tw=new lnTwoWire(instance,speed);
     cookie=(void *)tw;
       

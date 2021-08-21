@@ -48,6 +48,7 @@ lnTimer::lnTimer(int pin)
         {
             _timer=pins->timer;
             _channel=pins->timerChannel;
+            lnPeripherals::enable((Peripherals)(pTIMER0+_timer));
             return;
         }
         pins++;

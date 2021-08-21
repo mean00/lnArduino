@@ -46,6 +46,7 @@ lnDAC::lnDAC(int instance): _dma( lnDMA::DMA_MEMORY_TO_PERIPH,
                 lnDacDesc[_instance].dmaChannel, 
                 16,32)
 {
+    lnPeripherals::enable((Peripherals)(pDAC+instance));
     _instance=instance;
     disable();
 }

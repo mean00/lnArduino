@@ -36,7 +36,10 @@ void resetMe(const Peripherals periph)
     lnPeripherals::enable(periph);
      
 }
-
+void disabled(const Peripherals periph)
+{
+    lnPeripherals::disable(periph);
+}
 int main()
 {
     //
@@ -57,8 +60,8 @@ int main()
     resetMe(pDMA1);
     
     // I2C0 & 1
-    resetMe(pI2C0);
-    resetMe(pI2C1);
+    disabled(pI2C0);
+    disabled(pI2C1);
     
     // Enable exti
     lnExtiSysInit();
@@ -68,22 +71,22 @@ int main()
     
     
     // Init SPI0/1/2
-    resetMe(pSPI0);
-    resetMe(pSPI1);
-    resetMe(pSPI2);
+    disabled(pSPI0);
+    disabled(pSPI1);
+    disabled(pSPI2);
     
     // Init Timer 1..4
-    resetMe(pTIMER1);
-    resetMe(pTIMER2);
-    resetMe(pTIMER3);
-    resetMe(pTIMER4);
+    disabled(pTIMER1);
+    disabled(pTIMER2);
+    disabled(pTIMER3);
+    disabled(pTIMER4);
     
     // Basic timer
-    resetMe(pTIMER5);
-    resetMe(pTIMER6);
+    disabled(pTIMER5);
+    disabled(pTIMER6);
     
     // DAC
-     resetMe(pDAC);
+     disabled(pDAC);
     
      // ADC
      resetMe(pADC0);
