@@ -280,26 +280,53 @@ void lnAdcTimer::setPwmFrequency(int fqInHz)
     
 }
 #endif
+/**
+ * 
+ * @param pin
+ */
 lnDmaTimer::lnDmaTimer(int pin) : lnTimer(pin)
 {
 
 }
+/**
+ * 
+ */
 lnDmaTimer:: ~lnDmaTimer()
 {
 
 }
+/**
+ * 
+ * @param frequency
+ * @return 
+ */
 bool    lnDmaTimer::pwmSetup(int frequency)
 {
     return false;
 }
+/**
+ * 
+ * @return 
+ */
 int     lnDmaTimer::rollover()
 {
     return _rollover;
 }
+/**
+ * 
+ * @param cb
+ * @return 
+ */
 bool    lnDmaTimer::attachDmaCallback(lnDmaTimerCallback *cb)
 {
     return false;
 }
+/**
+ * 
+ * @param nbSample
+ * @param data
+ * @return 
+ */
 bool    lnDmaTimer::start(int nbSample, uint16_t *data)
 {
     return false;

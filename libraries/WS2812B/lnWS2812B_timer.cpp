@@ -50,6 +50,11 @@ void WS2812B_timer::convertOne(uint8_t value, uint16_t *target)
         value>>=1;
     }
 }
+/**
+ * 
+ * @param hilow
+ * @param rgb
+ */
 void WS2812B_timer::convertRgb(int hilow, uint8_t *rgb)
 {
     uint16_t *p=_timerPwmValue;
