@@ -1,5 +1,5 @@
 
-SET(AF_FOLDER  ${CMAKE_SOURCE_DIR}/Arduino_gd32_freeRTOS/)
+SET(AF_FOLDER  ${CMAKE_SOURCE_DIR}/lnArduino/)
 
 include(./mcuSelect.cmake)
 SET(CMAKE_TOOLCHAIN_FILE ${AF_FOLDER}/lnArduino.cmake)
@@ -15,6 +15,6 @@ add_subdirectory(${AF_FOLDER})
 
 include(${AF_FOLDER}/setup.cmake)
         
-USE_LIBRARY(WS2812B_timer)
+USE_LIBRARY(WS2812B)
 GENERATE_GD32_FIRMWARE(ws2812 hello.cpp )       
         
