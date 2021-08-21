@@ -33,6 +33,7 @@ protected:
         void setTickFrequency(int fqInHz);
 
 };
+
 /**
  * /!\ Changing the frequency alters ALL channels
  * @param timer
@@ -49,3 +50,32 @@ public:
         // this is a single pulse timer
         void setPwmFrequency(int fqInHz); 
 };
+
+
+/**
+ * /!\ Changing the frequency alters ALL channels
+ * @param timer
+ * @param channel
+ * @return 
+ */
+
+class lnDmaTimerCallback
+{
+public:
+        virtual bool timerCallback(bool half)=0; // return true if we continue, zero if we stop
+};
+
+class lnDmaTimer : public lnTimer
+{
+public:
+                lnDmaTimer(int pin);
+        virtual ~lnDmaTimer();                
+        bool    pwmSetup(int frequency);
+        int     rollover();
+        bool    attachDmaCallback(lnDmaTimerCallback *cb);
+        bool    start(int nbSample, uint16_t *data);
+protected:
+        lnDmaTimerCallback *_cb;
+        int _rollover;
+};
+

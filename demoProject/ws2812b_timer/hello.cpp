@@ -9,7 +9,8 @@
 #define LED     PA2
 #define LEDRED  PC13
 
-#define NB_WS2812B_timer 12
+#define NB_WS2812B   12
+#define WS2812B_PIN  PA7
 
 /**
  * 
@@ -161,7 +162,7 @@ void loop()
   //  uint32_t cpuFreq=get_cpu_freq();
   //  Logger("CPU FREQ=%d...\n",cpuFreq);
     // 1-setup WS2812B
-   WS2812B_timer    *ws=new WS2812B_timer(NB_WS2812B,spi);
+   WS2812B_timer    *ws=new WS2812B_timer(NB_WS2812B,WS2812B_PIN);
    ws->begin();
    
    wheelDemo(ws);

@@ -15,22 +15,10 @@
  * @param nbLeds
  * @param s
  */
-WS2812B_timer::WS2812B_timer(int nbLeds, int pin)
+WS2812B_timer::WS2812B_timer(int nbLeds, int pin) : WS2812B_base(nbLeds)
 {
-    _nbLeds=nbLeds;
-    
-        
-    _brightness=0xff;
-    _ledsColor=new uint8_t[3*nbLeds];
-    _ledsBrightness=new uint8_t[nbLeds];
-    
-    for(int i=0;i<nbLeds;i++)
-    {
-        _ledsColor[3*i+0]=0;
-        _ledsColor[3*i+1]=0;
-        _ledsColor[3*i+2]=0;
-        _ledsBrightness[i]=255;        
-    }
+   _timer=new lnDmaTimer(pin);
+   
     
 }
 /**
@@ -38,79 +26,60 @@ WS2812B_timer::WS2812B_timer(int nbLeds, int pin)
  */
 void WS2812B_timer::begin()
 {
-    int div;
+   if(!_timer->pwmSetup(5000000))  // at least 6 ticks @ 0.83 Mhz =>  ~ 5 Mhz       
+   {
+       xAssert(0);
+   }
+   _one=(_timer->rollover()*2)/6;
+   _zero=(_timer->rollover()*4)/6;   
+   _timer->attachDmaCallback(this);
 }
 
 /**
  */
 WS2812B_timer::~WS2812B_timer()
 {
-#define XCLR(x)     delete [] x;x=NULL;
-    XCLR(_ledsBrightness);
-    XCLR(_ledsColor);
 }
-/**
- * 
- * @param value
- */
- void   WS2812B_timer::setGlobalBrightness(int value)
- {
-     _brightness=value;
-     convertAll();         
- }
- /**
-  * 
-  * @param r
-  * @param g
-  * @param b
-  */
- void   WS2812B_timer::setColor(int r,int g, int b)
- {
-     uint8_t *pr=_ledsColor;
-     uint8_t *pg=_ledsColor+1;
-     uint8_t *pb=_ledsColor+2;
-     for(int i=0;i<_nbLeds;i++)
-     {
-            *pr=r;
-            *pg=g;
-            *pb=b;
-            pr+=3;pb+=3;pg+=3;
-     }
-     convertAll();
- }
- /**
-  * 
-  * @param led
-  * @param r
-  * @param g
-  * @param b
-  */
- void   WS2812B_timer::setLedColor(int led, int r,int g, int b)
- {
-      uint8_t *p=_ledsColor+led*3;
-      p[0]=g;
-      p[1]=r;
-      p[2]=b;
-      convert(led);
- }
- /**
-  * 
-  * @param led
-  * @param brightness
-  */
- void   WS2812B_timer::setLedBrightness(int led, int brightness)
- {
-     _ledsBrightness[led]=brightness;
-     convert(led);     
- }
+void WS2812B_timer::convertOne(uint8_t value, uint16_t *target)
+{
+    for(int i=0;i<8;i++)
+    {
+        if(value & 1) *target=_one;
+        else *target=_zero;
+        target++;
+        value>>=1;
+    }
+}
+void WS2812B_timer::convertRgb(int hilow, uint8_t *rgb)
+{
+    uint16_t *p=_timerPwmValue;
+    if(hilow) p+=24;
+    convertOne(rgb[0],p);
+    convertOne(rgb[1],p+8);
+    convertOne(rgb[2],p+16);
+}
+
  /**
   * 
   */
  void WS2812B_timer::update()
  {
-  
+    _nextLed=2;
+    convertRgb(false,_ledsColor);
+    convertRgb(true,_ledsColor+3);
+    // start PWM 
  }
- 
-
+/**
+ * 
+ * @param half
+ * @return 
+ */
+bool   WS2812B_timer::timerCallback(bool half)
+{
+    if(_nextLed==_nbLeds) return false; // done!
+    convertRgb(!half,_ledsColor+3*_nextLed);
+    _nextLed++;
+    return true;    
+}
 // EOF
  

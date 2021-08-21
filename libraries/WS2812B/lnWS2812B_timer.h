@@ -3,30 +3,31 @@
  *  See license file
  */
 #pragma once
-
+#include "lnWS2812B.h"
 #include "lnSPI.h"
-class WS2812B_timer
+#include "lnTimer.h"
+/**
+ * 
+ * @param nbLeds
+ * @param pin
+ */
+class WS2812B_timer : public WS2812B_base, public lnDmaTimerCallback
 {
 public:
                     WS2812B_timer(int nbLeds, int pin);
         virtual     ~WS2812B_timer();
         
              void   begin(); // call this first
-             void   setGlobalBrightness(int value); // between 0 & 255
-             void   setColor(int r,int g, int b); // set all the same color
-             void   setLedColor(int led, int r,int g, int b); // set only one led
-             void   setLedBrightness(int led, int brightness); // set only one led
              void   update(); // call this to have the changes committed
+             bool   timerCallback(bool half);
 
 protected:
-        int           _pin;
-        int           _timer;
-        int           _channel;
-        int           _nbLeds;
-        uint8_t       *_ledsColor;
-        uint8_t       *_ledsBrightness;
-        uint8_t       _brightness;
-protected:
-         void         convert(int led);
-         void         convertAll();
+            lnDmaTimer   *_timer;
+            uint16_t      _timerPwmValue[48]; 
+            uint16_t      _one,_zero;
+            int           _nextLed;
+            
+            void        convertOne(uint8_t value, uint16_t *target);
+            void        convertRgb(int hilow, uint8_t *rgb);
+            
 };
