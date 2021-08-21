@@ -33,6 +33,7 @@ lnTimer::lnTimer(int timer,int channel)
 {
     _timer=timer;
     _channel=channel;
+    lnPeripherals::enable((Peripherals)(pTIMER0+_timer));
 }
 /**
  * 
