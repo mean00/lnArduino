@@ -18,6 +18,7 @@
 void setup()
 {
     pinMode(LED,OUTPUT);
+    lnPinMode(WS2812B_PIN,lnPWM);
     digitalWrite(LED,true);
 }
 
@@ -152,6 +153,70 @@ void colors(WS2812B_timer *ws)
 }
     
 
+void wsDemoWheel()
+{
+   Logger("Wheel Demo\n");
+   WS2812B_timer    *ws=new WS2812B_timer(NB_WS2812B,WS2812B_PIN);
+   ws->begin();     
+   wheelDemo(ws);
+}
+
+void wsSimple()
+{
+   Logger("wsSimple Demo\n");
+   WS2812B_timer    *ws=new WS2812B_timer(NB_WS2812B,WS2812B_PIN);
+   ws->begin();
+   // simple
+   ws->setLedColor(0,0xff,0,0);
+   ws->setLedColor(1,0,0xff,0);
+   ws->setLedColor(2,0,0,0xff);
+   ws->update();
+   while(1)
+   {
+       xDelay(10);
+   }
+   
+}
+int cbCalled=0;
+lnDmaTimer *timer;
+class timCB : public  lnDmaTimerCallback
+{
+public:
+        virtual bool timerCallback(bool half); // return true if we continue, zero if we stop
+};
+
+ bool timCB::timerCallback(bool half)
+ {
+     cbCalled++;
+     return false;
+ }
+
+void manualDemo()
+{
+    timer=new lnDmaTimer(WS2812B_PIN);
+    
+   if(!timer->pwmSetup(830000)) 
+   {
+       xAssert(0);
+   }
+   int one=(timer->rollover()*4+3)/6;
+   int zero=(timer->rollover()*2+3)/6;   
+   timCB cb;
+   timer->attachDmaCallback(&cb);
+   uint16_t pwm[24*2];
+   for(int i=0;i<48;i++) pwm[i]=zero;
+#if 1
+   for(int i=0;i<8;i++) pwm[i]=one;    // g
+   for(int i=0;i<8;i++) pwm[i+8]=zero; //r
+   for(int i=0;i<8;i++) pwm[i+16]=zero; //b 
+#endif   
+   timer->start(24*2,pwm);
+   while(1)
+   {
+       xDelay(100);
+   }
+}
+
 /**
  * 
  */
@@ -159,17 +224,10 @@ void loop()
 {
     Logger("WS2812B_timer demo...\n");
     
-  //  uint32_t cpuFreq=get_cpu_freq();
-  //  Logger("CPU FREQ=%d...\n",cpuFreq);
-    // 1-setup WS2812B
-   WS2812B_timer    *ws=new WS2812B_timer(NB_WS2812B,WS2812B_PIN);
-   ws->begin();
-   
-   wheelDemo(ws);
-   //pulse(ws);
-   //dot(ws);
-   //colors(ws);
-   
+    manualDemo();
+    wsDemoWheel(); 
+    wsSimple();
+
 }
 // EOF
 

@@ -156,6 +156,7 @@ void lnTimer::setMode(lnTimerMode mode)
     switch(mode) 
     {
         case lnTimerModePwm1 : chCtl|=LN_TIME_CHCTL0_CTL_PWM1;break;
+        case lnTimerModePwm0 : chCtl|=LN_TIME_CHCTL0_CTL_PWM0;break;
         default: xAssert(0);break;
     }
     chCtl&=LN_TIME_CHCTL0_MS_MASK;
@@ -189,8 +190,7 @@ void lnTimer::enable()
 {
     LN_Timers_Registers *t=aTimers[_timer-1];
     t->CTL0&=~LN_TIMER_CTL0_CEN;
-    t->CNT=0;
-    // ?? t->SWEV |= LN_TIMER_SWEVG_UPG;
+    t->CNT=t->CAR-1;
     t->CHCTL2 |=LN_TIMER_CHTL2_CHxEN(_channel); // basic enable, active high
     t->CTL0|=LN_TIMER_CTL0_CEN;
 }

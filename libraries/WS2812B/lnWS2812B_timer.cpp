@@ -85,14 +85,25 @@ void WS2812B_timer::convertRgb(int hilow, uint8_t *rgb)
  */
 bool   WS2812B_timer::timerCallback(bool half)
 {
-    if(_nextLed==_nbLeds) 
+    if(_nextLed<_nbLeds)
     {
-        _sem.give();
-        return false; // done!
+        convertRgb(!half,_ledsColor+3*_nextLed);
+        _nextLed++;
+        return true;     
     }
-    convertRgb(!half,_ledsColor+3*_nextLed);
-    _nextLed++;
-    return true;    
+    
+    if(_nextLed==_nbLeds)
+    {
+        // ok we just wrote the last one, it is not sent yet
+        return true;     
+    }
+    if(_nextLed==_nbLeds+1)
+    {
+         _sem.give();
+        _nextLed++;
+        return true;     
+    }
+    return true;
 }
 // EOF
  

@@ -81,7 +81,7 @@ bool    lnDmaTimer::pwmSetup(int frequency)
     LN_Timers_Registers *t=aTimers[_timer-1];
     setTickFrequency(frequency);
     _rollover=t->CAR+1;
-    setMode(lnTimerModePwm1);
+    setMode(lnTimerModePwm0);
     return true;
 }
 /**
@@ -123,8 +123,13 @@ static void _dmaTimerCallback(void *c, lnDMA::DmaInterruptType typ)
 void lnDmaTimer::dmaInterrupt(bool h)
 {
     xAssert(_cb);
-    _cb->timerCallback(h);
+    if(!_cb->timerCallback(h)) stop();
 }
+
+#define DMA_EVENT (1<<(_channel+9))
+//#define DMA_EVENT (1<<(8))
+
+
 /**
  * 
  */
@@ -133,7 +138,7 @@ void    lnDmaTimer::stop()
     LN_Timers_Registers *t=aTimers[_timer-1];
     // disable timer
     disable();
-    t->DMAINTEN&=~(1<<(_channel+9));  
+    t->DMAINTEN&=~(DMA_EVENT);
     _dma->endTransfer();
 }
 
@@ -154,7 +159,8 @@ bool    lnDmaTimer::start(int nbSample, uint16_t *data)
     _dma->doMemoryToPeripheralTransferNoLock(nbSample,(uint16_t *)data,(uint16_t *)&(t->CHCVs[_channel]),false,true,true);                
     // PWM mode 1
     t->CHCVs[_channel]=_rollover/2;
-    t->DMAINTEN|=1<<(_channel+9);
+    t->DMAINTEN|=DMA_EVENT;
+    t->CTL1 |=LN_TIMER_CTL1_DMAS;
     enable();
     return true;
 }
@@ -184,6 +190,7 @@ bool    lnDmaTimer::start(int nbSample, uint16_t *data)
 
     if(!divider) divider=1;
     t->CAR=divider-1;
+    t->CNT=0;
     return true;
   }
 

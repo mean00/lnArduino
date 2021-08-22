@@ -15,8 +15,8 @@ struct LN_Timers_Registersx
 {
     uint32_t CTL0;      // 0
     uint32_t CTL1;      // 4
-    uint32_t SMCFG;     // 8
-    uint32_t DMAINTEN;  // C
+    uint32_t SMCFG;     // 8   Slave Mode
+    uint32_t DMAINTEN;  // C   DMA update
     uint32_t INTF;      // 10
     uint32_t SWEV;      // 14
     uint32_t CHCTLs[2];    // 18/1C
