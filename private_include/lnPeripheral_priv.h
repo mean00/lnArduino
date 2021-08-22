@@ -26,6 +26,7 @@
 
 #define LN_EXTI_ADR     (0x40010400)
 
+#define LN_TIMER0_ADR   (0x40012C00)
 #define LN_TIMER1_ADR   (0x40000000)
 #define LN_TIMER2_ADR   (0x40000400)
 
