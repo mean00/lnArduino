@@ -79,6 +79,7 @@ void wheelDemo(WS2812B_timer *ws)
         if(brightness==0 && dir<0) dir=-dir;
         if(brightness==255 && dir>0) dir=-dir;
         ws->update();
+        xDelay(1);
      }
   }
 }
@@ -167,7 +168,7 @@ void wsSimple()
    WS2812B_timer    *ws=new WS2812B_timer(NB_WS2812B,WS2812B_PIN);
    ws->begin();
    // simple
-   ws->setLedColor(0,0xff,0,0);
+   ws->setLedColor(0,0xff,0,0); 
    ws->setLedColor(1,0,0xff,0);
    ws->setLedColor(2,0,0,0xff);
    ws->update();
@@ -177,6 +178,33 @@ void wsSimple()
    }
    
 }
+
+
+void wsAll()
+{
+   Logger("wsSimple Demo\n");
+   WS2812B_timer    *ws=new WS2812B_timer(NB_WS2812B,WS2812B_PIN);
+   ws->begin();
+   // simple
+   for(int i=0;i<NB_WS2812B;i++)
+   {
+       switch(i%3)
+       {
+           case 0:ws->setLedColor(i,0xff,0,0);break;  // G R B
+           case 1:ws->setLedColor(i,0,0xff,0);break;  // G R B
+           case 2:ws->setLedColor(i,0,0,0xff);break;  // G R B
+       }
+   }
+   //ws->setColor(0,0,0xff);  // G R B
+   ws->update();
+   while(1)
+   {
+       ws->update();
+       xDelay(10);
+   }
+   
+}
+
 int cbCalled=0;
 lnDmaTimer *timer;
 class timCB : public  lnDmaTimerCallback
@@ -224,7 +252,8 @@ void loop()
 {
     Logger("WS2812B_timer demo...\n");
     
-    manualDemo();
+    //manualDemo();
+    //wsAll();
     wsDemoWheel(); 
     wsSimple();
 
