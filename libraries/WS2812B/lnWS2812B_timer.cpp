@@ -30,8 +30,8 @@ void WS2812B_timer::begin()
    {
        xAssert(0);
    }
-   _one=(_timer->rollover()*2)/6;
-   _zero=(_timer->rollover()*4)/6;   
+   _one=(_timer->rollover()*4+3)/6;
+   _zero=(_timer->rollover()*2+3)/6;   
    _timer->attachDmaCallback(this);
 }
 
@@ -44,10 +44,10 @@ void WS2812B_timer::convertOne(uint8_t value, uint16_t *target)
 {
     for(int i=0;i<8;i++)
     {
-        if(value & 1) *target=_one;
+        if(value & 0x80) *target=_one;
         else *target=_zero;
         target++;
-        value>>=1;
+        value<<=1;
     }
 }
 /**
