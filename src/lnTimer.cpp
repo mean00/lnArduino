@@ -14,11 +14,11 @@ LN_Timers_Registers     *aTimer4=(LN_Timers_Registers *)(LN_TIMER4_ADR);
 
 #define aTimer(x) abTimers[x]
 
-#define READ_CHANNEL_CTL(channel)       (  t->CHCTLs[channel>>1])>>(8*(channel&1))
+#define READ_CHANNEL_CTL(channel)       (((  t->CHCTLs[channel>>1])>>(8*(channel&1)))&0xFF)
 #define WRITE_CHANNEL_CTL(channel,val)  \
     { \
         int shift=8*(channel&1); \
-        uint32_t r=t->CHCTLs[(channel)>>1]; \
+        uint32_t r=t->CHCTLs[channel>>1]; \
         r&=0xff<<shift; \
         r|=(val&0xff)<<shift; \
         t->CHCTLs[channel>>1]=r; \
