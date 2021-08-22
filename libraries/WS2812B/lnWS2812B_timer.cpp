@@ -3,6 +3,8 @@
  *  See license file
  *  Each bit in the WS2812B_timer stream becomes a byte
  * 
+ *  writing the new PWM value takes ~ 4us on a GD32F303 @ 72 Mhz
+ *  so about 7 us
  */
 #include "lnArduino.h"
 #include "lnWS2812B_timer.h"
@@ -33,6 +35,19 @@ void WS2812B_timer::begin()
    _one=(_timer->rollover()*4+3)/6;
    _zero=(_timer->rollover()*2+3)/6;   
    _timer->attachDmaCallback(this);
+   uint16_t *target=lookup;
+   // Pre compute PWM for 4 bits value
+   for(int value=0;value<16;value++)
+   {
+       int copy=value;
+       for(int i=0;i<4;i++)
+       {
+            if(copy & 0x8) *target=_one;
+            else *target=_zero;
+            target++;
+            copy<<=1;
+        }
+   }   
 }
 
 /**
@@ -42,19 +57,17 @@ WS2812B_timer::~WS2812B_timer()
 }
 void WS2812B_timer::convertOne(uint8_t value, uint16_t *target)
 {
-    for(int i=0;i<8;i++)
-    {
-        if(value & 0x80) *target=_one;
-        else *target=_zero;
-        target++;
-        value<<=1;
-    }
+    int high=(value>>4)&0xf;
+    int low=value&0xf;
+    memcpy(target,lookup+high*4 ,2*4);
+    memcpy(target+4,lookup+low*4,2*4);
 }
 /**
  * 
  * @param hilow
  * @param rgb
  */
+ uint32_t delta;
 void WS2812B_timer::convertRgb(int hilow, uint8_t *rgb)
 {
     uint16_t *p=_timerPwmValue;
