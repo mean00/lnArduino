@@ -108,6 +108,7 @@ bool   WS2812B_timer::timerCallback(bool half)
     if(_nextLed==_nbLeds)
     {
         // ok we just wrote the last one, it is not sent yet
+        _nextLed++;
         return true;     
     }
     if(_nextLed==_nbLeds+1)
