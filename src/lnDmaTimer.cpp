@@ -8,6 +8,32 @@
 #include "lnPinMapping.h"
 
 extern LN_Timers_Registers *aTimers[4];
+/**
+ * 
+ * @param timer
+ * @param channel
+ * @param dmaEngine
+ * @param dmaChannel
+ * @return 
+ */
+static bool searchDma(int timer, int channel, int &dmaEngine,int &dmaChannel)
+{
+    const LN_TIMER_MAPPING *m=timerMappings;
+    int key=10*timer+channel;
+    while(m->TimerChannel!=-1)
+    {
+        if(m->TimerChannel==key)
+        {
+            dmaEngine=m->dmaEngine;
+            dmaChannel=m->dmaChannel;
+            return true;
+        }
+        m++;
+    }
+    xAssert(0);
+    return false;
+}
+
 
 /**
  * 
@@ -31,16 +57,7 @@ lnDmaTimer::lnDmaTimer(int pin) : lnTimer(pin)
         pins++;
     }
     if(_timer==-1) xAssert(0);
-    switch(_timer*10+_channel)
-    {
-        case 20:     dmaChannel=5;dmaEngine=0;break;
-        case 02:     dmaChannel=5;dmaEngine=0;break;
-        case 22:     dmaChannel=2;dmaEngine=0;break;
-        case 21:     dmaChannel=1;dmaEngine=0;break;
-        default:     xAssert(0);break;
-        
-    }
-               
+    searchDma(_timer,_channel,dmaEngine,dmaChannel);
     _dma=new lnDMA(lnDMA::DMA_MEMORY_TO_PERIPH,dmaEngine,dmaChannel,16,16);
 }
 /**
