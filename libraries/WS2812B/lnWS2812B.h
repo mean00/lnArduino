@@ -5,6 +5,11 @@
 #pragma once
 #include "lnWS2812B_base.h"
 #include "lnSPI.h"
+/**
+ * 
+ * @param nbLeds
+ * @param s
+ */
 class WS2812B : public WS2812B_base
 {
 public:
