@@ -33,14 +33,14 @@ lnDmaTimer::lnDmaTimer(int pin) : lnTimer(pin)
     if(_timer==-1) xAssert(0);
     switch(_timer*10+_channel)
     {
+        case 20:     dmaChannel=5;dmaEngine=0;break;
         case 02:     dmaChannel=5;dmaEngine=0;break;
         case 22:     dmaChannel=2;dmaEngine=0;break;
+        case 21:     dmaChannel=1;dmaEngine=0;break;
         default:     xAssert(0);break;
         
     }
-    
-    dmaChannel=5;
-    dmaEngine=0;            
+               
     _dma=new lnDMA(lnDMA::DMA_MEMORY_TO_PERIPH,dmaEngine,dmaChannel,16,16);
 }
 /**
@@ -118,14 +118,17 @@ bool    lnDmaTimer::start(int nbSample, uint16_t *data)
     _dma->beginTransfer(); // lock dma
     _dma->attachCallback(_dmaCallback,this);
     // circular, no repeat, both interrupt
+                                                                                    //  bool repeat,bool circular,bool  bothInterrupts)
     _dma->doMemoryToPeripheralTransferNoLock(nbSample,(uint16_t *)data,(uint16_t *)&(t->CHCVs[_channel]),false,true,true);                
     // PWM mode 1
     t->CHCVs[_channel]=_rollover/2;
+    t->DMAINTEN|=1<<(_channel+9);
     enable();
     while(1)
     {
         xDelay(100);
     }
+    t->DMAINTEN&=~(1<<(_channel+9));
     _dma->endTransfer();
     return false;
 }
