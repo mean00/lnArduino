@@ -110,17 +110,20 @@ bool    lnDmaTimer::attachDmaCallback(lnDmaTimerCallback *cb)
  */
 
 
-static void _dmaCallback(void *c, lnDMA::DmaInterruptType typ)
+static void _dmaTimerCallback(void *c, lnDMA::DmaInterruptType typ)
 {
     lnDmaTimer *t=(lnDmaTimer *)c;
-    t->dmaInterrupt();
+    bool h=false;
+    if(lnDMA::DMA_INTERRUPT_HALF==typ) h=true;
+    t->dmaInterrupt(h);
 }
 /**
  * 
  */
-void lnDmaTimer::dmaInterrupt()
+void lnDmaTimer::dmaInterrupt(bool h)
 {
-    xAssert(0);
+    xAssert(_cb);
+    _cb->timerCallback(h);
 }
 /**
  * 
@@ -133,7 +136,7 @@ bool    lnDmaTimer::start(int nbSample, uint16_t *data)
     LN_Timers_Registers *t=aTimers[_timer-1];
     
     _dma->beginTransfer(); // lock dma
-    _dma->attachCallback(_dmaCallback,this);
+    _dma->attachCallback(_dmaTimerCallback,this);
     // circular, no repeat, both interrupt
                                                                                     //  bool repeat,bool circular,bool  bothInterrupts)
     _dma->doMemoryToPeripheralTransferNoLock(nbSample,(uint16_t *)data,(uint16_t *)&(t->CHCVs[_channel]),false,true,true);                

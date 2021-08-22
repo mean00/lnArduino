@@ -11,8 +11,21 @@ void setup()
     pinMode(LED,OUTPUT);    
 }
 
+class timerCB : public lnDmaTimerCallback
+{
+    
+public:
+        virtual bool timerCallback(bool half);
+        
+};
 
-
+int countH=0,countF=0;
+bool timerCB::timerCallback(bool half)
+{
+    if(half) countH++;
+    else countF++;
+    return true;
+}
 void loop()
 {
     bool onoff=true;
@@ -26,6 +39,7 @@ void loop()
     
     lnPinMode(PWM_PIN,lnALTERNATE_PP);    
     lnDmaTimer timer(PWM_PIN);
+    timerCB cb;
     
     timer.pwmSetup(810000);
     int rollover=timer.rollover();
@@ -33,9 +47,13 @@ void loop()
     for(int i=0;i<n;i++)
         sequence[i]=(sequence[i]*rollover)/100;
     
+    timer.attachDmaCallback(&cb);
+    timer.start(n,sequence);
+    
     while(1)
     {
-           timer.start(n,sequence);
+        xDelay(1000);
+        Logger("Full : %d Half : %d \n",countF,countH);
     }
     
 }

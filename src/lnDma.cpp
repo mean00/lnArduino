@@ -356,6 +356,7 @@ void    lnDMA::invokeCallback()
     else
         xAssert(0);
     xAssert(_cb);
+     d->INTC=(7)<<(4*_channelInt); // clear all
     _cb(_cookie,typ);
 }
 /**
@@ -385,8 +386,7 @@ void dmaIrqHandler(int dma, int channel)
         return;
     }
     
-    // single shot mode
-    d->INTC=(3)<<(4*channel); // clear global+Transmit        
+    // single shot mode    
     // Disable DMA
     d->channels[channel].CTL&=~LN_DMA_CHAN_ENABLE;
     // disable interrupt

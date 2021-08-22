@@ -91,6 +91,6 @@ protected:
         int _rollover;
         lnDMA *_dma;
 public:        
-        void dmaInterrupt();
+        void dmaInterrupt(bool h);
 };
 
