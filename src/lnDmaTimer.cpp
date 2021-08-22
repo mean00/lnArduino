@@ -110,7 +110,7 @@ bool    lnDmaTimer::attachDmaCallback(lnDmaTimerCallback *cb)
  */
 
 
-static void _dmaCallback(void *c)
+static void _dmaCallback(void *c, lnDMA::DmaInterruptType typ)
 {
     lnDmaTimer *t=(lnDmaTimer *)c;
     t->dmaInterrupt();

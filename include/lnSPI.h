@@ -123,7 +123,7 @@ class hwlnSPIClass
     
     lnDMA               txDma;
     // callbacks
-    static void exTxDone(void *c);
+    static void exTxDone(void *c,lnDMA::DmaInterruptType it);
     bool writeInternal(int sz, int data);
     bool writesInternal(int sz, int nbBytes, const uint8_t *data);
     bool dmaWriteInternal(int wordSize,int nbBytes, const uint8_t *data,bool repeat);

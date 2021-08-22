@@ -19,7 +19,12 @@
 class lnDMA
 {
 public:    
-    typedef void (doneCallback)(void *);
+    enum DmaInterruptType
+    {
+        DMA_INTERRUPT_HALF,
+        DMA_INTERRUPT_FULL
+    };
+    typedef void (doneCallback)(void *,DmaInterruptType);
     
     enum DmaTransferType
     {

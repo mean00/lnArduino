@@ -45,7 +45,7 @@ protected:
     
 protected:    
     void txDmaCb();
- static    void _dmaCallback(void *c);
+ static    void _dmaCallback(void *c,lnDMA::DmaInterruptType it);
     
     
 };

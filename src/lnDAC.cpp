@@ -132,7 +132,7 @@ void    lnDAC::setValue(int value)
  * 
  * @param t
  */
-void lnDAC::dmaDone_(void *t)
+void lnDAC::dmaDone_(void *t, lnDMA::DmaInterruptType typ)
 {
     lnDAC *me=(lnDAC *)t;
     me->dmaDone();

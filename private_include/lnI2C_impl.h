@@ -109,6 +109,6 @@ protected:
             lnDMA                   _dmaRx;
 public:            
             void irq(int evt);            
-            static void dmaTxDone_(void *c);
-            static void dmaRxDone_(void *c);
+            static void dmaTxDone_(void *c, lnDMA::DmaInterruptType typ);
+            static void dmaRxDone_(void *c, lnDMA::DmaInterruptType typ);
 };

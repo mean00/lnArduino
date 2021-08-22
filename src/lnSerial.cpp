@@ -182,7 +182,7 @@ void lnSerial::txDmaCb()
  * 
  * @param c
  */
-void lnSerial:: _dmaCallback(void *c)
+void lnSerial::_dmaCallback(void *c,lnDMA::DmaInterruptType it)
 {
     lnSerial *i=(lnSerial *)c;
     i->txDmaCb();

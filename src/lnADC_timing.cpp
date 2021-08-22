@@ -130,7 +130,7 @@ bool     lnTimingAdc::setSource( int timer, int channel, int fq,int nbPins, lnPi
  * 
  * @param t
  */
-void lnTimingAdc::dmaDone_(void *t)
+void lnTimingAdc::dmaDone_(void *t, lnDMA::DmaInterruptType typ)
 {
     lnTimingAdc *me=(lnTimingAdc *)t;
     me->dmaDone();

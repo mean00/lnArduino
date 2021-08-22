@@ -361,7 +361,7 @@ bool lnTwoWire::read(int target,  int n, uint8_t *data)
  * 
  * @param c
  */
-void lnTwoWire::dmaTxDone_(void *c)
+void lnTwoWire::dmaTxDone_(void *c, lnDMA::DmaInterruptType typ)
 {
     lnTwoWire *i=(lnTwoWire *)c;
     i->dmaTxDone();

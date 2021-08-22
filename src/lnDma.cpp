@@ -345,8 +345,18 @@ bool    lnDMA::doPeripheralToMemoryTransferNoLock(int count, const uint16_t *tar
  */
 void    lnDMA::invokeCallback()
 {
+    DmaInterruptType typ;
+    DMA_struct *d=(DMA_struct *)_dmas[_dmaInt];
+    int pending= d->INTF;
+    pending>>=(4*_channelInt);
+    if(pending & 2) // full
+        typ=DMA_INTERRUPT_FULL;
+    else if(pending & 4) // half
+        typ=DMA_INTERRUPT_HALF;
+    else
+        xAssert(0);
     xAssert(_cb);
-    _cb(_cookie);
+    _cb(_cookie,typ);
 }
 /**
  * 
@@ -363,15 +373,29 @@ void dmaIrqHandler(int dma, int channel)
     {
         xAssert(0);
     }
-    d->INTC=(3)<<(4*channel); // clear global+Transmit    
+    
+    
+    // Are we in circular mode ?
+    if(d->channels[channel].CTL & LN_DMA_CHAN_CMEN)
+    {  // ok, is it full or helf interrupt ?
+         // then call handler
+        lnDMA *l=_lnDmas[dma][channel];
+        xAssert(l);
+        l->invokeCallback();
+        return;
+    }
+    
+    // single shot mode
+    d->INTC=(3)<<(4*channel); // clear global+Transmit        
     // Disable DMA
     d->channels[channel].CTL&=~LN_DMA_CHAN_ENABLE;
     // disable interrupt
-    lnDisableInterrupt(_dmaIrqs[dma][channel]);       
-    // then call handler
+    lnDisableInterrupt(_dmaIrqs[dma][channel]);   
+
     lnDMA *l=_lnDmas[dma][channel];
     xAssert(l);
     l->invokeCallback();
+    return;       
 }
 
 

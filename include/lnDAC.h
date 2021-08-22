@@ -45,7 +45,7 @@ public:
    
    
 public:
-   static void dmaDone_(void *t); // callback from interrupt
+   static void dmaDone_(void *t, lnDMA::DmaInterruptType typ); // callback from interrupt
 protected:   
    void    dmaDone();  
 

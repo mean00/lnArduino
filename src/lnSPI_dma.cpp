@@ -92,7 +92,7 @@ bool hwlnSPIClass::dmaWrite16Repeat(int nbWord, const uint16_t data)
  * 
  * @param c
  */
-void hwlnSPIClass::exTxDone(void *c)
+void hwlnSPIClass::exTxDone(void *c,lnDMA::DmaInterruptType it)
 {
     nbInterrupt++;
     hwlnSPIClass *i=(hwlnSPIClass *)c;
