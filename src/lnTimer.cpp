@@ -6,12 +6,13 @@
 #include "lnTimer.h"
 #include "lnTimer_priv.h"
 #include "lnPinMapping.h"
-
+LN_Timers_Registers     *aTimer0=(LN_Timers_Registers *)(LN_TIMER0_ADR);
 LN_Timers_Registers     *aTimer1=(LN_Timers_Registers *)(LN_TIMER1_ADR);
 LN_Timers_Registers     *aTimer2=(LN_Timers_Registers *)(LN_TIMER2_ADR);
 LN_Timers_Registers     *aTimer3=(LN_Timers_Registers *)(LN_TIMER3_ADR);
 LN_Timers_Registers     *aTimer4=(LN_Timers_Registers *)(LN_TIMER4_ADR);
 
+#define aTimer(x) abTimers[x]
 
 #define READ_CHANNEL_CTL(channel)       (  t->CHCTLs[channel>>1])>>(8*(channel&1))
 #define WRITE_CHANNEL_CTL(channel,val)  \
@@ -23,7 +24,10 @@ LN_Timers_Registers     *aTimer4=(LN_Timers_Registers *)(LN_TIMER4_ADR);
         t->CHCTLs[channel>>1]=r; \
     }
 
-LN_Timers_Registers *aTimers[4]={(LN_Timers_Registers *)(LN_TIMER1_ADR),(LN_Timers_Registers *)(LN_TIMER2_ADR),(LN_Timers_Registers *)(LN_TIMER3_ADR),(LN_Timers_Registers *)(LN_TIMER4_ADR)};
+LN_Timers_Registers *abTimers[5]={(LN_Timers_Registers *)(LN_TIMER0_ADR),(LN_Timers_Registers *)(LN_TIMER1_ADR),(LN_Timers_Registers *)(LN_TIMER2_ADR),(LN_Timers_Registers *)(LN_TIMER3_ADR),(LN_Timers_Registers *)(LN_TIMER4_ADR)};
+
+#define aTimers(x) abTimers[x]
+
 /**
  * 
  * @param timer
@@ -70,7 +74,7 @@ lnTimer::~lnTimer()
 void lnTimer::setPwmFrequency(int fqInHz)
 {
 //--
-  LN_Timers_Registers *t=aTimers[_timer-1];
+  LN_Timers_Registers *t=aTimers(_timer);;
     Peripherals per=pTIMER1;
     per=(Peripherals)((int)per+_timer-1);
     uint32_t clock=lnPeripherals::getClock(per);
@@ -112,7 +116,7 @@ void lnTimer::setPwmFrequency(int fqInHz)
  */
 void lnTimer::setTickFrequency(int fqInHz)
 {
-    LN_Timers_Registers *t=aTimers[_timer-1];
+    LN_Timers_Registers *t=aTimers(_timer);;
     Peripherals per=pTIMER1;
     per=(Peripherals)((int)per+_timer-1);
     uint32_t clock=lnPeripherals::getClock(per);
@@ -150,7 +154,7 @@ void lnTimer::setTickFrequency(int fqInHz)
 
 void lnTimer::setMode(lnTimerMode mode)
 {
-    LN_Timers_Registers *t=aTimers[_timer-1];
+    LN_Timers_Registers *t=aTimers(_timer);;
     uint32_t chCtl=READ_CHANNEL_CTL(_channel);
     chCtl&=LN_TIME_CHCTL0_CTL_MASK;
     switch(mode) 
@@ -171,7 +175,7 @@ void lnTimer::setMode(lnTimerMode mode)
  */
 void lnTimer::setPwmMode(int ratio1024)
 {
-  LN_Timers_Registers *t=aTimers[_timer-1];
+  LN_Timers_Registers *t=aTimers(_timer);;
   
   
   setMode(lnTimerModePwm1);
@@ -188,7 +192,7 @@ void lnTimer::setPwmMode(int ratio1024)
  */
 void lnTimer::enable()
 {
-    LN_Timers_Registers *t=aTimers[_timer-1];
+    LN_Timers_Registers *t=aTimers(_timer);;
     t->CTL0&=~LN_TIMER_CTL0_CEN;
     t->CNT=t->CAR-1;
     t->CHCTL2 |=LN_TIMER_CHTL2_CHxEN(_channel); // basic enable, active high
@@ -199,7 +203,7 @@ void lnTimer::enable()
  */
 void lnTimer::disable()
 {
-    LN_Timers_Registers *t=aTimers[_timer-1];
+    LN_Timers_Registers *t=aTimers(_timer);;
     t->CHCTL2 &=~(LN_TIMER_CHTL2_CHxEN(_channel)); // basic enable, active high
     t->CTL0&=~LN_TIMER_CTL0_CEN;
     t->CNT=0;
@@ -215,7 +219,7 @@ void lnTimer::disable()
  */
 void lnTimer::setChannelRatio(int ratio1024)
 {
-    LN_Timers_Registers *t=aTimers[_timer-1];
+    LN_Timers_Registers *t=aTimers(_timer);;
     t->CHCVs[_channel] =ratio1024; // A/R
 }
 /**
@@ -229,7 +233,7 @@ void lnTimer::setChannelRatio(int ratio1024)
 #endif
 void lnTimer::singleShot(int durationMs, bool down)
 {
-    LN_Timers_Registers *t=aTimers[_timer-1];
+    LN_Timers_Registers *t=aTimers(_timer);;
     xAssert(durationMs<=100);
    // noInterrupts();
     disable();
@@ -257,7 +261,7 @@ void lnTimer::singleShot(int durationMs, bool down)
 //--
 void lnAdcTimer::setPwmFrequency(int fqInHz)
 {
-    LN_Timers_Registers *t=aTimers[_timer-1];
+    LN_Timers_Registers *t=aTimers(_timer);;
     Peripherals per=pTIMER1;
     per=(Peripherals)((int)per+_timer-1);
     uint32_t clock=lnPeripherals::getClock(per);

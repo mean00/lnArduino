@@ -7,7 +7,8 @@
 #include "lnTimer_priv.h"
 #include "lnPinMapping.h"
 
-extern LN_Timers_Registers *aTimers[4];
+extern LN_Timers_Registers *abTimers[5];
+#define aTimer(x) abTimers[x]
 /**
  * 
  * @param timer
@@ -78,7 +79,7 @@ lnDmaTimer:: ~lnDmaTimer()
  */
 bool    lnDmaTimer::pwmSetup(int frequency)
 {
-    LN_Timers_Registers *t=aTimers[_timer-1];
+    LN_Timers_Registers *t=aTimer(_timer);
     setTickFrequency(frequency);
     _rollover=t->CAR+1;
     setMode(lnTimerModePwm0);
@@ -135,7 +136,7 @@ void lnDmaTimer::dmaInterrupt(bool h)
  */
 void    lnDmaTimer::stop()
 {
-    LN_Timers_Registers *t=aTimers[_timer-1];
+    LN_Timers_Registers *t=aTimer(_timer);
     // disable timer
     disable();
     t->DMAINTEN&=~(DMA_EVENT);
@@ -150,7 +151,7 @@ void    lnDmaTimer::stop()
  */
 bool    lnDmaTimer::start(int nbSample, uint16_t *data)
 {   
-    LN_Timers_Registers *t=aTimers[_timer-1];
+    LN_Timers_Registers *t=aTimer(_timer);
     
     _dma->beginTransfer(); // lock dma
     _dma->attachCallback(_dmaTimerCallback,this);
@@ -174,7 +175,7 @@ bool    lnDmaTimer::start(int nbSample, uint16_t *data)
  */
   bool    lnDmaTimer::setTickFrequency(int fqInHz)
   {        
-    LN_Timers_Registers *t=aTimers[_timer-1];
+    LN_Timers_Registers *t=aTimer(_timer);
     Peripherals per=pTIMER1;
     per=(Peripherals)((int)per+_timer-1);
     uint32_t clock=lnPeripherals::getClock(per);
