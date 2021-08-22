@@ -30,5 +30,6 @@ protected:
             
             void        convertOne(uint8_t value, uint16_t *target);
             void        convertRgb(int hilow, uint8_t *rgb);
+            xBinarySemaphore _sem; 
             
 };

@@ -74,6 +74,8 @@ void WS2812B_timer::convertRgb(int hilow, uint8_t *rgb)
     convertRgb(true,_ledsColor+3);
     // start PWM 
     _timer->start(48,_timerPwmValue);
+    _sem.take(100);
+    _timer->stop();
     
  }
 /**
@@ -83,7 +85,11 @@ void WS2812B_timer::convertRgb(int hilow, uint8_t *rgb)
  */
 bool   WS2812B_timer::timerCallback(bool half)
 {
-    if(_nextLed==_nbLeds) return false; // done!
+    if(_nextLed==_nbLeds) 
+    {
+        _sem.give();
+        return false; // done!
+    }
     convertRgb(!half,_ledsColor+3*_nextLed);
     _nextLed++;
     return true;    

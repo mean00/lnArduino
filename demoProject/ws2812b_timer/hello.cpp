@@ -10,7 +10,7 @@
 #define LEDRED  PC13
 
 #define NB_WS2812B   12
-#define WS2812B_PIN  PB0
+#define WS2812B_PIN  PA6
 
 /**
  * 

@@ -127,6 +127,18 @@ void lnDmaTimer::dmaInterrupt(bool h)
 }
 /**
  * 
+ */
+void    lnDmaTimer::stop()
+{
+    LN_Timers_Registers *t=aTimers[_timer-1];
+    // disable timer
+    disable();
+    t->DMAINTEN&=~(1<<(_channel+9));  
+    _dma->endTransfer();
+}
+
+/**
+ * 
  * @param nbSample
  * @param data
  * @return 
@@ -144,13 +156,7 @@ bool    lnDmaTimer::start(int nbSample, uint16_t *data)
     t->CHCVs[_channel]=_rollover/2;
     t->DMAINTEN|=1<<(_channel+9);
     enable();
-    while(1)
-    {
-        xDelay(100);
-    }
-    t->DMAINTEN&=~(1<<(_channel+9));
-    _dma->endTransfer();
-    return false;
+    return true;
 }
 /**
  * 

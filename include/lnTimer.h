@@ -85,6 +85,7 @@ public:
         int     rollover();
         bool    attachDmaCallback(lnDmaTimerCallback *cb);
         bool    start(int nbSample, uint16_t *data);
+        void    stop();
         bool    setTickFrequency(int fq);
 protected:
         lnDmaTimerCallback *_cb;
