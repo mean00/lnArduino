@@ -149,6 +149,12 @@ void lnExtiSWDOnly()
     v&=LN_AFIO_PCF0_SWJ_MASK;
     v|=LN_AFIO_PCF0_SWJ_SET(2);
     afio->PCF0=v;
+    // Do partial remap on timer1 to follow bluepill layout
+    v=afio->PCF0;
+    v&=~(3<<8);
+    v|=1<<8;
+    afio->PCF0=v;
+    
 }
 
 void EXTI_IrqHandler(int maskS,int maskE)
