@@ -125,8 +125,12 @@ void lnExtiEnableInterrupt(const lnPin pin)
     int source=pin&0xf; 
     _lnExtidescriptor *d=_extiDesc+source;
     xAssert(port==d->port);
-    aExiti->PD=1<<source; // clear pending interrupt
     aExiti->INTEN|=(1<<source);
+    // Let it propagate a bit, so we can clear it
+    __asm__("nop");
+    __asm__("nop");
+    __asm__("nop");
+    aExiti->PD=1<<source; // clear pending interrupt
 }
 /**
  * 
