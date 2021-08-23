@@ -84,27 +84,11 @@ void lnTimer::setPwmFrequency(int fqInHz)
     
     int divider=(clock+(fqInHz*512))/(fqInHz*1024);
     divider*=2;
-    int preDiv=2;  
     while(divider>65535)
     {
-        preDiv=preDiv*2;
         divider=divider/2;
     }
-    if(preDiv>8) preDiv=8;
     
-    //
-    lnADC_DIVIDER adcDiv;
-    switch(preDiv)
-    {
-        switch(preDiv)
-        {
-            case 2:  adcDiv=lnADC_CLOCK_DIV_BY_2;break;
-            case 4:  adcDiv=lnADC_CLOCK_DIV_BY_4;break;
-            case 8:  adcDiv=lnADC_CLOCK_DIV_BY_8;break;
-            default: xAssert(0);break;
-        }
-    }
-    lnPeripherals::setAdcDivider(adcDiv);
     uint32_t ctl0=t->CTL0;    
     if(!divider) divider=1;
     t->PSC=divider-1;    
@@ -132,21 +116,7 @@ void lnTimer::setTickFrequency(int fqInHz)
         preDiv=preDiv*2;
         divider=divider/2;
     }
-    if(preDiv>8) preDiv=8;
-    
-    //
-    lnADC_DIVIDER adcDiv;
-    switch(preDiv)
-    {
-        switch(preDiv)
-        {
-            case 2:  adcDiv=lnADC_CLOCK_DIV_BY_2;break;
-            case 4:  adcDiv=lnADC_CLOCK_DIV_BY_4;break;
-            case 8:  adcDiv=lnADC_CLOCK_DIV_BY_8;break;
-            default: xAssert(0);break;
-        }
-    }
-    lnPeripherals::setAdcDivider(adcDiv);
+   
     uint32_t ctl0=t->CTL0;    
     if(!divider) divider=1;
     t->PSC=divider-1;
@@ -257,8 +227,11 @@ void lnTimer::singleShot(int durationMs, bool down)
     xDelay(durationMs+10);
     disable();        
 }
-
+//----------------------------------------------
 //--
+//--
+//----------------------------------------------
+
 void lnAdcTimer::setPwmFrequency(int fqInHz)
 {
     LN_Timers_Registers *t=aTimers(_timer);;
