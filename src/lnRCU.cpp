@@ -7,6 +7,7 @@
 #include "lnRCU.h"
 #include "lnRCU_priv.h"
 #include "lnPeripheral_priv.h"
+#include "lnCpuID.h"
 LN_RCU *arcu=(LN_RCU *)LN_RCU_ADR;
 /**
  */
@@ -149,8 +150,20 @@ void lnPeripherals::setAdcDivider(lnADC_DIVIDER divider)
     val&=LN_RCU_ADC_PRESCALER_MASK;
     int r=(int)divider;
     if(r&4)
-        val|=LN_RCU_ADC_PRESCALER_HIGHBIT;
-    val|=LN_RCU_ADC_PRESCALER_LOWBIT(r);
+    {
+        if(lnCpuID::vendor()==lnCpuID::LN_MCU_STM32) // only up to 8
+        {
+            val |=LN_RCU_ADC_PRESCALER_LOWBIT(lnADC_CLOCK_DIV_BY_8);            
+        }else
+        {
+            val|=LN_RCU_ADC_PRESCALER_HIGHBIT;
+            val|=LN_RCU_ADC_PRESCALER_LOWBIT(r&3);
+        }
+    }
+    else
+    {
+        val|=LN_RCU_ADC_PRESCALER_LOWBIT(r);
+    }
     arcu->CFG0=val;
     
 }
