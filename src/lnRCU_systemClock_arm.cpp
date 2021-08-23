@@ -30,6 +30,8 @@ uint32_t lnPeripherals::getClock(const Peripherals periph)
         case pTIMER0:
         case pSPI0:
         case pAF:
+        case pADC0:
+        case pADC1:
                     return _rcuClockApb2;
         default:
                     return _rcuClockApb1;
