@@ -219,7 +219,7 @@ void lnDMA::endTransfer()
      // Ok now we can configure the dma
     DMA_struct *d=(DMA_struct *)_dma;
     DMA_channels *c=d->channels+_channelInt;
-    
+    noInterrupts();
     uint32_t control=c->CTL;    
     control &=~LN_DMA_CHAN_ENABLE;
     control &=~(LN_DMA_CHAN_ERRIE+LN_DMA_CHAN_TFTFIE);
@@ -230,6 +230,8 @@ void lnDMA::endTransfer()
     uint32_t mask=0xf<<_channelInt;
     d->INTC|=mask;
     _lnDmas[_dmaInt][_channelInt]=NULL;     
+    
+    interrupts();
     dmaMutex[_dmaInt][_channelInt]->unlock();
 }
    
