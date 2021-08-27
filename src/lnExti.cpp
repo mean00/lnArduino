@@ -143,6 +143,10 @@ void lnExtiDisableInterrupt(const lnPin pin)
     _lnExtidescriptor *d=_extiDesc+source;
     xAssert(port==d->port);
     aExiti->INTEN&=~(1<<source);
+    __asm__("nop");
+    __asm__("nop");
+    __asm__("nop");
+    aExiti->PD=1<<source; // clear pending interrupt
 }
 
 
