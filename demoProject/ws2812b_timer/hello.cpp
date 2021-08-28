@@ -73,7 +73,7 @@ void wheelDemo(WS2812B_timer *ws)
         
         after=micros();
         //Logger("Convert2 = %d\n",after-before);
-        //xDelay(20);
+        xDelay(20);
         //ws->setGlobalBrightness(brightness);
         brightness+=dir;
         if(brightness==0 && dir<0) dir=-dir;
@@ -231,7 +231,7 @@ void manualDemo()
    int zero=(timer->rollover()*2+3)/6;   
    timCB cb;
    timer->attachDmaCallback(&cb);
-   uint16_t pwm[24*2];
+   uint8_t pwm[24*2];
    for(int i=0;i<48;i++) pwm[i]=zero;
 #if 1
    for(int i=0;i<8;i++) pwm[i]=one;    // g
