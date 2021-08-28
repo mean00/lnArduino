@@ -56,15 +56,6 @@ void WS2812B_timer::begin()
 WS2812B_timer::~WS2812B_timer()
 {
 }
-void WS2812B_timer::convertOne(uint8_t value, uint8_t *target)
-{
-    int high=(value>>4)&0xf;
-    int low=value&0xf;
-    xAssert(!((int)target&3)); // 32 bits aligned
-    uint32_t *t32=(uint32_t *)target;
-    t32[0]=lookup[high];
-    t32[1]=lookup[low];
-}
 /**
  * 
  * @param hilow
@@ -73,11 +64,23 @@ void WS2812B_timer::convertOne(uint8_t value, uint8_t *target)
  uint32_t delta;
 void WS2812B_timer::convertRgb(int hilow, uint8_t *rgb)
 {
-    uint8_t *p=_timerPwmValue;
-    if(hilow) p+=24;
-    convertOne(rgb[0],p);
-    convertOne(rgb[1],p+8);
-    convertOne(rgb[2],p+16);
+    
+    uint32_t *t32=(uint32_t *)_timerPwmValue;
+    if(hilow) t32+=6;  // 6xuint32_t = 24 bytes = 1 led worth
+    xAssert(!((int)t32&3)); // 32 bits aligned
+    int high=(rgb[0]>>4)&0xf;
+    int low=rgb[0]&0xf;
+
+    t32[0]=lookup[high];
+    t32[1]=lookup[low];
+    high=(rgb[1]>>4)&0xf;
+    low=rgb[1]&0xf;
+    t32[2]=lookup[high];
+    t32[3]=lookup[low];
+    high=(rgb[2]>>4)&0xf;
+    low=rgb[2]&0xf;
+    t32[4]=lookup[high];
+    t32[5]=lookup[low];
 }
 
  /**

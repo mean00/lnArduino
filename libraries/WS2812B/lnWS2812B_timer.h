@@ -22,15 +22,13 @@ public:
              bool   timerCallback(bool half);
 
 protected:
-            lnPin        _pin;
-            lnDmaTimer   *_timer;
-            uint8_t       _timerPwmValue[48]; 
-            int           _one,_zero;
-            int           _nextLed;
-            
-            void        convertOne(uint8_t value, uint8_t *target);
-            void        convertRgb(int hilow, uint8_t *rgb);
-            xBinarySemaphore _sem; 
-            uint32_t    lookup[16];
+            void                convertRgb(int hilow, uint8_t *rgb);
+            lnPin               _pin;
+            lnDmaTimer          *_timer;
+            uint8_t             _timerPwmValue[48]; 
+            int                 _one,_zero;
+            int                 _nextLed;
+            xBinarySemaphore    _sem; 
+            uint32_t            lookup[16];
             
 };
