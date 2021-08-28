@@ -24,13 +24,13 @@ public:
 protected:
             lnPin        _pin;
             lnDmaTimer   *_timer;
-            uint16_t      _timerPwmValue[48]; 
-            uint16_t      _one,_zero;
+            uint8_t       _timerPwmValue[48]; 
+            int           _one,_zero;
             int           _nextLed;
             
-            void        convertOne(uint8_t value, uint16_t *target);
+            void        convertOne(uint8_t value, uint8_t *target);
             void        convertRgb(int hilow, uint8_t *rgb);
             xBinarySemaphore _sem; 
-            uint16_t    lookup[16*4];
+            uint32_t    lookup[16];
             
 };

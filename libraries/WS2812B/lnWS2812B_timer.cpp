@@ -10,8 +10,6 @@
 #include "lnWS2812B_timer.h"
 
 
-#define WS_PREAMBLE 4*24 // number of zero byte preamble
-
 /**
  * 
  * @param nbLeds
@@ -34,9 +32,12 @@ void WS2812B_timer::begin()
    }
    _one=(_timer->rollover()*4+3)/6;
    _zero=(_timer->rollover()*2+3)/6;   
+   xAssert(_one<256);
+   xAssert(_zero<256);
    _timer->attachDmaCallback(this);
-   uint16_t *target=lookup;
+   uint8_t *target=(uint8_t *)lookup;
    // Pre compute PWM for 4 bits value
+   // Each value will come out as  4 bytes = uint32_t
    for(int value=0;value<16;value++)
    {
        int copy=value;
@@ -55,12 +56,14 @@ void WS2812B_timer::begin()
 WS2812B_timer::~WS2812B_timer()
 {
 }
-void WS2812B_timer::convertOne(uint8_t value, uint16_t *target)
+void WS2812B_timer::convertOne(uint8_t value, uint8_t *target)
 {
     int high=(value>>4)&0xf;
     int low=value&0xf;
-    memcpy(target,lookup+high*4 ,2*4);
-    memcpy(target+4,lookup+low*4,2*4);
+    xAssert(!((int)target&3)); // 32 bits aligned
+    uint32_t *t32=(uint32_t *)target;
+    t32[0]=lookup[high];
+    t32[1]=lookup[low];
 }
 /**
  * 
@@ -70,7 +73,7 @@ void WS2812B_timer::convertOne(uint8_t value, uint16_t *target)
  uint32_t delta;
 void WS2812B_timer::convertRgb(int hilow, uint8_t *rgb)
 {
-    uint16_t *p=_timerPwmValue;
+    uint8_t *p=_timerPwmValue;
     if(hilow) p+=24;
     convertOne(rgb[0],p);
     convertOne(rgb[1],p+8);
