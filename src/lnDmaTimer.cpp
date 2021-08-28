@@ -40,12 +40,14 @@ static bool searchDma(int timer, int channel, int &dmaEngine,int &dmaChannel)
  * 
  * @param pin
  */
-lnDmaTimer::lnDmaTimer(int pin) : lnTimer(pin)
+lnDmaTimer::lnDmaTimer(int bits, lnPin pin) : lnTimer(pin)
 {
     const LN_PIN_MAPPING *pins=pinMappings;
     int dmaChannel=-1;
     int dmaEngine=-1;
     _timer=-1;
+    _bits=bits;
+    
     while(1)
     {
         xAssert(pins->pin!=-1); //t2c1
@@ -59,7 +61,17 @@ lnDmaTimer::lnDmaTimer(int pin) : lnTimer(pin)
     }
     if(_timer==-1) xAssert(0);
     searchDma(_timer,_channel,dmaEngine,dmaChannel);
-    _dma=new lnDMA(lnDMA::DMA_MEMORY_TO_PERIPH,dmaEngine,dmaChannel,8,16);
+    switch(_bits)
+    {
+        case 8:
+            _dma=new lnDMA(lnDMA::DMA_MEMORY_TO_PERIPH,dmaEngine,dmaChannel,8,16);
+            break;
+        case 16:
+            _dma=new lnDMA(lnDMA::DMA_MEMORY_TO_PERIPH,dmaEngine,dmaChannel,8,16);
+            break;
+        default: xAssert(0);
+            break;
+    }
 }
 /**
  * 

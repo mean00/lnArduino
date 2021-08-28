@@ -18,7 +18,7 @@
 WS2812B_timer::WS2812B_timer(int nbLeds, int pin) : WS2812B_base(nbLeds)
 {
    _pin=pin;
-   _timer=new lnDmaTimer(pin);
+   _timer=new lnDmaTimer(8,pin);
 }
 /**
  * 

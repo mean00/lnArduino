@@ -79,7 +79,8 @@ public:
 class lnDmaTimer : public lnTimer
 {
 public:
-                lnDmaTimer(int pin);
+                /* bits is 8 or 16, the size of the data to send to the timer*/
+                lnDmaTimer(int bits, lnPin pin);
         virtual ~lnDmaTimer();                
         bool    pwmSetup(int frequency);
         int     rollover();
@@ -88,9 +89,10 @@ public:
         void    stop();
         bool    setTickFrequency(int fq);
 protected:
-        lnDmaTimerCallback *_cb;
-        int _rollover;
-        lnDMA *_dma;
+        lnDmaTimerCallback  *_cb;
+        int                 _rollover;
+        lnDMA               *_dma;
+        int                 _bits; /* 8 or 16 bits buffer ? */ 
 public:        
         void dmaInterrupt(bool h);
 };

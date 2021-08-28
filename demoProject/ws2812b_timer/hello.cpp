@@ -221,7 +221,7 @@ public:
 
 void manualDemo()
 {
-    timer=new lnDmaTimer(WS2812B_PIN);
+    timer=new lnDmaTimer(8,WS2812B_PIN);
     
    if(!timer->pwmSetup(830000)) 
    {
