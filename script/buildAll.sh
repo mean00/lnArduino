@@ -16,7 +16,7 @@ exit 4
 function buildAll()
 {
 echo "** STARTING ARCH ${ARCH}:${MCU}"
-for i in `ls  ../demoProject/`;
+for i in `ls  ../demoProject/ | grep -v cmake`;
 #for i in adc;
 do
     cd $CUR
@@ -29,13 +29,15 @@ do
     rm -Rf build${ARCH}_${MCU}
     mkdir build${ARCH}_${MCU}
     cd build${ARCH}_${MCU}
+    echo "*** ${i} ****"
     cmake -DLN_ARCH="${ARCH}" -DLN_MCU="${MCU}" .. || fail cmake
     make -j 6  || fail make
+    echo "/*** ${i} ****"
     cd $CUR
 done
 echo "** DONE FOR ARCH ${ARCH}:${MCU}"
 }
-export SDK=Arduino_gd32_freeRTOS
+export SDK=lnArduino
 
 export ARCH=RISCV
 export MCU=VF103
