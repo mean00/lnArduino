@@ -84,7 +84,7 @@ public:
         bool    pwmSetup(int frequency);
         int     rollover();
         bool    attachDmaCallback(lnDmaTimerCallback *cb);
-        bool    start(int nbSample, uint16_t *data);
+        bool    start(int nbSample, uint8_t *data);
         void    stop();
         bool    setTickFrequency(int fq);
 protected:

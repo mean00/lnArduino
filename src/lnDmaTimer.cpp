@@ -59,7 +59,7 @@ lnDmaTimer::lnDmaTimer(int pin) : lnTimer(pin)
     }
     if(_timer==-1) xAssert(0);
     searchDma(_timer,_channel,dmaEngine,dmaChannel);
-    _dma=new lnDMA(lnDMA::DMA_MEMORY_TO_PERIPH,dmaEngine,dmaChannel,16,16);
+    _dma=new lnDMA(lnDMA::DMA_MEMORY_TO_PERIPH,dmaEngine,dmaChannel,8,16);
 }
 /**
  * 
@@ -149,7 +149,7 @@ void    lnDmaTimer::stop()
  * @param data
  * @return 
  */
-bool    lnDmaTimer::start(int nbSample, uint16_t *data)
+bool    lnDmaTimer::start(int nbSample, uint8_t *data)
 {   
     LN_Timers_Registers *t=aTimer(_timer);
     
