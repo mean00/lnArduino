@@ -1,12 +1,8 @@
-
-SET(AF_FOLDER  ${CMAKE_SOURCE_DIR}/Arduino_gd32_freeRTOS/)
-
-include(./mcuSelect.cmake)
-SET(CMAKE_TOOLCHAIN_FILE ${AF_FOLDER}/lnArduino.cmake)
-
 cmake_minimum_required(VERSION 3.0)
 
-PROJECT(lnBasicDac C CXX ASM)
+include(../common_CMakeLists.cmake)
+
+PROJECT(lnNVM C CXX ASM)
 
 include_directories(${CMAKE_SOURCE_DIR})        
 add_subdirectory(${AF_FOLDER})
