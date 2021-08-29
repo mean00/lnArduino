@@ -64,14 +64,13 @@ lnDmaTimer::lnDmaTimer(int bits, lnPin pin) : lnTimer(pin)
     switch(_bits)
     {
         case 8:
-            _dma=new lnDMA(lnDMA::DMA_MEMORY_TO_PERIPH,dmaEngine,dmaChannel,8,16);
-            break;
         case 16:
-            _dma=new lnDMA(lnDMA::DMA_MEMORY_TO_PERIPH,dmaEngine,dmaChannel,8,16);
             break;
-        default: xAssert(0);
+        default:
+            xAssert(0);
             break;
     }
+    _dma=new lnDMA(lnDMA::DMA_MEMORY_TO_PERIPH,dmaEngine,dmaChannel,_bits,16);
 }
 /**
  * 
@@ -185,8 +184,8 @@ bool    lnDmaTimer::start(int nbSample, uint8_t *data)
  * @param fq
  * @return 
  */
-  bool    lnDmaTimer::setTickFrequency(int fqInHz)
-  {        
+bool    lnDmaTimer::setTickFrequency(int fqInHz)
+{        
     LN_Timers_Registers *t=aTimer(_timer);
     Peripherals per=pTIMER1;
     per=(Peripherals)((int)per+_timer-1);
@@ -205,6 +204,6 @@ bool    lnDmaTimer::start(int nbSample, uint8_t *data)
     t->CAR=divider-1;
     t->CNT=0;
     return true;
-  }
+}
 
 // EOF
