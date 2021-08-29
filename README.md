@@ -2,9 +2,9 @@
 
 
 The aim of this project is to offer an Arduino style framework for the Longan Nano board (RISCV) or GD32F1/F3 (ARM) boards.
-It also works with STM32F1 chips to some extent.
+It also works with STM32F1 chips.
 
-The API is 99% the same between the Riscv & Arm versions. Mostly tiny pinout/clock value changes.
+The API is 99% the same between the Riscv & Arm versions. Mostly tiny pinout/clock/interrupt changes.
 
 _What are the differences compared to vanilla Arduino ?_
 * Cmake based build system, use whatever IDE you want.
@@ -25,8 +25,8 @@ _What works for the moment :_
  * PWM support
  * Onboard LCD support (Longan Nano)
  * DAC (DMA) support
- * very basic ADC support
- * Basic Flash erase/write
+ * very basic ADC support / Timer triggered ADC
+ * Flash storage
 
 _Demos_
 The demoProject contains simple API demonstration programs.
@@ -48,7 +48,7 @@ _Heritage:_
 * The riscv freeRTOS port is from QQxiaming (see [1])
 * A couple of header file from arduino to offer a basic compatibility API
 * A couple of header from nucleisys to access n200 extra functions
-* Everything else has been written from scratch
+* Everything else has been written from scratch, no licensing issue.
 
 
 The demoProject folder contains sample code to show the API.
