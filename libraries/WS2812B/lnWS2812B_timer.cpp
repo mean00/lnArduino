@@ -3,8 +3,7 @@
  *  See license file
  *  Each bit in the WS2812B_timer stream becomes a byte
  * 
- *  writing the new PWM value takes ~ 4us on a GD32F303 @ 72 Mhz
- *  so about 7 us
+ * As far as the callback is concerned, it takes ~ 2.5 us on a VF103, 4 us on F303 and ~ 6 us on aF103
  */
 #include "lnArduino.h"
 #include "lnWS2812B_timer.h"
