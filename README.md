@@ -32,10 +32,12 @@ _Demos_
 The demoProject contains simple API demonstration programs.
 
 _How to build the demos :_
-* Symlink/copy the Arduino_gd32_freeRTOS folder under the demo folder
+* Symlink/copy the lnArduino folder under the demo folder
 Fill-in platformconfig.cmake to point to your toolchain (adjust flags if needed)
 mkdir build && cd build && cmake .. && make
 * edit mcuSelect.Cmake to define which MCU you are using
+
+By default they use a shared common_CMakeLists.txt / common_mcuSelect etc...
 
 _Bonus:_
 
