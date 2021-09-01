@@ -62,7 +62,7 @@ SET(GD32_C_FLAGS  "${GD32_SPECS}  ${PLATFORM_C_FLAGS} -DLN_ARCH=LN_ARCH_RISCV -W
 SET(CMAKE_C_FLAGS "${GD32_C_FLAGS}")
 SET(CMAKE_CXX_FLAGS "${GD32_C_FLAGS}  -fno-rtti -fno-exceptions" ) 
 #
-SET(GD32_LD_FLAGS "-nostdlib ${GD32_SPECS} ")
+SET(GD32_LD_FLAGS "-nostdlib ${GD32_SPECS}  -Wl,--traditional-format -Wl,--warn-common")
 SET(GD32_LD_LIBS "-lm -lc -lgcc")
 #-lgd32_overlay  -lgd32Arduino -lgd32 -lFreeRTOS -lgd32_lowlevel  -lc -lm -lgd32 -lgcc -lc  -lgcc 
 #
