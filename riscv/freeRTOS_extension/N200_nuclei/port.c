@@ -106,7 +106,7 @@ extern void prvPortStartFirstTask(void) __attribute__((naked));
  */
 static void prvTaskExitError(void);
 
-#define xPortSysTickHandler     eclic_mtip_handler
+//#define xPortSysTickHandler     eclic_mtip_handler
 
 /*-----------------------------------------------------------*/
 
