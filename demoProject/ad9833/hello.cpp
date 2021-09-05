@@ -37,6 +37,17 @@ void loop()
 {
     Logger("Entering main app...\n");
     int onoff=0;
+    
+    ad->setWaveForm(simplerAD9833::Square);
+    ad->setFrequency(1000);
+    ad->enable();
+    while(1)
+    {
+     ad->disable();
+     ad->setFrequency(1000);
+     ad->enable();
+    }
+    
     while(1)
     {
         xDelay(1000);

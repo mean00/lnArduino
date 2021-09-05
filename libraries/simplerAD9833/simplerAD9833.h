@@ -38,13 +38,28 @@
 class simplerAD9833 
 {
 public: 
+            enum WaveForm
+            {
+                Square,
+                Triangle,
+                Sine
+            };
+    
                               simplerAD9833(hwlnSPIClass *spi,lnPin cs);        
             virtual           ~simplerAD9833();
+            void              enable();
+            void              disable();
+            void              setWaveForm(WaveForm wf);
+            void              setFrequency(int frequency);
  protected:
             int               readRegister(int addr);
             void              writeRegister(int addr, int value);
             hwlnSPIClass     *_spi;
             lnPin             _cs;
+            WaveForm          _waveform;
+            int               _frequency;
+            int               _state;
+            lnSPISettings     *_spiSettings;
     
 };
 
