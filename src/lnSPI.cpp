@@ -235,7 +235,7 @@ bool hwlnSPIClass::writeInternal(int sz, int data)
     
     senable();
     csOn();
-    while (stxBusy()) 
+    while (sbusy()) 
     {
     }
     d->DATA=data;
@@ -257,7 +257,7 @@ bool hwlnSPIClass::writesInternal(int sz, int nbBytes, const uint8_t *data)
     csOn();
     for (size_t i = 0; i < nbBytes; i++) 
     {
-        while (stxBusy()) 
+        while (sbusy()) 
         {
         }
         d->DATA=data[i];
@@ -332,7 +332,7 @@ void hwlnSPIClass::waitForCompletion()
             xAssert(0);
             break;
         case 3: //  t only
-            while(stxBusy())
+            while(sbusy())
             {
                 
             }
@@ -396,23 +396,24 @@ void hwlnSPIClass::setup()
     switch(_settings->bOrder)
     {
         case   SPI_LSBFIRST: d->CTL0|=LN_SPI_CTL0_LSB;break;
-        case   SPI_MSBFIRST: break;
+        case   SPI_MSBFIRST:  d->CTL0&=~LN_SPI_CTL0_LSB;break;
         default:xAssert(0);
                 break;            
     }
     uint32_t s=0;
     switch(_settings->dMode)
     {
-        case SPI_MODE0:
+        // https://en.wikipedia.org/wiki/Serial_Peripheral_Interface
+        case SPI_MODE0: // Pol0, Phase 0/Edge 1
             s=0; // Low 1 edge
             break;
-        case SPI_MODE1:
+        case SPI_MODE1: // Pol 0 Phase 1 Edge 0
             s=LN_SPI_CTL0_CKPH; // Low 2 edge
             break;
-        case SPI_MODE2:
+        case SPI_MODE2: // POL 1 PHA 0 Edge 1
             s=LN_SPI_CTL0_CKPL; // high , 1 edge
             break;
-        case SPI_MODE3:
+        case SPI_MODE3: // POL 1 PHA 1 Edge 0
             s=LN_SPI_CTL0_CKPL|LN_SPI_CTL0_CKPH; // high , 2 edge
             break;
         default:xAssert(0);
@@ -439,8 +440,11 @@ void hwlnSPIClass::setup()
             toggle*=2;
             psc++;
         }
-    }       
-    d->CTL0|=psc<<3;
+    }     
+    uint32_t sp=d->CTL0;
+    sp&=~(7<<3);
+    sp|=psc<<3;
+    d->CTL0=sp;
     updateMode(d,false); // Tx only by default    
 }
 /**
