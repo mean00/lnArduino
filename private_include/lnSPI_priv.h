@@ -69,7 +69,7 @@ typedef volatile LN_SPI_Registersx LN_SPI_Registers;
 #define senable()  { if(d->CTL0 &LN_SPI_CTL0_SPIEN) xAssert(0); (d->CTL0 |=LN_SPI_CTL0_SPIEN);}
 #define sdisable() (d->CTL0&=~LN_SPI_CTL0_SPIEN)
 #define sbusy()    (d->STAT&LN_SPI_STAT_TRANS)
-#define stxBusy() !(d->STAT&LN_SPI_STAT_TBE)
+
 
 
 void updateMode(LN_SPI_Registers *d,bool rxTx);
