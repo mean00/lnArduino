@@ -220,7 +220,12 @@ bool hwlnSPIClass::asyncTransfer(int nbBytes, uint8_t *dataOut, uint8_t *dataIn,
     _callbackCookie=cookie;
     return transfer(nbBytes,dataOut,dataIn);
 }
-
+/**
+ * 
+ * @param sz
+ * @param data
+ * @return 
+ */
 bool hwlnSPIClass::writeInternal(int sz, int data)
 {
     LN_SPI_Registers *d=(LN_SPI_Registers *)_adr;
@@ -241,6 +246,7 @@ bool hwlnSPIClass::writeInternal(int sz, int data)
     d->DATA=data;
     
     waitForCompletion();
+    int dummy=d->DATA;
     csOff();
     sdisable();
     return true;
