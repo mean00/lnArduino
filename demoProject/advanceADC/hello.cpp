@@ -10,7 +10,8 @@
 
 void setup()
 {
-    pinMode(LED,OUTPUT);
+    pinMode(LN_SYSTEM_LED,OUTPUT);
+    
     
 }
 /**
