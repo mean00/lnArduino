@@ -32,6 +32,11 @@ simplerAD9833::simplerAD9833(hwlnSPIClass *spi,lnPin cs)
     _frequency=1000;
     _state=0;
     _spiSettings=new lnSPISettings(1*1000,SPI_MSBFIRST,SPI_MODE2,_cs);
+    
+    writeRegister(0,LN_AD9833_RESET);
+    xDelay(1);
+    writeRegister(0,0);
+    
 }
 /**
  * 
@@ -100,20 +105,22 @@ void   simplerAD9833::disable()
  */
 void simplerAD9833::writeRegister(int addr, int value)
 {
-    _spi->beginTransaction(*_spiSettings);
+    //_spi->beginTransaction(*_spiSettings);
     //_spi->write16(0*0x55aa+1*value);
-    _spi->write(value>>8);
-    _spi->write(value&0xff);
-    _spi->endTransaction();
+    digitalWrite(PB11,false);
+    xDelay(1);
+    uint32_t x=(uint32_t)value;
+    _spi->write(x>>8);
+    _spi->write(x&0xff);
+    xDelay(1);
+        digitalWrite(PB11,true);
+    //_spi->endTransaction();
 }
   
 /**
  * 
  * @param fq
  */
-
-const float mulmul=((float)(1<<28));
-
 void simplerAD9833::setFrequency(int fq)
 {
     _frequency=fq;
@@ -123,20 +130,15 @@ void simplerAD9833::setFrequency(int fq)
     if(!fq) fq=1;
     
     
-    float dividerf=(fq*mulmul)/baseFq;
-    int divider=(int)(dividerf+.49);
-    int High14=divider>>14;
-    int Low14=divider&0x3FFF;
+    float t=fq*(float)(1<<28);
+    t/=baseFq;
+    int reg=(int)(t+0.49);
+    int High14=reg>>14;
+    int Low14=reg&0x3FFF;
     
-    // always right Freq 0 ?
-     writeRegister(0, LN_AD9833_B28 | LN_AD9833_CTRL(0));
-     // Now we can write the fq
-     writeRegister(0,Low14 | LN_AD9833_CTRL(1));
-     writeRegister(0,High14| LN_AD9833_CTRL(1));
-     
-    
-    
-    
+    writeRegister(0,LN_AD9833_B28+_state); // Wrote
+    writeRegister(0,LN_AD9833_FREQ+Low14); // Wrote
+    writeRegister(0,LN_AD9833_FREQ+High14); // Wrote
 }  
 // EOF
 

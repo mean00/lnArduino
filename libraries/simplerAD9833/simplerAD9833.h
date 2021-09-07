@@ -51,7 +51,7 @@ public:
             void              disable();
             void              setWaveForm(WaveForm wf);
             void              setFrequency(int frequency);
- protected:
+public:
             int               readRegister(int addr);
             void              writeRegister(int addr, int value);
             hwlnSPIClass     *_spi;
