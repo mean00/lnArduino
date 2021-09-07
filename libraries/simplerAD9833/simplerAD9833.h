@@ -45,7 +45,7 @@ public:
                 Sine
             };
     
-                              simplerAD9833(hwlnSPIClass *spi,lnPin cs);        
+                              simplerAD9833(hwlnSPIClass *spi,lnPin cs,int baseClock=25000000);        
             virtual           ~simplerAD9833();
             void              enable();
             void              disable();
@@ -60,6 +60,8 @@ public:
             int               _frequency;
             int               _state;
             lnSPISettings     *_spiSettings;
+            int                _baseClock;
+            int                _factor; // fixed decimal multiplier
     
 };
 

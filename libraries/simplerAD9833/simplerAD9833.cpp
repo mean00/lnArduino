@@ -19,10 +19,14 @@
  * @param spi
  * @param cs
  */
-simplerAD9833::simplerAD9833(hwlnSPIClass *spi,lnPin cs)
+simplerAD9833::simplerAD9833(hwlnSPIClass *spi,lnPin cs, int baseClock)
 {
     _spi=spi;
     _cs=cs;
+    _baseClock=baseClock;
+    
+    float m=(1024.*(float)(1<<(28)))/(float)baseClock;
+    _factor=(int)(m+0.49);
     if(_cs!=-1)
     {
         digitalWrite(_cs,true);
@@ -123,18 +127,15 @@ void simplerAD9833::writeRegister(int addr, int value)
  */
 void simplerAD9833::setFrequency(int fq)
 {
-    _frequency=fq;
-    // Default frequency : 25 Mhz
-    float baseFq=25.*1000.*1000.;
-    if(fq>baseFq) fq=baseFq;
+    _frequency=fq;    
+    if(fq>_baseClock) fq=_baseClock;
     if(!fq) fq=1;
     
+    uint64_t m=(uint64_t)fq*(uint64_t)_factor; // ~ 10*256 
+    uint32_t n=(uint32_t)(m>>10);
     
-    float t=fq*(float)(1<<28);
-    t/=baseFq;
-    int reg=(int)(t+0.49);
-    int High14=reg>>14;
-    int Low14=reg&0x3FFF;
+    int High14=n>>14;
+    int Low14=n&0x3FFF;
     
     writeRegister(0,LN_AD9833_B28+_state); // Wrote
     writeRegister(0,LN_AD9833_FREQ+Low14); // Wrote
