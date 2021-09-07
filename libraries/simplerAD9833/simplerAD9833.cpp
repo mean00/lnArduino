@@ -102,24 +102,6 @@ void   simplerAD9833::disable()
     writeRegister(0,_state);
 }
 
-/**
- * 
- * @param addr
- * @param value
- */
-void simplerAD9833::writeRegister(int addr, int value)
-{
-    //_spi->beginTransaction(*_spiSettings);
-    //_spi->write16(0*0x55aa+1*value);
-    digitalWrite(PB11,false);
-    xDelay(1);
-    uint32_t x=(uint32_t)value;
-    _spi->write(x>>8);
-    _spi->write(x&0xff);
-    xDelay(1);
-        digitalWrite(PB11,true);
-    //_spi->endTransaction();
-}
   
 /**
  * 
@@ -136,11 +118,28 @@ void simplerAD9833::setFrequency(int fq)
     
     int High14=n>>14;
     int Low14=n&0x3FFF;
-    
+    // this is inefficient, but the amount of data transfered is very low
+    // so it does not really matter
     writeRegister(0,LN_AD9833_B28+_state); // Wrote
     writeRegister(0,LN_AD9833_FREQ+Low14); // Wrote
     writeRegister(0,LN_AD9833_FREQ+High14); // Wrote
 }  
+
+
+/**
+ * 
+ * @param addr
+ * @param value
+ */
+void simplerAD9833::writeRegister(int addr, int value)
+{
+    _spi->beginTransaction(*_spiSettings);
+    _spi->write16(value);
+    for(int i=0;i<600;i++) 
+        __asm__("nop");
+    _spi->endTransaction();
+}
+
 // EOF
 
 
