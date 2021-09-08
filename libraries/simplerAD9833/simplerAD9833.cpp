@@ -35,7 +35,7 @@ simplerAD9833::simplerAD9833(hwlnSPIClass *spi,lnPin cs, int baseClock)
     _waveform=Sine;
     _frequency=1000;
     _state=0;
-    _spiSettings=new lnSPISettings(1*1000,SPI_MSBFIRST,SPI_MODE2,_cs);
+    _spiSettings=new lnSPISettings(5*1000*1000,SPI_MSBFIRST,SPI_MODE2,-1);
     
     writeRegister(0,LN_AD9833_RESET);
     xDelay(1);
@@ -120,24 +120,28 @@ void simplerAD9833::setFrequency(int fq)
     int Low14=n&0x3FFF;
     // this is inefficient, but the amount of data transfered is very low
     // so it does not really matter
+    
     writeRegister(0,LN_AD9833_B28+_state); // Wrote
     writeRegister(0,LN_AD9833_FREQ+Low14); // Wrote
     writeRegister(0,LN_AD9833_FREQ+High14); // Wrote
+    
 }  
 
 
 /**
- * 
+ * \brief It seems the AD9833 does not like the CS to go up quickly, so manually
+ * drive it and add a small delay at the end of the transmittion
  * @param addr
  * @param value
  */
 void simplerAD9833::writeRegister(int addr, int value)
 {
     _spi->beginTransaction(*_spiSettings);
+    digitalWrite(_cs,false);
     _spi->write16(value);
-    for(int i=0;i<600;i++) 
-        __asm__("nop");
-    _spi->endTransaction();
+    lnDelayUs(1);
+    digitalWrite(_cs,true);
+    _spi->endTransaction();    
 }
 
 // EOF

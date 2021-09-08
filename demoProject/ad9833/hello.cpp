@@ -28,7 +28,7 @@ void setup()
     spi->setSpeed(1000); // dont care much about the speed    
     spi->setBitOrder(SPI_MSBFIRST);
     spi->setDataMode(SPI_MODE2);
-    ad=new simplerAD9833(spi,AD9833_CS);    
+    ad=new simplerAD9833(spi,AD9833_CS);
 }
 
 
@@ -40,10 +40,13 @@ void loop()
     ad->setFrequency(1000);
     ad->setWaveForm(simplerAD9833::Square);
     ad->enable();
+    
     while(1)
     {
+        ad->setWaveForm(simplerAD9833::Triangle);
         ad->setFrequency  (1000);
         xDelay(2000);
+        ad->setWaveForm(simplerAD9833::Square);
         ad->setFrequency  (10000);
         xDelay(2000);    
         ad->disable();
