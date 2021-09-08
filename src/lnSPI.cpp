@@ -267,6 +267,7 @@ bool hwlnSPIClass::writesInternal(int sz, int nbBytes, const uint8_t *data)
         {
         }
         d->DATA=data[i];
+        int dummy=d->DATA;
     }
     waitForCompletion();
     csOff();
@@ -338,9 +339,13 @@ void hwlnSPIClass::waitForCompletion()
             xAssert(0);
             break;
         case 3: //  t only
+            while(txbusy())
+            {
+                __asm__("nop");
+            }           
             while(sbusy())
             {
-                
+                __asm__("nop");
             }
             break;
     }
