@@ -13,8 +13,8 @@ MACRO(GENERATE_GD32_FIRMWARE target)
     ENDIF(NOT LN_MCU_EEPROM_SIZE)
 
     configure_file( "${AF_FOLDER}/legacy/boards/bluepill/ld.lds.in" "${CMAKE_BINARY_DIR}/linker_script.ld" @ONLY)
-    ADD_EXECUTABLE(${target} ${ARGN}  ${AF_FOLDER}/arm/start.S   ${AF_FOLDER}/arm/start.cpp 
-                                                                 ${AF_FOLDER}/arm/vector_table.S) 
+    ADD_EXECUTABLE(${target} ${ARGN}  ${AF_FOLDER}/arm_gd32fx/start.S   ${AF_FOLDER}/arm_gd32fx/start.cpp 
+                                                                 ${AF_FOLDER}/arm_gd32fx/vector_table.S) 
     TARGET_LINK_LIBRARIES(${target} ${USED_LIBS} ) # duplicates are NOT a mistake !
     # duplicates are NOT a mistake !
     TARGET_LINK_LIBRARIES(${target} embeddedPrintf gd32_overlay gd32Arduino   FreeRTOS  gd32_lowlevel c  c gcc ) 

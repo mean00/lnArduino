@@ -13,7 +13,7 @@ MACRO(GENERATE_GD32_FIRMWARE target)
 
    configure_file( "${AF_FOLDER}/legacy/boards/sipeed-longan-nano/ld.lds.in" "${CMAKE_BINARY_DIR}/linker_script.lds" @ONLY)
 
-    ADD_EXECUTABLE(${target}  ${AF_FOLDER}/riscv/start.S ${ARGN})
+    ADD_EXECUTABLE(${target}  ${AF_FOLDER}/riscv_gd32fx/start.S ${ARGN})
     TARGET_LINK_LIBRARIES(${target} ${USED_LIBS} ) # duplicates are NOT a mistake !
     TARGET_LINK_LIBRARIES(${target} embeddedPrintf gd32_overlay gd32Arduino   FreeRTOS  gd32_lowlevel c  c gcc ) # dupicates are NOT a mistake !
     TARGET_LINK_OPTIONS(${target}  PRIVATE "-T${CMAKE_BINARY_DIR}/linker_script.lds" )
