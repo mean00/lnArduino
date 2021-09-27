@@ -36,6 +36,23 @@ void lnPinMode(const lnPin pin, const GpioMode mode);
 void lnDigitalWrite(const lnPin pin, bool value);
 bool lnDigitalRead(const lnPin pin);
 void lnDigitalToggle(const lnPin pin);
+volatile uint32_t *lnGetGpioToggleRegister(int port); // Bop register for port "port" with port A:0, B:1, ...
+uint32_t lnReadPort(int port);
+
+/**
+ * 
+ * @param p
+ */
+class lnFastIO
+{
+public:
+        lnFastIO(lnPin p);
+    void on() {*_onoff=_onbit;}
+    void off() {*_onoff=_offbit;}
+protected:
+    volatile uint32_t *_onoff;
+    uint32_t  _onbit,_offbit;
+};
 
 #include "lnExti.h"
 // EOF

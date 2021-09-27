@@ -16,6 +16,8 @@ static  LN_GPIO *gpioA=(LN_GPIO *)LN_GPIOA_ADR;
 static  LN_GPIO *gpioB=(LN_GPIO *)LN_GPIOB_ADR;
 static  LN_GPIO *gpioC=(LN_GPIO *)LN_GPIOC_ADR;
 
+static  LN_GPIO *gpios[3]={gpioA,gpioB,gpioC};
+
 /**
  * 
  * @param pin
@@ -97,7 +99,15 @@ void lnDigitalToggle(const lnPin pin)
     val^=1<<xpin;
     port->OCTL=val;
 }
-
+/**
+ * 
+ * @param port
+ * @return 
+ */
+volatile  uint32_t *lnGetGpioToggleRegister(int port)
+{
+    return &(gpios[port]->BOP);
+}
 
 /**
  * 
@@ -112,6 +122,31 @@ bool lnDigitalRead(const lnPin pin)
     uint32_t v=port->ISTAT;
     return !!(v&(1<<xpin));
 }
+/**
+ * 
+ * @param port
+ * @return 
+ */
+uint32_t lnReadPort(int port)
+{
+     return (gpios[port]->ISTAT);
+}
+
+/**
+ * 
+ * @param p
+ */
+lnFastIO::lnFastIO(lnPin pin)
+{
+    lnPinMode(pin,lnOUTPUT);
+    
+    LN_GPIO *port=gpio[pin>>4];
+    _onoff=&port->BOP;
+    int bit=1<<(pin&0xf);
+    _offbit=bit<<16;
+    _onbit=bit;
+}
+
 // EOF
 
 
