@@ -13,6 +13,16 @@ typedef volatile LN_SystemTimer_Registersx LN_SystemTimer_Registers;
 
 
 LN_SystemTimer_Registers *aSysTick=(LN_SystemTimer_Registers *)0xE000E010;
+
+/**
+ * 
+ * @return 
+ */
+uint32_t lnGetCycle32()
+{
+    return aSysTick->CVR;
+}
+
 /**
  * 
  * @return 

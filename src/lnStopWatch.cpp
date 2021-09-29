@@ -48,4 +48,31 @@ bool lnStopWatch::elapsed()
     if(xnow>_end) return true;
     return false;
 }
+
+//---------------------------------
+
+extern uint32_t lnGetCycle32();
+
+
+lnCycleClock::lnCycleClock()
+{
+}
+
+void  lnCycleClock::restart()
+{
+    _start=lnGetCycle32();
+}
+/**
+ * 
+ * @return 
+ */
+uint32_t  lnCycleClock::elapsed()
+{
+    uint32_t after=lnGetCycle32();
+    return after-_start; // to do : handle wrap
+    
+}
+
+
+
 //

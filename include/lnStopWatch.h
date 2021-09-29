@@ -17,3 +17,16 @@ protected:
         uint32_t _end;
     
 };
+/**
+ * 
+ */
+class lnCycleClock
+{
+public:
+                    lnCycleClock();
+        void        restart();
+        uint32_t    elapsed();
+protected:
+        uint32_t _start;
+    
+};
