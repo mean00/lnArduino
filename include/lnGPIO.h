@@ -49,8 +49,10 @@ public:
         lnFastIO(lnPin p);
     void on() {*_onoff=_onbit;}
     void off() {*_onoff=_offbit;}
+    void pulseLow() __attribute__((always_inline)) { *_onoff=_offbit;*_onoff=_onbit;}
+    void pulseHigh() __attribute__((always_inline)) { *_onoff=_onbit ;*_onoff=_offbit;}
 protected:
-    volatile uint32_t *_onoff;
+    uint32_t *_onoff;
     uint32_t  _onbit,_offbit;
 };
 

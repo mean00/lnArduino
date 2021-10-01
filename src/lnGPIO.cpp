@@ -141,7 +141,7 @@ lnFastIO::lnFastIO(lnPin pin)
     lnPinMode(pin,lnOUTPUT);
     
     LN_GPIO *port=gpio[pin>>4];
-    _onoff=&port->BOP;
+    _onoff=(uint32_t *)&port->BOP;
     int bit=1<<(pin&0xf);
     _offbit=bit<<16;
     _onbit=bit;
