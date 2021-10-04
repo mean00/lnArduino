@@ -149,13 +149,27 @@ void lnExtiDisableInterrupt(const lnPin pin)
     aExiti->PD=1<<source; // clear pending interrupt
 }
 
-
+// this is for the risc version
+void lnExtiJtagNoResetOnly()
+{
+    LN_AFIO *afio=(LN_AFIO*)LN_AFIO_ADR;
+    uint32_t v=afio->PCF0;
+    v&=LN_AFIO_PCF0_SWJ_MASK;
+    v|=LN_AFIO_PCF0_SWJ_SET(1); // Jtag,no reset, frees up PB4
+    afio->PCF0=v;
+    // Do partial remap on timer1 to follow bluepill layout
+    v=afio->PCF0;
+    v&=~(3<<8);
+    v|=1<<8;
+    afio->PCF0=v; 
+}
+// Arm version
 void lnExtiSWDOnly()
 {
     LN_AFIO *afio=(LN_AFIO*)LN_AFIO_ADR;
     uint32_t v=afio->PCF0;
     v&=LN_AFIO_PCF0_SWJ_MASK;
-    v|=LN_AFIO_PCF0_SWJ_SET(2);
+    v|=LN_AFIO_PCF0_SWJ_SET(2); // SWD, no Jtag
     afio->PCF0=v;
     // Do partial remap on timer1 to follow bluepill layout
     v=afio->PCF0;

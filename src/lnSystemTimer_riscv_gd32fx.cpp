@@ -23,6 +23,34 @@ extern "C" void lnSystemTimerInit()
     
 }
 /**
+ */
+uint32_t lnGetCycle32()
+{
+    return lnSysTimer->MTIME_LO;
+}
+/**
+ */
+uint64_t lnGetCycle64()
+{
+    uint32_t high,low;
+    while(1)
+    {
+        high= lnSysTimer->MTIME_HI;
+        low=  lnSysTimer->MTIME_LO;
+        uint32_t high2=lnSysTimer->MTIME_HI;
+        if(high==high2)
+        {
+            break;
+        }
+    }
+    uint64_t r=high;
+    r<<=32;
+    r+=low;
+    return r;
+}
+
+
+/**
  * 
  */
 extern "C" void lnSystemTimerTick()
@@ -59,44 +87,15 @@ extern "C" void lnSystemTimerClearSwInterrupt()
  */
 uint64_t lnGetUs64()
 {    
-    uint32_t high;
-    uint32_t low;
-
-
-    while(1)
-    {
-        high= lnSysTimer->MTIME_HI;
-        low=  lnSysTimer->MTIME_LO;
-        uint32_t high2=lnSysTimer->MTIME_HI;
-        if(high==high2)
-        {
-            break;
-        }
-    }
-    uint64_t tick=(((uint64_t)high)<<32)+low;
+    uint64_t tick=lnGetCycle64();
     // convert tick to us
     tick=(tick*16)/tickPerUs16;
     return tick;    
 }
+/**
+ */
 uint32_t lnGetUs()
 {    
-    uint32_t high;
-    uint32_t low;
-
-
-    while(1)
-    {
-        high= lnSysTimer->MTIME_HI;
-        low=  lnSysTimer->MTIME_LO;
-        uint32_t high2=lnSysTimer->MTIME_HI;
-        if(high==high2)
-        {
-            break;
-        }
-    }
-    uint64_t tick=(((uint64_t)high)<<32)+low;
-    // convert tick to us
-    tick=(tick*16)/tickPerUs16;
-    return tick;    
+    return (uint32_t)lnGetUs64();
 }
 // EOF
