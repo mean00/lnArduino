@@ -21,6 +21,7 @@ enum
 enum GpioMode
 {
     lnFLOATING=0,
+    lnINPUT_FLOATING=0,
     lnINPUT_PULLUP=2,
     lnINPUT_PULLDOWN=3,
     lnOUTPUT=1,
