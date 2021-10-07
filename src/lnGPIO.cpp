@@ -108,7 +108,15 @@ volatile  uint32_t *lnGetGpioToggleRegister(int port)
 {
     return &(gpios[port]->BOP);
 }
-
+/**
+ * 
+ * @param port
+ * @return 
+ */
+volatile uint32_t *lnGetGpioDirectionRegister(int port)
+{
+    return &(gpios[port]->CTL0);
+}
 /**
  * 
  * @param pin

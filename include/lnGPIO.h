@@ -38,6 +38,7 @@ void lnDigitalWrite(const lnPin pin, bool value);
 bool lnDigitalRead(const lnPin pin);
 void lnDigitalToggle(const lnPin pin);
 volatile uint32_t *lnGetGpioToggleRegister(int port); // Bop register for port "port" with port A:0, B:1, ...
+volatile uint32_t *lnGetGpioDirectionRegister(int port); // Direction register for the bit 0..7 of port "port" , A=0, B=1, ...
 uint32_t lnReadPort(int port);
 
 /**
