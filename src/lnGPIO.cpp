@@ -119,6 +119,17 @@ volatile uint32_t *lnGetGpioDirectionRegister(int port)
 }
 /**
  * 
+ * @param port
+ * @return 
+ */
+volatile uint32_t *lnGetGpioValueRegister(int port)
+{
+    return &(gpios[port]->OCTL);
+}
+
+
+/**
+ * 
  * @param pin
  * @return 
  */
