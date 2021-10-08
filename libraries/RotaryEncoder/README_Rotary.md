@@ -1,4 +1,5 @@
 This code is derived from https://github.com/brianlow/Rotary.git
+/!\ ---As such it is GPLV3---
 
 Rotary Encoder Arduino Library
 ==============================

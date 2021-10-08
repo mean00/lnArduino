@@ -1,0 +1,1 @@
+https://github.com/brianlow/Rotary/ => GNU GPL V3
