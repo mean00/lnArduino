@@ -17,6 +17,7 @@ extern "C" void lnSystemTimerInit()
 {
     lnSysTimer64->MTIME64=0;
     lnSysTimer64->MTIMECMP64=increment;    
+    LN_FENCE();
     // number of ticks for a duration of 1 us
     tickPerUs16=((SystemCoreClock*4))/(1000*1000); // *16/4
 
@@ -63,7 +64,7 @@ extern "C" void lnSystemTimerTick()
     lnSysTimer->MTIMECMP_LO=~0;
     lnSysTimer->MTIMECMP_HI=now>>32;
     lnSysTimer->MTIMECMP_LO=now&0xffffffffUL;
-    
+    LN_FENCE();
 }
 
 /**
@@ -72,6 +73,7 @@ extern "C" void lnSystemTimerTick()
 extern "C" void lnSystemTimerTriggerSwInterrupt()
 {   
    *lnSysTimer_msip=1;
+   LN_FENCE();
 }
 /**
  * 
@@ -79,6 +81,7 @@ extern "C" void lnSystemTimerTriggerSwInterrupt()
 extern "C" void lnSystemTimerClearSwInterrupt()
 {   
    *lnSysTimer_msip=0;
+   LN_FENCE();
 }
 
 /**
