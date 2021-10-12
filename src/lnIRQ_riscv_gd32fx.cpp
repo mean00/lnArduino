@@ -87,6 +87,7 @@ void _enableDisable(bool enableDisable, const LnIRQ &irq)
         iclic->ie|=1;
     else
         iclic->ie&=~1;
+    LN_FENCE();
 }
 /**
  * 
@@ -96,6 +97,7 @@ extern "C" void lnEnableInterruptDirect(int irq)
 {   
     LN_ECLIC_irq *iclic=eclicIrqs+irq;
     iclic->ie|=1;
+    LN_FENCE();
 }
 /**
  * 
@@ -105,6 +107,7 @@ extern "C" void lnDisableInterruptDirect(int irq)
 {   
     LN_ECLIC_irq *iclic=eclicIrqs+irq;
     iclic->ie&=~1;
+    LN_FENCE();
 }
 
 /**
@@ -130,6 +133,7 @@ void lnSetInterruptLevelDirect(int irq, int prio, bool vectored)
     //  4 bits then 1 1 1 1
     // nlbits=4 => level = 4 bits, priority=0 bits
     iclic->control=(prio<<ECLIC_CTLBIT_SHIFT)+ECLIC_CTLBIT_LOW;    
+    LN_FENCE();
 }
 /**
  * 
@@ -143,6 +147,7 @@ void lnDisableInterrupt(const LnIRQ &irq)
 void lnWriteMthDirect(int mth)
 {
     *eclicMth=mth;
+    LN_FENCE();
 }
 int  lnReadMthDirect()
 {
