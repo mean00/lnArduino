@@ -56,7 +56,7 @@ extern void lnSystemTimerTick();
 #define SysTimer_SetSWIRQ lnSystemTimerTriggerSwInterrupt
 #define SysTimer_ClearSWIRQ lnSystemTimerClearSwInterrupt
 #define SysTick_Reload(x)   lnSystemTimerTick()
-#warning FIXME THIS IS INCORRECT
+// Hardcoded value for now....
 #define __ECLIC_GetCfgNlbits() 4
 #define __ECLIC_INTCTLBITS     4
 //-------------------------------------------------
