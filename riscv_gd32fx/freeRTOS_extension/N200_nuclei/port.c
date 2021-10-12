@@ -373,7 +373,7 @@ void vPortEndScheduler(void)
     configASSERT(uxCriticalNesting == 1000UL);
 }
 /*-----------------------------------------------------------*/
-
+extern uint32_t underInterrupt;
 void vPortEnterCritical(void)
 {
     portDISABLE_INTERRUPTS();
@@ -384,8 +384,10 @@ void vPortEnterCritical(void)
     functions that end in "FromISR" can be used in an interrupt.  Only assert if
     the critical nesting count is 1 to protect against recursive calls if the
     assert function also uses a critical section. */
-    if (uxCriticalNesting == 1) {
-        configASSERT((__ECLIC_GetMth() & portMTH_MASK) == uxMaxSysCallMTH);
+    if (uxCriticalNesting == 1) 
+    {
+        //FX: This does not really test if we are under interrupt...configASSERT((__ECLIC_GetMth() & portMTH_MASK) == uxMaxSysCallMTH);
+        configASSERT(underInterrupt==0); // this does
     }
 }
 /*-----------------------------------------------------------*/
