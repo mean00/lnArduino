@@ -16,6 +16,20 @@
 
 
 
+
+#if LN_ARCH == LN_ARCH_RISCV
+    #include "lnIRQ_riscv.h"
+    #define LN_FENCE()  __asm volatile("fence.i")
+    #define LN_IOWRITE(adr,value)  {*adr=value;}
+#else
+    #if LN_ARCH == LN_ARCH_ARM        
+        #define LN_FENCE() {} // no need for fence on arm
+        #define LN_IOWRITE(adr,value) {*adr=value;}
+    #else
+        #error UNSUPPORTED ARCH
+    #endif
+#endif
+
 #include "Arduino.h"
 #include "systemHelper.h"
 extern "C"
@@ -30,6 +44,7 @@ extern "C"
 
 
 
+
 #include "lnFreeRTOS.h"
 #include "lnDebug.h"
 #include "lnGPIO.h"
@@ -39,6 +54,8 @@ extern "C"
 
 #include "lnPrintf.h"
 #include "lnSystemTime.h"
+
+
 
 
 

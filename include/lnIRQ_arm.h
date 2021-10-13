@@ -100,5 +100,3 @@ enum LnIRQ
 void lnSetInterruptLevelDirect(int intr, int prio, bool vectored);
 
 #define LN_SYSTEM_LED PC13
-
-#define LN_FENCE() {} // no need for fence on arm

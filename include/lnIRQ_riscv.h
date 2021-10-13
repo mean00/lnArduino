@@ -77,5 +77,3 @@ void lnSetInterruptLevelDirect(int intr, int prio, bool vectored);
 
 
 #define LN_SYSTEM_LED PA2
-
-#define LN_FENCE()  __asm volatile("fence.i")
