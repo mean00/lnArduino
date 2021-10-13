@@ -58,10 +58,8 @@ static void waitCfg0Bit(int mask)
     }
     
 }
-
-
-#define CLOCK_XTAL_VALUE      8 // 8mhz quartz
-#define CLOCK_TARGET_SYSCLOCK 108 // 108 Mhz
+#define CLOCK_XTAL_VALUE        8 // 8mhz quartz
+#define CLOCK_TARGET_SYSCLOCK   (LN_MCU_SPEED/(1000*1000))  // 108 Mhz
 #define CLOCK_TARGET_PREDIV   2
 
 //{CTL = 0x38683, CFG0 = 0x400, CIR = 0x0, APB2RSTR = 0x0, APB1RSTR = 0x0, AHBENR = 0x14, APB2ENR = 0x0, APB1ENR = 0x0, BDCR = 0x18, CSR = 0x1c000000}
@@ -102,7 +100,8 @@ static void setPll(int multiplier, int predivider)
     c1&=~LN_RCU_CFG1_PRED_CLOCKSEL; // 0-> XTAL is source for PREDV0
     c1|=LN_RCU_CFG1_PREDV0_DIV(1); // divide by 2
     c1|=LN_RCU_CFG1_PREDV1_DIV(1); // divide by 2
-    c1|=LN_RCU_CFG1_PLL1_MUL(15);  // multipy by 20
+#warning do we use PLL1 / PLL2 ? Maybe I2S    
+    c1|=LN_RCU_CFG1_PLL1_MUL(15);  // multipy by 20, 
     c1|=LN_RCU_CFG1_PLL2_MUL(15);  // multipy by 20
     *cfg1=c1;
                 
@@ -134,7 +133,7 @@ void lnInitSystemClock()
     {
         // Set HXTAL as source for PLL <<
         *cfg0=LN_RCU_CFG0_PLLSEL;
-        setPll(27,2); // 8*27/2=108 Mhz
+        setPll(CLOCK_TARGET_SYSCLOCK*CLOCK_TARGET_PREDIV/(CLOCK_XTAL_VALUE),CLOCK_TARGET_PREDIV); // 8*27/2=108 Mhz
     }
     // Setup AHB...
     // AHB is Xtal:1, divider value=0
