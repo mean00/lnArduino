@@ -22,7 +22,7 @@ public:
 
                     }
             int      getVref(); // direct value
-            float    getVcc();  // Vcc value in mv
+    static  float    getVcc();  // Vcc value in mv
 protected:
             void     readVcc();
     virtual void     setup();
@@ -45,7 +45,7 @@ public:
    bool    pollingMultiRead(int nbPins, lnPin *pins, int *output); // read N pins in one go POLLING
    
    int      getVref(); // direct value
-   float    getVcc();  // Vcc value in mv
+   static float    getVcc();  // Vcc value in mv
 protected:
     void    readVcc();
     void    setup();
