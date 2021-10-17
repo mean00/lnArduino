@@ -45,9 +45,11 @@ void   lnSimpleADC:: setup()
 {
   LN_ADC_Registers *adc=lnAdcDesc[_instance].registers;
   lnBaseAdc::setup();
+  // 
+  adc->CTL1&=~LN_ADC_CTL1_ADCON;
   adc->RSQS[2]=adcChannel(_pin);
   adc->RSQS[0]=0<<20; // one channel
-  
+  adc->CTL1|=LN_ADC_CTL1_ADCON;
 }
 /**
  * 
@@ -74,9 +76,9 @@ bool    lnSimpleADC::setPin(lnPin pin)
  */
 int     lnSimpleADC::simpleRead()
 {
-    int value;
+    uint16_t value;
     if(!pollingMultiRead(1,&_pin,&value)) return -1;
-    return value;
+    return (int)value;
 }
 /**
  * 
@@ -85,7 +87,7 @@ int     lnSimpleADC::simpleRead()
  * @param output
  * @return 
  */
-bool    lnSimpleADC::pollingMultiRead(int nbPins, lnPin *pins, int *output)
+bool    lnSimpleADC::pollingMultiRead(int nbPins, lnPin *pins, uint16_t *output)
 {
     xAssert(nbPins<=5);
     LN_ADC_Registers *adc=lnAdcDesc[_instance].registers;

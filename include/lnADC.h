@@ -42,14 +42,13 @@ public:
    lnPin   pin();
    bool    setPin(lnPin pin);
    int     simpleRead();      // do a basic sampling
-   bool    pollingMultiRead(int nbPins, lnPin *pins, int *output); // read N pins in one go POLLING
+   bool    pollingMultiRead(int nbPins, lnPin *pins, uint16_t *output); // read N pins in one go POLLING
    
    int      getVref(); // direct value
    static float    getVcc();  // Vcc value in mv
 protected:
     void    readVcc();
     void    setup();
-    int     _instance;
     int     _pin;
 
 };

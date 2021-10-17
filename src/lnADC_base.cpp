@@ -47,6 +47,8 @@ void lnBaseAdc::readVcc()
 {
     LN_ADC_Registers *adc=lnAdcDesc[_instance].registers;
     //adc->CTL1 &=~LN_ADC_CTL1_ADCON;
+    if(_instance) xAssert(0); // only ADC0 has channel 16 & 17
+    
     adc->CTL1|=LN_ADC_CTL1_TSVREN;
     adc->RSQS[2]=17;  // VREF    
     adc->RSQS[0]=0;  // VREF
