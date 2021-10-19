@@ -105,6 +105,7 @@ bool    lnSimpleADC::pollingMultiRead(int nbPins, lnPin *pins, uint16_t *output)
             __asm__("nop");
         }
         int data=adc->RDATA ;
+        adc->STAT&=~LN_ADC_STAT_STRC;
         // Retrieve data
         output[i]=data&0xfff;
     }
