@@ -117,7 +117,8 @@ void   lnBaseAdc:: setup()
     adc->OVRS=0;
     
     // Set default clock divider
-    lnPeripherals::setAdcDivider(lnADC_CLOCK_DIV_BY_8);
+    // no we dont
+   // lnPeripherals::setAdcDivider(lnADC_CLOCK_DIV_BY_8);
     
     
     adc->CTL1 |=LN_ADC_CTL1_ADCON;
