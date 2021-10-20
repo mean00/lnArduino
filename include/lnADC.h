@@ -7,6 +7,20 @@
 
 #pragma once
 #include "lnDma.h"
+
+
+enum lnADC_CYCLES
+{
+    LN_ADC_SMPT_1_5=0,
+    LN_ADC_SMPT_7_5=1,
+    LN_ADC_SMPT_13_5=2,
+    LN_ADC_SMPT_28_5=3,
+    LN_ADC_SMPT_41_5=4,
+    LN_ADC_SMPT_55_5=5,
+    LN_ADC_SMPT_71_5=6,
+    LN_ADC_SMPT_239_5=7,
+};
+
 class lnBasicTimer;
 /**
  */
@@ -23,6 +37,7 @@ public:
                     }
             int      getVref(); // direct value
     static  float    getVcc();  // Vcc value in mv
+            void     setSmpt(lnADC_CYCLES cycles);
 protected:
             void     readVcc();
     virtual void     setup();

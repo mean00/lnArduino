@@ -159,6 +159,17 @@ int lnBaseAdc::getVref()
 {
     return adc_vcc;
 }
-
+/**
+ * 
+ * @param cycles
+ */
+void     lnBaseAdc::setSmpt(lnADC_CYCLES cycles)
+{
+    LN_ADC_Registers *adc=lnAdcDesc[_instance].registers;
+    uint32_t smpt=  adc->SAMPT[1];
+    smpt&=~7;
+    smpt|=cycles&7;
+    adc->SAMPT[1]=smpt;
+}
 
 // EOF
