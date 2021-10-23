@@ -214,9 +214,8 @@ void lnDMA::beginTransfer()
 /**
  * 
  */
-void lnDMA::endTransfer()
+void lnDMA::cancelTransfer()
 {
-     // Ok now we can configure the dma
     DMA_struct *d=(DMA_struct *)_dma;
     DMA_channels *c=d->channels+_channelInt;
     noInterrupts();
@@ -229,9 +228,12 @@ void lnDMA::endTransfer()
     _cookie=NULL;
     uint32_t mask=0xf<<_channelInt;
     d->INTC|=mask;
-    _lnDmas[_dmaInt][_channelInt]=NULL;     
-    
-    interrupts();
+    _lnDmas[_dmaInt][_channelInt]=NULL;         
+    interrupts(); 
+}
+void lnDMA::endTransfer()
+{
+    cancelTransfer();
     dmaMutex[_dmaInt][_channelInt]->unlock();
 }
    

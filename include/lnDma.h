@@ -41,6 +41,7 @@ public:
         bool    doPeripheralToMemoryTransferNoLock(int count, const uint16_t *target,const uint16_t *source,  bool circularMode=false,bool bothInterrutps=false);
         void    beginTransfer();
         void    endTransfer();
+        void    cancelTransfer();
         void    setWordSize(int sourceWordSize, int targetWordSize);
         void    invokeCallback();
 protected:
