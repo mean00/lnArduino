@@ -57,6 +57,9 @@ public:
         }    
         // this is a single pulse timer
         void setPwmFrequency(int fqInHz); 
+        int getPwmFrequency();
+protected:
+        int _actualPwmFrequency;
 };
 
 

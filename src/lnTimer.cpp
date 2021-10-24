@@ -227,11 +227,18 @@ void lnTimer::singleShot(int durationMs, bool down)
     xDelay(durationMs+10);
     disable();        
 }
-//----------------------------------------------
-//--
-//--
-//----------------------------------------------
-
+/**
+ * 
+ * @return 
+ */
+int lnAdcTimer::getPwmFrequency()
+{
+    return _actualPwmFrequency;     
+}
+/**
+ * 
+ * @param fqInHz
+ */
 void lnAdcTimer::setPwmFrequency(int fqInHz)
 {
     LN_Timers_Registers *t=aTimers(_timer);;
@@ -247,6 +254,12 @@ void lnAdcTimer::setPwmFrequency(int fqInHz)
     
     int intDiv=divider/65536;
     int fracDiv=divider & 65535;
+    
+    int totalDivider=(intDiv<<16)+fracDiv;
+    if(!totalDivider) totalDivider=1;
+    _actualPwmFrequency=clock/totalDivider;
+    
+    Logger("Adc : Asked for fq=%d got fq=%d\n",fqInHz,_actualPwmFrequency);
     
     if(!intDiv) intDiv=1;
     t->PSC=intDiv-1;
