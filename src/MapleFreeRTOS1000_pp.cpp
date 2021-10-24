@@ -9,6 +9,8 @@
 
 #define  fos_ms2tick(ms) (((ms)+portTICK_PERIOD_MS-1)/portTICK_PERIOD_MS)
 
+#define EVENT_INDEX 1
+
 extern "C"
 {
 extern void deadEnd(int code);
@@ -54,6 +56,17 @@ bool xBinarySemaphore::take(int timeoutMs)
   int ticks=1+(timeoutMs*configTICK_RATE_HZ+500)/1000;
   return (bool) xSemaphoreTake(_handle,ticks);
 }
+/**
+ * 
+ * @param timeoutMs
+ * @return 
+ */
+bool xBinarySemaphore::tryTake()
+{
+     return (bool) xSemaphoreTake(_handle,0);
+}
+  
+
 /**
  * 
  * @return 
@@ -204,13 +217,16 @@ uint32_t    xEventGroup::readEvents(uint32_t maskInt) // it is also cleared auto
 /**
  * 
  */
-
 #define BEGIN_LOCK() ENTER_CRITICAL()
 #define END_LOCK()   EXIT_CRITICAL()
 
+
+
+#define INVALID_TASK (TaskHandle_t)-1
 xFastEventGroup::xFastEventGroup() 
 {
     _value = _mask = 0;
+    _waitingTask=INVALID_TASK;
 }
 
 /**
@@ -222,25 +238,49 @@ xFastEventGroup::~xFastEventGroup()
 }
 /**
  * 
+ */
+void        xFastEventGroup::takeOwnership()
+{
+    _waitingTask=xTaskGetCurrentTaskHandle(); 
+}
+/**
+ * 
  * @param events
  */
+
+#define BEGIN_LOCK() ENTER_CRITICAL()
+#define END_LOCK()   EXIT_CRITICAL()
+
+
 void xFastEventGroup::setEvents(uint32_t events) 
 {
-    if(!underInterrupt)
-    {
-        BEGIN_LOCK();
+    if(underInterrupt)
+    {       
+#warning : Could we have a race here between different interrupts ? probably        
         _value = _value | events;
-        bool w = _value & _mask;
-        END_LOCK();
-        if (w)
-            _sem.give();
-    }else
-    {
-        _value = _value | events;
-        bool w = _value & _mask;
-        if (w)
-            _sem.give();
+        bool w = _value & _mask;        
+        if (!w || _waitingTask==INVALID_TASK) // no need to wake up task
+        {     
+             return;
+        }   
+        BaseType_t awake;
+        vTaskNotifyGiveIndexedFromISR(_waitingTask,EVENT_INDEX,&awake);
+        portYIELD_FROM_ISR(awake); // reschedule
+        return;
     }
+
+    // not under interrupt
+    BEGIN_LOCK();
+    _value = _value | events;
+    bool w = _value & _mask;
+    if (!w || _waitingTask==INVALID_TASK) // no need to wake up task
+    {
+        END_LOCK();
+        return;
+    }   
+    END_LOCK();
+    xTaskNotifyGiveIndexed(_waitingTask,EVENT_INDEX);  
+    return;    
 }
 /**
  * 
@@ -248,29 +288,40 @@ void xFastEventGroup::setEvents(uint32_t events)
  * @param timeout
  * @return 
  */
+
+
 uint32_t xFastEventGroup::waitEvents(uint32_t maskint, int timeout )
-{
-    BEGIN_LOCK();
-    uint32_t set = maskint & _value;
-    if (set) 
+{   
+    xAssert(_waitingTask!=INVALID_TASK);
+    xAssert(!underInterrupt);
+    while(1)
     {
+        BEGIN_LOCK();         
+        uint32_t set = maskint & _value;
+        if (set) 
+        {            
+            _value &= ~set;
+            _mask=0;        
+            END_LOCK();
+            xTaskNotifyStateClearIndexed(xTaskGetCurrentTaskHandle(),EVENT_INDEX);            
+            return set;
+        }
+        _mask=maskint;        
+        END_LOCK(); 
+        if(pdFALSE==ulTaskNotifyTakeIndexed(EVENT_INDEX, pdTRUE,timeout)) // cleared on exit
+        { // timeout
+            return 0;
+        }
+        // got it
+        BEGIN_LOCK();
+        set = maskint & _value;
+        xAssert(set);
         _value &= ~set;
-        _mask=0;        
+        _mask=0;         // no need to clear waitintTask, it must be the same !
         END_LOCK();
         return set;
+        
     }
-    _mask=maskint;
-    END_LOCK(); // not atomic !
-    _sem.take(timeout);
-    BEGIN_LOCK();
-    set = maskint & _value;
-    if (set) 
-    {
-        _value &= ~set;
-    }
-    _mask=0;
-    END_LOCK();
-    return set;
 }
 
 /**
@@ -284,6 +335,7 @@ uint32_t xFastEventGroup::readEvents(uint32_t maskInt)
     uint32_t v = _value & maskInt;
     _value &= ~maskInt;
     _mask = 0;
+    xTaskNotifyStateClearIndexed(xTaskGetCurrentTaskHandle(),EVENT_INDEX);
     END_LOCK(); 
     return v;
 }

@@ -16,6 +16,7 @@ class xBinarySemaphore
 public:
         xBinarySemaphore();
         bool take();
+        bool tryTake();
         bool take(int timeoutMs);
         bool give();
   
@@ -69,13 +70,15 @@ class xFastEventGroup
 public:
                 xFastEventGroup();
     virtual     ~xFastEventGroup();
+    void        takeOwnership(); // the task calling this will own the FastEventGroup
     void        setEvents(uint32_t events);
     uint32_t    waitEvents(uint32_t maskint, int timeout=0); //  the events are cleared upon return from here ! returns  0 if timeout
     uint32_t    readEvents(uint32_t maskInt); // it is also cleared automatically !
 protected:
     uint32_t    _value;
-    uint32_t    _mask;
-    xBinarySemaphore _sem;
+    uint32_t    _mask;    
+    TaskHandle_t _waitingTask;
+           
 };
 
 
