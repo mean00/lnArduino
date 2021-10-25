@@ -148,6 +148,7 @@ void   lnBaseAdc:: setup()
  */
  float lnBaseAdc::getVcc()
  {
+    xAssert(adc_volt);
     return adc_volt;
  }
 
