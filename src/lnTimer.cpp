@@ -245,8 +245,13 @@ void lnAdcTimer::setPwmFrequency(int fqInHz)
     Peripherals per=pTIMER1;
     per=(Peripherals)((int)per+_timer-1);
     uint32_t clock=lnPeripherals::getClock(per);
-    // If ABP1 prescale=1, clock*=2 ???? see 5.2 in GD32VF103
-    clock=clock*2;
+    // If ABP1 prescale=1, clock*=2 ???? see 5.2.1 in GD32VF103
+    if(_timer) 
+    {
+               // Timer0,7,8,9 is connected to APB2 with prescaler==1 so no x2
+               // timer 1, 2,3,4 are connected to APB1 with prescaler =1/2, so *2
+        clock=clock*2;
+    }
     // disable
     t->CTL0&=~LN_TIMER_CTL0_CEN;
     
@@ -256,29 +261,25 @@ void lnAdcTimer::setPwmFrequency(int fqInHz)
     int fracDiv=divider & 65535;
     
     int totalDivider=(intDiv<<16)+fracDiv;
-    if(!totalDivider) totalDivider=1;
     _actualPwmFrequency=clock/totalDivider;
     
     Logger("Adc : Asked for fq=%d got fq=%d\n",fqInHz,_actualPwmFrequency);
-    
-    if(!intDiv) intDiv=1;
-    t->PSC=intDiv-1;
+    Logger("intDiv:%d intFrac=%d\n",intDiv,fracDiv);
+    t->PSC=intDiv; // 0 => not divided
     // Set reload to 0
     t->CAR=fracDiv-1;
     
     uint32_t chCtl=READ_CHANNEL_CTL(_channel);
-  
     
     chCtl&=LN_TIME_CHCTL0_CTL_MASK;
-    chCtl|=LN_TIME_CHCTL0_CTL_PWM1;
+    chCtl|=LN_TIME_CHCTL0_CTL_PWM0;
     chCtl&=LN_TIME_CHCTL0_MS_MASK;
     chCtl|=LN_TIME_CHCTL0_MS_OUPUT;
     
-    WRITE_CHANNEL_CTL(_channel,chCtl)
-    
+    WRITE_CHANNEL_CTL(_channel,chCtl)    
 
-    t->CHCVs[_channel] =2; // A/R
-    t->CHCTL2 &=~(LN_TIMER_CHTL2_CHxP(_channel)); // active low
+    t->CHCVs[_channel] =1; // A/R
+    t->CHCTL2 &=~(LN_TIMER_CHTL2_CHxP(_channel)); // active high ?
     
 }
 //EOF
