@@ -115,6 +115,7 @@ typedef volatile LN_ADC_Registersx LN_ADC_Registers;
 #define LN_ADC_CTL1_CTN                 (1<<1)  // Continuous mode
 
 
+#define LN_ADC_OVRS_OVSR_TOVS          (1<<9) // Oversampling ratio
 #define LN_ADC_OVRS_OVSR_MASK          (~(0x7<<2)) // Oversampling ratio
 #define LN_ADC_OVRS_OVSR_SET(x)        ((x<<2)) 
 
