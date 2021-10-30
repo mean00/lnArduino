@@ -152,3 +152,11 @@ int lnCpuID::ramSize()
      xAssert(0);
      return "???";
  }
+ /**
+  * 
+  * @return 
+  */
+ int          lnCpuID::clockSpeed()
+ {
+     return SystemCoreClock;
+ }

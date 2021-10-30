@@ -30,6 +30,7 @@ public:
         static int          ramSize();
 
         static const char   *idAsString();
+        static int          clockSpeed();
         
 };
 
