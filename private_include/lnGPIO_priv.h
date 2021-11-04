@@ -34,3 +34,7 @@ typedef volatile LN_GPIOx LN_GPIO;
 #define LN_CTL_OUTPUT_ALTERNAT_OD   3
 
 #define LNGPIOSET(mod,ctl) ((ctl<<2)+mod)
+
+
+#define LN_GPIO_TIMER1_REMAP (2<<8)
+#define LN_GPIO_TIMER1_MASK  (3<<8)

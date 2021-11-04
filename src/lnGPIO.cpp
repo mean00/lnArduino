@@ -5,6 +5,7 @@
 #include "lnArduino.h"
 #include "lnGPIO.h"
 #include "lnGPIO_priv.h"
+#include "lnAFIO_priv.h"
 #include "lnPeripheral_priv.h"
 #include "lnPinMapping.h"
 #include "lnTimer.h"
@@ -17,6 +18,8 @@ static  LN_GPIO *gpioB=(LN_GPIO *)LN_GPIOB_ADR;
 static  LN_GPIO *gpioC=(LN_GPIO *)LN_GPIOC_ADR;
 
 static  LN_GPIO *gpios[3]={gpioA,gpioB,gpioC};
+
+LN_AFIO         *aAfio=(LN_AFIO *)LN_AFIO_ADR;
 
 /**
  * 
@@ -72,6 +75,27 @@ void lnPinMode(const lnPin xpin, const GpioMode mode)
     ref|=value<<(pin*4);
     *CTL=ref;        
 }
+/**
+ *  \brief Hardcoded switch PB10/PB11
+ * @param timer
+ */
+void lnRemapTimerPin(int timer)
+{
+    switch(timer)
+    {
+        case 1:
+        {
+            uint32_t v=  aAfio->PCF0;
+            v&=LN_GPIO_TIMER1_MASK;
+            v|=LN_GPIO_TIMER1_REMAP;
+            aAfio->PCF0=v;
+        }
+            break;
+        default:
+            xAssert(0);
+    }
+}
+
 /**
  * 
  * @param pin

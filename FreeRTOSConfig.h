@@ -52,7 +52,7 @@ extern void do_assert(const char *a);
 #define configUSE_DAEMON_TASK_STARTUP_HOOK      0
 #define configUSE_PREEMPTION                    1
 #define configUSE_IDLE_HOOK			0
-#define configUSE_TICK_HOOK			0 // MEANX
+#define configUSE_TICK_HOOK			1 // MEANX
 #define configMAX_PRIORITIES                    ( 31 )
 #define configAPPLICATION_ALLOCATED_HEAP        1
 #define configMAX_TASK_NAME_LEN                 ( 16 )

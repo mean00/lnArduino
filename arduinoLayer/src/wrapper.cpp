@@ -35,7 +35,7 @@ void digitalWrite(uint8_t pin, uint8_t val)
 }
 uint64_t millis(void)
 {
-    return xTaskGetTickCount();
+    return lnGetMs();
 }
 void digitalToggle(uint8_t a)
 {

@@ -47,6 +47,18 @@ lnCpuID::LN_MCU lnCpuID::mcu()
     return _mcu;
 }
 /**
+ */
+const char   *lnCpuID::mcuAsString()
+ {
+     switch(_mcu)
+     {
+         case LN_MCU_RISCV: return "RISCV";break;
+         default: return "????";
+     }
+ }
+
+
+/**
  * 
  * @return 
  */

@@ -13,7 +13,7 @@ LN_EXTI_Register *aExiti=(LN_EXTI_Register *)LN_EXTI_ADR ;
 
 #define LN_EXTI_NB_SOURCES 19
 
-LN_AFIO         *aAfio=(LN_AFIO *)LN_AFIO_ADR;
+extern LN_AFIO         *aAfio;
 
 
 /**

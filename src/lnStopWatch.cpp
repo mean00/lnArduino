@@ -10,7 +10,7 @@
  */
 uint32_t now(uint32_t startAt)
 {
-    uint32_t tick=xTaskGetTickCount();
+    uint32_t tick=lnGetMs();
     if(tick>=startAt) return tick-startAt;
     uint32_t wrap=0xFFFFFFFFUL;
     uint32_t val=wrap-startAt;
