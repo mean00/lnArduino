@@ -34,7 +34,7 @@ volatile LN_NVIC *anvic=(LN_NVIC *)0xE000E100;
 #define LN_MSP_SIZE_UINT32  128
 static uint32_t msp[LN_MSP_SIZE_UINT32]  __attribute__((aligned(8)));  // 128*4=512 bytes for msp
 
-
+lnInterruptHandler *adcIrqHandler=NULL;
 /**
  * \fn unsupportedInterrupt
  */
@@ -97,6 +97,22 @@ void lnEnableInterrupt(const LnIRQ &irq)
 }
 /**
  * 
+ * @param irq
+ * @param handler
+ */
+void lnSetInterruptHandler(const LnIRQ &irq, lnInterruptHandler*handler)
+{
+    switch(irq)
+    {
+        case LN_IRQ_ADC0_1: adcIrqHandler=handler;break;
+        default:
+            xAssert(0);
+            break;
+    }
+}
+
+/**
+ * 
  * @param per
  */
 void lnDisableInterrupt(const LnIRQ &irq)
@@ -133,7 +149,15 @@ DMA_IRQ(1,3)
 DMA_IRQ(1,4)
 DMA_IRQ(1,5)
 DMA_IRQ(1,6)
-  
+/**
+ * 
+ */
+void ADC01_IRQHandler(void)
+{
+    if(!adcIrqHandler) xAssert(0);
+    adcIrqHandler();
+}
+        
 /**
  * I2C
  * @param code

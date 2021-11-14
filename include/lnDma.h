@@ -40,6 +40,7 @@ public:
         bool    doMemoryToPeripheralTransferNoLock(int count, const uint16_t *source,const uint16_t *target,  bool repeat,bool circularMode=false,bool bothInterrutps=false);
         bool    doPeripheralToMemoryTransferNoLock(int count, const uint16_t *target,const uint16_t *source,  bool circularMode=false,bool bothInterrutps=false);
         void    beginTransfer();
+        uint32_t getCurrentPointer();
         void    endTransfer();
         void    cancelTransfer();
         void    setWordSize(int sourceWordSize, int targetWordSize);

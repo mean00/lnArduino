@@ -44,7 +44,7 @@ VEC(DMA0_Channel3_IRQHandler), /*LN_IRQ_DMA0_Channel3       !< DMA0 channel3 int
 VEC(DMA0_Channel4_IRQHandler), /*LN_IRQ_DMA0_Channel4       !< DMA0 channel4 interrupt                                  */
 VEC(DMA0_Channel5_IRQHandler), /*LN_IRQ_DMA0_Channel5       !< DMA0 channel5 interrupt                                  */
 VEC(DMA0_Channel6_IRQHandler), /*LN_IRQ_DMA0_Channel6       !< 30 DMA0 channel6 interrupt                                  */
-VEC(unsupported), /*LN_IRQ_ADC0_1              !< 31 ADC0 and ADC1 interrupt                                  */
+VEC(ADC01_IRQHandler), /*LN_IRQ_ADC0_1              !< 31 ADC0 and ADC1 interrupt                                  */
 VEC(unsupported), /*LN_IRQ_CAN0_TX             !< CAN0 TX interrupts                                       */
 VEC(unsupported), /*LN_IRQ_CAN0_RX0            !< CAN0 RX0 interrupts                                      */
 VEC(unsupported), /*LN_IRQ_CAN0_RX1            !< CAN0 RX1 interrupts                                      */
