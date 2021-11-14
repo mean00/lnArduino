@@ -14,6 +14,11 @@ static lnDMA *_lnDmas[2][7]={ {NULL,NULL,NULL,NULL,NULL,NULL,NULL},{NULL,NULL,NU
 static const LnIRQ  _dmaIrqs[2][7]= { { z0(0),z0(1),z0(2), z0(3),z0(4),z0(5),z0(6)},{ z1(0),z1(1),z1(2),z1(3),z1(4),LN_IRQ_NONE,LN_IRQ_NONE}}; // Warning DMA CHANNEL5/6 is not available
 static const uint32_t _dmas[2]={LN_DMA0_ADR,LN_DMA1_ADR};
 static xMutex *dmaMutex[2][7];
+
+static int dmaError[2][7]={{0,0,0,0,0,0,0},{0,0,0,0,0,0,0}};
+static int dmaSpurious[2][7]={{0,0,0,0,0,0,0},{0,0,0,0,0,0,0}};;
+static int dmaMissed[2][7]={{0,0,0,0,0,0,0},{0,0,0,0,0,0,0}};;
+
 /**
  */
 
@@ -309,6 +314,33 @@ uint32_t lnDMA::getCurrentPointer()
 
 /**
  * 
+ */
+void lnDMA::pause()
+{
+    DMA_struct *d=(DMA_struct *)_dma;
+    DMA_channels *c=d->channels+_channelInt;    
+    uint32_t control=c->CTL;  
+#warning NOT ATOMIC    
+    control &=~LN_DMA_CHAN_ENABLE;
+    c->CTL=control;    
+    d->INTC|=0xff<<_channelInt; // clear pending interrupt
+}
+/**
+ * 
+ */
+void lnDMA::resume()
+{
+    DMA_struct *d=(DMA_struct *)_dma;
+    DMA_channels *c=d->channels+_channelInt;    
+    uint32_t control=c->CTL;      
+#warning NOT ATOMIC    
+    control |=LN_DMA_CHAN_ENABLE;
+    c->CTL=control;    
+
+}
+
+/**
+ * 
  * @param count
  * @param target
  * @param source
@@ -355,6 +387,7 @@ bool    lnDMA::doPeripheralToMemoryTransferNoLock(int count, const uint16_t *tar
         if(bothInterrupts)
             control|=LN_DMA_CHAN_HTFIE;
     }
+#warning NOT ATOMIC    
     c->CTL=control|LN_DMA_CHAN_ENABLE; // GO!       
     lnEnableInterrupt(_irq);        
     return true;
@@ -362,20 +395,53 @@ bool    lnDMA::doPeripheralToMemoryTransferNoLock(int count, const uint16_t *tar
 /**
  * 
  */
+
+
+
 void    lnDMA::invokeCallback()
 {
     DmaInterruptType typ;
     DMA_struct *d=(DMA_struct *)_dmas[_dmaInt];
+    DMA_channels *c=d->channels+_channelInt;
     int pending= d->INTF;
     pending>>=(4*_channelInt);
-    if(pending & 2) // full
-        typ=DMA_INTERRUPT_FULL;
-    else if(pending & 4) // half
-        typ=DMA_INTERRUPT_HALF;
-    else
-        xAssert(0);
+    pending&=c->CTL;
+    pending>>=1; // remove the GIF but, we dont care
+    
+    pending&=7;
+    d->INTC=(7)<<(4*_channelInt); // clear all
+    switch(pending)
+    {
+        case 0:
+            dmaSpurious[_dmaInt][_channelInt]++;
+            return;
+            break;
+        case 1: // Full
+            typ=DMA_INTERRUPT_FULL;
+            break;
+            
+        case 2: // Half
+            typ=DMA_INTERRUPT_HALF;
+            break;
+        case 3 : // Both
+#warning We can probably have it the other way around            
+            xAssert(_cb);
+            _cb(_cookie,DMA_INTERRUPT_HALF);
+            typ=DMA_INTERRUPT_FULL;
+            dmaMissed[_dmaInt][_channelInt]++;
+            break;
+        case 4: // Error, ignore it (?)
+        case 5:
+        case 6:
+        case 7:
+            dmaError[_dmaInt][_channelInt]++;
+            xAssert(0);
+            break;
+        default:
+            xAssert(0);
+            break;
+    }
     xAssert(_cb);
-     d->INTC=(7)<<(4*_channelInt); // clear all
     _cb(_cookie,typ);
 }
 /**

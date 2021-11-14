@@ -45,6 +45,8 @@ public:
         void    cancelTransfer();
         void    setWordSize(int sourceWordSize, int targetWordSize);
         void    invokeCallback();
+        void    pause();
+        void    resume();
 protected:
     uint32_t         _dma;
     int             _channelInt;
