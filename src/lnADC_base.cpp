@@ -46,7 +46,7 @@ int lnBaseAdc::adcChannel(lnPin pin)
 void lnBaseAdc::readVcc()
 {
     LN_ADC_Registers *adc=lnAdcDesc[_instance].registers;
-    //adc->CTL1 &=~LN_ADC_CTL1_ADCON;
+    adc->CTL1 &=~LN_ADC_CTL1_ADCON;
     if(_instance) xAssert(0); // only ADC0 has channel 16 & 17
     
     adc->CTL1|=LN_ADC_CTL1_TSVREN;
@@ -55,7 +55,7 @@ void lnBaseAdc::readVcc()
     adc->SAMPT[1]=LN_ADC_SAMPT_239_5; 
     
     
-    //adc->CTL1 |=LN_ADC_CTL1_ADCON;
+    adc->CTL1 |=LN_ADC_CTL1_ADCON;
     delayMicroseconds(10);
     //
     adc_vcc=0;
@@ -79,7 +79,7 @@ void lnBaseAdc::readVcc()
     //
     adc_vcc/=NB_VCC_AVERAGE;
     //
-    //adc->CTL1 &=~LN_ADC_CTL1_ADCON;
+    adc->CTL1 &=~LN_ADC_CTL1_ADCON;
     adc->CTL1&=~LN_ADC_CTL1_TSVREN;
     //adc->CTL1 |=LN_ADC_CTL1_ADCON;    
 }
