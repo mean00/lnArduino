@@ -24,7 +24,8 @@ public:
 public:
         static void         identify();
         static LN_VENDOR    vendor();
-        static LN_MCU       mcu();        
+        static LN_MCU       mcu();     
+        static const char   *mcuAsString();
         
         static int          flashSize();
         static int          ramSize();

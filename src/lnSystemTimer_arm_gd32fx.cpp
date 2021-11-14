@@ -34,9 +34,9 @@ uint32_t lnGetCycle32()
     
     while(1)
     {
-        before=xTaskGetTickCount();
+        before=lnGetMs();
         us=aSysTick->CVR;
-        after=xTaskGetTickCount();
+        after=lnGetMs();
         if(before==after) break;
     }
     us=aSysTick->RVR+1-us; // counter goes downward
@@ -57,9 +57,9 @@ uint32_t lnGetCycle32()
     
     while(1)
     {
-        before=xTaskGetTickCount();
+        before=lnGetMs();
         us=aSysTick->CVR;
-        after=xTaskGetTickCount();
+        after=lnGetMs();
         if(before==after) break;
     }
     us=aSysTick->RVR+1-us; // counter goes downward

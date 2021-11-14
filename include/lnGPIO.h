@@ -42,6 +42,9 @@ volatile uint32_t *lnGetGpioDirectionRegister(int port); // Direction register f
 volatile uint32_t *lnGetGpioValueRegister(int port); // Bit value for LOW bits of port "port"
 uint32_t lnReadPort(int port);
 
+void lnRemapTimerPin(int timer);
+
+
 /**
  * 
  * @param p

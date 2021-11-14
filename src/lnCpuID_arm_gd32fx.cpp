@@ -119,6 +119,18 @@ lnCpuID::LN_MCU lnCpuID::mcu()
     return _mcu;
 }
 /**
+ */
+ const char   *lnCpuID::mcuAsString()
+ {
+     switch(_mcu)
+     {
+         case LN_MCU_ARM_F3: return "ARMF3";break;
+         case LN_MCU_ARM_F4: return "ARMF4";break;
+         default: return "????";
+     }
+ }
+
+/**
  * 
  * @return 
  */

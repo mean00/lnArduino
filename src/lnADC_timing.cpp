@@ -160,7 +160,7 @@ bool     lnTimingAdc::multiRead( int nbSamplePerChannel,  uint16_t *output)
     _dma.attachCallback(lnTimingAdc::dmaDone_,this);
     _dma.doPeripheralToMemoryTransferNoLock(nbSamplePerChannel*_nbPins, (uint16_t *)output,(uint16_t *)&( adc->RDATA),  false);
     // go !
-    adc->CTL1|=LN_ADC_CTL1_CTN;
+    adc->CTL1&=~LN_ADC_CTL1_CTN;
     adc->CTL1|=LN_ADC_CTL1_DMA;
     _adcTimer->enable();    
     _dmaSem.take();

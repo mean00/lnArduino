@@ -8,7 +8,6 @@ extern "C"
 {
 #include "riscv_encoding.h"
 #include "FreeRTOS.h"
-extern "C"    TickType_t xTaskGetTickCount( void );
 }
 #include "systemHelper.h"
 
@@ -98,13 +97,22 @@ void lnDelayUs(int wait)
     }
     
 }
+
+static uint32_t myTick;
+extern "C" void vApplicationTickHook()
+{
+    // this is not atomic, ok but it is called under interrupt
+    myTick++;
+}
+
 /**
  * 
  * @return 
  */
 uint32_t lnGetMs()
 {
-    return xTaskGetTickCount();
+    uint32_t v=myTick;
+    return myTick;
 }
 // EOF
 
