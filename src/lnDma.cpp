@@ -298,18 +298,17 @@ bool lnDMA::doMemoryToPeripheralTransferNoLock(int count, const uint16_t *source
     return true;
 }
 /**
- * \fn getCurrentPointer
+ * \fn getCurrentCount
  * \brief return the current DMA address
  * @return 
  */
-uint32_t lnDMA::getCurrentPointer()
+uint32_t lnDMA::getCurrentCount()
 {
      // clear pending bits
     DMA_struct *d=(DMA_struct *)_dma;
-    d->INTC|=0xff<<_channelInt;
- 
     DMA_channels *c=d->channels+_channelInt;
-    return c->MADDR;
+    uint32_t v=c->CNT;
+    return v;
 }
 
 /**
