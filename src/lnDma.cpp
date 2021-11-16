@@ -398,6 +398,31 @@ bool    lnDMA::doPeripheralToMemoryTransferNoLock(int count, const uint16_t *tar
 }
 /**
  * 
+ * @param full
+ * @param half
+ * @return 
+ */
+bool    lnDMA::setInterruptMask(bool full, bool half)
+{
+      // clear pending bits
+    DMA_struct *d=(DMA_struct *)_dma;
+    DMA_channels *c=d->channels+_channelInt;
+
+    uint32_t control=c->CTL;    
+    control&=~(7<<1); // reset
+    control|=LN_DMA_CHAN_ERRIE;
+    if(full)  control |=LN_DMA_CHAN_TFTFIE;
+    if(half)  control |=LN_DMA_CHAN_HTFIE;
+    
+    // clear interrupts if any
+    d->INTC=(1)<<(4*_channelInt); // clear all
+    
+    c->CTL=control;
+    return true;
+}
+
+/**
+ * 
  */
 
 

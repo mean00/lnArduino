@@ -39,6 +39,7 @@ public:
         
         bool    doMemoryToPeripheralTransferNoLock(int count, const uint16_t *source,const uint16_t *target,  bool repeat,bool circularMode=false,bool bothInterrutps=false);
         bool    doPeripheralToMemoryTransferNoLock(int count, const uint16_t *target,const uint16_t *source,  bool circularMode=false,bool bothInterrutps=false);
+        bool    setInterruptMask(bool full, bool half);
         void    beginTransfer();
         uint32_t getCurrentCount();
         void    endTransfer();
