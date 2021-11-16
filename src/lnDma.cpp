@@ -15,9 +15,13 @@ static const LnIRQ  _dmaIrqs[2][7]= { { z0(0),z0(1),z0(2), z0(3),z0(4),z0(5),z0(
 static const uint32_t _dmas[2]={LN_DMA0_ADR,LN_DMA1_ADR};
 static xMutex *dmaMutex[2][7];
 
-static int dmaError[2][7]={{0,0,0,0,0,0,0},{0,0,0,0,0,0,0}};
-static int dmaSpurious[2][7]={{0,0,0,0,0,0,0},{0,0,0,0,0,0,0}};;
-static int dmaMissed[2][7]={{0,0,0,0,0,0,0},{0,0,0,0,0,0,0}};;
+
+struct lnDmaStats
+{
+    int error, spurious, missed, total, half,full;
+};
+
+static lnDmaStats dmaStats[2][7];
 
 /**
  */
@@ -30,6 +34,7 @@ DMA_struct *adma1=(DMA_struct *)LN_DMA1_ADR;
  */
 void lnDmaSysInit()
 {
+    memset(&dmaStats,0,sizeof(dmaStats));
     for(int i=0;i<7;i++)
     {
         dmaMutex[0][i]=new xMutex;
@@ -402,44 +407,35 @@ void    lnDMA::invokeCallback()
     DmaInterruptType typ;
     DMA_struct *d=(DMA_struct *)_dmas[_dmaInt];
     DMA_channels *c=d->channels+_channelInt;
+    
     int pending= d->INTF;
     pending>>=(4*_channelInt);
-    pending&=c->CTL;
-    pending>>=1; // remove the GIF but, we dont care
+    pending&=c->CTL;    // only check enabled interrupt
+    pending>>=1;        // remove the GIF, we dont care    
+    pending&=3;         // Only keep FT and HT
+    d->INTC=(1)<<(4*_channelInt); // clear all
     
-    pending&=7;
-    d->INTC=(7)<<(4*_channelInt); // clear all
-    switch(pending)
+    lnDmaStats *stats=&(dmaStats[_dmaInt][_channelInt]);
+    stats->total++;
+    if(pending==3)
     {
-        case 0:
-            dmaSpurious[_dmaInt][_channelInt]++;
+        stats->missed++;
+    }    
+    if(pending&1)
+    {
+            typ=DMA_INTERRUPT_FULL;
+            stats->full++;
+    } 
+    else if(pending&2)
+    {
+             typ=DMA_INTERRUPT_HALF;
+             stats->half++;             
+    }else 
+    {
+            stats->spurious++;
             return;
-            break;
-        case 1: // Full
-            typ=DMA_INTERRUPT_FULL;
-            break;
-            
-        case 2: // Half
-            typ=DMA_INTERRUPT_HALF;
-            break;
-        case 3 : // Both
-#warning We can probably have it the other way around            
-            xAssert(_cb);
-            _cb(_cookie,DMA_INTERRUPT_HALF);
-            typ=DMA_INTERRUPT_FULL;
-            dmaMissed[_dmaInt][_channelInt]++;
-            break;
-        case 4: // Error, ignore it (?)
-        case 5:
-        case 6:
-        case 7:
-            dmaError[_dmaInt][_channelInt]++;
-            xAssert(0);
-            break;
-        default:
-            xAssert(0);
-            break;
     }
+    
     xAssert(_cb);
     _cb(_cookie,typ);
 }
