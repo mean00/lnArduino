@@ -50,7 +50,7 @@ static void unsupportedInterrupt()
  * @param irq
  * @param prio
  */
-void lnIrqSetPriority(LnIRQ irq, int prio )
+void lnIrqSetPriority(const LnIRQ &irq, int prio )
 {
     int p=(prio&0xf)<<4;
     if(irq<LN_IRQ_WWDG) // Non IRQ

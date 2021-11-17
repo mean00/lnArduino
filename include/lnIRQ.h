@@ -22,3 +22,4 @@ typedef void (lnInterruptHandler)(void);
 void lnEnableInterrupt(const LnIRQ &irq);
 void lnDisableInterrupt(const LnIRQ &irq);
 void lnSetInterruptHandler(const LnIRQ &irq, lnInterruptHandler*handler);
+void lnIrqSetPriority(const LnIRQ &irq, int prio); // Lower prio = more urgent
