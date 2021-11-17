@@ -97,7 +97,18 @@ lnDMA::lnDMA(DmaTransferType type, int dmaEngine, int dmaChannel, int sourceWidt
     
     _sourceWidth=sourceWidth;
     _targetWidth=targetWidth;
+    
+    _priority=LN_DMA_CHAN_PRIO_HIGH;
 }
+/**
+ * 
+ * @param prio
+ */
+void lnDMA::setPriority(DmaPriority prio)
+{
+    _priority=(int)prio<<12;
+}
+
 /**
  * 
  * @param sourceWordSize
@@ -199,7 +210,7 @@ void lnDMA::beginTransfer()
             _control|=source;
             _control|=target;
             _control|=LN_DMA_CHAN_DIR_M2P;
-            _control|=LN_DMA_CHAN_PRIO_HIGH;
+            _control|=_priority; //LN_DMA_CHAN_PRIO_HIGH;
             break;
         }
         case DMA_PERIPH_TO_MEMORY:
@@ -210,7 +221,7 @@ void lnDMA::beginTransfer()
             _control|=source;
             _control|=target;
             _control|=LN_DMA_CHAN_DIR_P2M;
-            _control|=LN_DMA_CHAN_PRIO_HIGH;
+            _control|=_priority; //LN_DMA_CHAN_PRIO_HIGH;
             break;
         }
         default:

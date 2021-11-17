@@ -32,6 +32,15 @@ public:
         DMA_PERIPH_TO_MEMORY
     };
     
+    enum DmaPriority
+    {
+        DMA_PRIORITY_LOW=0,
+        DMA_PRIORITY_NORMAL=1,
+        DMA_PRIORITY_HIGH=2,
+        DMA_PRIORITY_ULTRA_HIGH=3,
+    };
+    
+    
                 lnDMA(DmaTransferType type, int dmaEngine, int dmaChannel, int sourceWith, int targetWidth);
                 ~lnDMA();
         void    attachCallback(doneCallback *cb, void *cookie);
@@ -40,6 +49,7 @@ public:
         bool    doMemoryToPeripheralTransferNoLock(int count, const uint16_t *source,const uint16_t *target,  bool repeat,bool circularMode=false,bool bothInterrutps=false);
         bool    doPeripheralToMemoryTransferNoLock(int count, const uint16_t *target,const uint16_t *source,  bool circularMode=false,bool bothInterrutps=false);
         bool    setInterruptMask(bool full, bool half);
+        void    setPriority(DmaPriority prio); // prio between 0 (low) to 3 (ultra high)
         void    beginTransfer();
         uint32_t getCurrentCount();
         void    endTransfer();
@@ -58,6 +68,7 @@ protected:
     doneCallback    *_cb;
     void            *_cookie;
     uint32_t        _control;
+    uint32_t        _priority;
     
     int             _sourceWidth,_targetWidth;
     
