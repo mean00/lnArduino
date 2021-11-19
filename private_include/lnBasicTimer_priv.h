@@ -47,7 +47,8 @@ typedef volatile LN_BTimers_Registersx LN_BTimers_Registers;
 
 
 //-------------- DMAINTEN ---------
-
+#define LN_BTIMER_DMAINTEN_UPIE           (1<<(0))            // Update interrupt enable
+#define LN_BTIMER_DMAINTEN_UPDEN           (1<<(8))           // Update dma request flag
 //-------------- INTF ---------
 #define LN_BTIMER_INTF_UPIF               (1<<(0))            // Update interrupt flag
 
