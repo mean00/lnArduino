@@ -24,9 +24,6 @@ public:
         int  getTimerFrequency();
         void disable();
         void enable();
-        void enableInterrupt();
-        void disableInterrupt();
-        void setInterrupt(lnBasicTimerIrq *handler, void *cookie);
 protected:
         
         int _timer;

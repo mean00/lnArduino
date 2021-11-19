@@ -24,6 +24,7 @@ lnBasicTimer::lnBasicTimer(int timer)
     LN_BTimers_Registers *t=aBTimers[_timer];
     t->DMAINTEN=0;
     t->INTF=0;
+    t->CTL0=0;
 }
 
 /**

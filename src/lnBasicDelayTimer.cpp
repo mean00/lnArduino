@@ -34,22 +34,20 @@ lnBasicDelayTimer::~lnBasicDelayTimer()
     _cookie=NULL;    
     btimerInstances[_timer]=NULL;
 }
-
 /**
  * 
  */
-void lnBasicDelayTimer::enableInterrupt()
+void lnBasicDelayTimer::enableInterrupt ()
 {
-    LN_BTimers_Registers *t=aBTimers[_timer];
-    t->INTF &=~LN_BTIMER_INTF_UPIF;
+    lnEnableInterrupt((LnIRQ)(LN_IRQ_TIMER5+_timer));
 }
+
 /**
  * 
  */
 void lnBasicDelayTimer::disableInterrupt()
 {
-    LN_BTimers_Registers *t=aBTimers[_timer];
-    t->INTF |=LN_BTIMER_INTF_UPIF;
+    lnDisableInterrupt((LnIRQ)(LN_IRQ_TIMER5+_timer));
 }
 /**
  * 
@@ -78,10 +76,42 @@ void lnBasicDelayTimer::irq(void)
 {
     disableInterrupt();
     disable();
+    LN_BTimers_Registers *t=aBTimers[_timer];
+    t->INTF &=~LN_BTIMER_INTF_UPIF;    
     xAssert(_handler);
     _handler(_cookie);
 }
-
+/**
+ * 
+ */
+void lnBasicDelayTimer::arm(int durationUs)
+{
+    disableInterrupt();
+    disable();
+    // Compute # of ticks
+     LN_BTimers_Registers *t=aBTimers[_timer];
+    Peripherals per=pTIMER5;
+    per=(Peripherals)((int)per+_timer);
+    
+    
+    int clock=lnPeripherals::getClock(per)/1000000; // In Mhz => In us
+    
+    
+    int cycles=durationUs*clock;
+    int psc=cycles>>16;
+        cycles&=0xffff;
+    
+    disable();    
+    t->CTL0 |=LN_BTIMER_CTL0_ARSE;
+    
+    uint32_t car=cycles;
+    if(car) car--;    
+    t->PSC=psc;    
+    t->CAR=car;    
+  //  t->CTL1=(2<<4); // issue TRGO
+    enableInterrupt();
+    enable();    
+}
 /**
  * 
  */
