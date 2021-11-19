@@ -81,7 +81,7 @@ void lnBasicTimer::setTimerFrequency(int fqInHz)
  */
 int lnBasicTimer::getTimerFrequency()
 {
-      LN_BTimers_Registers *t=aBTimers[_timer];
+    LN_BTimers_Registers *t=aBTimers[_timer];
     int car=t->CAR+1;
     int div=t->PSC+1;
     Peripherals per=pTIMER5;

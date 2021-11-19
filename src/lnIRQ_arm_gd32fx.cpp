@@ -149,6 +149,9 @@ DMA_IRQ(1,3)
 DMA_IRQ(1,4)
 DMA_IRQ(1,5)
 DMA_IRQ(1,6)
+//--
+void TIMER6_IRQHandler();
+void TIMER5_IRQHandler();
 /**
  * 
  */

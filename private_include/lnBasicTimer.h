@@ -1,5 +1,7 @@
 #pragma once
 
+
+typedef void (lnBasicTimerIrq)(void *cookie);
 /**
  * \brief Careful all the channels of a given timer share the same frequency!
  * Max frequency is around 100 kHz in PWM mode !
@@ -22,9 +24,33 @@ public:
         int  getTimerFrequency();
         void disable();
         void enable();
+        void enableInterrupt();
+        void disableInterrupt();
+        void setInterrupt(lnBasicTimerIrq *handler, void *cookie);
 protected:
         
         int _timer;
-
 };
-
+/**
+ * 
+ * @param timer
+ * @return 
+ */
+class lnBasicDelayTimer : lnBasicTimer
+{
+public:
+             lnBasicDelayTimer(int timer);
+    virtual ~lnBasicDelayTimer();
+        void arm(int delayUs);
+        void setInterrupt(lnBasicTimerIrq *handler, void *cookie);
+        //--
+        static void interruptHandler(int timer);
+protected:
+        void irq();
+        void enableInterrupt();
+        void disableInterrupt();
+        
+        lnBasicTimerIrq *_handler;
+        void             *_cookie;
+        
+};

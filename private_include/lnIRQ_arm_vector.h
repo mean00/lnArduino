@@ -74,8 +74,8 @@ VEC(unsupported), /*LN_IRQ_TIMER4              !< 57 TIMER4 global interrupt    
 VEC(unsupported), /*LN_IRQ_SPI2                !< SPI2 global interrupt                                    */
 VEC(unsupported), /*LN_IRQ_UART3               !< UART3 global interrupt                                   */
 VEC(unsupported), /*LN_IRQ_UART4               !< 60 UART4 global interrupt                                   */
-VEC(unsupported), /*LN_IRQ_TIMER5              !< TIMER5 global interrupt                                  */
-VEC(unsupported), /*LN_IRQ_TIMER6              !< TIMER6 global interrupt                                  */
+VEC(TIMER5_IRQHandler), /*LN_IRQ_TIMER5              !< TIMER5 global interrupt                                  */
+VEC(TIMER6_IRQHandler), /*LN_IRQ_TIMER6              !< TIMER6 global interrupt                                  */
 VEC(DMA1_Channel0_IRQHandler), /*LN_IRQ_DMA1_Channel0       !< DMA1 channel0 global interrupt                           */
 VEC(DMA1_Channel1_IRQHandler), /*LN_IRQ_DMA1_Channel1       !< DMA1 channel1 global interrupt                           */
 VEC(DMA1_Channel2_IRQHandler), /*LN_IRQ_DMA1_Channel2       !< DMA1 channel2 global interrupt                           */

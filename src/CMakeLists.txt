@@ -12,6 +12,7 @@ ADD_LIBRARY(gd32_overlay STATIC  MapleFreeRTOS1000_pp.cpp systemAlloc.cpp lnDebu
                                  lnCpuID_${LN_EXT}.cpp 
                                  lnDAC.cpp lnExti.cpp
                                  lnBasicTimer.cpp
+                                 lnBasicDelayTimer.cpp
                                  lnTimer.cpp
                                  lnDmaTimer.cpp
                                  lnStopWatch.cpp
