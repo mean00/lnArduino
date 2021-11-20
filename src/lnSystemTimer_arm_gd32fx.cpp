@@ -70,3 +70,5 @@ uint32_t lnGetCycle32()
     
 
 }
+ extern "C" uint32_t lnGetUs_C() {return lnGetUs();}
+ extern "C" uint32_t lnGetCycle32_C() {return lnGetCycle32();}
