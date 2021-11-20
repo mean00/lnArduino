@@ -105,16 +105,18 @@ void lnBasicDelayTimer::arm(int durationUs)
         cycles&=0xffff;
     
     disable();    
-   // t->CTL0 =LN_BTIMER_CTL0_SPM;
+    t->CTL0 =LN_BTIMER_CTL0_SPM+LN_BTIMER_CTL0_UPS;
     t->CTL1=0;
     uint32_t car=cycles;
     if(car) car--; 
+    t->DMAINTEN=0;
     t->INTF=0;
+    //t->SWEV=LN_BTIMER_SWEVG_UPG;
     t->PSC=psc;    
     t->CAR=car;    
     t->CNT=0;
     
-  //  t->CTL1=(2<<4); // issue TRGO
+   // t->CTL1=(2<<4); // issue TRGO
     enableInterrupt();
     enable();    
 }
