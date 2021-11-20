@@ -74,19 +74,19 @@ enum LnIRQ
     LN_IRQ_EXTI10_15     ,
     LN_IRQ_RTCALARM       ,
     LN_IRQ_USBWAKEUP      ,//42
-    LN_IRQ_TIMER8_BRK_TIMER12 ,
-    LN_IRQ_TIMER8_UP_TIMER13 , //44
-    LN_IRQ_TIMER8_TRG_COM_TIMER14 ,
-    LN_IRQ_TIMER8_CC      , // 46
-    LN_IRQ_ADC3           , // 47
+    LN_IRQ_TIMER7_BRK_TIMER12 ,
+    LN_IRQ_TIMER7_UP_TIMER13 , //44
+    LN_IRQ_TIMER7_TRG_COM_TIMER14 ,
+    LN_IRQ_TIMER7_CC      , // 46
+    LN_IRQ_ADC2           , // 47
     LN_IRQ_FSMC           , // 48
     LN_IRQ_SDIO           , // 49
-    LN_IRQ_TIMER5         , // 50
+    LN_IRQ_TIMER4         , // 50
     LN_IRQ_SPI2           , // 51
     LN_IRQ_UART3          , // 52
     LN_IRQ_UART4          , // 53
-    LN_IRQ_TIMER6         , // 54
-    LN_IRQ_TIMER7         , // 55
+    LN_IRQ_TIMER5         , // 54
+    LN_IRQ_TIMER6         , // 55
     LN_IRQ_DMA1_Channel0       ,   // 56
     LN_IRQ_DMA1_Channel1       ,   // 57
     LN_IRQ_DMA1_Channel2       ,   // 58 
