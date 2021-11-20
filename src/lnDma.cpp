@@ -15,6 +15,9 @@ static const LnIRQ  _dmaIrqs[2][7]= { { z0(0),z0(1),z0(2), z0(3),z0(4),z0(5),z0(
 static const uint32_t _dmas[2]={LN_DMA0_ADR,LN_DMA1_ADR};
 static xMutex *dmaMutex[2][7];
 
+#define CLEAR_DMA_INTERRUPT()   {d->INTC|=1<<(4*_channelInt);}
+
+
 
 struct lnDmaStats
 {
@@ -194,8 +197,7 @@ void lnDMA::beginTransfer()
     c->CNT&=LN_DMA_CHAN_KEEP_MASK; // disable
     
     // Clear interrupts & flags
-    uint32_t mask=0xf<<_channelInt;
-    d->INTC|=mask;
+    CLEAR_DMA_INTERRUPT();
     
     
     uint32_t sw;
@@ -247,8 +249,7 @@ void lnDMA::cancelTransfer()
     
     _cb=NULL;
     _cookie=NULL;
-    uint32_t mask=0xf<<_channelInt;
-    d->INTC|=mask;
+    CLEAR_DMA_INTERRUPT();
     _lnDmas[_dmaInt][_channelInt]=NULL;         
     interrupts(); 
 }
@@ -271,7 +272,7 @@ bool lnDMA::doMemoryToPeripheralTransferNoLock(int count, const uint16_t *source
 {
      // clear pending bits
     DMA_struct *d=(DMA_struct *)_dma;
-    d->INTC|=0xff<<_channelInt;
+    CLEAR_DMA_INTERRUPT();
  
     DMA_channels *c=d->channels+_channelInt;
     uint32_t control=c->CTL;    
@@ -338,7 +339,7 @@ void lnDMA::pause()
 #warning NOT ATOMIC    
     control &=~LN_DMA_CHAN_ENABLE;
     c->CTL=control;    
-    d->INTC|=0xff<<_channelInt; // clear pending interrupt
+    CLEAR_DMA_INTERRUPT(); // clear pending interrupt
 }
 /**
  * 
@@ -367,7 +368,8 @@ bool    lnDMA::doPeripheralToMemoryTransferNoLock(int count, const uint16_t *tar
 {
      // clear pending bits
     DMA_struct *d=(DMA_struct *)_dma;
-    d->INTC|=0xff<<_channelInt;
+    CLEAR_DMA_INTERRUPT();
+    
  
     DMA_channels *c=d->channels+_channelInt;
     uint32_t control=c->CTL;    
@@ -426,7 +428,8 @@ bool    lnDMA::setInterruptMask(bool full, bool half)
     if(half)  control |=LN_DMA_CHAN_HTFIE;
     
     // clear interrupts if any
-    d->INTC=(1)<<(4*_channelInt); // clear all
+    CLEAR_DMA_INTERRUPT();
+    
     
     c->CTL=control;
     return true;
@@ -449,7 +452,8 @@ void    lnDMA::invokeCallback()
     pending&=c->CTL;    // only check enabled interrupt
     pending>>=1;        // remove the GIF, we dont care    
     pending&=3;         // Only keep FT and HT
-    d->INTC=(1)<<(4*_channelInt); // clear all
+    CLEAR_DMA_INTERRUPT();
+    
     
     lnDmaStats *stats=&(dmaStats[_dmaInt][_channelInt]);
     stats->total++;
