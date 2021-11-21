@@ -46,6 +46,7 @@ extern void do_assert(const char *a);
  *
  * See http://www.freertos.org/a00110.html
  *----------------------------------------------------------*/
+#define configUSE_MALLOC_FAILED_HOOK            1
 #define configTICK_RATE_HZ			( ( TickType_t ) 1000 )
 #define configSUPPORT_DYNAMIC_ALLOCATION        1
 #define configSUPPORT_STATIC_ALLOCATION         0

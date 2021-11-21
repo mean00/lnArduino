@@ -6,7 +6,7 @@
 extern "C"
 {
 #include "FreeRTOS.h"
-
+void do_assert(const char *a);
 /*
  Use freeRTOS allocator
  It is thread safe + it avoid pulling exception support from malloc & new
@@ -17,7 +17,9 @@ void   vPortFree( void * pv );
 
 void *sysAlloc(int size)
 {
-    return pvPortMalloc(size);
+    void *m= pvPortMalloc(size);
+    if(!m) do_assert(0);
+    return m;
 }
 void sysFree(void *p)
 {
