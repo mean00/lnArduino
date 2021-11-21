@@ -5,6 +5,8 @@ FOREACH(common croutine.c  event_groups.c  list.c  queue.c  stream_buffer.c  tas
     LIST(APPEND CMN ${FOS}/${common})
 ENDFOREACH(common croutine.c  event_groups.c  list.c  queue.c  stream_buffer.c  tasks.c  timers.c)
 
+ADD_DEFINITIONS("-DLN_MCU_RAM_SIZE=${LN_MCU_RAM_SIZE}")
+
 SET(MEM ${FOS}/portable/MemMang/heap_4.c)
 
 ADD_LIBRARY( FreeRTOS STATIC ${CMN} ${LN_FREERTOS_PORT_SOURCES} ${MEM})

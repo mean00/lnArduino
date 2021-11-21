@@ -96,7 +96,7 @@ int main()
     lnRunTimeInitPostPeripherals();
      
     // Start freertos
-    xTaskCreate(initTask,"entryTask",1024,NULL,2,NULL);    
+    xTaskCreate(initTask,"entryTask",250,NULL,2,NULL);    
     vTaskStartScheduler();      
     deadEnd(25);    
 }
