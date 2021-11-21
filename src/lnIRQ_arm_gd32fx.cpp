@@ -52,9 +52,9 @@ static void unsupportedInterrupt()
  */
 void lnIrqSetPriority(const LnIRQ &irq, int prio )
 {
-    int p=(prio&0xf)<<4;
     if(irq<LN_IRQ_WWDG) // Non IRQ
     {       
+        int p=(prio&0xf)<<4;  
         // 2's complmenet
         uint32_t i=(uint32_t)irq;
         i&=0Xf;
@@ -62,7 +62,8 @@ void lnIrqSetPriority(const LnIRQ &irq, int prio )
         aSCB->SHP[i]=p;
         return;
     }
-    anvic->IP[irq]=p;   
+    if(prio<configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY) prio=configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY;
+    anvic->IP[irq]=prio<<configPRIO_BITS   ;
 }
 
 
@@ -276,7 +277,7 @@ void lnIrqSysInit()
     
     // Set priority to 14 for all interrupts
     for(int i=LN_IRQ_WWDG;i<LN_IRQ_ARM_LAST;i++)
-        lnIrqSetPriority((LnIRQ)i,6);
+        lnIrqSetPriority((LnIRQ)i,14);
     
     // Relocate vector to there    
     aSCB->VTOR = (uint32_t)LnVectorTable;
