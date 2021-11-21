@@ -72,7 +72,7 @@ ELSE()
      ENDIF()
 ENDIF()
 
-SET(G32_DEBUG_FLAGS "-g3 -Os " CACHE INTERNAL "")
+SET(G32_DEBUG_FLAGS "-g3 -O1 " CACHE INTERNAL "")
 
 SET(GD32_LD_EXTRA "  -Wl,--unresolved-symbols=report-all -Wl,--warn-common -Wl,--warn-section-align " CACHE INTERNAL "")
 #
