@@ -52,18 +52,25 @@ static void unsupportedInterrupt()
  */
 void lnIrqSetPriority(const LnIRQ &irq, int prio )
 {
+    // Interrupt set should be between configLIBRARY_LOWEST_INTERRUPT_PRIORITY<<4 and configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY<<4
+    // Low interrupt means more urgent
+    prio=configLIBRARY_LOWEST_INTERRUPT_PRIORITY-prio;
+    if(prio<configLIBRARY_LOWEST_INTERRUPT_PRIORITY) prio=configLIBRARY_LOWEST_INTERRUPT_PRIORITY;
+    if(prio>configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY) prio=configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY;
+    
     if(irq<LN_IRQ_WWDG) // Non IRQ
     {       
-        int p=(prio&0xf)<<4;  
-        // 2's complmenet
+        // not completely sure about this...
+        // FreeRTOS will change the important one anyway (?)
+        int p=(prio&0xf)<<(8-configPRIO_BITS);  
+        // 2's complement
         uint32_t i=(uint32_t)irq;
-        i&=0Xf;
+        i&=0xf;
         i-=4;
         aSCB->SHP[i]=p;
         return;
     }
-    if(prio<configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY) prio=configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY;
-    anvic->IP[irq]=prio<<configPRIO_BITS   ;
+    anvic->IP[irq]=prio<<(8-configPRIO_BITS)   ;
 }
 
 
@@ -277,7 +284,7 @@ void lnIrqSysInit()
     
     // Set priority to 14 for all interrupts
     for(int i=LN_IRQ_WWDG;i<LN_IRQ_ARM_LAST;i++)
-        lnIrqSetPriority((LnIRQ)i,14);
+        lnIrqSetPriority((LnIRQ)i,0); // by default lesss urgent
     
     // Relocate vector to there    
     aSCB->VTOR = (uint32_t)LnVectorTable;
