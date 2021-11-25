@@ -6,7 +6,6 @@
 
 static lnCpuID::LN_MCU    _mcu;
 static lnCpuID::LN_VENDOR _vendor;
-static uint32_t _cpuId=0;
 static int      _flashSize=0;
 static int      _ramSize=0;
 extern LN_SCB_Registers *aSCB;
@@ -25,7 +24,7 @@ void lnCpuID::identify()
     
     if(_flashSize) return; // already done
     
-    _cpuId=MCU_GD32VF103_128K;
+    _chipId=MCU_GD32VF103_128K;
     _ramSize=32;
     _flashSize=64;
     _vendor=lnCpuID::LN_MCU_GD32;
@@ -88,3 +87,10 @@ int lnCpuID::ramSize()
      xAssert(0);
      return "???";
  }
+/**
+*/
+int          lnCpuID::clockSpeed()
+ {
+     return SystemCoreClock;
+ }
+
