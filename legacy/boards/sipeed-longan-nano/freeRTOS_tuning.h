@@ -12,5 +12,5 @@
 #define configRTC_CLOCK_HZ                      ((uint32_t)TIMER_FREQ)
 
 #define configMINIMAL_STACK_SIZE                ( ( unsigned short ) 128 )
-#define configTOTAL_HEAP_SIZE                   ( ( size_t ) (  26 * 1024 ) ) 
+#define configTOTAL_HEAP_SIZE                   ( ( size_t ) (  25 * 1024 ) ) 
 
