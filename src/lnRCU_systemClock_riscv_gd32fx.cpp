@@ -5,6 +5,7 @@
 #include "lnArduino.h"
 #include "lnRCU.h"
 #include "lnRCU_priv.h"
+#include "lnCpuID.h"
 
 
 extern LN_RCU *arcu;
@@ -115,6 +116,8 @@ static void setPll(int multiplier, int predivider)
 //
 void lnInitSystemClock()
 {
+    lnCpuID::identify();
+
     volatile uint32_t *control=&(arcu->CTL);
     volatile uint32_t *cfg0=&(arcu->CFG0);
     
