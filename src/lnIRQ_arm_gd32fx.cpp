@@ -55,19 +55,11 @@ void lnIrqSetPriority(const LnIRQ &irq, int prio )
     // Interrupt set should be between configLIBRARY_LOWEST_INTERRUPT_PRIORITY<<4 and configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY<<4
     // Low interrupt means more urgent
     prio=configLIBRARY_LOWEST_INTERRUPT_PRIORITY-prio;
-    if(prio<configLIBRARY_LOWEST_INTERRUPT_PRIORITY) prio=configLIBRARY_LOWEST_INTERRUPT_PRIORITY;
-    if(prio>configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY) prio=configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY;
+    if(prio>configLIBRARY_LOWEST_INTERRUPT_PRIORITY) prio=configLIBRARY_LOWEST_INTERRUPT_PRIORITY;
+    if(prio<configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY) prio=configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY;
     
     if(irq<LN_IRQ_WWDG) // Non IRQ
-    {       
-        // not completely sure about this...
-        // FreeRTOS will change the important one anyway (?)
-        int p=(prio&0xf)<<(8-configPRIO_BITS);  
-        // 2's complement
-        uint32_t i=(uint32_t)irq;
-        i&=0xf;
-        i-=4;
-        aSCB->SHP[i]=p;
+    {  
         return;
     }
     anvic->IP[irq]=prio<<(8-configPRIO_BITS)   ;
@@ -273,6 +265,7 @@ IRQ_STUBS(DebugMon_IrqHandler,0x2b);
 
 /**
  * \fn lnIrqSysInit
+ * https://www.freertos.org/RTOS-Cortex-M3-M4.html
  */
 void lnIrqSysInit()
 {
@@ -282,12 +275,26 @@ void lnIrqSysInit()
     anvic->ICER.data[2]=0xffffffffUL;
     anvic->ICER.data[3]=0xffffffffUL; 
     
+    // Set AIRCR to 3 (i.e. 4 bits), see https://interrupt.memfault.com/blog/arm-cortex-m-exceptions-and-nvic
+    uint32_t aircr=aSCB->AIRCR&7;
+    aircr|=(0x05FA<<16)+(3<<8);
+    aSCB->AIRCR=aircr;
+    
     // Set priority to 14 for all interrupts
     for(int i=LN_IRQ_WWDG;i<LN_IRQ_ARM_LAST;i++)
         lnIrqSetPriority((LnIRQ)i,0); // by default lesss urgent
     
+    // set exception priority, SVC and friends will be set by FreeRTOS
+    uint8_t exceptionPriority=configMAX_SYSCALL_INTERRUPT_PRIORITY;
+    for(int i=0;i<4;i++)
+    {
+        aSCB->SHP[i]=exceptionPriority; // Usage fault, page fault,mem manage        
+    }
+    // SVC priority => dont change, it is used only once anyway
+    
     // Relocate vector to there    
     aSCB->VTOR = (uint32_t)LnVectorTable;
+    
     __asm__ __volatile__("dsb sy") ;
     return;
 }
