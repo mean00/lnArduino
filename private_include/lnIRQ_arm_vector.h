@@ -26,25 +26,25 @@ VEC(xPortPendSVHandler),/*14 LN_IRQ_PENDSV                                      
 VEC(xPortSysTickHandler),/*15 LN_IRQ_SYSTICK                                                                           */
 
 /* REAL IRQS */
-VEC(WDG_IrqHandler), /*LN_IRQ_WDGT               !< window watchDog timer interrupt                          */
-VEC(unsupported), /*LN_IRQ_LVD                 !< LVD through EXTI line detect interrupt                   */
-VEC(Tamper_IrqHandler), /*LN_IRQ_TAMPER              !< tamper through EXTI line detect                          */
-VEC(RTC_IrqHandler), /*LN_IRQ_RTC                 !< RTC alarm interrupt                                      */
-VEC(FMC_IrqHandler), /*LN_IRQ_FMC                 !< FMC interrupt                                            */
+VEC(WDG_IrqHandler), /*16 LN_IRQ_WDGT               !< window watchDog timer interrupt                          */
+VEC(unsupported), /*17 LN_IRQ_LVD                 !< LVD through EXTI line detect interrupt                   */
+VEC(Tamper_IrqHandler), /*18 LN_IRQ_TAMPER              !< tamper through EXTI line detect                          */
+VEC(RTC_IrqHandler), /*19 LN_IRQ_RTC                 !< RTC alarm interrupt                                      */
+VEC(FMC_IrqHandler), /*20 LN_IRQ_FMC                 !< FMC interrupt                                            */
 VEC(RCU_IrqHandler), /*LN_IRQ_RCU_CTC             !< RCU and CTC interrupt                                    */
-VEC(EXTI0_IRQHandler), /*LN_IRQ_EXTI0               !< EXTI line 0 interrupts                                   */
+VEC(EXTI0_IRQHandler), /*22 LN_IRQ_EXTI0               !< EXTI line 0 interrupts                                   */
 VEC(EXTI1_IRQHandler), /*LN_IRQ_EXTI1               !< 20 EXTI line 1 interrupts                                   */
 VEC(EXTI2_IRQHandler), /*LN_IRQ_EXTI2               !< EXTI line 2 interrupts                                   */
 VEC(EXTI3_IRQHandler), /*LN_IRQ_EXTI3               !< EXTI line 3 interrupts                                   */
-VEC(EXTI4_IRQHandler), /*LN_IRQ_EXTI4               !< EXTI line 4 interrupts                                   */
-VEC(DMA0_Channel0_IRQHandler), /*LN_IRQ_DMA0_Channel0       !< DMA0 channel0 interrupt                                  */
+VEC(EXTI4_IRQHandler), /*26 LN_IRQ_EXTI4               !< EXTI line 4 interrupts                                   */
+VEC(DMA0_Channel0_IRQHandler), /* 27 LN_IRQ_DMA0_Channel0       !< DMA0 channel0 interrupt                                  */
 VEC(DMA0_Channel1_IRQHandler), /*LN_IRQ_DMA0_Channel1       !< DMA0 channel1 interrupt                                  */
 VEC(DMA0_Channel2_IRQHandler), /*LN_IRQ_DMA0_Channel2       !< DMA0 channel2 interrupt                                  */
-VEC(DMA0_Channel3_IRQHandler), /*LN_IRQ_DMA0_Channel3       !< DMA0 channel3 interrupt                                  */
+VEC(DMA0_Channel3_IRQHandler), /*30 LN_IRQ_DMA0_Channel3       !< DMA0 channel3 interrupt                                  */
 VEC(DMA0_Channel4_IRQHandler), /*LN_IRQ_DMA0_Channel4       !< DMA0 channel4 interrupt                                  */
 VEC(DMA0_Channel5_IRQHandler), /*LN_IRQ_DMA0_Channel5       !< DMA0 channel5 interrupt                                  */
 VEC(DMA0_Channel6_IRQHandler), /*LN_IRQ_DMA0_Channel6       !< 30 DMA0 channel6 interrupt                                  */
-VEC(ADC01_IRQHandler), /*LN_IRQ_ADC0_1              !< 31 ADC0 and ADC1 interrupt                                  */
+VEC(ADC01_IRQHandler), /*34 LN_IRQ_ADC0_1              !< 31 ADC0 and ADC1 interrupt                                  */
 VEC(unsupported), /*LN_IRQ_CAN0_TX             !< CAN0 TX interrupts                                       */
 VEC(unsupported), /*LN_IRQ_CAN0_RX0            !< CAN0 RX0 interrupts                                      */
 VEC(unsupported), /*LN_IRQ_CAN0_RX1            !< CAN0 RX1 interrupts                                      */

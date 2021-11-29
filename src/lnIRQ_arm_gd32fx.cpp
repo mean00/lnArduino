@@ -15,10 +15,14 @@
  * 
  */
 
+
 #define LN_NB_INTERRUPT 68
 #define LN_VECTOR_OFFSET 16
 
 LN_SCB_Registers *aSCB=(LN_SCB_Registers *)0xE000ED00;
+
+uint32_t *armCurrentInterrupt=(uint32_t *)0xE000ED04;
+
 static uint32_t interruptVector[LN_NB_INTERRUPT]  __attribute__((aligned(256)));
 
 extern "C" void xPortPendSVHandler();
@@ -38,7 +42,9 @@ lnInterruptHandler *adcIrqHandler=NULL;
 /**
  * \fn unsupportedInterrupt
  */
-static void unsupportedInterrupt()
+
+static void unsupportedInterrupt() LN_INTERRUPT_TYPE;
+void unsupportedInterrupt() 
 {
     curInterrupt=aSCB->ICSR &0xff;
     curLnInterrupt=(LnIRQ)(curInterrupt-LN_VECTOR_OFFSET);
@@ -128,7 +134,7 @@ extern "C" void USART1_IRQHandler ();
 extern "C" void USART2_IRQHandler ();
 
 
-#define DMA_IRQ(d,c) extern "C" void DMA##d##_Channel##c##_IRQHandler(void) { dmaIrqHandler(d,c);}
+#define DMA_IRQ(d,c) extern "C" void DMA##d##_Channel##c##_IRQHandler(void)  LN_INTERRUPT_TYPE; void DMA##d##_Channel##c##_IRQHandler(void) { dmaIrqHandler(d,c);}
 /**
  * 
  * @param dma
@@ -155,6 +161,7 @@ void TIMER5_IRQHandler();
 /**
  * 
  */
+void ADC01_IRQHandler(void) LN_INTERRUPT_TYPE;
 void ADC01_IRQHandler(void)
 {
     if(!adcIrqHandler) xAssert(0);
@@ -166,8 +173,8 @@ void ADC01_IRQHandler(void)
  * @param code
  */     
 void i2cIrqHandler(int instance, bool error);
-#define I2C_IRQ(d) extern "C" void I2C##d##_EV_IRQHandler(void) { i2cIrqHandler(d,false);} \
-                   extern "C" void I2C##d##_ERR_IRQHandler(void) { i2cIrqHandler(d,true);} 
+#define I2C_IRQ(d) extern "C"{ void I2C##d##_EV_IRQHandler(void) LN_INTERRUPT_TYPE ; void I2C##d##_EV_IRQHandler(void) { i2cIrqHandler(d,false);}} \
+                   extern "C"{ void I2C##d##_ERR_IRQHandler(void)LN_INTERRUPT_TYPE;  void I2C##d##_ERR_IRQHandler(void) { i2cIrqHandler(d,true);} }
 
 I2C_IRQ(0)
 I2C_IRQ(1)
@@ -211,7 +218,7 @@ volatile registerStack *crashStructure;
  * 
  * @param sp
  */
-extern "C" void crashHandler2(void *sp)  __attribute__((used)) __attribute__((naked ));
+extern "C" void crashHandler2(void *sp) LN_INTERRUPT_TYPE;
 /**
  * 
  * @param sp
@@ -234,6 +241,7 @@ void crashHandler(int code)  __attribute__((used)) __attribute__((naked ));
 { \
     __asm__ \
     ( \
+        " mrs r1, ipsr \n"  \
         " tst lr, #4                                                \n" \
         " ite eq                                                    \n" \
         " mrseq r0, msp                                             \n" \

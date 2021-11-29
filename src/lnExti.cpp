@@ -199,6 +199,16 @@ void EXTI_IrqHandler(int maskS,int maskE)
 
 extern "C" 
 {
+    
+    void EXTI0_IRQHandler()     LN_INTERRUPT_TYPE;
+    void EXTI1_IRQHandler()     LN_INTERRUPT_TYPE;
+    void EXTI2_IRQHandler()     LN_INTERRUPT_TYPE;
+    void EXTI3_IRQHandler()     LN_INTERRUPT_TYPE;
+    void EXTI4_IRQHandler()     LN_INTERRUPT_TYPE;
+    void EXTI5_9_IRQHandler()   LN_INTERRUPT_TYPE;
+    void EXTI10_15_IRQHandler() LN_INTERRUPT_TYPE;
+    
+    
     void EXTI0_IRQHandler()     {EXTI_IrqHandler(0,0);}
     void EXTI1_IRQHandler()     {EXTI_IrqHandler(1,1);}
     void EXTI2_IRQHandler()     {EXTI_IrqHandler(2,2);}

@@ -94,7 +94,7 @@ void lnBasicDelayTimer::arm(int durationUs)
     disableInterrupt();
     disable();
     // Compute # of ticks
-     LN_BTimers_Registers *t=aBTimers[_timer];
+    LN_BTimers_Registers *t=aBTimers[_timer];
     Peripherals per=pTIMER5;
     per=(Peripherals)((int)per+_timer);
         
@@ -103,8 +103,7 @@ void lnBasicDelayTimer::arm(int durationUs)
     int cycles=durationUs*clock;
     int psc=cycles>>16;
         cycles&=0xffff;
-    
-    disable();    
+       
     t->CTL0 =LN_BTIMER_CTL0_SPM+LN_BTIMER_CTL0_UPS;
     t->CTL1=0;
     uint32_t car=cycles;
@@ -123,6 +122,9 @@ void lnBasicDelayTimer::arm(int durationUs)
 /**
  * 
  */
+ void TIMER5_IRQHandler() LN_INTERRUPT_TYPE;
+ void TIMER6_IRQHandler() LN_INTERRUPT_TYPE;
+ 
 void TIMER5_IRQHandler()
 {
     lnBasicDelayTimer::interruptHandler(0);

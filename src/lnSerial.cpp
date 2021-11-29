@@ -272,7 +272,7 @@ void lnSerial::interrupts(int instance)
     inst->_interrupt();
 }
 
-#define IRQHANDLER(x) extern "C" void USART##x##_IRQHandler () {    lnSerial::interrupts(x);}
+#define IRQHANDLER(x) extern "C"{  void USART##x##_IRQHandler () LN_INTERRUPT_TYPE ;void USART##x##_IRQHandler () {    lnSerial::interrupts(x);} }
 
 IRQHANDLER(0)
 IRQHANDLER(1)
