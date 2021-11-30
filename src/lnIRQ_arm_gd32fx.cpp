@@ -22,6 +22,7 @@
 LN_SCB_Registers *aSCB=(LN_SCB_Registers *)0xE000ED00;
 
 uint32_t *armCurrentInterrupt=(uint32_t *)0xE000ED04;
+uint32_t *armFaultStatusRegister=(uint32_t *)0xE000ED28;
 
 static uint32_t interruptVector[LN_NB_INTERRUPT]  __attribute__((aligned(256)));
 
@@ -36,7 +37,7 @@ static  volatile LnIRQ   curLnInterrupt;
 volatile LN_NVIC *anvic=(LN_NVIC *)0xE000E100;
 
 #define LN_MSP_SIZE_UINT32  128
-static uint32_t msp[LN_MSP_SIZE_UINT32]  __attribute__((aligned(8)));  // 128*4=512 bytes for msp
+static uint32_t mspStack[LN_MSP_SIZE_UINT32]  __attribute__((aligned(8)));  // 128*4=512 bytes for msp
 
 lnInterruptHandler *adcIrqHandler=NULL;
 /**
@@ -44,6 +45,7 @@ lnInterruptHandler *adcIrqHandler=NULL;
  */
 
 static void unsupportedInterrupt() LN_INTERRUPT_TYPE;
+static void unsupportedInterrupt2() LN_INTERRUPT_TYPE;
 void unsupportedInterrupt() 
 {
     curInterrupt=aSCB->ICSR &0xff;
@@ -51,6 +53,15 @@ void unsupportedInterrupt()
     __asm__  ("bkpt 1");  
     xAssert(0);
 }
+void unsupportedInterrupt2() 
+{
+    __asm__  ("bkpt 1");  
+    curInterrupt=aSCB->ICSR &0xff;
+    curLnInterrupt=(LnIRQ)(curInterrupt-LN_VECTOR_OFFSET);
+    
+    xAssert(0);
+}
+
 /**
  * 
  * @param irq
@@ -246,11 +257,30 @@ void crashHandler(int code)  __attribute__((used)) __attribute__((naked ));
         " ite eq                                                    \n" \
         " mrseq r0, msp                                             \n" \
         " mrsne r0, psp                                             \n" \
+        " bkpt 1                                                     \n" \            
         " ldr r2, handler2_address_const"#name"                     \n" \
         " bx r2                                                     \n" \
         " handler2_address_const"#name": .word crashHandler2    \n" ::  \
     ); \
 }
+
+extern "C" void UsageFault_IrqHandler() __attribute__((used)) __attribute__((naked )); 
+extern "C" void UsageFault_IrqHandler()   
+{ \
+    __asm__ \
+    ( \
+        " bkpt 1                                                    \n" \            
+        " mrs r1, ipsr \n"  \
+        " tst lr, #4                                                \n" \
+        " ite eq                                                    \n" \
+        " mrseq r0, msp                                             \n" \
+        " mrsne r0, psp                                             \n" \        
+        " ldr r2, handler2_address_constUsageFault_IrqHandler       \n" \
+        " bx r2                                                     \n" \
+        " handler2_address_constUsageFault_IrqHandler: .word crashHandler2    \n" ::  \
+    ); \
+}
+
 /**
  * 
  * @param code
@@ -265,10 +295,11 @@ IRQ_STUBS(HardFault_IrqHandler,0x26);
 IRQ_STUBS(NMI_IrqHandler,0x27);
 IRQ_STUBS(MemManage_IrqHandler,0x28);
 IRQ_STUBS(BusFault_IrqHandler,0x29);
-IRQ_STUBS(UsageFault_IrqHandler,0x2a);
 IRQ_STUBS(DebugMon_IrqHandler,0x2b);
+//IRQ_STUBS(UsageFault_IrqHandler, 0x30);
 
 #define unsupported unsupportedInterrupt
+#define unsupported2 unsupportedInterrupt2
 #include "lnIRQ_arm_vector.h"
 
 /**
@@ -298,11 +329,16 @@ void lnIrqSysInit()
     {
         aSCB->SHP[i]=exceptionPriority; // Usage fault, page fault,mem manage        
     }
-    // SVC priority => dont change, it is used only once anyway
+    // 5..8 SVC priority => dont change, it is used only once anyway
+    // 9..11 => done by FreeRTOS
     
     // Relocate vector to there    
     aSCB->VTOR = (uint32_t)LnVectorTable;
+    aSCB->CR |= (1<<3)+ // unaligned access
+                (1<<4)+  // div by zero
+                (1<<9) ; // stack aligned to 8 bytes
     
+    aSCB->SHCSR |= (7<<16); // enable fault, div by zero,...
     __asm__ __volatile__("dsb sy") ;
     return;
 }
