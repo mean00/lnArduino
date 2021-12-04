@@ -119,16 +119,8 @@ void lnEnableInterrupt(const LnIRQ &irq)
     _enableDisable(true,irq);   
 }
 void lnIrqSetPriority(const LnIRQ &irq, int prio )
-{
-    #WARNING DO IT
-    #WARNING DO IT
-    #WARNING DO IT
-    #WARNING DO IT
-    #WARNING DO IT
-    #WARNING DO IT
-    #WARNING DO IT
-    #WARNING DO IT
-    #WARNING DO IT
+{    
+    lnSetInterruptLevelDirect(irq,1+prio,false);
 }
 /**
  * 

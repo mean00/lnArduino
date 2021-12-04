@@ -97,6 +97,5 @@ enum LnIRQ
 };
 
 
-void lnSetInterruptLevelDirect(int intr, int prio, bool vectored);
 
 #define LN_SYSTEM_LED PC13

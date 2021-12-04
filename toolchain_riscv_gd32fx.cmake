@@ -75,4 +75,5 @@ include_directories(${ARDUINO_GD32_FREERTOS}/legacy/boards/${GD32_BOARD}/)
 # Sees optimizaton >=2 are causing issues (???)
 
 ADD_DEFINITIONS("-g3  -Os ")
+#ADD_DEFINITIONS("-O0 ")
 ENDIF()
