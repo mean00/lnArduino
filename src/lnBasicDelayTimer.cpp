@@ -122,8 +122,8 @@ void lnBasicDelayTimer::arm(int durationUs)
 /**
  * 
  */
- void TIMER5_IRQHandler() LN_INTERRUPT_TYPE;
- void TIMER6_IRQHandler() LN_INTERRUPT_TYPE;
+ extern "C" void TIMER5_IRQHandler() LN_INTERRUPT_TYPE;
+ extern "C" void TIMER6_IRQHandler() LN_INTERRUPT_TYPE;
  
 void TIMER5_IRQHandler()
 {

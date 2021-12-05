@@ -92,8 +92,8 @@ vector_base:
 	UNHANDLED(70) //.word     unhandledException //SPI2_IRQHandler
 	.word USART3_IRQHandler //UNHANDLED(71) //.word     unhandledException //UART3_IRQHandler
 	UNHANDLED(72) //.word     unhandledException //UART4_IRQHandler
-	UNHANDLED(73) //.word     unhandledException //TIMER5_IRQHandler
-	UNHANDLED(74) //.word     unhandledException //TIMER6_IRQHandler
+	.word TIMER5_IRQHandler //.word     unhandledException //TIMER5_IRQHandler
+	.word TIMER6_IRQHandler //.word     unhandledException //TIMER6_IRQHandler
 	.word DMA1_Channel0_IRQHandler //UNHANDLED(75) //.word     unhandledException //DMA1_Channel0_IRQHandler
 	.word DMA1_Channel1_IRQHandler //UNHANDLED(76) //.word     unhandledException //DMA1_Channel1_IRQHandler
 	.word DMA1_Channel2_IRQHandler //UNHANDLED(77) //.word     unhandledException //DMA1_Channel2_IRQHandler
