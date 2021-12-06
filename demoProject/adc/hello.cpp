@@ -44,7 +44,7 @@ void loop()
     Logger("Connect PA4 and PA0\n");
     Logger("Connect PA5 and PA1\n");
     
-    int output[2];
+    uint16_t output[2];
     lnPin pins[2]={PA0,PA1};
     
     while(1)
