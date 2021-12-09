@@ -60,7 +60,17 @@ SET(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 MESSAGE(STATUS "GD32 C   compiler ${CMAKE_C_COMPILER}")
 MESSAGE(STATUS "GD32 C++ compiler ${CMAKE_CXX_COMPILER}")
 
-SET(GD32_SPECS  "--specs=nano.specs")
+# spec files....
+IF(LN_SPEC)
+    SET(LN_SPEC "${LN_SPEC}" CACHE INTERNAL "" FORCE)
+ELSE(LN_SPEC)
+    SET(LN_SPEC "nano" CACHE INTERNAL "" FORCE)
+ENDIF(LN_SPEC)
+
+#
+SET(GD32_SPECS  "--specs=${LN_SPEC}.specs")
+
+# M3 or M4 ?
 
 IF( "${LN_MCU}" STREQUAL "M3")
     SET(GD32_MCU "  -mcpu=cortex-m3 -mthumb  -march=armv7-m ")

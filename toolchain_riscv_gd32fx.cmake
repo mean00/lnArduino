@@ -59,8 +59,12 @@ SET(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 
 MESSAGE(STATUS "GD32 C   compiler ${CMAKE_C_COMPILER}")
 MESSAGE(STATUS "GD32 C++ compiler ${CMAKE_CXX_COMPILER}")
-
-SET(GD32_SPECS  "--specs=nano.specs")
+IF(LN_SPEC)
+    SET(LN_SPEC "${LN_SPEC}" CACHE INTERNAL "" FORCE)
+ELSE(LN_SPEC)
+    SET(LN_SPEC "nano" CACHE INTERNAL "" FORCE)
+ENDIF(LN_SPEC)
+SET(GD32_SPECS  "--specs=${LN_SPEC}.specs" CACHE INTERNAL "" FORCE)
 #
 SET(GD32_C_FLAGS  "${GD32_SPECS}  ${PLATFORM_C_FLAGS} -DLN_ARCH=LN_ARCH_RISCV -Werror=return-type  -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -fno-common ${GD32_BOARD_FLAG}")
 SET(CMAKE_C_FLAGS "${GD32_C_FLAGS}")

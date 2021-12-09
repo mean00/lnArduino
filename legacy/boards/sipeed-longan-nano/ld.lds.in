@@ -18,7 +18,7 @@ REGION_ALIAS("REGION_EEPROM", e2prom);
 
 SECTIONS
 {
-  __stack_size = DEFINED(__stack_size) ? __stack_size : 2K;
+  __stack_size = DEFINED(__stack_size) ? __stack_size : 512; /* original stack, we dont use it */
 
 
   .init           :
