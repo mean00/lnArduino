@@ -20,7 +20,7 @@ LN_SystemTimer_Registers *aSysTick=(LN_SystemTimer_Registers *)0xE000E010;
  */
 uint32_t lnGetCycle32()
 {
-    return aSysTick->CVR;
+    return 0xffffffff-aSysTick->CVR;
 }
 
 /**
