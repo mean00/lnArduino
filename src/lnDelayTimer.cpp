@@ -1,11 +1,21 @@
 /*
  *  (C) 2021 MEAN00 fixounet@free.fr
  *  See license file
+ * 
+ * This is basically a copy/paste of basicDelayTimer
+ * It is most probably incomplete
+ * 
  */
 #include "lnArduino.h"
 #include "lnTimer.h"
 #include "lnPinMapping.h"
 #include "lnTimer_priv.h"
+
+#warning PROPERLY INITIALIZE IT
+#warning PROPERLY INITIALIZE IT
+#warning PROPERLY INITIALIZE IT
+#warning PROPERLY INITIALIZE IT
+
 
 lnDelayTimer        *timerInstances[5]={NULL,NULL,NULL,NULL,NULL};
 extern LN_Timers_Registers *abTimers[];
