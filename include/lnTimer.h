@@ -1,6 +1,7 @@
 #pragma once
 #include "lnDma.h"
 
+typedef void (lnTimerIrq)(void *cookie);
 
 enum lnTimerMode
 {
@@ -99,4 +100,24 @@ protected:
 public:        
         void dmaInterrupt(bool h);
 };
-
+/**
+ * \brief careful : this will use the whole timer,  not just a channel
+*/
+class lnDelayTimer : lnTimer
+{
+public:
+             lnDelayTimer(int timer,int channel);
+    virtual ~lnDelayTimer();
+        void arm(int delayUs);
+        void setInterrupt(lnTimerIrq *handler, void *cookie);
+        //--
+        static void interruptHandler(int timer);
+protected:
+        void irq();
+        void enableInterrupt();
+        void disableInterrupt();
+        
+        lnTimerIrq       *_handler;
+        void             *_cookie;
+        
+};

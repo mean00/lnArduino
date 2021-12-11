@@ -169,6 +169,12 @@ DMA_IRQ(1,6)
 //--
 extern "C" void TIMER6_IRQHandler();
 extern "C" void TIMER5_IRQHandler();
+extern "C" void TIMER1_IRQHandler();
+extern "C" void TIMER2_IRQHandler();
+extern "C" void TIMER3_IRQHandler();
+
+
+
 /**
  * 
  */
