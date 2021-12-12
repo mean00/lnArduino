@@ -14,6 +14,7 @@ uint32_t _rcuClockApb1=108000000/2;
 uint32_t _rcuClockApb2=108000000;
 extern "C" uint32_t SystemCoreClock;
 uint32_t SystemCoreClock=0;
+uint32_t jtagId=0;
 /**
  * 
  * @param periph
@@ -218,6 +219,12 @@ void lnInitSystemClock()
     // now switch system clock to pll
     a&=~(LN_RCU_CFG0_SYSCLOCK_MASK);
     a|=LN_RCU_CFG0_SYSCLOCK_PLL;
-    *cfg0=a;       
+    *cfg0=a;     
+
+    // In debug mode, halt everthing we can
+    volatile uint32_t *debug=(volatile uint32_t *)0xE0042000U;
+    // stop timer 0..3 i2c0 i2c1  timer 4..7 timer 8..13
+    jtagId=debug[0];
+    debug[1]=(0xf<<10)+(1<<15)+(0x1f<<16)+(0x3f<<25);
 }
 // EOF
