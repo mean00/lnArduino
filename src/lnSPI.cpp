@@ -26,9 +26,9 @@ static const SpiDescriptor spiDescriptor[3]=
     {LN_SPI1_ADR, LN_IRQ_SPI1,0, 4, pSPI1,   PB15,PB14,PB13},
     {LN_SPI2_ADR, LN_IRQ_SPI2,1, 1, pSPI2,   PB5, PB4, PB3}
 };
-LN_SPI_Registers *aspi0=(LN_SPI_Registers *)LN_SPI0_ADR;
-LN_SPI_Registers *aspi1=(LN_SPI_Registers *)LN_SPI1_ADR;
-LN_SPI_Registers *aspi2=(LN_SPI_Registers *)LN_SPI2_ADR;
+static LN_SPI_Registers *aspi0=(LN_SPI_Registers *)LN_SPI0_ADR;
+static LN_SPI_Registers *aspi1=(LN_SPI_Registers *)LN_SPI1_ADR;
+static LN_SPI_Registers *aspi2=(LN_SPI_Registers *)LN_SPI2_ADR;
 /**
  * switch between RX/TX and TX only : false is txRx, 
  * @param adr
@@ -396,18 +396,18 @@ void hwlnSPIClass::setup()
     d->CTL0&=LN_SPI_CTL0_MASK;
     d->CTL1&=LN_SPI_CTL1_MASK;
     
-    
-    d->CTL0|=LN_SPI_CTL0_MSTMODE;
+    uint32_t ctl0=d->CTL0;
+    ctl0|=LN_SPI_CTL0_MSTMODE;
     // Drive the NSS by sw, pull it up
     // there does not seem to be a way to completely disconnect NSS management
-    d->CTL0|=LN_SPI_CTL0_SWNSS;
-    d->CTL0|=LN_SPI_CTL0_SWNSSEN;
+    ctl0|=LN_SPI_CTL0_SWNSS;
+    ctl0|=LN_SPI_CTL0_SWNSSEN;
     
     
     switch(_settings->bOrder)
     {
-        case   SPI_LSBFIRST: d->CTL0|=LN_SPI_CTL0_LSB;break;
-        case   SPI_MSBFIRST:  d->CTL0&=~LN_SPI_CTL0_LSB;break;
+        case   SPI_LSBFIRST:  ctl0|=LN_SPI_CTL0_LSB;break;
+        case   SPI_MSBFIRST:  ctl0&=~LN_SPI_CTL0_LSB;break;
         default:xAssert(0);
                 break;            
     }
@@ -428,9 +428,10 @@ void hwlnSPIClass::setup()
             s=LN_SPI_CTL0_CKPL|LN_SPI_CTL0_CKPH; // high , 2 edge
             break;
         default:xAssert(0);
-                break;
+            break;
     }     
-    d->CTL0|=s;
+    ctl0|=s;
+    d->CTL0=ctl0;
     uint32_t prescale = 0,speed=_settings->speed,apb ;
     xAssert(speed);
     
