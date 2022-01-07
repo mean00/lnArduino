@@ -7,9 +7,10 @@
 #include "stdarg.h"
 #include "lnSerial.h"
 #define LOGGER_USE_DMA 1
-lnSerial *serial0=NULL;
 
-static char buffer[1024];
+extern lnSerial *serial0=NULL;
+
+
 
 /**
  * 
@@ -17,6 +18,8 @@ static char buffer[1024];
  */
 void Logger(const char *fmt...)
 {
+    static char buffer[1024];
+    
     va_list va;
     va_start(va,fmt);
     vsnprintf(buffer,1022,fmt,va);
