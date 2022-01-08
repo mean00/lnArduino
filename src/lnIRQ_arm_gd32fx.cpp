@@ -258,12 +258,13 @@ void crashHandler(int code)  __attribute__((used)) __attribute__((naked ));
 { \
     __asm__ \
     ( \
+        " .balign 4 \n" \
         " mrs r1, ipsr \n"  \
         " tst lr, #4                                                \n" \
         " ite eq                                                    \n" \
         " mrseq r0, msp                                             \n" \
         " mrsne r0, psp                                             \n" \
-        " bkpt 1                                                     \n" \            
+        " bkpt 1                                                     \n" \
         " ldr r2, handler2_address_const"#name"                     \n" \
         " bx r2                                                     \n" \
         " handler2_address_const"#name": .word crashHandler2    \n" ::  \
@@ -275,12 +276,13 @@ extern "C" void UsageFault_IrqHandler()
 { \
     __asm__ \
     ( \
-        " bkpt 1                                                    \n" \            
+        " .balign 4 \n" \
+        " bkpt 1                                                    \n" \
         " mrs r1, ipsr \n"  \
         " tst lr, #4                                                \n" \
         " ite eq                                                    \n" \
         " mrseq r0, msp                                             \n" \
-        " mrsne r0, psp                                             \n" \        
+        " mrsne r0, psp                                             \n" \
         " ldr r2, handler2_address_constUsageFault_IrqHandler       \n" \
         " bx r2                                                     \n" \
         " handler2_address_constUsageFault_IrqHandler: .word crashHandler2    \n" ::  \
