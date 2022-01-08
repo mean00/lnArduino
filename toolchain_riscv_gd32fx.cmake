@@ -1,11 +1,4 @@
 #=============================================================================#
-# Author: Tomasz Bogdal (QueezyTheGreat)
-# Home:   https://github.com/queezythegreat/arduino-cmake
-#
-# This Source Code Form is subject to the terms of the Mozilla Public
-# License, v. 2.0. If a copy of the MPL was not distributed with this file,
-# You can obtain one at http://mozilla.org/MPL/2.0/.
-#=============================================================================#
 MESSAGE(STATUS "Setting up GD32 riscv cmake environment")
 IF(NOT DEFINED LN_EXT)
 SET(LN_EXT riscv_gd32fx CACHE INTERNAL "")
