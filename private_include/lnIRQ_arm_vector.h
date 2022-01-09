@@ -6,7 +6,7 @@
 
 #define VEC(x) ((uint32_t)x)
 
-static const uint32_t LnVectorTable[]  __attribute__((aligned(512)))   __attribute__((used())) __attribute__((section ("LNVECTOR"))) 
+static const uint32_t LnVectorTable[]  __attribute__((aligned(512)))  LN_USED __attribute__((section ("LNVECTOR"))) 
 ={
 VEC(&mspStack[LN_MSP_SIZE_UINT32-1]), /* 0 LN_IRQ_MSI=-13, */
 VEC(__exc_reset),                   /*01 LN_IRQ_RESET                                                                               */

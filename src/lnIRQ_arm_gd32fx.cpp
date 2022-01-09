@@ -19,10 +19,10 @@
 #define LN_NB_INTERRUPT 68
 #define LN_VECTOR_OFFSET 16
 
-LN_SCB_Registers *aSCB=(LN_SCB_Registers *)0xE000ED00;
+LN_SCB_Registers *aSCB  LN_USED =(LN_SCB_Registers *)0xE000ED00;
 
-uint32_t *armCurrentInterrupt=(uint32_t *)0xE000ED04;
-uint32_t *armFaultStatusRegister=(uint32_t *)0xE000ED28;
+uint32_t *armCurrentInterrupt   LN_USED =(uint32_t *)0xE000ED04;
+uint32_t *armFaultStatusRegister  LN_USED =(uint32_t *)0xE000ED28;
 
 static uint32_t interruptVector[LN_NB_INTERRUPT]  __attribute__((aligned(256)));
 
@@ -251,10 +251,10 @@ void crashHandler2(void *sp)
  * 
  * @param code
  */
-void crashHandler(int code)  __attribute__((used)) __attribute__((naked ));
+void crashHandler(int code) LN_USED __attribute__((naked ));
 
 // https://www.freertos.org/Debugging-Hard-Faults-On-Cortex-M-Microcontrollers.html   
-#define IRQ_STUBS(name,code) extern "C" void name() __attribute__((used)) __attribute__((naked )); extern "C" void name()   \
+#define IRQ_STUBS(name,code) extern "C" void name() LN_USED __attribute__((naked )); extern "C" void name()   \
 { \
     __asm__ \
     ( \
@@ -271,7 +271,7 @@ void crashHandler(int code)  __attribute__((used)) __attribute__((naked ));
     ); \
 }
 
-extern "C" void UsageFault_IrqHandler() __attribute__((used)) __attribute__((naked )); 
+extern "C" void UsageFault_IrqHandler() LN_USED __attribute__((naked )); 
 extern "C" void UsageFault_IrqHandler()   
 { \
     __asm__ \

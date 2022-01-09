@@ -14,7 +14,7 @@
 #define LN_ARCH_RISCV       1
 #define LN_ARCH_ARM         2
 
-
+#define LN_USED __attribute__((used))
 
 
 #if LN_ARCH == LN_ARCH_RISCV
