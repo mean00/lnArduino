@@ -1,0 +1,26 @@
+[package] 
+authors = ["mean00 <mean00@gmail.com>"]
+edition = "2021"
+readme = "README.md"
+name = "rnArduino"
+version = "0.0.0"
+
+[build-dependencies]
+cc = "1.0"
+
+[dependencies]
+
+[lib]
+name = "rnArduino"
+path = "lib/rnArduino.rs"
+crate-type = ["staticlib"] # Creates static lib
+
+[profile.dev]
+codegen-units = 1
+debug = true
+lto = true
+
+[profile.release]
+codegen-units = 1
+debug = false
+lto = true

@@ -13,3 +13,4 @@ include(./arduino.cmake)
 include(./embeddedPrintf.cmake)
         
 add_subdirectory(src)
+add_subdirectory(rust)
