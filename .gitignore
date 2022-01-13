@@ -1,5 +1,6 @@
 *.sw*
 *.gch
+*.tmp
 *.*~
 nbproject/*
 nbproject
