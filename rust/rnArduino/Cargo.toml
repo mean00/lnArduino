@@ -5,8 +5,6 @@ readme = "README.md"
 name = "rnArduino"
 version = "0.0.0"
 
-[build-dependencies]
-cc = "1.0"
 
 [dependencies]
 cty = "0.2.1"

@@ -1,5 +1,4 @@
 //!
-use cc;
 
 fn main() {
 
