@@ -15,3 +15,4 @@ pyUsb/*.csv
 bins
 demoProject/*/Arduino_gd32_freeRTOS
 demoProject/*/lnArduino
+*/.ccls-cache/
