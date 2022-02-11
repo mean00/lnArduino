@@ -137,8 +137,34 @@ void lnPeripherals::disable(const Peripherals periph)
 {
     _rcuAction(periph,3);
 }
+/**
 
-
+*/
+extern uint32_t _rcuClockApb1;
+void lnPeripherals::enableUsb48Mhz()
+{
+  static bool usb48M=false;
+  if(usb48M) return;
+  usb48M=true;
+  // careful, the usb clock must be off !
+  int scaler=(2*lnPeripherals::getClock(pSYSCLOCK))/48000000;
+  uint32_t cfg0=arcu->CFG0;
+  // clear usbd
+  cfg0&=LN_RCU_CFG0_USBPSC_MASK;
+  int x=0;
+  switch(scaler)
+  {
+      case 3: x=0;break; // 3/2=1.5
+      case 2: x=1;break; // 2/2=1
+      case 5: x=2;break; // 5/2=2.5
+      case 4: x=3;break; // 4/2=2
+      default:
+        xAssert(0); // invalid sys clock
+        break;
+  }   
+  cfg0|=LN_RCU_CFG0_USBPSC(x);
+  arcu->CFG0=cfg0;
+}
 /**
  * 
  * @param divider

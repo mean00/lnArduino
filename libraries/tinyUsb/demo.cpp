@@ -22,7 +22,7 @@
  * THE SOFTWARE.
  *
  */
-
+#include "lnArduino.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -35,12 +35,16 @@
 #include "queue.h"
 #include "task.h"
 #include "timers.h"
+#include "lnUSBD.h"
 
 // Increase stack size when debug log is enabled
 #define USBD_STACK_SIZE    (3*configMINIMAL_STACK_SIZE/2) * (CFG_TUSB_DEBUG ? 2 : 1)
 
 // static task for cdc
 #define CDC_STACK_SZIE      configMINIMAL_STACK_SIZE
+
+
+static lnUsbDevice *_usbd=NULL;
 
 void usb_device_task(void* param);
 void cdc_task(void* params);
@@ -151,3 +155,71 @@ void tud_cdc_rx_cb(uint8_t itf)
   (void) itf;
 }
 
+//---------------------------------
+//
+//---------------------------------
+#define DEBUG_ENTER() Logger(__PRETTY_FUNCTION__)
+extern "C"
+{
+void dcd_init(uint8_t rhport)
+{
+  DEBUG_ENTER();
+  _usbd=new lnUsbDevice(rhport);
+  _usbd->power(true); 
+  _usbd->init();
+}  
+void dcd_int_enable(uint8_t rhport)  
+{
+  DEBUG_ENTER();
+   _usbd->irqEnabled(true);
+}
+void dcd_int_disable(uint8_t rhport)  
+{
+    DEBUG_ENTER();
+   _usbd->irqEnabled(false);
+}
+void dcd_set_address(uint8_t rhport, uint8_t dev_addr)
+{  
+    DEBUG_ENTER();
+   _usbd->setAddress(dev_addr);
+}
+void dcd_remote_wakeup(uint8_t rhport)
+{ 
+    DEBUG_ENTER();
+    xAssert(0);
+}
+//-------------
+void dcd_edpt_open(uint8_t rhport, tusb_desc_endpoint_t const * desc_edpt)
+{
+    DEBUG_ENTER();
+    xAssert(0);
+}  
+void dcd_edpt_xfer(uint8_t rhport, uint8_t ep_addr, uint8_t * buffer, uint16_t total_bytes)
+{ 
+    DEBUG_ENTER();
+    xAssert(0);
+}  
+/**
+*/
+void dcd_edpt_stall(uint8_t rhport, uint8_t dev_addr)
+{
+    DEBUG_ENTER();
+    xAssert(0);
+}
+/**
+*/
+void dcd_edpt_clear_stall(uint8_t rhport, uint8_t dev_addr)
+{
+    DEBUG_ENTER();
+    xAssert(0);
+}
+/**
+*/
+void dcd_edpt_close_all(uint8_t rhport)
+{
+    DEBUG_ENTER();
+    xAssert(0);
+}
+
+}
+// EOF

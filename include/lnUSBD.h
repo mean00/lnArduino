@@ -15,9 +15,9 @@ public:
         virtual   ~lnUsbDevice();
         bool      init();
         bool      power(bool onoff);
-        bool      enableIrq();
-        bool      disableIrq();
+        bool      irqEnabled(bool onoff);
         bool      registerInterruptHandler(lnUsbIrqHandler *h);
+        bool      setAddress(int address);
 protected:
         int       _instance;
         lnUsbIrqHandler *_handler;

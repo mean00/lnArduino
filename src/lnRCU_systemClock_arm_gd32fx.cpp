@@ -26,16 +26,22 @@ uint32_t lnPeripherals::getClock(const Peripherals periph)
     {
         case pTIMER5:
         case pTIMER6:
-                    return _rcuClockApb1*2;
+                    return _rcuClockApb1*2;break;
         case pUART0:
         case pTIMER0:
         case pSPI0:
         case pAF:
         case pADC0:
         case pADC1:
-                    return _rcuClockApb2;
+                    return _rcuClockApb2;break;
+        case pAPB1:
+                    return _rcuClockApb1;break;
+        case pAPB2:
+                    return _rcuClockApb2;break;
+        case pSYSCLOCK:
+                    return SystemCoreClock;break;
         default:
-                    return _rcuClockApb1;
+                    return _rcuClockApb1;break;
     }
 }
 /**

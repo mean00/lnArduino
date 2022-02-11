@@ -33,29 +33,41 @@ lnUsbDevice::~lnUsbDevice()
 */
 bool     lnUsbDevice:: init()
 {
-  xAssert(0);
-  return false;
+  // first disable interrupt
+  irqEnabled(false);    
+  // give it a clock...
+  lnPeripherals::disable(Peripherals::pUSB);  
+  // 48 Mhz input to usb
+  lnPeripherals::enableUsb48Mhz();
+  return true;
 }
 /**
 */
 bool      lnUsbDevice::power(bool onoff)
 { 
-  xAssert(0);
-  return false;
+  if(onoff)
+  {
+    lnPeripherals::enable(Peripherals::pUSB);   
+  }else
+  {
+    lnPeripherals::disable(Peripherals::pUSB);
+  }
+  return true;
 }
 /**
 */
-bool      lnUsbDevice::enableIrq()
+bool      lnUsbDevice::irqEnabled(bool onoff)
 { 
-  xAssert(0);
-  return false;
-}
-/**
-*/
-bool     lnUsbDevice:: disableIrq()
-{
-  xAssert(0);
-  return false;
+  if(onoff)
+  {
+    lnEnableInterrupt(LN_IRQ_USB_HP_CAN_TX);
+    lnEnableInterrupt(LN_IRQ_USB_LP_CAN_RX0);
+  }else
+  {
+    lnDisableInterrupt(LN_IRQ_USB_HP_CAN_TX);
+    lnDisableInterrupt(LN_IRQ_USB_LP_CAN_RX0);    
+  }
+  return true;
 }
 /**
 */
@@ -64,48 +76,12 @@ bool      lnUsbDevice::registerInterruptHandler(lnUsbIrqHandler *h)
     _handler=h; 
     return true;
 }
-extern "C"
-{
-void dcd_int_enable(uint8_t rhport)  
-{
-    xAssert(0);
-}
-void dcd_init(uint8_t rhport)
-{
-    xAssert(0);
-}  
-void dcd_edpt_open(uint8_t rhport, tusb_desc_endpoint_t const * desc_edpt)
-{
-    xAssert(0);
-}  
-void dcd_remote_wakeup(uint8_t rhport)
-{ 
-    xAssert(0);
-}
-void dcd_edpt_xfer(uint8_t rhport, uint8_t ep_addr, uint8_t * buffer, uint16_t total_bytes)
-{ 
-    xAssert(0);
-}  
-void dcd_set_address(uint8_t rhport, uint8_t dev_addr)
-{
-    xAssert(0);
-}
 /**
 */
-void dcd_edpt_stall(uint8_t rhport, uint8_t dev_addr)
+bool      lnUsbDevice:: setAddress(int address)
 {
-    xAssert(0);
+  xAssert(0);
+  return true;
 }
-/**
-*/
 
-void dcd_edpt_close_all(uint8_t rhport)
-{
-    xAssert(0);
-}
-void dcd_edpt_clear_stall(uint8_t rhport, uint8_t dev_addr)
-{
-    xAssert(0);
-}
-}
 // EOF

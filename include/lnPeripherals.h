@@ -40,6 +40,11 @@ enum Peripherals
             pAF,
             pDMA0,
             pDMA1,
-            pUSB
+            pUSB,
+            
+            
+            pAPB1=100,
+            pAPB2,
+            pSYSCLOCK,
     };
 // EOF
