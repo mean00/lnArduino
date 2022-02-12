@@ -53,6 +53,7 @@ typedef volatile LN_RCUx LN_RCU;
 #define LN_RCU_APB1_USART4EN  (1<<20)
 #define LN_RCU_APB1_I2C0EN    (1<<21)
 #define LN_RCU_APB1_I2C1EN    (1<<22)
+#define LN_RCU_APB1_USBDEN    (1<<23)
 #define LN_RCU_APB1_CAN0EN    (1<<25)
 #define LN_RCU_APB1_CAN1EN    (1<<26)
 #define LN_RCU_APB1_BKPIEN    (1<<27)
@@ -95,8 +96,8 @@ typedef volatile LN_RCUx LN_RCU;
 #define LN_RCU_CFG0_PLLSEL       ( 1<<16)
 #define LN_RCU_CFG0_PREDIV       ( 1<<17)
 
-#define LN_RCU_CFG0_USBPSC_MASK  ( 3<<22)
-#define LN_RCU_CFG0_USBPSC(x)       ((x&3)<<22)
+#define LN_RCU_CFG0_USBPSC_MASK  (~(3<<22))
+#define LN_RCU_CFG0_USBPSC(x)     ((x&3)<<22)
 
 
 #define LN_RCU_ADC_PRESCALER_MASK     (~((1<<28)+(3<<14)))

@@ -30,6 +30,7 @@ enum Peripherals
             pTIMER4,
             pTIMER5,
             pTIMER6,
+            pUSB,            
             pADC0,
             pADC1,
             pGPIOA,
@@ -40,7 +41,7 @@ enum Peripherals
             pAF,
             pDMA0,
             pDMA1,
-            pUSB,
+
             
             
             pAPB1=100,

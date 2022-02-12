@@ -7,6 +7,11 @@ include_directories( ${TUSB})
 include_directories( ${TUSB}/common)
 include_directories( ${TUSB}/device)
 include_directories( ${TUSB}/class/device/cdc)
+
+ADD_DEFINITIONS("-DCFG_TUSB_DEBUG=3")
+ADD_DEFINITIONS("-DCFG_TUSB_DEBUG")
+ADD_DEFINITIONS("-DCFG_TUSB_DEBUG_PRINTF=Logger_C")
+
 SET(SRCS  ${TUSB}/tusb.c 
           ${TUSB}/device/usbd_control.c 
           ${TUSB}/device/usbd.c 

@@ -22,8 +22,7 @@ lnUsbDevice::lnUsbDevice(int port)
 {
   xAssert(port==0);
   _handler=NULL;
-  _usbInstance=this;
-  init();
+  _usbInstance=this;  
 }
 /**
 */
@@ -40,12 +39,13 @@ bool     lnUsbDevice:: init()
   irqEnabled(false);    
   // 48 Mhz input to usb
   lnPeripherals::enableUsb48Mhz();  
-  // give it a clock...
-  lnPeripherals::disable(Peripherals::pUSB);  
+  // Switch pins... PA11 and PA12
+  lnPinMode(PA12,lnINPUT_FLOATING); // D+
+  lnPinMode(PA11,lnINPUT_FLOATING); // D-
   // Clear all interrupts
   aUSBD0->USBD_CTL&=~0xff; // disable all interrupts  
   aUSBD0->USBD_DADDR=0; // address 0, disabled
-  aUSBD0->USBD_CTL=LN_USBD_CTL_SETRST;  
+  aUSBD0->USBD_CTL=LN_USBD_CTL_SETRST;  // reset
   lnDelayUs(100);
   aUSBD0->USBD_CTL=LN_USBD_CTL_CLOSE; // clear reset, go to closed dstate  
   if(!_usbd_buffer)
@@ -57,8 +57,9 @@ bool     lnUsbDevice:: init()
   uint32_t asLong=(uint32_t )_usbd_buffer;
   xAssert(!(asLong&7)); // aligned normally  already  
   aUSBD0->USBD_BADDR=asLong;   
-  // And go
-  aUSBD0-> USBD_CTL=0;
+  // And go, enable most IT
+#define GG(x) LN_USBD_CTL_##x  
+  aUSBD0->USBD_CTL= GG(RSTIE)+GG(SOFIE)+GG(ESOFIE)+GG(ERRIE)+GG(PMOUIE)+GG(STIE)+GG(WKUPIE);
   return true;
 }
 /**
@@ -68,6 +69,8 @@ bool      lnUsbDevice::power(bool onoff)
   if(onoff)
   {
     lnPeripherals::enable(Peripherals::pUSB);   
+    lnPeripherals::reset(Peripherals::pUSB);   
+    
   }else
   {
     lnPeripherals::disable(Peripherals::pUSB);
@@ -82,10 +85,13 @@ bool      lnUsbDevice::irqEnabled(bool onoff)
   {
     lnEnableInterrupt(LN_IRQ_USB_HP_CAN_TX);
     lnEnableInterrupt(LN_IRQ_USB_LP_CAN_RX0);
+    lnEnableInterrupt(LN_IRQ_USBWAKEUP);
+    
   }else
   {
     lnDisableInterrupt(LN_IRQ_USB_HP_CAN_TX);
     lnDisableInterrupt(LN_IRQ_USB_LP_CAN_RX0);    
+    lnDisableInterrupt(LN_IRQ_USBWAKEUP);
   }
   return true;
 }
@@ -96,6 +102,13 @@ bool      lnUsbDevice::registerInterruptHandler(lnUsbIrqHandler *h)
     _handler=h; 
     return true;
 }
+
+bool lnUsbDevice::wakeUpHost()
+{
+  aUSBD0->USBD_CTL|= LN_USBD_CTL_RSREQ; // clear suspend
+  return true;
+}
+
 /**
 */
 bool      lnUsbDevice:: setAddress(int address)

@@ -8,7 +8,7 @@
 struct LN_USBD_Registersx
 {
     uint32_t USBD_EPCS[8];     // 0x00--0x1c
-    uint32_t filler[(0x40-0x1c)/4];
+    uint32_t filler[(0x40-0x20)/4];
     uint32_t USBD_CTL;        // 0x40
     uint32_t USBD_INTF;       // 0x44
     uint32_t USBD_STAT;       // 0x48

@@ -1,4 +1,6 @@
 /* 
+
+  Derived fromt the example from tinyUsb
  * The MIT License (MIT)
  *
  * Copyright (c) 2019 Ha Thach (tinyusb.org)
@@ -43,17 +45,72 @@
 // static task for cdc
 #define CDC_STACK_SZIE      configMINIMAL_STACK_SIZE
 
-
+#if 0
+  #define DEBUG_ENTER() Logger("-%s\n",__PRETTY_FUNCTION__ )
+#else
+  #define DEBUG_ENTER() {}
+#endif
 static lnUsbDevice *_usbd=NULL;
 
 void usb_device_task(void* param);
 void cdc_task(void* params);
+
+extern "C" void dcd_edpt_xfer(uint8_t rhport, uint8_t ep_addr, uint8_t * buffer, uint16_t total_bytes);
+
+
+static const tusb_desc_endpoint_t ep0OUT_desc =
+{
+  .bLength          = sizeof(tusb_desc_endpoint_t),
+  .bDescriptorType  = TUSB_DESC_ENDPOINT,
+
+  .bEndpointAddress = 0x00,
+  .bmAttributes     = { .xfer = TUSB_XFER_CONTROL },
+  .wMaxPacketSize   = CFG_TUD_ENDPOINT0_SIZE,
+  .bInterval        = 0
+};
+
+static const tusb_desc_endpoint_t ep0IN_desc =
+{
+  .bLength          = sizeof(tusb_desc_endpoint_t),
+  .bDescriptorType  = TUSB_DESC_ENDPOINT,
+
+  .bEndpointAddress = 0x80,
+  .bmAttributes     = { .xfer = TUSB_XFER_CONTROL },
+  .wMaxPacketSize   = CFG_TUD_ENDPOINT0_SIZE,
+  .bInterval        = 0
+};
+
+// One of these for every EP IN & OUT, uses a bit of RAM....
+typedef struct
+{
+  uint8_t * buffer;
+  // tu_fifo_t * ff;  // TODO support dcd_edpt_xfer_fifo API
+  uint16_t total_len;
+  uint16_t queued_len;
+  uint16_t pma_ptr;
+  uint8_t max_packet_size;
+  uint8_t pma_alloc_size;
+} xfer_ctl_t;
+
+
+extern "C" int Logger_C(const char *fmt,...)
+{
+  char str[64];
+  
+  va_list args;
+  va_start(args, fmt);
+  vsnprintf(str, 63,fmt, args);
+  va_end(args);      
+  Logger(str);
+  return 0;
+}
 
 /**
 */
 
 void tinyUsbInit()
 {
+  DEBUG_ENTER();
   // Create a task for tinyusb device stack
   (void) xTaskCreate( usb_device_task, "usbd", USBD_STACK_SIZE, NULL, configMAX_PRIORITIES-1,  NULL);
 
@@ -67,6 +124,7 @@ void tinyUsbInit()
 // This top level thread process all usb events and invoke callbacks
 void usb_device_task(void* param)
 {
+  DEBUG_ENTER();
   (void) param;
 
   // This should be called after scheduler/kernel is started.
@@ -80,12 +138,13 @@ void usb_device_task(void* param)
     tud_task();
   }
 }
-
+#if 0
 // Invoked when usb bus is suspended
 // remote_wakeup_en : if host allow us  to perform remote wakeup
 // Within 7ms, device must draw an average of current less than 2.5 mA from bus
 void tud_suspend_cb(bool remote_wakeup_en)
 {
+  DEBUG_ENTER();
   (void) remote_wakeup_en;
   
 }
@@ -93,14 +152,15 @@ void tud_suspend_cb(bool remote_wakeup_en)
 // Invoked when usb bus is resumed
 void tud_resume_cb(void)
 {
-  
+  DEBUG_ENTER();
 }
-
+#endif
 //--------------------------------------------------------------------+
 // USB CDC
 //--------------------------------------------------------------------+
 void cdc_task(void* params)
 {
+  DEBUG_ENTER();
   (void) params;
 
   // RTOS forever loop
@@ -136,6 +196,7 @@ void cdc_task(void* params)
 // Invoked when cdc when line state changed e.g connected/disconnected
 void tud_cdc_line_state_cb(uint8_t itf, bool dtr, bool rts)
 {
+  DEBUG_ENTER();
   (void) itf;
   (void) rts;
 
@@ -152,13 +213,14 @@ void tud_cdc_line_state_cb(uint8_t itf, bool dtr, bool rts)
 // Invoked when CDC interface received data from host
 void tud_cdc_rx_cb(uint8_t itf)
 {
+  DEBUG_ENTER();
   (void) itf;
 }
 
 //---------------------------------
 //
 //---------------------------------
-#define DEBUG_ENTER() Logger(__PRETTY_FUNCTION__)
+#define STFSDEV_EP_COUNT 4
 extern "C"
 {
 void dcd_init(uint8_t rhport)
@@ -181,12 +243,13 @@ void dcd_int_disable(uint8_t rhport)
 void dcd_set_address(uint8_t rhport, uint8_t dev_addr)
 {  
     DEBUG_ENTER();
-   _usbd->setAddress(dev_addr);
+    dcd_edpt_xfer(rhport, tu_edpt_addr(0, TUSB_DIR_IN), NULL, 0); //reply
+   //usbd->setAddress(dev_addr);
 }
 void dcd_remote_wakeup(uint8_t rhport)
 { 
     DEBUG_ENTER();
-    xAssert(0);
+    _usbd->wakeUpHost();
 }
 //-------------
 void dcd_edpt_open(uint8_t rhport, tusb_desc_endpoint_t const * desc_edpt)
@@ -194,6 +257,8 @@ void dcd_edpt_open(uint8_t rhport, tusb_desc_endpoint_t const * desc_edpt)
     DEBUG_ENTER();
     xAssert(0);
 }  
+/**
+*/
 void dcd_edpt_xfer(uint8_t rhport, uint8_t ep_addr, uint8_t * buffer, uint16_t total_bytes)
 { 
     DEBUG_ENTER();
