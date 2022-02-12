@@ -18,6 +18,9 @@ public:
         bool      irqEnabled(bool onoff);
         bool      registerInterruptHandler(lnUsbIrqHandler *h);
         bool      setAddress(int address);
+        void      rxIrq();
+        void      txIrq();
+        void      wakeUpIrq();
 protected:
         int       _instance;
         lnUsbIrqHandler *_handler;

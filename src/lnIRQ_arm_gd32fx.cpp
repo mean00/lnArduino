@@ -173,7 +173,9 @@ extern "C" void TIMER1_IRQHandler();
 extern "C" void TIMER2_IRQHandler();
 extern "C" void TIMER3_IRQHandler();
 
-
+extern void USB_TX_IRQHandler();
+extern void USB_RX_IRQHandler();
+extern void USB_WAKEUP_IRQHandler();
 
 /**
  * 

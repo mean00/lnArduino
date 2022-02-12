@@ -57,7 +57,10 @@ static const RCU_Peripheral _peripherals[]=
     {        pAF,            2,          LN_RCU_APB2_AFEN},
             // PERIP        AHB/APB         APB         BIT        
     {        pDMA0,          8,          LN_RCU_AHB_DMA0EN},
-    {        pDMA1,          8,          LN_RCU_AHB_DMA1EN}
+    {        pDMA1,          8,          LN_RCU_AHB_DMA1EN},
+    //
+    {        pUSB,           8,          LN_RCU_AHB_USBFSEN} // not sure
+    //
 };
 
 // 1 : Reset
@@ -65,6 +68,7 @@ static const RCU_Peripheral _peripherals[]=
 // 3: disable
 static void _rcuAction(const Peripherals periph, int action)
 {
+    xAssert((int)periph<100);
     RCU_Peripheral *o=(RCU_Peripheral *)(_peripherals+(int)periph);
     xAssert(o->periph==periph);
     xAssert(o->enable);
@@ -152,6 +156,7 @@ void lnPeripherals::enableUsb48Mhz()
   // clear usbd
   cfg0&=LN_RCU_CFG0_USBPSC_MASK;
   int x=0;
+
   switch(scaler)
   {
       case 3: x=0;break; // 3/2=1.5
@@ -162,6 +167,12 @@ void lnPeripherals::enableUsb48Mhz()
         xAssert(0); // invalid sys clock
         break;
   }   
+
+  if(lnCpuID::vendor()==lnCpuID::LN_MCU_STM32)
+  {
+    if(x>1) xAssert(0); // STM32F1 chip only supports div by 1 and div by 1.5, x=0 or 1
+  }
+  
   cfg0|=LN_RCU_CFG0_USBPSC(x);
   arcu->CFG0=cfg0;
 }
