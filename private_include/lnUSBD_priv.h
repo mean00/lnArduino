@@ -62,6 +62,36 @@ typedef volatile LN_USBD_Registersx LN_USBD_Registers;
 #define LN_USBD_STAT_RX_DM     (1<<14)
 #define LN_USBD_STAT_RX_DP     (1<<15)
 
+//-------------- EPxCS ---------
+#define LN_USBD_EPxCS_EPADDR_MASK     (0xf)
+#define LN_USBD_EPxCS_EPADDR(x)       (x&0xf)
+#define LN_USBD_EPxCS_TX_DTG          (1<<6)
+#define LN_USBD_EPxCS_TX_ST           (1<<7)
+#define LN_USBD_EPxCS_EP_KCTL         (1<<8) 
+#define LN_USBD_EPxCS_SETUP           (1<<11)
+#define LN_USBD_EPxCS_RX_DTG          (1<<14)
+#define LN_USBD_EPxCS_RX_ST           (1<<15)
+
+#define LN_USBD_EPxCS_RX_STA_MASK     (3<<12)
+#define LN_USBD_EPxCS_RX_STA_DISABLED (0<<12)
+#define LN_USBD_EPxCS_RX_STA_STALL    (1<<12)
+#define LN_USBD_EPxCS_RX_STA_NAK      (2<<12)
+#define LN_USBD_EPxCS_RX_STA_VALID    (3<<12)
+
+#define LN_USBD_EPxCS_EPCTL_MASK      (3<<9)
+#define LN_USBD_EPxCS_EPCTL_BULK      (0<<9)
+#define LN_USBD_EPxCS_EPCTL_CONTROL   (1<<9)
+#define LN_USBD_EPxCS_EPCTL_ISO       (2<<9)
+#define LN_USBD_EPxCS_EPCTL_INTERRUPT (3<<9)
+
+#define LN_USBD_EPxCS_TX_STA_MASK     (3<<4)
+#define LN_USBD_EPxCS_TX_STA_DISABLED (0<<4)
+#define LN_USBD_EPxCS_TX_STA_STALL    (1<<4)
+#define LN_USBD_EPxCS_TX_STA_NAK      (2<<4)
+#define LN_USBD_EPxCS_TX_STA_VALID    (3<<4)
+
+
 // EOF
+
 
 

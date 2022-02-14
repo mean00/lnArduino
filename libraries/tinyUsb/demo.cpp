@@ -38,7 +38,8 @@
 #include "task.h"
 #include "timers.h"
 #include "lnUSBD.h"
-
+#include "../private_include/lnUSBD_priv.h"
+#include "device/dcd.h"
 // Increase stack size when debug log is enabled
 #define USBD_STACK_SIZE    (3*configMINIMAL_STACK_SIZE/2) * (CFG_TUSB_DEBUG ? 2 : 1)
 
@@ -53,9 +54,12 @@
 static lnUsbDevice *_usbd=NULL;
 
 void usb_device_task(void* param);
+extern "C" void dcd_handle_bus_reset(void);
 void cdc_task(void* params);
 
-extern "C" void dcd_edpt_xfer(uint8_t rhport, uint8_t ep_addr, uint8_t * buffer, uint16_t total_bytes);
+int remoteWakeCountdown=0;
+
+extern "C" bool dcd_edpt_xfer(uint8_t rhport, uint8_t ep_addr, uint8_t * buffer, uint16_t total_bytes);
 
 
 static const tusb_desc_endpoint_t ep0OUT_desc =
@@ -252,17 +256,19 @@ void dcd_remote_wakeup(uint8_t rhport)
     _usbd->wakeUpHost();
 }
 //-------------
-void dcd_edpt_open(uint8_t rhport, tusb_desc_endpoint_t const * desc_edpt)
+bool dcd_edpt_open(uint8_t rhport, tusb_desc_endpoint_t const * desc_edpt)
 {
     DEBUG_ENTER();
     xAssert(0);
+    return false;
 }  
 /**
 */
-void dcd_edpt_xfer(uint8_t rhport, uint8_t ep_addr, uint8_t * buffer, uint16_t total_bytes)
+bool dcd_edpt_xfer(uint8_t rhport, uint8_t ep_addr, uint8_t * buffer, uint16_t total_bytes)
 { 
     DEBUG_ENTER();
     xAssert(0);
+    return false;
 }  
 /**
 */
@@ -285,6 +291,94 @@ void dcd_edpt_close_all(uint8_t rhport)
     DEBUG_ENTER();
     xAssert(0);
 }
+/**
 
+
+*/
+
+extern LN_USBD_Registers      *aUSBD0;
+extern volatile uint32_t      *aUSBD0_SRAM;
+extern  lnUsbDevice     *_usbInstance;
+void dcd_ep_ctr_handler(void)
+{
+  xAssert(0);
+}
+
+void dcd_int_handler(uint8_t rhport) {
+
+  (void) rhport;
+
+  uint32_t int_status = aUSBD0->USBD_INTF;
+  //const uint32_t handled_ints = USB_ISTR_CTR | USB_ISTR_RESET | USB_ISTR_WKUP
+  //    | USB_ISTR_SUSP | USB_ISTR_SOF | USB_ISTR_ESOF;
+  // unused IRQs: (USB_ISTR_PMAOVR | USB_ISTR_ERR | USB_ISTR_L1REQ )
+
+  // The ST driver loops here on the CTR bit, but that loop has been moved into the
+  // dcd_ep_ctr_handler(), so less need to loop here. The other interrupts shouldn't
+  // be triggered repeatedly.
+#define clear_istr_bits(x) {aUSBD0->USBD_INTF=~x;}
+#define reg16_clear_bits(a,x) { *a=*a & (~x);}
+
+
+  if(int_status & LN_USBD_INTF_RSTIF) {
+    // USBRST is start of reset.
+    clear_istr_bits(LN_USBD_INTF_RSTIF);
+    dcd_handle_bus_reset();
+    dcd_event_bus_reset(0, TUSB_SPEED_FULL, true);
+    return; // Don't do the rest of the things here; perhaps they've been cleared?
+  }
+
+  if (int_status & LN_USBD_INTF_STIF)
+  {
+    /* servicing of the endpoint correct transfer interrupt */
+    /* clear of the CTR flag into the sub */
+    dcd_ep_ctr_handler();
+  }
+
+  if (int_status & LN_USBD_INTF_WKUPIF)
+  {
+    reg16_clear_bits(&aUSBD0->USBD_CTL, LN_USBD_CTL_LOWM);
+    reg16_clear_bits(&aUSBD0->USBD_CTL, LN_USBD_CTL_SETSPS);
+    clear_istr_bits(LN_USBD_INTF_WKUPIF);
+    dcd_event_bus_signal(0, DCD_EVENT_RESUME, true);
+  }
+
+  if (int_status & LN_USBD_INTF_SPSIF)
+  {
+    /* Suspend is asserted for both suspend and unplug events. without Vbus monitoring,
+     * these events cannot be differentiated, so we only trigger suspend. */
+
+    /* Force low-power mode in the macrocell */
+    aUSBD0->USBD_CTL |= LN_USBD_CTL_SETSPS;
+    aUSBD0->USBD_CTL |= LN_USBD_CTL_LOWM;
+
+    /* clear of the ISTR bit must be done after setting of CNTR_FSUSP */
+    clear_istr_bits(LN_USBD_INTF_SPSIF);
+    dcd_event_bus_signal(0, DCD_EVENT_SUSPEND, true);
+  }
+
+#if USE_SOF
+  if(int_status & USB_ISTR_SOF) {
+    clear_istr_bits(USB_ISTR_SOF);
+    dcd_event_bus_signal(0, DCD_EVENT_SOF, true);
+  }
+#endif 
+
+  if(int_status & LN_USBD_INTF_ESOFIF) {
+    if(remoteWakeCountdown == 1u)
+    {
+      aUSBD0->USBD_CTL &= (uint16_t)(~LN_USBD_CTL_RSREQ);
+    }
+    if(remoteWakeCountdown > 0u)
+    {
+      remoteWakeCountdown--;
+    }
+    clear_istr_bits(LN_USBD_INTF_ESOFIF);
+  }
+}
+void dcd_handle_bus_reset(void)
+{
+  
+}
 }
 // EOF
