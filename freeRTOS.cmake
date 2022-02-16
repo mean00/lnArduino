@@ -5,7 +5,7 @@ FOREACH(common croutine.c  event_groups.c  list.c  queue.c  stream_buffer.c  tas
     LIST(APPEND CMN ${FOS}/${common})
 ENDFOREACH(common croutine.c  event_groups.c  list.c  queue.c  stream_buffer.c  tasks.c  timers.c)
 
-ADD_DEFINITIONS("-DLN_MCU_RAM_SIZE=${LN_MCU_RAM_SIZE}")
+ADD_DEFINITIONS("-DLN_FREERTOS_HEAP_SIZE=(${LN_MCU_RAM_SIZE}-${LN_MCU_STATIC_RAM})")
 
 SET(MEM ${FOS}/portable/MemMang/heap_4.c)
 

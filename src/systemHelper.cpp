@@ -48,7 +48,7 @@ extern "C"
     {
         ENTER_CRITICAL();
     }
-    void vApplicationStackOverflowHook()
+    void vApplicationStackOverflowHook( void *xTask,    char * pcTaskName )
     {
         deadEnd(0x1001);
     }

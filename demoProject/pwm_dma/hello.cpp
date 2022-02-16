@@ -38,7 +38,7 @@ void loop()
     };
     
     lnPinMode(PWM_PIN,lnALTERNATE_PP);    
-    lnDmaTimer timer(PWM_PIN);
+    lnDmaTimer timer(16,PWM_PIN);
     timerCB cb;
     
     timer.pwmSetup(810000);
@@ -48,7 +48,7 @@ void loop()
         sequence[i]=(sequence[i]*rollover)/100;
     
     timer.attachDmaCallback(&cb);
-    timer.start(n,sequence);
+    timer.start(n,(uint8_t *)sequence);
     
     while(1)
     {
