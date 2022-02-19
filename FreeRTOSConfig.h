@@ -29,8 +29,10 @@
 #define FREERTOS_CONFIG_H
 
 extern uint32_t SystemCoreClock;
+
 extern void do_assert(const char *a);
-#define configASSERT(a)  if(!(a)) {do_assert(#a);}
+//#define configASSERT(a)  if(!(a)) {do_assert(#a);}
+#define configASSERT(a)  if(!(a)) {do_assert("");}
 
 
 #include "freeRTOS_tuning.h"

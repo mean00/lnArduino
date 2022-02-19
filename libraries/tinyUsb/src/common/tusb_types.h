@@ -513,10 +513,7 @@ static inline uint8_t tu_edpt_addr(uint8_t num, uint8_t dir)
   return (uint8_t)(num | (dir ? TUSB_DIR_IN_MASK : 0));
 }
 
-static inline uint16_t tu_edpt_packet_size(tusb_desc_endpoint_t const* desc_ep)
-{
-  return tu_le16toh(desc_ep->wMaxPacketSize) & TU_GENMASK(10, 0);
-}
+uint16_t tu_edpt_packet_size(tusb_desc_endpoint_t const* desc_ep);
 
 //--------------------------------------------------------------------+
 // Descriptor helper

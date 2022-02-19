@@ -2,6 +2,8 @@
 #include "lnIRQ.h"
 #include "lnPeripheral_priv.h"
 
+#define LN_USBD_MAX_ENDPOINT 8
+
 /**
  */
 
@@ -28,13 +30,13 @@ typedef volatile LN_USBD_Registersx LN_USBD_Registers;
 #define LN_USBD_CTL_SETRST    (1<<0)
 #define LN_USBD_CTL_CLOSE     (1<<1)
 #define LN_USBD_CTL_LOWM      (1<<2)
-#define LN_USBD_CTL_SETSPS    (1<<3)
-#define LN_USBD_CTL_RSREQ     (1<<4)
+#define LN_USBD_CTL_SETSPS    (1<<3) // suspend
+#define LN_USBD_CTL_RSREQ     (1<<4) // resume
 
 #define LN_USBD_CTL_ESOFIE    (1<<8)
 #define LN_USBD_CTL_SOFIE     (1<<9)
 #define LN_USBD_CTL_RSTIE     (1<<10)
-#define LN_USBD_CTL_SPEIE     (1<<11)
+#define LN_USBD_CTL_SPSIE     (1<<11)
 #define LN_USBD_CTL_WKUPIE    (1<<12)
 #define LN_USBD_CTL_ERRIE     (1<<13)
 #define LN_USBD_CTL_PMOUIE    (1<<14)
@@ -78,6 +80,10 @@ typedef volatile LN_USBD_Registersx LN_USBD_Registers;
 #define LN_USBD_EPxCS_RX_STA_NAK      (2<<12)
 #define LN_USBD_EPxCS_RX_STA_VALID    (3<<12)
 
+#define LN_USBD_EPxCS_RX_STA_BIT1     (1<<12)
+#define LN_USBD_EPxCS_RX_STA_BIT2     (2<<12)
+
+
 #define LN_USBD_EPxCS_EPCTL_MASK      (3<<9)
 #define LN_USBD_EPxCS_EPCTL_BULK      (0<<9)
 #define LN_USBD_EPxCS_EPCTL_CONTROL   (1<<9)
@@ -89,6 +95,9 @@ typedef volatile LN_USBD_Registersx LN_USBD_Registers;
 #define LN_USBD_EPxCS_TX_STA_STALL    (1<<4)
 #define LN_USBD_EPxCS_TX_STA_NAK      (2<<4)
 #define LN_USBD_EPxCS_TX_STA_VALID    (3<<4)
+
+#define LN_USBD_EPxCS_TX_STA_BIT1     (1<<4)
+#define LN_USBD_EPxCS_TX_STA_BIT2     (2<<4)
 
 
 // EOF

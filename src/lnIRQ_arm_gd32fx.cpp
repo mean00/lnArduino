@@ -328,7 +328,8 @@ void lnIrqSysInit()
     uint32_t aircr=aSCB->AIRCR&7;
     aircr|=(0x05FA<<16)+(3<<8);
     aSCB->AIRCR=aircr;
-    
+   
+
     // Set priority to 14 for all interrupts
     for(int i=LN_IRQ_WWDG;i<LN_IRQ_ARM_LAST;i++)
         lnIrqSetPriority((LnIRQ)i,0); // by default lesss urgent
@@ -344,7 +345,8 @@ void lnIrqSysInit()
     
     // Relocate vector to there    
     aSCB->VTOR = (uint32_t)LnVectorTable;
-    aSCB->CR |= (1<<3)+ // unaligned access
+    aSCB->CR |= 0+
+               // (1<<3)+ // unaligned access
                 (1<<4)+  // div by zero
                 (1<<9) ; // stack aligned to 8 bytes
     

@@ -166,12 +166,15 @@ char const* const tusb_strerr[TUSB_ERROR_COUNT] = { ERROR_TABLE(ERROR_STRING) };
 static void dump_str_line(uint8_t const* buf, uint16_t count)
 {
   tu_printf("  |");
-
+  char c; // MEANX
   // each line is 16 bytes
   for(uint16_t i=0; i<count; i++)
   {
     const char ch = buf[i];
-    tu_printf("%c", isprint(ch) ? ch : '.');
+    // MEANX tu_printf("%c", isprint(ch) ? ch : '.');
+    if(ch<' ') c='.';
+        else c=ch;
+    tu_printf("%c", c);
   }
 
   tu_printf("|\r\n");
