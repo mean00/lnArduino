@@ -354,4 +354,16 @@ void lnIrqSysInit()
     __asm__ __volatile__("dsb sy") ;
     return;
 }
+void  __attribute__((weak))  USB_WAKEUP_IRQHandler()
+{
+  xAssert(0);
+}
+void  __attribute__((weak)) USB_TX_IRQHandler()
+{
+    xAssert(0);
+}
+void  __attribute__((weak)) USB_RX_IRQHandler()
+{
+    xAssert(0);
+}
 // EOF

@@ -1,6 +1,6 @@
 #pragma once 
 
-
+#define CFG_TUSB_MCU OPT_MCU_STM32F1
 // only one port
 #define BOARD_DEVICE_RHPORT_NUM     0
 #define BOARD_DEVICE_RHPORT_SPEED   OPT_MODE_HIGH_SPEED
