@@ -56,6 +56,8 @@
 #define LN_GPIOD_ADR    (0x40011400)
 #define LN_GPIOE_ADR    (0x40011800)
 
+#define LN_USBD0_ADR     (0x40005c00)
+#define LN_USBD0_RAM_ADR (0x40006000)
 
 // RISCV
 

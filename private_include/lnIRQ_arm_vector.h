@@ -45,8 +45,8 @@ VEC(DMA0_Channel4_IRQHandler),      /*   LN_IRQ_DMA0_Channel4       !< DMA0 chan
 VEC(DMA0_Channel5_IRQHandler),      /*   LN_IRQ_DMA0_Channel5       !< DMA0 channel5 interrupt                                  */
 VEC(DMA0_Channel6_IRQHandler),      /*   LN_IRQ_DMA0_Channel6       !< 30 DMA0 channel6 interrupt                                  */
 VEC(ADC01_IRQHandler),              /*34 LN_IRQ_ADC0_1              !< 31 ADC0 and ADC1 interrupt                                  */
-VEC(unsupported),                   /*   LN_IRQ_CAN0_TX             !< CAN0 TX interrupts                                       */
-VEC(unsupported),                   /*   LN_IRQ_CAN0_RX0            !< CAN0 RX0 interrupts                                      */
+VEC(USB_TX_IRQHandler),             /*   LN_IRQ_USB_HP_CAN_TX       !< CAN0 TX interrupts                                       */
+VEC(USB_RX_IRQHandler),             /*   LN_IRQ_USB_LP_CAN_RX0      !< CAN0 RX0 interrupts                                      */
 VEC(unsupported),                   /*   LN_IRQ_CAN0_RX1            !< CAN0 RX1 interrupts                                      */
 VEC(unsupported),                   /*   LN_IRQ_CAN0_EWMC           !< CAN0 EWMC interrupts                                     */
 VEC(EXTI5_9_IRQHandler),            /*   LN_IRQ_EXTI5_9             !< EXTI[9:5] interrupts                                     */
@@ -68,7 +68,7 @@ VEC(USART1_IRQHandler),             /*   LN_IRQ_USART1              !< USART1 in
 VEC(USART2_IRQHandler),             /*55 LN_IRQ_USART2              !< USART2 interrupt                                         */
 VEC(EXTI10_15_IRQHandler),          /*   LN_IRQ_EXTI10_15           !< EXTI[15:10] interrupts                                   */
 VEC(RTC_IrqHandler),                /*   LN_IRQ_RTC_ALARM           !< RTC alarm interrupt EXTI                                 */
-VEC(unsupported), //                     LN_IRQ_USBFS_WKUP          !< USBFS wakeup interrupt                                   */
+VEC(USB_WAKEUP_IRQHandler), //           LN_IRQ_USBFS_WKUP          !< USBFS wakeup interrupt                                   */
 
 VEC(unsupported), //                     LN_IRQ_TIMER7_BRK_TIMER12 ,
 VEC(unsupported), //                60   LN_IRQ_TIMER7_UP_TIMER13 ,
