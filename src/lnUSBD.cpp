@@ -1,3 +1,4 @@
+
 /*
 This is derived from the stm sample code from tinyusb
 Original Copyright (c) 2019 Nathan Conrad
@@ -34,22 +35,10 @@ extern "C" void dcd_int_handler(uint8_t rhport);
 int EndPoints::ep_bufferTail;
 int EndPoints::ep_nbEp;
 
-#define CLEAR_INTERRUPT(x)                                                                                             \
-    {                                                                                                                  \
-        aUSBD0->USBD_INTF &= ~(LN_USBD_INTF_##x##IF);                                                                  \
-    }
-#define DISABLE_INTERRUPT(x)                                                                                           \
-    {                                                                                                                  \
-        aUSBD0->USBD_CTL &= ~(LN_USBD_CTL_##x##IE);                                                                    \
-    }
-#define CLEAR_CONTROL(x)                                                                                               \
-    {                                                                                                                  \
-        aUSBD0->USBD_CTL &= ~(LN_USBD_CTL_##x);                                                                        \
-    }
-#define SET_CONTROL(x)                                                                                                 \
-    {                                                                                                                  \
-        aUSBD0->USBD_CTL |= (LN_USBD_CTL_##x);                                                                         \
-    }
+#define CLEAR_INTERRUPT(x)   {  aUSBD0->USBD_INTF &= ~(LN_USBD_INTF_##x##IF);      }
+#define DISABLE_INTERRUPT(x) {  aUSBD0->USBD_CTL &= ~(LN_USBD_CTL_##x##IE);    }
+#define CLEAR_CONTROL(x)     {  aUSBD0->USBD_CTL &= ~(LN_USBD_CTL_##x);   }
+#define SET_CONTROL(x)       {  aUSBD0->USBD_CTL |= (LN_USBD_CTL_##x);    }
 
 /**
  */
@@ -365,11 +354,12 @@ void lnUsbDevice::clearDTG(int ep, bool isTx)
     uint32_t reg = aUSBD0->USBD_EPCS[ep & 7] & 0xffff;
     uint32_t change = 0;
     if (isTx)
+    {
         if (reg & LN_USBD_EPxCS_TX_DTG)
             change = LN_USBD_EPxCS_TX_DTG;
         else if (reg & LN_USBD_EPxCS_RX_DTG)
             change = LN_USBD_EPxCS_RX_DTG;
-
+    }
     if (change)
     {
         reg &= MASK_CLEAR;
@@ -414,6 +404,7 @@ void lnUsbDevice::resetEps()
 {
     for (uint32_t i = 0; i < LN_USBD_MAX_ENDPOINT; i++)
         _usbInstance->setEpStatusReg(i, 0);
+    EndPoints::reset();        
 }
 
 /**
@@ -520,11 +511,11 @@ void lnUsbDevice::irq()
 
     if (flags & LN_USBD_INTF_ESOFIF) // expected end of frame
     {
-        if (_remoteWakeCountdown == 1u)
+        if (_remoteWakeCountdown == 1)
         {
             CLEAR_CONTROL(RSREQ);
         }
-        if (_remoteWakeCountdown > 0u)
+        if (_remoteWakeCountdown > 0)
         {
             _remoteWakeCountdown--;
         }
