@@ -191,12 +191,18 @@ void ADC01_IRQHandler(void)
  * I2C
  * @param code
  */     
-void i2cIrqHandler(int instance, bool error);
+#ifdef LN_ENABLE_I2C
+ void i2cIrqHandler(int instance, bool error);
+#else
+  #define i2cIrqHandler(...) deadEnd(1)
+#endif
+
 #define I2C_IRQ(d) extern "C"{ void I2C##d##_EV_IRQHandler(void) LN_INTERRUPT_TYPE ; void I2C##d##_EV_IRQHandler(void) { i2cIrqHandler(d,false);}} \
-                   extern "C"{ void I2C##d##_ERR_IRQHandler(void)LN_INTERRUPT_TYPE;  void I2C##d##_ERR_IRQHandler(void) { i2cIrqHandler(d,true);} }
+                 extern "C"{ void I2C##d##_ERR_IRQHandler(void)LN_INTERRUPT_TYPE;  void I2C##d##_ERR_IRQHandler(void) { i2cIrqHandler(d,true);} }
 
 I2C_IRQ(0)
 I2C_IRQ(1)
+
 
 extern "C"
 {
