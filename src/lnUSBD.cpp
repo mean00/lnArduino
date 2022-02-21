@@ -27,7 +27,7 @@ LN_USBD_Registers *aUSBD0 = (LN_USBD_Registers *)(LN_USBD0_ADR);
 lnUsbDevice *_usbInstance = NULL;
 volatile uint32_t *aUSBD0_SRAM = (volatile uint32_t *)LN_USBD0_RAM_ADR;
 #include "lnUSBD_endPoints.h"
-EndPoints::xfer_descriptor EndPoints::xfer_status[LN_USBD_MAX_ENDPOINT*2];
+EndPoints::xfer_descriptor EndPoints::xfer_status[LN_USBD_MAX_ENDPOINT * 2];
 extern "C" void dcd_int_handler(uint8_t rhport);
 // this is mapped at the start of of the SrAM
 
@@ -149,104 +149,104 @@ bool lnUsbDevice::irqEnabled(bool onoff)
 */
 void lnUsbDevice::copyFromSRAM(uint8_t *dest, int srcOffset, int bytes)
 {
-  int nbWord = bytes/2;
-  volatile uint16_t *ram=(volatile uint16_t *)aUSBD0_SRAM;
-  ram+=2*(srcOffset/2);
-  
-  if( ((uint32_t)dest) &1 ) // not aligned
-  {
-      uint8_t *target=dest;
+    int nbWord = bytes / 2;
+    volatile uint16_t *ram = (volatile uint16_t *)aUSBD0_SRAM;
+    ram += 2 * (srcOffset / 2);
 
-      for(int i=0;i<nbWord;i++)  
-      {
-        int temp = *ram;
-        ram += 2;
-        *target++ = ((temp >> 0) & 0xFF);
-        *target++ = ((temp >> 8) & 0xFF);
-      }
+    if (((uint32_t)dest) & 1) // not aligned
+    {
+        uint8_t *target = dest;
+
+        for (int i = 0; i < nbWord; i++)
+        {
+            int temp = *ram;
+            ram += 2;
+            *target++ = ((temp >> 0) & 0xFF);
+            *target++ = ((temp >> 8) & 0xFF);
+        }
     }
     else // aligned, copy 16 bits at a time
     {
-      uint16_t *target16=(uint16_t *)dest;
-      
-      int pack4=nbWord/8;
-      for(int i=0;i<pack4;i++)
-      {
-        target16[0]=ram[0];
-        target16[1]=ram[2];
-        target16[2]=ram[4];
-        target16[3]=ram[6];
-        target16[4]=ram[8];
-        target16[5]=ram[10];
-        target16[6]=ram[12];
-        target16[7]=ram[14];
-        ram+=16;
-        target16+=8;
-      }
-      int l=nbWord&7;
-      for(int i=0;i<l;i++)
-      {
-        target16[0]=ram[0];
-        ram+=2;
-        target16+=1;
-      }
+        uint16_t *target16 = (uint16_t *)dest;
+
+        int pack4 = nbWord / 8;
+        for (int i = 0; i < pack4; i++)
+        {
+            target16[0] = ram[0];
+            target16[1] = ram[2];
+            target16[2] = ram[4];
+            target16[3] = ram[6];
+            target16[4] = ram[8];
+            target16[5] = ram[10];
+            target16[6] = ram[12];
+            target16[7] = ram[14];
+            ram += 16;
+            target16 += 8;
+        }
+        int l = nbWord & 7;
+        for (int i = 0; i < l; i++)
+        {
+            target16[0] = ram[0];
+            ram += 2;
+            target16 += 1;
+        }
     }
 
-  if (bytes & 1)
-  {
-    int temp = *ram;
-    dest[bytes-1]=temp & 0xff;    
-  }
-  return ;  
+    if (bytes & 1)
+    {
+        int temp = *ram;
+        dest[bytes - 1] = temp & 0xff;
+    }
+    return;
 }
 /**
-* @brief <brief>
-* @param [in] <name> <parameter_description>
-* @return <return_description>
-* @details <details>
-*/
+ * @brief <brief>
+ * @param [in] <name> <parameter_description>
+ * @return <return_description>
+ * @details <details>
+ */
 
 void lnUsbDevice::copyToSRAM(int destOffset, uint8_t *src, int bytes)
 {
-  int nbWords=(bytes+1)/2; // might overread by one byte,not an issue
-  volatile uint16_t *ram=(volatile uint16_t *)aUSBD0_SRAM;
-  ram+=2*(destOffset/2);
-  if( ((uint32_t)src) &1 ) // not aligned
-  {
-    uint8_t *s8=src;
-    for(int i=0;i<nbWords;i++)
+    int nbWords = (bytes + 1) / 2; // might overread by one byte,not an issue
+    volatile uint16_t *ram = (volatile uint16_t *)aUSBD0_SRAM;
+    ram += 2 * (destOffset / 2);
+    if (((uint32_t)src) & 1) // not aligned
     {
-        int temp = (int)s8[0]+((int)s8[1]<<8);
-        *ram=temp;
-        ram += 2;
-        s8+=2;
+        uint8_t *s8 = src;
+        for (int i = 0; i < nbWords; i++)
+        {
+            int temp = (int)s8[0] + ((int)s8[1] << 8);
+            *ram = temp;
+            ram += 2;
+            s8 += 2;
+        }
     }
-  }else
-  { // aligned
-     uint16_t *s16=(uint16_t *)src;
-     int pack8=nbWords/8;
-     for(int i=0;i<pack8;i++)
-     {       
-        ram[0]=s16[0];
-        ram[2]=s16[1];
-        ram[4]=s16[2];
-        ram[6]=s16[3];
-        ram[8]=s16[4];
-        ram[10]=s16[5];
-        ram[12]=s16[6];
-        ram[14]=s16[7];
-        ram+=16;
-        s16+=8;        
-     }
-     int l=nbWords & 7;
-     for(int i=0;i<l;i++)
-     {
-       *ram=*s16++;
-       ram+=2;
-     }
-    
-  }
-  // We copy one extra byte in case it is not even, no need to take care of it
+    else
+    { // aligned
+        uint16_t *s16 = (uint16_t *)src;
+        int pack8 = nbWords / 8;
+        for (int i = 0; i < pack8; i++)
+        {
+            ram[0] = s16[0];
+            ram[2] = s16[1];
+            ram[4] = s16[2];
+            ram[6] = s16[3];
+            ram[8] = s16[4];
+            ram[10] = s16[5];
+            ram[12] = s16[6];
+            ram[14] = s16[7];
+            ram += 16;
+            s16 += 8;
+        }
+        int l = nbWords & 7;
+        for (int i = 0; i < l; i++)
+        {
+            *ram = *s16++;
+            ram += 2;
+        }
+    }
+    // We copy one extra byte in case it is not even, no need to take care of it
 }
 
 /**
@@ -309,25 +309,24 @@ void lnUsbDevice::toggleDTG(int ep, bool isTx)
 void lnUsbDevice::setEpKind(int ep, bool set)
 {
     uint32_t reg = aUSBD0->USBD_EPCS[ep & 7] & 0xffff;
-    
-    reg &=MASK_CLEAR;
-    if(set) 
-      reg |= LN_USBD_EPxCS_EP_KCTL;
+
+    reg &= MASK_CLEAR;
+    if (set)
+        reg |= LN_USBD_EPxCS_EP_KCTL;
     reg |= LN_USBD_EPxCS_RX_ST + LN_USBD_EPxCS_TX_ST;
-    
-    
+
     aUSBD0->USBD_EPCS[ep & 7] = reg & 0xffff;
 }
 
 void lnUsbDevice::setEpAddress(int ep, int adr)
 {
-  uint32_t reg = aUSBD0->USBD_EPCS[ep & 7] & 0xffff;
-  
-  reg &=MASK_CLEAR;
-  reg |=adr;
-  reg |= LN_USBD_EPxCS_RX_ST + LN_USBD_EPxCS_TX_ST;
-  
-  aUSBD0->USBD_EPCS[ep & 7] = reg & 0xffff;
+    uint32_t reg = aUSBD0->USBD_EPCS[ep & 7] & 0xffff;
+
+    reg &= MASK_CLEAR;
+    reg |= adr;
+    reg |= LN_USBD_EPxCS_RX_ST + LN_USBD_EPxCS_TX_ST;
+
+    aUSBD0->USBD_EPCS[ep & 7] = reg & 0xffff;
 }
 
 /**
@@ -341,21 +340,22 @@ void lnUsbDevice::setEpStatus(int ep, bool isTx, int status)
 {
     // rx
 
-  uint32_t reg= aUSBD0->USBD_EPCS[ep & 7] & 0xffff;  
-  uint32_t c;
+    uint32_t reg = aUSBD0->USBD_EPCS[ep & 7] & 0xffff;
+    uint32_t c;
 
-  if(isTx)  
-  {
-    reg &= MASK_CLEAR + LN_USBD_EPxCS_TX_STA_MASK; 
-    c=LN_USBD_EPxCS_TX_STA_MASK & status;
-  }else
-  {
-    reg &= MASK_CLEAR+LN_USBD_EPxCS_RX_STA_MASK; 
-    c=LN_USBD_EPxCS_RX_STA_MASK & status;
-  }
-  reg^=c;
-  reg |= LN_USBD_EPxCS_RX_ST + LN_USBD_EPxCS_TX_ST ; 
-  aUSBD0->USBD_EPCS[ep & 7]=reg & 0xffff;
+    if (isTx)
+    {
+        reg &= MASK_CLEAR + LN_USBD_EPxCS_TX_STA_MASK;
+        c = LN_USBD_EPxCS_TX_STA_MASK & status;
+    }
+    else
+    {
+        reg &= MASK_CLEAR + LN_USBD_EPxCS_RX_STA_MASK;
+        c = LN_USBD_EPxCS_RX_STA_MASK & status;
+    }
+    reg ^= c;
+    reg |= LN_USBD_EPxCS_RX_ST + LN_USBD_EPxCS_TX_ST;
+    aUSBD0->USBD_EPCS[ep & 7] = reg & 0xffff;
 }
 
 /**
@@ -380,13 +380,13 @@ void lnUsbDevice::clearDTG(int ep, bool isTx)
 
 /**
  */
-void lnUsbDevice::setEpType(int ep,int type)
+void lnUsbDevice::setEpType(int ep, int type)
 {
-  uint32_t reg = aUSBD0->USBD_EPCS[ep & 7] & 0xffff;
-  reg &=MASK_CLEAR & ~LN_USBD_EPxCS_EPCTL_MASK;
-  reg |= type;
-  reg |= LN_USBD_EPxCS_RX_ST + LN_USBD_EPxCS_TX_ST;
-  aUSBD0->USBD_EPCS[ep & 7] = reg & 0xffff;
+    uint32_t reg = aUSBD0->USBD_EPCS[ep & 7] & 0xffff;
+    reg &= MASK_CLEAR & ~LN_USBD_EPxCS_EPCTL_MASK;
+    reg |= type;
+    reg |= LN_USBD_EPxCS_RX_ST + LN_USBD_EPxCS_TX_ST;
+    aUSBD0->USBD_EPCS[ep & 7] = reg & 0xffff;
 }
 
 /**
@@ -412,20 +412,20 @@ bool lnUsbDevice::wakeUpHost()
 }
 void lnUsbDevice::resetEps()
 {
-  for(uint32_t i=0; i<LN_USBD_MAX_ENDPOINT; i++)  
-   _usbInstance->setEpStatusReg(i,0);
- }
+    for (uint32_t i = 0; i < LN_USBD_MAX_ENDPOINT; i++)
+        _usbInstance->setEpStatusReg(i, 0);
+}
 
 /**
  */
 bool lnUsbDevice::setAddress(int address)
 {
-    if(address==-1)
+    if (address == -1)
     {
         aUSBD0->USBD_DADDR = 0;
         return true;
     }
-  
+
     aUSBD0->USBD_DADDR = 0;
     aUSBD0->USBD_DADDR = 0x80 + (address & 0x7f); // address 0, enabled
     return true;
@@ -534,5 +534,4 @@ void lnUsbDevice::irq()
     if (flags)
         xAssert(0);
 }
-
 // EOF

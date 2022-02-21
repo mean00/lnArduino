@@ -30,7 +30,7 @@ original header below
  * This file is part of the TinyUSB stack.
 
  */
- #include "lnTinyUsb.h"
+#include "lnTinyUsb.h"
 
 #include "../private_include/lnUSBD_endPoints.h"
 #include "ep0desc.h"
@@ -391,4 +391,4 @@ void dcd_edpt_clear_stall(uint8_t rhport, uint8_t ep_addr)
         _usbInstance->setEpStatus(ep_addr, false, LN_USBD_EPxCS_RX_STA_NAK);
     }
 }
-// EOF
+// EOF 
