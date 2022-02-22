@@ -25,6 +25,7 @@
  * THE SOFTWARE.
  *
  */
+ #if 0
 #include "lnArduino.h"
 
 #include <stdio.h>
@@ -205,3 +206,4 @@ void tud_cdc_rx_cb(uint8_t itf)
     (void)itf;
 }
 // EOF
+#endif
