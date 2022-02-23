@@ -14,6 +14,7 @@ void dcd_ep_ctr_rx_handler(uint32_t wIstr);
 void dcd_ep_ctr_tx_handler(uint32_t wIstr);
 void cdc_task(void *params);
 lnUsbDevice *_usbDevice = NULL;
+static lnTUSB *lnTusbInstance =NULL;
 //--------------------------------------------------------------------+
 // Main
 //--------------------------------------------------------------------+
@@ -61,13 +62,14 @@ void usb_device_task(void *param)
 lnTUSB::lnTUSB()
 {
   _running=true;
+  lnTusbInstance=this;
 }
 /**
 
 */
 lnTUSB::~lnTUSB()
 {
-
+  lnTusbInstance=NULL;
 }
 /**
 * @brief <brief>
@@ -76,11 +78,13 @@ lnTUSB::~lnTUSB()
 * @details <details>
 */
 
-void lnTUSB::init()
+void lnTUSB::init(int nb,const char **desc)
 {
       _usbDevice = new lnUsbDevice(0);
       _usbDevice->init();
       _usbDevice->registerEventHandler(&myEventHandler);
+      _deviceDescriptor=desc;
+      _nbDeviceDescriptor=nb;
 }
 static void tusbTrampoline(void *a)
 {
@@ -135,8 +139,7 @@ void dcd_init(uint8_t rhport)
 
 void dcd_edpt_close_all(uint8_t rhport)
 {
-    (void)rhport;
-    // TODO implement dcd_edpt_close_all()
+    (void)rhport;    
 }
 
 // Invoked when usb bus is suspended
@@ -152,6 +155,42 @@ void tud_suspend_cb(bool remote_wakeup_en)
 void tud_resume_cb(void)
 {
     // xTimerChangePeriod(blinky_tm, pdMS_TO_TICKS(BLINK_MOUNTED), 0);
+}
+
+uint16_t const* tud_descriptor_string_cb(uint8_t index, uint16_t langid)
+{
+  xAssert(lnTusbInstance);
+  return lnTusbInstance->getDeviceDescriptor(index);
+}
+
+
+// Invoked when received GET STRING DESCRIPTOR request
+// Application return pointer to descriptor, whose contents must exist long enough for transfer to complete
+uint16_t const* lnTUSB::getDeviceDescriptor(int index)
+{
+static uint16_t _desc_str[32];
+
+  xAssert(_deviceDescriptor);
+  xAssert(_nbDeviceDescriptor);  
+  uint16_t *p=&(_desc_str[0]);
+  if ( !index )
+  {    
+    *p++ = (TUSB_DESC_STRING << 8 ) | 4;
+    memcpy(p, _deviceDescriptor[0], 2);
+    return _desc_str;
+  }
+  // Note: the 0xEE index string is a Microsoft OS 1.0 Descriptors.
+  // https://docs.microsoft.com/en-us/windows-hardware/drivers/usbcon/microsoft-defined-usb-descriptors
+  if(index>=_nbDeviceDescriptor) return NULL;
+  const char* str = _deviceDescriptor[index];
+  // Cap at max char
+  int mx = strlen(str);
+  if ( mx > 31 ) mx = 31;
+  
+  *p++ = (TUSB_DESC_STRING << 8 ) | (2*mx + 2);
+  for(int i=0; i<mx; i++)
+      *p++ = str[i];
+  return _desc_str;
 }
 
 // EOF

@@ -78,17 +78,10 @@ bool lnUsbDevice::init()
     aUSBD0->USBD_INTF = 0;
     aUSBD0->USBD_DADDR = 0; // address 0, disabled
     aUSBD0->USBD_BADDR = 0; // Descriptors at the begining
-    // Set buffer address
-    uint32_t asLong = (uint32_t)0;
-    xAssert(!(asLong & 7)); // aligned normally  already
-
-    // And go, enable most IT
-    // setup endpoint 0
-    aUSBD0->USBD_BADDR = asLong;
     setAddress(-1);
     //
 #define GG(x) LN_USBD_CTL_##x
-    aUSBD0->USBD_CTL = GG(RSTIE) + GG(ERRIE) + GG(PMOUIE) + GG(STIE) + GG(WKUPIE); //+GG(ESOFIE)++GG(SOFIE);
+    aUSBD0->USBD_CTL = GG(RSTIE) + GG(ERRIE) + GG(PMOUIE) + GG(STIE) + GG(WKUPIE)+ GG(ESOFIE); //Ignore ESOFIE/SOFIE +GG(ESOFIE)++GG(SOFIE);
 
     lnDelayUs(20);
     // clear state
@@ -138,9 +131,10 @@ bool lnUsbDevice::irqEnabled(bool onoff)
 */
 void lnUsbDevice::copyFromSRAM(uint8_t *dest, int srcOffset, int bytes)
 {
+    xAssert( !(srcOffset & 1));
     int nbWord = bytes / 2;
     volatile uint16_t *ram = (volatile uint16_t *)aUSBD0_SRAM;
-    ram += 2 * (srcOffset / 2);
+    ram += srcOffset;
 
     if (((uint32_t)dest) & 1) // not aligned
     {
@@ -150,7 +144,7 @@ void lnUsbDevice::copyFromSRAM(uint8_t *dest, int srcOffset, int bytes)
         {
             int temp = *ram;
             ram += 2;
-            *target++ = ((temp >> 0) & 0xFF);
+            *target++ = ((temp >> 0) & 0xFF); // copy 16 bits every 32 bits
             *target++ = ((temp >> 8) & 0xFF);
         }
     }
@@ -199,7 +193,8 @@ void lnUsbDevice::copyToSRAM(int destOffset, uint8_t *src, int bytes)
 {
     int nbWords = (bytes + 1) / 2; // might overread by one byte,not an issue
     volatile uint16_t *ram = (volatile uint16_t *)aUSBD0_SRAM;
-    ram += 2 * (destOffset / 2);
+    xAssert( !(destOffset & 1));
+    ram += destOffset ;
     if (((uint32_t)src) & 1) // not aligned
     {
         uint8_t *s8 = src;
@@ -252,8 +247,7 @@ bool lnUsbDevice::registerEventHandler(const lnUsbEventHandler *h)
  * @return <return_description>
  * @details <details>
  */
-#define MASK_CLEAR                                                                                                     \
-    (0xffff & ~LN_USBD_EPxCS_RX_DTG & ~LN_USBD_EPxCS_TX_DTG & ~LN_USBD_EPxCS_RX_STA_MASK & ~LN_USBD_EPxCS_TX_STA_MASK)
+#define MASK_CLEAR      (0xffff & ~LN_USBD_EPxCS_RX_DTG & ~LN_USBD_EPxCS_TX_DTG & ~LN_USBD_EPxCS_RX_STA_MASK & ~LN_USBD_EPxCS_TX_STA_MASK)
 void lnUsbDevice::clearTxRx(int ep, bool isTx)
 {
     uint32_t reg = aUSBD0->USBD_EPCS[ep & 7] & 0xffff;
@@ -265,8 +259,8 @@ void lnUsbDevice::clearTxRx(int ep, bool isTx)
     }
     else // Rx
     {
-        reg |= LN_USBD_EPxCS_TX_ST;
         reg &= ~LN_USBD_EPxCS_RX_ST;
+        reg |= LN_USBD_EPxCS_TX_ST;        
     }
     aUSBD0->USBD_EPCS[ep & 7] = reg & 0xffff;
 }
@@ -302,8 +296,9 @@ void lnUsbDevice::setEpKind(int ep, bool set)
     reg &= MASK_CLEAR;
     if (set)
         reg |= LN_USBD_EPxCS_EP_KCTL;
+    else
+        reg &= ~LN_USBD_EPxCS_EP_KCTL;
     reg |= LN_USBD_EPxCS_RX_ST + LN_USBD_EPxCS_TX_ST;
-
     aUSBD0->USBD_EPCS[ep & 7] = reg & 0xffff;
 }
 
@@ -357,7 +352,10 @@ void lnUsbDevice::clearDTG(int ep, bool isTx)
     {
         if (reg & LN_USBD_EPxCS_TX_DTG)
             change = LN_USBD_EPxCS_TX_DTG;
-        else if (reg & LN_USBD_EPxCS_RX_DTG)
+    }
+    else
+    {
+       if (reg & LN_USBD_EPxCS_RX_DTG)
             change = LN_USBD_EPxCS_RX_DTG;
     }
     if (change)
@@ -410,14 +408,12 @@ void lnUsbDevice::resetEps()
 /**
  */
 bool lnUsbDevice::setAddress(int address)
-{
+{  
+    aUSBD0->USBD_DADDR = 0;
     if (address == -1)
     {
-        aUSBD0->USBD_DADDR = 0;
         return true;
-    }
-
-    aUSBD0->USBD_DADDR = 0;
+    }    
     aUSBD0->USBD_DADDR = 0x80 + (address & 0x7f); // address 0, enabled
     return true;
 }
@@ -475,7 +471,7 @@ void lnUsbDevice::irq()
                 _handler->event(lnUsbEventHandler::UsbTransferTxCompleted, LN_USBD_INTF_EPNUM(f));
             }
             f = aUSBD0->USBD_INTF;
-        }
+        }        
     }
 
     if (flags & LN_USBD_INTF_ERRIF) // error
@@ -525,4 +521,5 @@ void lnUsbDevice::irq()
     if (flags)
         xAssert(0);
 }
+
 // EOF
