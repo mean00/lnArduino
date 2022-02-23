@@ -1,0 +1,5 @@
+include_directories(${AF_FOLDER}/libraries/tinyUsb)
+include_directories(${AF_FOLDER}/libraries/tinyUsb/src)
+include_directories(${AF_FOLDER}/libraries/tinyUsb/src/common)
+include_directories(${AF_FOLDER}/libraries/tinyUsb/src/device)
+include_directories(${AF_FOLDER}/libraries/tinyUsb/src/class)

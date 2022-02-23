@@ -63,6 +63,10 @@ lnTUSB::lnTUSB()
 {
   _running=true;
   lnTusbInstance=this;
+  _qualifier=NULL;
+  _hs=NULL;
+  _fs=NULL;
+  _descDevice=NULL;
 }
 /**
 
@@ -192,5 +196,38 @@ static uint16_t _desc_str[32];
       *p++ = str[i];
   return _desc_str;
 }
+//--//
+
+uint8_t const* tud_descriptor_other_speed_configuration_cb(uint8_t index)
+{
+  (void) index; // for multiple configurations
+  return (tud_speed_get() == TUSB_SPEED_HIGH) ?  lnTusbInstance->getFSConfiguration() : lnTusbInstance->getHSConfiguration();
+}
+
+// Invoked when received GET CONFIGURATION DESCRIPTOR
+// Application return pointer to descriptor
+// Descriptor contents must exist long enough for transfer to complete
+uint8_t const * tud_descriptor_configuration_cb(uint8_t index)
+{
+  (void) index; // for multiple configurations
+  return (tud_speed_get() == TUSB_SPEED_HIGH) ?  lnTusbInstance->getHSConfiguration() : lnTusbInstance->getFSConfiguration();
+}
+
+// Invoked when received GET DEVICE QUALIFIER DESCRIPTOR request
+// Application return pointer to descriptor, whose contents must exist long enough for transfer to complete.
+// device_qualifier descriptor describes information about a high-speed capable device that would
+// change if the device were operating at the other speed. If not highspeed capable stall this request.
+uint8_t const* tud_descriptor_device_qualifier_cb(void)
+{
+  xAssert(lnTusbInstance);
+  return (uint8_t *)lnTusbInstance->getQualifier();
+}
+
+uint8_t const * tud_descriptor_device_cb(void)
+{
+  xAssert(lnTusbInstance); // tusb_desc_device_t
+  return (uint8_t const *) lnTusbInstance->getDeviceDescriptor();
+}
+
 
 // EOF
