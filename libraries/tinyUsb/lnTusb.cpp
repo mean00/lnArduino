@@ -14,6 +14,9 @@ void dcd_ep_ctr_tx_handler(int ep);
 void cdc_task(void *params);
 lnUsbDevice *_usbDevice = NULL;
 static lnTUSB *lnTusbInstance =NULL;
+
+//
+
 //--------------------------------------------------------------------+
 // Main
 //--------------------------------------------------------------------+
@@ -29,20 +32,20 @@ class tusbEventHandler : public lnUsbEventHandler
                             dcd_handle_bus_reset();
                             dcd_event_bus_reset(0, TUSB_SPEED_FULL, true);
                             break;
-            case UsbResume: 
-                            dcd_event_bus_signal(0, DCD_EVENT_RESUME, true); 
+            case UsbResume:
+                            dcd_event_bus_signal(0, DCD_EVENT_RESUME, true);
                             break;
-            case UsbSuspend: 
-                            dcd_event_bus_signal(0, DCD_EVENT_SUSPEND, true); 
+            case UsbSuspend:
+                            dcd_event_bus_signal(0, DCD_EVENT_SUSPEND, true);
                             break;
-            case UsbTransferRxCompleted: 
+            case UsbTransferRxCompleted:
                             dcd_ep_ctr_rx_handler(endPoint);
                             break;
-            case UsbTransferTxCompleted: 
-                            dcd_ep_ctr_tx_handler(endPoint); 
+            case UsbTransferTxCompleted:
+                            dcd_ep_ctr_tx_handler(endPoint);
                             break;
-            default: 
-                            xAssert(0); 
+            default:
+                            xAssert(0);
                             break;
         };
     }
@@ -111,7 +114,7 @@ void    lnTUSB::sendEvent(lnTUSB_Events ev)
 */
 void    lnTUSB::start()
 {
-  (void)xTaskCreate(tusbTrampoline, "usbd", USBD_STACK_SIZE, this, configMAX_PRIORITIES - 1,      NULL); 
+  (void)xTaskCreate(tusbTrampoline, "usbd", USBD_STACK_SIZE, this, configMAX_PRIORITIES - 1,      NULL);
 }
 /**
 
@@ -119,7 +122,7 @@ void    lnTUSB::start()
 void    lnTUSB::stop()
 {
     _running=false;
-    
+
 }
 /**
 * @brief <brief>
@@ -154,7 +157,7 @@ void dcd_init(uint8_t rhport)
 
 void dcd_edpt_close_all(uint8_t rhport)
 {
-    (void)rhport;    
+    (void)rhport;
 }
 
 // Invoked when usb bus is suspended
@@ -204,10 +207,10 @@ uint16_t const* lnTUSB::getDeviceDescriptor(int index)
 static uint16_t _desc_str[32];
 
   xAssert(_deviceDescriptor);
-  xAssert(_nbDeviceDescriptor);  
+  xAssert(_nbDeviceDescriptor);
   uint16_t *p=&(_desc_str[0]);
   if ( !index )
-  {    
+  {
     *p++ = (TUSB_DESC_STRING << 8 ) | 4;
     memcpy(p, _deviceDescriptor[0], 2);
     return _desc_str;
@@ -219,7 +222,7 @@ static uint16_t _desc_str[32];
   // Cap at max char
   int mx = strlen(str);
   if ( mx > 31 ) mx = 31;
-  
+
   *p++ = (TUSB_DESC_STRING << 8 ) | (2*mx + 2);
   for(int i=0; i<mx; i++)
       *p++ = str[i];
@@ -257,6 +260,5 @@ uint8_t const * tud_descriptor_device_cb(void)
   xAssert(lnTusbInstance); // tusb_desc_device_t
   return (uint8_t const *) lnTusbInstance->getDeviceDescriptor();
 }
-
 
 // EOF

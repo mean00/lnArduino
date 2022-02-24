@@ -1,12 +1,15 @@
 
 
-#pragma once
-
-#include "class/cdc/cdc_device.h"
-#include "usbd.h"
-/**
+/*
 
 */
+#pragma once
+
+#include "usbd.h"
+#include "tusb_types.h"
+#include "class/cdc/cdc.h"
+
+
 class lnTUSB
 {
   public:
