@@ -9,8 +9,8 @@
 // local prototypes
 void dcd_handle_bus_reset(void);
 void dcd_ep_ctr_handler(void);
-void dcd_ep_ctr_rx_handler(uint32_t wIstr);
-void dcd_ep_ctr_tx_handler(uint32_t wIstr);
+void dcd_ep_ctr_rx_handler(int ep);
+void dcd_ep_ctr_tx_handler(int ep);
 void cdc_task(void *params);
 lnUsbDevice *_usbDevice = NULL;
 static lnTUSB *lnTusbInstance =NULL;

@@ -464,11 +464,19 @@ void lnUsbDevice::irq()
         {
             if (f & LN_USBD_INTF_DIR) // OUT Type PC-> DEV
             {
+              uint32_t reg = _usbInstance->getEpStatusReg(LN_USBD_INTF_EPNUM(f));
+              if (reg & LN_USBD_EPxCS_RX_ST) 
+              {
                 _handler->event(lnUsbEventHandler::UsbTransferRxCompleted, LN_USBD_INTF_EPNUM(f));
+              }
             }
             else // In Type Ddev->PC
             {
-                _handler->event(lnUsbEventHandler::UsbTransferTxCompleted, LN_USBD_INTF_EPNUM(f));
+                  uint32_t reg = _usbInstance->getEpStatusReg(LN_USBD_INTF_EPNUM(f));
+                  if ((reg & LN_USBD_EPxCS_TX_ST))
+                  {                  
+                    _handler->event(lnUsbEventHandler::UsbTransferTxCompleted, LN_USBD_INTF_EPNUM(f));
+                  }
             }
             f = aUSBD0->USBD_INTF;
         }        

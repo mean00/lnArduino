@@ -90,26 +90,15 @@ void dcd_handle_bus_reset(void)
  * @return <return_description>
  * @details <details>
  */
-void dcd_ep_ctr_tx_handler(uint32_t wIstr)
-{
-    uint32_t EPindex = wIstr & LN_USBD_EPxCS_EPADDR_MASK;
-    uint32_t wEPRegVal = _usbInstance->getEpStatusReg(EPindex);
-
-    // Verify the CTR_TX bit is set. This was in the ST Micro code,
-    // but I'm not sure it's actually necessary?
-    if ((wEPRegVal & LN_USBD_EPxCS_TX_ST) == 0U)
-    {
-        return;
-    }
-
+void dcd_ep_ctr_tx_handler(int ep)
+{      
     /* clear int flag */
-    _usbInstance->clearTxRx(EPindex, true);
-
-    EndPoints::xfer_descriptor *xfer = EndPoints::getDescriptor(EPindex, TUSB_DIR_IN);
+    _usbInstance->clearTxRx(ep, true);
+    EndPoints::xfer_descriptor *xfer = EndPoints::getDescriptor(ep, TUSB_DIR_IN);
     if ((xfer->total_len != xfer->queued_len)) /* TX not complete */
-        dcd_transmit_packet(xfer, EPindex);
+        dcd_transmit_packet(xfer, ep);
     else /* TX Complete */
-        dcd_event_xfer_complete(0, (uint8_t)(0x80 + EPindex), xfer->total_len, XFER_RESULT_SUCCESS, true);
+        dcd_event_xfer_complete(0, (uint8_t)(0x80 + ep), xfer->total_len, XFER_RESULT_SUCCESS, true);
 }
 /**
  * @brief <brief>
@@ -117,22 +106,15 @@ void dcd_ep_ctr_tx_handler(uint32_t wIstr)
  * @return <return_description>
  * @details <details>
  */
-void dcd_ep_ctr_rx_handler(uint32_t wIstr)
+void dcd_ep_ctr_rx_handler(int ep)
 {
-    uint32_t EPindex = wIstr & LN_USBD_EPxCS_EPADDR_MASK;
-    uint32_t wEPRegVal = _usbInstance->getEpStatusReg(EPindex);
-    uint32_t count = EndPoints::getBTable(EPindex)->RxSize & 0x3ffU; // pcd_get_ep_rx_cnt(EPindex);
+    
+    uint32_t wEPRegVal = _usbInstance->getEpStatusReg(ep);
+    uint32_t count = EndPoints::getBTable(ep)->RxSize & 0x3ffU; // pcd_get_ep_rx_cnt(EPindex);
 
-    EndPoints::xfer_descriptor *xfer = EndPoints::getDescriptor(EPindex, TUSB_DIR_OUT);
+    EndPoints::xfer_descriptor *xfer = EndPoints::getDescriptor(ep, TUSB_DIR_OUT);
 
-    // Verify the CTR_RX bit is set. This was in the ST Micro code,
-    // but I'm not sure it's actually necessary?
-    if ((wEPRegVal & LN_USBD_EPxCS_RX_ST) == 0U)
-    {
-        return;
-    }
-
-    if ((EPindex == 0U) && ((wEPRegVal & LN_USBD_EPxCS_SETUP) != 0U)) /* Setup packet */
+    if ((ep == 0U) && ((wEPRegVal & LN_USBD_EPxCS_SETUP) != 0U)) /* Setup packet */
     {
         // The setup_received function uses memcpy, so this must first copy the setup data into
         // user memory, to allow for the 32-bit access that memcpy performs.
@@ -143,22 +125,22 @@ void dcd_ep_ctr_rx_handler(uint32_t wIstr)
             // Must reset EP to NAK (in case it had been stalling) (though, maybe too late here)
             _usbInstance->setEpStatus(0, false, LN_USBD_EPxCS_RX_STA_NAK);
             _usbInstance->setEpStatus(0, true, LN_USBD_EPxCS_TX_STA_NAK);
-            _usbInstance->copyFromSRAM(userMemBuf, EndPoints::getBTable(EPindex)->RxAdr, 8);
+            _usbInstance->copyFromSRAM(userMemBuf, EndPoints::getBTable(ep)->RxAdr, 8);
             dcd_event_setup_received(0, (uint8_t *)userMemBuf, true);
         }
     }
     else
     {
         // Clear RX CTR interrupt flag
-        if (EPindex != 0u)
+        if (ep)
         {
-            _usbInstance->clearTxRx(EPindex, false);
+            _usbInstance->clearTxRx(ep, false);
         }
 
         if (count != 0U)
         {
             _usbInstance->copyFromSRAM((uint8_t *)&(xfer->buffer[xfer->queued_len]),
-                                       EndPoints::getBTable(EPindex)->RxAdr /* *pcd_ep_rx_address_ptr(EPindex)*/,
+                                       EndPoints::getBTable(ep)->RxAdr /* *pcd_ep_rx_address_ptr(EPindex)*/,
                                        count);
             xfer->queued_len = (uint16_t)(xfer->queued_len + count);
         }
@@ -166,7 +148,7 @@ void dcd_ep_ctr_rx_handler(uint32_t wIstr)
         if (((int)count < xfer->max_packet_size) || (xfer->queued_len == xfer->total_len))
         {
             /* RX COMPLETE */
-            dcd_event_xfer_complete(0, EPindex, xfer->queued_len, XFER_RESULT_SUCCESS, true);
+            dcd_event_xfer_complete(0, ep, xfer->queued_len, XFER_RESULT_SUCCESS, true);
             // Though the host could still send, we don't know.
             // Does the bulk pipe need to be reset to valid to allow for a ZLP?
         }
@@ -176,19 +158,19 @@ void dcd_ep_ctr_rx_handler(uint32_t wIstr)
             int sz = remaining;
             if (sz > xfer->max_packet_size)
                 sz = xfer->max_packet_size;
-            EndPoints::setRxBufferSize(EPindex, sz);
-            _usbInstance->setEpStatus(EPindex, false, LN_USBD_EPxCS_RX_STA_VALID);
+            EndPoints::setRxBufferSize(ep, sz);
+            _usbInstance->setEpStatus(ep, false, LN_USBD_EPxCS_RX_STA_VALID);
         }
     }
 
     // For EP0, prepare to receive another SETUP packet.
     // Clear CTR last so that a new packet does not overwrite the packing being read.
     // (Based on the docs, it seems SETUP will always be accepted after CTR is cleared)
-    if (EPindex == 0u)
+    if (!ep)
     {
         // Always be prepared for a status packet...
-        EndPoints::setRxBufferSize(EPindex, CFG_TUD_ENDPOINT0_SIZE);
-        _usbInstance->clearTxRx(EPindex, false);
+        EndPoints::setRxBufferSize(ep, CFG_TUD_ENDPOINT0_SIZE);
+        _usbInstance->clearTxRx(ep, false);
     }
 }
 
