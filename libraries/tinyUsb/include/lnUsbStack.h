@@ -10,10 +10,10 @@
 #include "class/cdc/cdc.h"
 
 
-class lnTUSB
+class lnUsbStack
 {
   public:
-    enum lnTUSB_Events
+    enum lnUsbStackEvents
     {
         USB_CONNECT,
         USB_DISCONNECT,
@@ -21,11 +21,11 @@ class lnTUSB
         USB_RESUME
     };
 
-    typedef void lnTUSB_EventHandler(void *cookie, const lnTUSB_Events event);
+    typedef void lnUsbStackEventHandler(void *cookie, const lnUsbStackEvents event);
 
   public:
-    lnTUSB();
-    virtual ~lnTUSB();
+            lnUsbStack();
+    virtual ~lnUsbStack();
     void init(int nbDescriptorLine, const char **deviceDescriptor);
     void setConfiguration(const uint8_t *hsConfiguration, const uint8_t *fsConfiguration,
                           const tusb_desc_device_t *desc, const tusb_desc_device_qualifier_t *qual)
@@ -35,7 +35,7 @@ class lnTUSB
         _descDevice = desc;
         _qualifier = qual;
     }
-    void setEventHandler(void *cookie, lnTUSB_EventHandler *ev)
+    void setEventHandler(void *cookie, lnUsbStackEventHandler *ev)
     {
         _eventHandler = ev;
         _cookie = cookie;
@@ -56,7 +56,7 @@ class lnTUSB
     {
         return _qualifier;
     }
-    void sendEvent(lnTUSB_Events ev);
+    void sendEvent(lnUsbStackEvents ev);
     void start();
     void stop();
 
@@ -70,7 +70,7 @@ class lnTUSB
     const tusb_desc_device_qualifier_t *_qualifier;
     const tusb_desc_device_t *_descDevice;
     const uint8_t *_hs, *_fs;
-    lnTUSB_EventHandler *_eventHandler;
+    lnUsbStackEventHandler *_eventHandler;
     void *_cookie;
 
   public: // dont use these

@@ -1,4 +1,4 @@
-
+#pragma once
 
 #include "lnArduino.h"
 
@@ -13,9 +13,9 @@ public:
     UsbSuspend,
     UsbTransferRxCompleted,
     UsbTransferTxCompleted
-    
+
   };
-  
+
 public:
     virtual void event(const lnUsbdEvent ev,const uint32_t endPoint=0) const=0;
 };

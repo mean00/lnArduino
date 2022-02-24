@@ -2,6 +2,8 @@
 # CFG_TUSB_OS == OPT_OS_FREERTOS
 
 SET(TUSB ${CMAKE_CURRENT_SOURCE_DIR}/src)
+SET(LNSRC ${CMAKE_CURRENT_SOURCE_DIR}/lnSrc)
+include_directories( ${AF_FOLDER}/private_include)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/private_include)
@@ -19,10 +21,9 @@ SET(SRCS  ${TUSB}/tusb.c
           ${TUSB}/device/usbd_control.c
           ${TUSB}/device/usbd.c
           ${TUSB}/common/tusb_fifo.c
-          ${TUSB}/class/cdc/cdc_device.c 
-          ${TUSB}/../basic_cdc.cpp
-          ${TUSB}/../lnTinyUsbImpl.cpp
-          ${TUSB}/../lnTusb.cpp
-          ${TUSB}/../lnUsbCDC.cpp
+          ${TUSB}/class/cdc/cdc_device.c
+          ${LNSRC}/lnTinyUsbImpl.cpp
+          ${LNSRC}/lnUsbStack.cpp
+          ${LNSRC}/lnUsbCDC.cpp
           )
 add_library(tinyUsb STATIC ${SRCS})

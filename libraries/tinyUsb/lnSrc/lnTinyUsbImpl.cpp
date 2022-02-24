@@ -30,7 +30,7 @@ original header below
  * This file is part of the TinyUSB stack.
 
  */
-#include "lnTinyUsb.h"
+#include "lnUSDB_tinyUSB.h"
 
 #include "../private_include/lnUSBD_endPoints.h"
 #include "ep0desc.h"
@@ -91,7 +91,7 @@ void dcd_handle_bus_reset(void)
  * @details <details>
  */
 void dcd_ep_ctr_tx_handler(int ep)
-{      
+{
     /* clear int flag */
     _usbInstance->clearTxRx(ep, true);
     EndPoints::xfer_descriptor *xfer = EndPoints::getDescriptor(ep, TUSB_DIR_IN);
@@ -108,7 +108,7 @@ void dcd_ep_ctr_tx_handler(int ep)
  */
 void dcd_ep_ctr_rx_handler(int ep)
 {
-    
+
     uint32_t wEPRegVal = _usbInstance->getEpStatusReg(ep);
     uint32_t count = EndPoints::getBTable(ep)->RxSize & 0x3ffU; // pcd_get_ep_rx_cnt(EPindex);
 
@@ -373,4 +373,4 @@ void dcd_edpt_clear_stall(uint8_t rhport, uint8_t ep_addr)
         _usbInstance->setEpStatus(ep_addr, false, LN_USBD_EPxCS_RX_STA_NAK);
     }
 }
-// EOF 
+// EOF

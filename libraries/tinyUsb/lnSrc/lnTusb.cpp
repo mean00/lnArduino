@@ -1,6 +1,6 @@
 
 #include "lnArduino.h"
-#include "lnTusb.h"
+#include "lnUSDB_tinyUSB.h"
 #include "tusb.h"
 #include "device/dcd.h"
 #include "lnUSBD.h"
@@ -62,7 +62,7 @@ void dcd_remote_wakeup(uint8_t rhport)
 /**
 
 */
-lnTUSB::lnTUSB()
+lnUSBStack::lnUSBStack()
 {
   _running=true;
   lnTusbInstance=this;
@@ -76,7 +76,7 @@ lnTUSB::lnTUSB()
 /**
 
 */
-lnTUSB::~lnTUSB()
+lnUSBStack::~lnUSBStack()
 {
   lnTusbInstance=NULL;
 }
@@ -87,7 +87,7 @@ lnTUSB::~lnTUSB()
 * @details <details>
 */
 
-void lnTUSB::init(int nb,const char **desc)
+void lnUSBStack::init(int nb,const char **desc)
 {
       _usbDevice = new lnUsbDevice(0);
       _usbDevice->init();
@@ -103,7 +103,7 @@ static void tusbTrampoline(void *a)
 /**
 
 */
-void    lnTUSB::sendEvent(lnTUSB_Events ev)
+void    lnUSBStack::sendEvent(lnTUSB_Events ev)
 {
     if(!_eventHandler) return;
     _eventHandler(_cookie,ev);
@@ -112,14 +112,14 @@ void    lnTUSB::sendEvent(lnTUSB_Events ev)
 /**
 
 */
-void    lnTUSB::start()
+void    lnUSBStack::start()
 {
   (void)xTaskCreate(tusbTrampoline, "usbd", USBD_STACK_SIZE, this, configMAX_PRIORITIES - 1,      NULL);
 }
 /**
 
 */
-void    lnTUSB::stop()
+void    lnUSBStack::stop()
 {
     _running=false;
 
@@ -131,7 +131,7 @@ void    lnTUSB::stop()
 * @details <details>
 */
 
-void    lnTUSB::task()
+void    lnUSBStack::task()
 {
     tusb_init();
     while (_running)
@@ -170,27 +170,27 @@ USB_DISCONNECT,
 void tud_suspend_cb(bool remote_wakeup_en)
 {
   xAssert(lnTusbInstance);
-  lnTusbInstance->sendEvent(lnTUSB::USB_SUSPEND);
+  lnTusbInstance->sendEvent(lnUSBStack::USB_SUSPEND);
 }
 
 // Invoked when usb bus is resumed
 void tud_resume_cb(void)
 {
   xAssert(lnTusbInstance);
-  lnTusbInstance->sendEvent(lnTUSB::USB_RESUME);
+  lnTusbInstance->sendEvent(lnUSBStack::USB_RESUME);
 }
 
 void tud_mount_cb(void)
 {
   xAssert(lnTusbInstance);
-  lnTusbInstance->sendEvent(lnTUSB::USB_CONNECT);
+  lnTusbInstance->sendEvent(lnUSBStack::USB_CONNECT);
 }
 
 // Invoked when device is unmounted
 void tud_umount_cb(void)
 {
   xAssert(lnTusbInstance);
-  lnTusbInstance->sendEvent(lnTUSB::USB_DISCONNECT);
+  lnTusbInstance->sendEvent(lnUSBStack::USB_DISCONNECT);
 }
 /**
 */
@@ -202,7 +202,7 @@ uint16_t const* tud_descriptor_string_cb(uint8_t index, uint16_t langid)
 
 // Invoked when received GET STRING DESCRIPTOR request
 // Application return pointer to descriptor, whose contents must exist long enough for transfer to complete
-uint16_t const* lnTUSB::getDeviceDescriptor(int index)
+uint16_t const* lnUSBStack::getDeviceDescriptor(int index)
 {
 static uint16_t _desc_str[32];
 

@@ -1,10 +1,8 @@
 #include "lnArduino.h"
-#include "lnUsbCDC.h"
-#include "lnTusb.h"
+#include "lnUsbStack.h"
 #include "tusb.h"
 #include "device/dcd.h"
-#include "lnUSBD.h"
-
+#include "lnUsbCDC.h"
 
 lnUsbCDC *_cdc_instances[2]={NULL,NULL};
 
