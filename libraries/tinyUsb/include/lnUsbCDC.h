@@ -17,7 +17,7 @@ public:
               lnUsbCDC(int instance);
           int read(uint8_t *buffer, int maxSize);
           int write(uint8_t *buffer, int maxSize);
-          void setHandler(lnUsbCDCEventsHandler *h, void *cookie)
+          void setEventHandler(lnUsbCDCEventsHandler *h, void *cookie)
           {
               _eventHandler=h;
               _eventCookie=cookie;
