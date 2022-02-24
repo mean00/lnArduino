@@ -9,7 +9,6 @@
 // local prototypes
 void dcd_handle_bus_reset(void);
 void dcd_ep_ctr_handler(void);
-void usb_device_task(void *param);
 void dcd_ep_ctr_rx_handler(uint32_t wIstr);
 void dcd_ep_ctr_tx_handler(uint32_t wIstr);
 void cdc_task(void *params);
@@ -27,14 +26,24 @@ class tusbEventHandler : public lnUsbEventHandler
         switch (ev)
         {
             case UsbReset:
-                dcd_handle_bus_reset();
-                dcd_event_bus_reset(0, TUSB_SPEED_FULL, true);
-                break;
-            case UsbResume: dcd_event_bus_signal(0, DCD_EVENT_RESUME, true); break;
-            case UsbSuspend: dcd_event_bus_signal(0, DCD_EVENT_SUSPEND, true); break;
-            case UsbTransferRxCompleted: dcd_ep_ctr_rx_handler(endPoint);
-            case UsbTransferTxCompleted: dcd_ep_ctr_tx_handler(endPoint); break;
-            default: xAssert(0); break;
+                            dcd_handle_bus_reset();
+                            dcd_event_bus_reset(0, TUSB_SPEED_FULL, true);
+                            break;
+            case UsbResume: 
+                            dcd_event_bus_signal(0, DCD_EVENT_RESUME, true); 
+                            break;
+            case UsbSuspend: 
+                            dcd_event_bus_signal(0, DCD_EVENT_SUSPEND, true); 
+                            break;
+            case UsbTransferRxCompleted: 
+                            dcd_ep_ctr_rx_handler(endPoint);
+                            break;
+            case UsbTransferTxCompleted: 
+                            dcd_ep_ctr_tx_handler(endPoint); 
+                            break;
+            default: 
+                            xAssert(0); 
+                            break;
         };
     }
 };
@@ -45,15 +54,6 @@ void dcd_remote_wakeup(uint8_t rhport)
 {
     (void)rhport;
     _usbDevice->wakeUpHost();
-}
-// USB Device Driver task
-// This top level thread process all usb events and invoke callbacks
-void usb_device_task(void *param)
-{
-    (void)param;
-    // This should be called after scheduler/kernel is started.
-    // Otherwise it could cause kernel issue since USB IRQ handler does use RTOS queue API.
-  
 }
 
 /**
@@ -67,6 +67,8 @@ lnTUSB::lnTUSB()
   _hs=NULL;
   _fs=NULL;
   _descDevice=NULL;
+  _eventHandler=NULL;
+  _cookie=NULL;
 }
 /**
 
@@ -95,6 +97,15 @@ static void tusbTrampoline(void *a)
   lnTUSB *t=(lnTUSB *)a;
   t->task();
 }
+/**
+
+*/
+void    lnTUSB::sendEvent(lnTUSB_Events ev)
+{
+    if(!_eventHandler) return;
+    _eventHandler(_cookie,ev);
+}
+
 /**
 
 */
@@ -149,24 +160,42 @@ void dcd_edpt_close_all(uint8_t rhport)
 // Invoked when usb bus is suspended
 // remote_wakeup_en : if host allow us  to perform remote wakeup
 // Within 7ms, device must draw an average of current less than 2.5 mA from bus
+/**
+USB_CONNECT,
+USB_DISCONNECT,
+*/
 void tud_suspend_cb(bool remote_wakeup_en)
 {
-    //(void) remote_wakeup_en;
-    // xTimerChangePeriod(blinky_tm, pdMS_TO_TICKS(BLINK_SUSPENDED), 0);
+  xAssert(lnTusbInstance);
+  lnTusbInstance->sendEvent(lnTUSB::USB_SUSPEND);
 }
 
 // Invoked when usb bus is resumed
 void tud_resume_cb(void)
 {
-    // xTimerChangePeriod(blinky_tm, pdMS_TO_TICKS(BLINK_MOUNTED), 0);
+  xAssert(lnTusbInstance);
+  lnTusbInstance->sendEvent(lnTUSB::USB_RESUME);
 }
 
+void tud_mount_cb(void)
+{
+  xAssert(lnTusbInstance);
+  lnTusbInstance->sendEvent(lnTUSB::USB_CONNECT);
+}
+
+// Invoked when device is unmounted
+void tud_umount_cb(void)
+{
+  xAssert(lnTusbInstance);
+  lnTusbInstance->sendEvent(lnTUSB::USB_DISCONNECT);
+}
+/**
+*/
 uint16_t const* tud_descriptor_string_cb(uint8_t index, uint16_t langid)
 {
   xAssert(lnTusbInstance);
   return lnTusbInstance->getDeviceDescriptor(index);
 }
-
 
 // Invoked when received GET STRING DESCRIPTOR request
 // Application return pointer to descriptor, whose contents must exist long enough for transfer to complete
