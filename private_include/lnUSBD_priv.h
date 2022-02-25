@@ -2,7 +2,7 @@
 #include "lnIRQ.h"
 #include "lnPeripheral_priv.h"
 
-#define LN_USBD_MAX_ENDPOINT 8
+#define LN_USBD_MAX_ENDPOINT 2 // should be enough, 2 CDC/ACM for example
 
 /**
  */
@@ -16,7 +16,7 @@ struct LN_USBD_Registersx
     uint32_t USBD_STAT;       // 0x48
     uint32_t USBD_DADDR;      // 0x4C
     uint32_t USBD_BADDR;      // 0x50
-        
+
 };
 
 /**
@@ -69,7 +69,7 @@ typedef volatile LN_USBD_Registersx LN_USBD_Registers;
 #define LN_USBD_EPxCS_EPADDR(x)       (x&0xf)
 #define LN_USBD_EPxCS_TX_DTG          (1<<6)
 #define LN_USBD_EPxCS_TX_ST           (1<<7)
-#define LN_USBD_EPxCS_EP_KCTL         (1<<8) 
+#define LN_USBD_EPxCS_EP_KCTL         (1<<8)
 #define LN_USBD_EPxCS_SETUP           (1<<11)
 #define LN_USBD_EPxCS_RX_DTG          (1<<14)
 #define LN_USBD_EPxCS_RX_ST           (1<<15)
@@ -101,6 +101,3 @@ typedef volatile LN_USBD_Registersx LN_USBD_Registers;
 
 
 // EOF
-
-
-

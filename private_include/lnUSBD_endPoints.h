@@ -1,5 +1,7 @@
 #pragma once
 #define ENTRY_SIZE_T uint32_t
+
+
 struct BTableEntry
 {
     volatile ENTRY_SIZE_T TxAdr;
@@ -19,34 +21,34 @@ extern LN_USBD_Registers    *aUSBD0;
 static BTableEntry *btables = (BTableEntry *)LN_USBD0_RAM_ADR;
 class EndPoints
 {
-  public:  
+  public:
     static int ep_bufferTail;
     static int ep_nbEp;
     class xfer_descriptor
     {
     public:
-      uint8_t * buffer;  
-      int total_len;
-      int queued_len;
-      int pma_ptr;
-      int max_packet_size;
-      int pma_alloc_size;
+      uint8_t * buffer;
+      uint16_t total_len;
+      uint16_t queued_len;
+      uint16_t pma_ptr;
+      uint16_t max_packet_size;
+      uint16_t pma_alloc_size;
     };
   public:
-    
+
     static BTableEntry *getBTable(int ep)
     {
         BTableEntry  *b=btables+ep;
         return b;
     }
-    
+
     static xfer_descriptor *getDescriptor(int ep, int dir)
     {
       return  (xfer_status+2*(ep&0x7f)+(!!dir));
     }
-    
+
     static void setRxBufferSize(int ep, int size)
-    {      
+    {
         uint32_t out;
         if(size > 62)
         {
@@ -57,11 +59,11 @@ class EndPoints
         {
           int nbBlock=(size+1)/2; // 2 bytes block
           out=nbBlock<<10;
-        }      
+        }
         BTableEntry  *b=btables+ep;
         b->RxSize=out;
     }
-    
+
     static int initEpRam(int address, int size)
     {
       int   epnum = address &0x7f;
@@ -98,12 +100,12 @@ class EndPoints
         int start=0;
         if(partial)
             start=2;
-        
+
         xfer_descriptor* desc = xfer_status+start;
         for (int i = start; i < LN_USBD_MAX_ENDPOINT*2; i++)
-        {            
-            memset(desc,0,sizeof(*desc)); 
-            desc++;           
+        {
+            memset(desc,0,sizeof(*desc));
+            desc++;
         }
     }
     static void setBlock(int ep, bool isTx, int address, int size)
@@ -114,23 +116,23 @@ class EndPoints
       { // RX
         ptr+=4;
         // Plus we need to compute the size differently
-        int r = size;        
+        int r = size;
         if (size <= 62)
         {
             int n = ((size - 1) / 2);
-            r |= n << 10; // # of 2 bytes block            
+            r |= n << 10; // # of 2 bytes block
         }
         else
         {
             int n = (size - 31) / 32;
-            r |= (n << 10) + (1 << 15); // # of 32 bytes block            
+            r |= (n << 10) + (1 << 15); // # of 32 bytes block
         }
         size=r;
       }
       ptr[0]=address;
       ptr[1]=size;
     }
-    
-public:  
+
+public:
      static xfer_descriptor xfer_status[LN_USBD_MAX_ENDPOINT*2];
 };
