@@ -207,7 +207,7 @@ bool dcd_edpt_open(uint8_t rhport, tusb_desc_endpoint_t const *p_endpoint_desc)
 
     // Isochronous not supported (yet), and some other driver assumptions.
     TU_ASSERT(p_endpoint_desc->bmAttributes.xfer != TUSB_XFER_ISOCHRONOUS);
-    TU_ASSERT(epnum < MAX_EP_COUNT);
+    TU_ASSERT(epnum < (MAX_EP_COUNT+2)); // ep0 is pre-reserved
 
     // Set type
     switch (p_endpoint_desc->bmAttributes.xfer)

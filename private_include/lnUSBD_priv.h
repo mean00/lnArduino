@@ -2,7 +2,7 @@
 #include "lnIRQ.h"
 #include "lnPeripheral_priv.h"
 
-#define LN_USBD_MAX_ENDPOINT 2 // should be enough, 2 CDC/ACM for example
+#define LN_USBD_MAX_ENDPOINT 4 // should be enough
 
 /**
  */
