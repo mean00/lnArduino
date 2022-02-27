@@ -154,6 +154,8 @@ void dcd_int_enable(uint8_t rhport)
 
 void dcd_init(uint8_t rhport)
 {
+  // Send a reset
+  _usbDevice->hwReset();
 }
 
 void dcd_edpt_close_all(uint8_t rhport)

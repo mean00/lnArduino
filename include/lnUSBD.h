@@ -45,6 +45,7 @@ public:
         int       getEpStatusReg(int ep);
         void      resetEps();
         void      setEpStatusReg(int ep,int value);
+        void      hwReset();
 public:
         void      irq();
 protected:

@@ -33,6 +33,10 @@ typedef volatile LN_USBD_Registersx LN_USBD_Registers;
 #define LN_USBD_CTL_SETSPS    (1<<3) // suspend
 #define LN_USBD_CTL_RSREQ     (1<<4) // resume
 
+// Only on GD32F3°xxx
+#define LN_USBD_CTL_L1RSREQ_F3 (1<<5) // Send Result signal to host
+#define LN_USBD_CTL_L1REQIE_F3 (1<<7) // Interrupt enable for the above
+
 #define LN_USBD_CTL_ESOFIE    (1<<8)
 #define LN_USBD_CTL_SOFIE     (1<<9)
 #define LN_USBD_CTL_RSTIE     (1<<10)
@@ -46,6 +50,7 @@ typedef volatile LN_USBD_Registersx LN_USBD_Registers;
 
 #define LN_USBD_INTF_EPNUM(x)  (x&0x0f)
 #define LN_USBD_INTF_DIR       (1<<4)
+#define LN_USBD_INTF_L1REQIF_F3    (1<<7)
 #define LN_USBD_INTF_ESOFIF    (1<<8)
 #define LN_USBD_INTF_SOFIF     (1<<9)
 #define LN_USBD_INTF_RSTIF     (1<<10)

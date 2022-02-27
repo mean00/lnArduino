@@ -81,7 +81,7 @@ bool lnUsbDevice::init()
     setAddress(-1);
     //
 #define GG(x) LN_USBD_CTL_##x
-    aUSBD0->USBD_CTL = GG(RSTIE) + GG(ERRIE) + GG(PMOUIE) + GG(STIE) + GG(WKUPIE)+ GG(ESOFIE); //Ignore ESOFIE/SOFIE +GG(ESOFIE)++GG(SOFIE);
+    aUSBD0->USBD_CTL = GG(RSTIE) + GG(PMOUIE) + GG(STIE) + GG(WKUPIE)+ GG(ESOFIE); //Ignore ESOFIE/SOFIE +GG(ESOFIE)++GG(SOFIE);  GG(ERRIE) +
 
     lnDelayUs(20);
     // clear state
@@ -260,7 +260,7 @@ void lnUsbDevice::clearTxRx(int ep, bool isTx)
     else // Rx
     {
         reg &= ~LN_USBD_EPxCS_RX_ST;
-        reg |= LN_USBD_EPxCS_TX_ST;        
+        reg |= LN_USBD_EPxCS_TX_ST;
     }
     aUSBD0->USBD_EPCS[ep & 7] = reg & 0xffff;
 }
@@ -402,18 +402,42 @@ void lnUsbDevice::resetEps()
 {
     for (uint32_t i = 0; i < LN_USBD_MAX_ENDPOINT; i++)
         _usbInstance->setEpStatusReg(i, 0);
-    EndPoints::reset();        
+    EndPoints::reset();
 }
+/**
 
+*/
+void      lnUsbDevice::hwReset()
+{
+  aUSBD0->USBD_INTF=0;
+  aUSBD0->USBD_STAT=0;
+  uint32_t reg=aUSBD0->USBD_CTL ;
+  reg&=~ LN_USBD_CTL_SETRST; // clear reset
+  aUSBD0->USBD_CTL=reg;
+  reg |=LN_USBD_CTL_RSTIE; // enable reset interrupt
+  aUSBD0->USBD_CTL=reg;
+  reg |=LN_USBD_CTL_SETRST;
+  aUSBD0->USBD_CTL=reg;
+  lnDelayUs(10);
+  reg &=~LN_USBD_CTL_SETRST;
+  aUSBD0->USBD_CTL=reg;
+
+  // Clear error
+  uint32_t intf=aUSBD0->USBD_INTF;
+  intf &= ~LN_USBD_INTF_ERRIF;
+  intf &= ~LN_USBD_INTF_ESOFIF;
+  intf &= ~LN_USBD_INTF_SPSIF;
+  aUSBD0->USBD_INTF=intf;
+}
 /**
  */
 bool lnUsbDevice::setAddress(int address)
-{  
+{
     aUSBD0->USBD_DADDR = 0;
     if (address == -1)
     {
         return true;
-    }    
+    }
     aUSBD0->USBD_DADDR = 0x80 + (address & 0x7f); // address 0, enabled
     return true;
 }
@@ -448,9 +472,10 @@ void lnUsbDevice::irq()
     uint32_t flags = (flags_original & flags_mask & 0xff00);
     // static uint32_t flags=(flags_original);
 
-    if (flags & LN_USBD_INTF_RSTIF) // Reset
+    if (flags & LN_USBD_INTF_RSTIF || (aUSBD0->USBD_CTL & LN_USBD_CTL_SETRST)) // Reset
     {
         CLEAR_INTERRUPT(RST);
+        CLEAR_CONTROL(SETRST);
         _handler->event(lnUsbEventHandler::UsbReset);
         return;
     }
@@ -465,7 +490,7 @@ void lnUsbDevice::irq()
             if (f & LN_USBD_INTF_DIR) // OUT Type PC-> DEV
             {
               uint32_t reg = _usbInstance->getEpStatusReg(LN_USBD_INTF_EPNUM(f));
-              if (reg & LN_USBD_EPxCS_RX_ST) 
+              if (reg & LN_USBD_EPxCS_RX_ST)
               {
                 _handler->event(lnUsbEventHandler::UsbTransferRxCompleted, LN_USBD_INTF_EPNUM(f));
               }
@@ -474,12 +499,12 @@ void lnUsbDevice::irq()
             {
                   uint32_t reg = _usbInstance->getEpStatusReg(LN_USBD_INTF_EPNUM(f));
                   if ((reg & LN_USBD_EPxCS_TX_ST))
-                  {                  
+                  {
                     _handler->event(lnUsbEventHandler::UsbTransferTxCompleted, LN_USBD_INTF_EPNUM(f));
                   }
             }
             f = aUSBD0->USBD_INTF;
-        }        
+        }
     }
 
     if (flags & LN_USBD_INTF_ERRIF) // error
