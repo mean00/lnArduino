@@ -18,20 +18,20 @@ extern "C" void do_assert(const char *a);
  */
 
 
-extern "C" 
+extern "C"
 {
     void deadEnd(int code);
     extern void taskENTER_CRITICAL( void );
     extern void taskEXIT_CRITICAL( void );
-    
+
     uintptr_t handle_trap(uintptr_t mcause, uintptr_t sp)
     {
          deadEnd(0xffff);
          return 0;
     }
 
-    
-    __attribute__( ( interrupt ) )  void unhandledException( void ) 
+
+    __attribute__( ( interrupt ) )  void unhandledException( void )
     {
         deadEnd(0x1000);
     }
@@ -44,7 +44,7 @@ extern "C"
     {
         EXIT_CRITICAL();
     }
-    void noInterrupt() 
+    void noInterrupt()
     {
         ENTER_CRITICAL();
     }
@@ -84,18 +84,20 @@ namespace std
         do_assert(a);
     }
 }
+/**
 
+*/
 void lnDelayUs(int wait)
 {
     uint64_t target=lnGetUs()+wait;
     while(1)
     {
         uint64_t vw=lnGetUs();
-        if(vw>target) 
+        if(vw>target)
             return;
         __asm__("nop"::);
     }
-    
+
 }
 
 static uint32_t myTick;
@@ -106,13 +108,21 @@ extern "C" void vApplicationTickHook()
 }
 
 /**
- * 
- * @return 
+ *
+ * @return
  */
 uint32_t lnGetMs()
 {
     uint32_t v=myTick;
     return myTick;
 }
-// EOF
 
+void xDelay(int a);
+/**
+*/
+void lnDelay(int wait)
+{
+  xDelay(wait);
+}
+
+// EOF
