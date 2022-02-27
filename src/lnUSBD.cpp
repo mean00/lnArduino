@@ -60,6 +60,8 @@ lnUsbDevice::~lnUsbDevice()
  */
 bool lnUsbDevice::init()
 {
+  // Only do low level hw setup here
+  // the follow up will be in hwReset
     // first disable interrupt
     irqEnabled(false);
     // 48 Mhz input to usb
@@ -70,21 +72,6 @@ bool lnUsbDevice::init()
     lnPinMode(PA12, lnINPUT_FLOATING); // D+
     lnPinMode(PA11, lnINPUT_FLOATING); // D-
     power(true);
-    // Clear all interrupts
-    aUSBD0->USBD_CTL = 0; // disable all interrupts
-    aUSBD0->USBD_INTF = 0;
-    aUSBD0->USBD_DADDR = 0; // address 0, disabled
-    aUSBD0->USBD_BADDR = 0; // Descriptors at the begining
-    setAddress(-1);
-    //
-#define GG(x) LN_USBD_CTL_##x
-    aUSBD0->USBD_CTL = GG(RSTIE) + GG(PMOUIE) + GG(STIE) + GG(WKUPIE)+ GG(ESOFIE); //Ignore ESOFIE/SOFIE +GG(ESOFIE)++GG(SOFIE);  GG(ERRIE) +
-
-    lnDelayUs(20);
-    // clear state
-    aUSBD0->USBD_INTF = 0;
-    lnDelayUs(20);
-
     return true;
 }
 /**
@@ -406,29 +393,37 @@ void lnUsbDevice::resetEps()
 */
 void      lnUsbDevice::hwReset()
 {
-  aUSBD0->USBD_INTF=0;
-  aUSBD0->USBD_STAT=0;
-  uint32_t reg=aUSBD0->USBD_CTL ;
-  reg&=~ LN_USBD_CTL_SETRST; // clear reset
-  aUSBD0->USBD_CTL=reg;
-  reg |=LN_USBD_CTL_RSTIE; // enable reset interrupt
-  aUSBD0->USBD_CTL=reg;
-  reg |=LN_USBD_CTL_SETRST;
-  aUSBD0->USBD_CTL=reg;
-  lnDelayUs(10);
-  reg &=~LN_USBD_CTL_SETRST;
-  aUSBD0->USBD_CTL=reg;
+#if 0 // According to GD doc...
+1. Clear the CLOSE bit in USBD_CTL register, then clear the SETRST bit.
+2. Clear USBD_INTF register to remove any spurious pending interrupt.
+3. Program USBD_BADDR register to set endpoint buffer base address.
+4. Set USBD_CTL register to enable interrupts.
+5. Wait for the reset interrupt (RSTIF).
+6. In the reset interrupt, initialize default control endpoint 0 to start enumeration process and
+program USBD_ADDR to set the device address to 0 and enable USB module function.
+7. Configure endpoint 0 and prepare to receive SETUP packet.
+#endif
+// Force host reset by asserting PA12 low for 10 ms
+lnDigitalWrite(PA12,0);
+lnPinMode(PA12, lnOUTPUT); // D+
+lnDigitalWrite(PA12,0);
+lnDelay(10);
+lnPinMode(PA12, lnINPUT_FLOATING); // D+
 
-  // Clear error
-  uint32_t intf=aUSBD0->USBD_INTF;
-  intf &= ~LN_USBD_INTF_ERRIF;
-  intf &= ~LN_USBD_INTF_ESOFIF;
-  intf &= ~LN_USBD_INTF_SPSIF;
-  aUSBD0->USBD_INTF=intf;
-  //
-  SET_CONTROL(CLOSE);
-  lnDelayUs(10);
-  CLEAR_CONTROL(CLOSE);
+CLEAR_CONTROL(CLOSE);
+CLEAR_CONTROL(SETRST);
+aUSBD0->USBD_INTF &= LN_USBD_INTF_RSTIF; // clear all except reset
+// Clear all interrupts
+aUSBD0->USBD_BADDR = 0; // Descriptors at the begining
+aUSBD0->USBD_DADDR = 0; // address 0, disabled
+aUSBD0->USBD_STAT=0;
+
+#define GG(x) LN_USBD_CTL_##x
+uint32_t inter=aUSBD0->USBD_CTL;
+inter|= GG(RSTIE) + GG(PMOUIE) + GG(STIE); // + GG(WKUPIE) + GG(SPSIE); //+ GG(ESOFIE); //Ignore ESOFIE/SOFIE +GG(ESOFIE)++GG(SOFIE);  GG(ERRIE) +
+aUSBD0->USBD_CTL=inter;
+
+
 
 }
 /**
@@ -474,10 +469,11 @@ void lnUsbDevice::irq()
     uint32_t flags = (flags_original & flags_mask & 0xff00);
     // static uint32_t flags=(flags_original);
 
-    if (flags & LN_USBD_INTF_RSTIF || (aUSBD0->USBD_CTL & LN_USBD_CTL_SETRST)) // Reset
+    if (flags & LN_USBD_INTF_RSTIF /*|| (aUSBD0->USBD_CTL & LN_USBD_CTL_SETRST)*/)
     {
         CLEAR_INTERRUPT(RST);
-        CLEAR_CONTROL(SETRST);
+      //  CLEAR_CONTROL(SETRST);
+      //  CLEAR_CONTROL(RSTIE);
         _handler->event(lnUsbEventHandler::UsbReset);
         return;
     }
