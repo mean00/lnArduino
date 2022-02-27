@@ -70,9 +70,6 @@ bool lnUsbDevice::init()
     lnPinMode(PA12, lnINPUT_FLOATING); // D+
     lnPinMode(PA11, lnINPUT_FLOATING); // D-
     power(true);
-    SET_CONTROL(CLOSE);
-    lnDelayUs(10);
-    CLEAR_CONTROL(CLOSE);
     // Clear all interrupts
     aUSBD0->USBD_CTL = 0; // disable all interrupts
     aUSBD0->USBD_INTF = 0;
@@ -428,6 +425,11 @@ void      lnUsbDevice::hwReset()
   intf &= ~LN_USBD_INTF_ESOFIF;
   intf &= ~LN_USBD_INTF_SPSIF;
   aUSBD0->USBD_INTF=intf;
+  //
+  SET_CONTROL(CLOSE);
+  lnDelayUs(10);
+  CLEAR_CONTROL(CLOSE);
+
 }
 /**
  */
