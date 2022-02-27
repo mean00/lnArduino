@@ -6,7 +6,13 @@
 #include "lnUSBD.h"
 #include "lnUsbStack.h"
 
-#define USBD_STACK_SIZE configMINIMAL_STACK_SIZE
+
+#ifdef CFG_TUSB_DEBUG
+  #define USBD_EXTRA_STACK 500
+#else
+  #define USBD_EXTRA_STACK 0
+#endif
+#define USBD_STACK_SIZE (configMINIMAL_STACK_SIZE+USBD_EXTRA_STACK)
 // local prototypes
 void dcd_handle_bus_reset(void);
 void dcd_ep_ctr_handler(void);
