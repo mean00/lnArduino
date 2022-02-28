@@ -1,4 +1,2 @@
-SET(Rust_CARGO_TARGET "thumbv7m-none-eabi")
-find_package(Corrosion REQUIRED)
+include(${AF_FOLDER}/rnArduino.cmake)
 corrosion_import_crate(MANIFEST_PATH rnArduino/Cargo.toml)
-
