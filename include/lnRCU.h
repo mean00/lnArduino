@@ -29,6 +29,7 @@ public:
     static void disable(const Peripherals periph);
     static uint32_t getClock(const Peripherals periph);
     static void setAdcDivider(lnADC_DIVIDER divider);
+    static void enableUsb48Mhz(); // Call this once so that the usb clock is 48 Mhz, you still have to enable/disable the usbd clock
 };
 
 

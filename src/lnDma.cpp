@@ -21,7 +21,7 @@ static xMutex *dmaMutex[2][7];
 
 struct lnDmaStats
 {
-    int error, spurious, missed, total, half,full;
+    uint16_t error, spurious, missed, total, half,full;
 };
 
 static lnDmaStats dmaStats[2][7];
@@ -33,7 +33,7 @@ DMA_struct *adma0=(DMA_struct *)LN_DMA0_ADR;
 DMA_struct *adma1=(DMA_struct *)LN_DMA1_ADR;
 
 /**
- * 
+ *
  */
 void lnDmaSysInit()
 {
@@ -46,9 +46,9 @@ void lnDmaSysInit()
 }
 
 /**
- * 
+ *
  * @param v
- * @return 
+ * @return
  */
 static uint32_t memoryWidth(int v)
 {
@@ -63,9 +63,9 @@ static uint32_t memoryWidth(int v)
     }
 }
 /**
- * 
+ *
  * @param v
- * @return 
+ * @return
  */
 static uint32_t peripheralWidth(int v)
 {
@@ -79,9 +79,9 @@ static uint32_t peripheralWidth(int v)
             return 0;
     }
 }
-      
+
 /**
- * 
+ *
  * @param type
  * @param dmaEngine
  * @param dmaChannel
@@ -93,18 +93,18 @@ lnDMA::lnDMA(DmaTransferType type, int dmaEngine, int dmaChannel, int sourceWidt
     _control=0;
     _channelInt=dmaChannel;
     _dmaInt=dmaEngine;
-    
+
     _dma=_dmas[dmaEngine];
     _type=type;
     _irq=_dmaIrqs[dmaEngine][dmaChannel];
-    
+
     _sourceWidth=sourceWidth;
     _targetWidth=targetWidth;
-    
+
     _priority=LN_DMA_CHAN_PRIO_HIGH;
 }
 /**
- * 
+ *
  * @param prio
  */
 void lnDMA::setPriority(DmaPriority prio)
@@ -113,7 +113,7 @@ void lnDMA::setPriority(DmaPriority prio)
 }
 
 /**
- * 
+ *
  * @param sourceWordSize
  * @param targetWordSize
  */
@@ -133,13 +133,13 @@ void    lnDMA::setWordSize(int sourceWordSize, int targetWordSize)
         break;
         case DMA_PERIPH_TO_MEMORY:
             {
-                source=peripheralWidth(sourceWordSize);                
+                source=peripheralWidth(sourceWordSize);
                 target=memoryWidth(targetWordSize);
                 _control&=LN_DMA_CHAN_WIDTH_MASK;
                 _control|=source;
                 _control|=target;
             }
-        break;        
+        break;
         default:
             xAssert(0);
             break;
@@ -147,7 +147,7 @@ void    lnDMA::setWordSize(int sourceWordSize, int targetWordSize)
 }
 
 /**
- * 
+ *
  */
 lnDMA::~lnDMA()
 {
@@ -157,7 +157,7 @@ lnDMA::~lnDMA()
 }
 
 /**
- * 
+ *
  * @param cb
  * @param cookie
  */
@@ -167,7 +167,7 @@ void lnDMA::attachCallback(doneCallback *cb, void *cookie)
     _cookie=cookie;
 }
 /**
- * 
+ *
  */
 void    lnDMA::detachCallback()
 {
@@ -176,15 +176,15 @@ void    lnDMA::detachCallback()
 }
 
 /**
- * 
+ *
  * @param count
  * @param source
  * @param repeat
- * @return 
+ * @return
  */
 
 /**
- * 
+ *
  */
 void lnDMA::beginTransfer()
 {
@@ -192,14 +192,14 @@ void lnDMA::beginTransfer()
     // Ok now we can configure the dma
     DMA_struct *d=(DMA_struct *)_dma;
     DMA_channels *c=d->channels+_channelInt;
-    
-    
+
+
     c->CNT&=LN_DMA_CHAN_KEEP_MASK; // disable
-    
+
     // Clear interrupts & flags
     CLEAR_DMA_INTERRUPT();
-    
-    
+
+
     uint32_t sw;
     uint32_t source,target;
     switch(_type)
@@ -228,58 +228,58 @@ void lnDMA::beginTransfer()
         }
         default:
             xAssert(0);
-            break;                
+            break;
     }
-    
+
     if(_lnDmas[_dmaInt][_channelInt]) xAssert(0);
-    _lnDmas[_dmaInt][_channelInt]=this;     
+    _lnDmas[_dmaInt][_channelInt]=this;
 }
 /**
- * 
+ *
  */
 void lnDMA::cancelTransfer()
 {
     DMA_struct *d=(DMA_struct *)_dma;
     DMA_channels *c=d->channels+_channelInt;
     noInterrupts();
-    uint32_t control=c->CTL;    
+    uint32_t control=c->CTL;
     control &=~LN_DMA_CHAN_ENABLE;
     control &=~(LN_DMA_CHAN_ERRIE+LN_DMA_CHAN_TFTFIE);
     c->CTL=control;
-    
+
     _cb=NULL;
     _cookie=NULL;
     CLEAR_DMA_INTERRUPT();
-    _lnDmas[_dmaInt][_channelInt]=NULL;         
-    interrupts(); 
+    _lnDmas[_dmaInt][_channelInt]=NULL;
+    interrupts();
 }
 void lnDMA::endTransfer()
 {
     cancelTransfer();
     dmaMutex[_dmaInt][_channelInt]->unlock();
 }
-   
+
 
 /**
- * 
+ *
  * @param count
  * @param source
  * @param target
  * @param repeat
- * @return 
+ * @return
  */
 bool lnDMA::doMemoryToPeripheralTransferNoLock(int count, const uint16_t *source,const uint16_t *target,  bool repeat,bool circular,bool  bothInterrupts)
 {
      // clear pending bits
     DMA_struct *d=(DMA_struct *)_dma;
     CLEAR_DMA_INTERRUPT();
- 
+
     DMA_channels *c=d->channels+_channelInt;
-    uint32_t control=c->CTL;    
+    uint32_t control=c->CTL;
     control&=LN_DMA_CHAN_KEEP_MASK;
 
     c->CTL=control; // also disable
-    
+
     control|=_control; // base configuration
 
     c->PADDR=(uint32_t)target;
@@ -288,7 +288,7 @@ bool lnDMA::doMemoryToPeripheralTransferNoLock(int count, const uint16_t *source
     if(!repeat)
         control|=LN_DMA_CHAN_MINCREASE; // increase address
 
-    
+
     if(circular)
     {
         control|=LN_DMA_CHAN_CMEN; // replay the dma in a loop
@@ -302,22 +302,22 @@ bool lnDMA::doMemoryToPeripheralTransferNoLock(int count, const uint16_t *source
         }
     }else
     {
-        control&=~LN_DMA_CHAN_CMEN; 
-        control|=LN_DMA_CHAN_ERRIE+LN_DMA_CHAN_TFTFIE; // error and transmit complete interrupt        
+        control&=~LN_DMA_CHAN_CMEN;
+        control|=LN_DMA_CHAN_ERRIE+LN_DMA_CHAN_TFTFIE; // error and transmit complete interrupt
         if(bothInterrupts)
             control|=LN_DMA_CHAN_HTFIE;
     }
-        
-    
-    
-    c->CTL=control|LN_DMA_CHAN_ENABLE; // GO!       
-    lnEnableInterrupt(_irq);        
+
+
+
+    c->CTL=control|LN_DMA_CHAN_ENABLE; // GO!
+    lnEnableInterrupt(_irq);
     return true;
 }
 /**
  * \fn getCurrentCount
  * \brief return the current DMA address
- * @return 
+ * @return
  */
 uint32_t lnDMA::getCurrentCount()
 {
@@ -329,63 +329,63 @@ uint32_t lnDMA::getCurrentCount()
 }
 
 /**
- * 
+ *
  */
 void lnDMA::pause()
 {
     DMA_struct *d=(DMA_struct *)_dma;
-    DMA_channels *c=d->channels+_channelInt;    
-    uint32_t control=c->CTL;  
-#warning NOT ATOMIC    
+    DMA_channels *c=d->channels+_channelInt;
+    uint32_t control=c->CTL;
+#warning NOT ATOMIC
     control &=~LN_DMA_CHAN_ENABLE;
-    c->CTL=control;    
+    c->CTL=control;
     CLEAR_DMA_INTERRUPT(); // clear pending interrupt
 }
 /**
- * 
+ *
  */
 void lnDMA::resume()
 {
     DMA_struct *d=(DMA_struct *)_dma;
-    DMA_channels *c=d->channels+_channelInt;    
-    uint32_t control=c->CTL;      
-#warning NOT ATOMIC    
+    DMA_channels *c=d->channels+_channelInt;
+    uint32_t control=c->CTL;
+#warning NOT ATOMIC
     control |=LN_DMA_CHAN_ENABLE;
-    c->CTL=control;    
+    c->CTL=control;
 
 }
 
 /**
- * 
+ *
  * @param count
  * @param target
  * @param source
  * @param repeat
  * @param circularMode
- * @return 
+ * @return
  */
 bool    lnDMA::doPeripheralToMemoryTransferNoLock(int count, const uint16_t *target,const uint16_t *source,  bool circular,bool bothInterrupts)
 {
      // clear pending bits
     DMA_struct *d=(DMA_struct *)_dma;
     CLEAR_DMA_INTERRUPT();
-    
- 
+
+
     DMA_channels *c=d->channels+_channelInt;
-    uint32_t control=c->CTL;    
+    uint32_t control=c->CTL;
     control&=LN_DMA_CHAN_KEEP_MASK;
 
     c->CTL=control; // also disable
-    
+
     control=_control; // base configuration
 
-    
+
     c->PADDR=(uint32_t)source;
     c->MADDR=(uint32_t)target;
     c->CNT=  (uint32_t)count;
 
     control|=LN_DMA_CHAN_MINCREASE; // increase address
-    
+
     if(circular)
     {
         control|=LN_DMA_CHAN_CMEN; // replay the dma in a loop
@@ -399,21 +399,21 @@ bool    lnDMA::doPeripheralToMemoryTransferNoLock(int count, const uint16_t *tar
         }
     }else
     {
-        control&=~LN_DMA_CHAN_CMEN; 
-        control|=LN_DMA_CHAN_ERRIE+LN_DMA_CHAN_TFTFIE; // error and transmit complete interrupt        
+        control&=~LN_DMA_CHAN_CMEN;
+        control|=LN_DMA_CHAN_ERRIE+LN_DMA_CHAN_TFTFIE; // error and transmit complete interrupt
         if(bothInterrupts)
             control|=LN_DMA_CHAN_HTFIE;
     }
-#warning NOT ATOMIC    
-    c->CTL=control|LN_DMA_CHAN_ENABLE; // GO!       
-    lnEnableInterrupt(_irq);        
+#warning NOT ATOMIC
+    c->CTL=control|LN_DMA_CHAN_ENABLE; // GO!
+    lnEnableInterrupt(_irq);
     return true;
 }
 /**
- * 
+ *
  * @param full
  * @param half
- * @return 
+ * @return
  */
 bool    lnDMA::setInterruptMask(bool full, bool half)
 {
@@ -421,22 +421,22 @@ bool    lnDMA::setInterruptMask(bool full, bool half)
     DMA_struct *d=(DMA_struct *)_dma;
     DMA_channels *c=d->channels+_channelInt;
 
-    uint32_t control=c->CTL;    
+    uint32_t control=c->CTL;
     control&=~(7<<1); // reset
     control|=LN_DMA_CHAN_ERRIE;
     if(full)  control |=LN_DMA_CHAN_TFTFIE;
     if(half)  control |=LN_DMA_CHAN_HTFIE;
-    
+
     // clear interrupts if any
     CLEAR_DMA_INTERRUPT();
-    
-    
+
+
     c->CTL=control;
     return true;
 }
 
 /**
- * 
+ *
  */
 
 
@@ -446,41 +446,41 @@ void    lnDMA::invokeCallback()
     DmaInterruptType typ;
     DMA_struct *d=(DMA_struct *)_dmas[_dmaInt];
     DMA_channels *c=d->channels+_channelInt;
-    
+
     int pending= d->INTF;
     pending>>=(4*_channelInt);
     pending&=c->CTL;    // only check enabled interrupt
-    pending>>=1;        // remove the GIF, we dont care    
+    pending>>=1;        // remove the GIF, we dont care
     pending&=3;         // Only keep FT and HT
     CLEAR_DMA_INTERRUPT();
-    
-    
+
+
     lnDmaStats *stats=&(dmaStats[_dmaInt][_channelInt]);
     stats->total++;
     if(pending==3)
     {
         stats->missed++;
-    }    
+    }
     if(pending&1)
     {
             typ=DMA_INTERRUPT_FULL;
             stats->full++;
-    } 
+    }
     else if(pending&2)
     {
              typ=DMA_INTERRUPT_HALF;
-             stats->half++;             
-    }else 
+             stats->half++;
+    }else
     {
             stats->spurious++;
             return;
     }
-    
+
     xAssert(_cb);
     _cb(_cookie,typ);
 }
 /**
- * 
+ *
  * @param dma
  * @param channel
  */
@@ -488,14 +488,14 @@ void dmaIrqHandler(int dma, int channel)
 {
     // First clear the interrupt
     DMA_struct *d=(DMA_struct *)_dmas[dma];
-    uint32_t status= d->INTF; 
+    uint32_t status= d->INTF;
     status>>=(4*channel); // ERR DONE HALFDONE GLOBAL
     if(status & 8) // error bit
     {
         xAssert(0);
     }
-    
-    
+
+
     // Are we in circular mode ?
     if(d->channels[channel].CTL & LN_DMA_CHAN_CMEN)
     {  // ok, is it full or helf interrupt ?
@@ -505,17 +505,17 @@ void dmaIrqHandler(int dma, int channel)
         l->invokeCallback();
         return;
     }
-    
-    // single shot mode    
+
+    // single shot mode
     // Disable DMA
     d->channels[channel].CTL&=~LN_DMA_CHAN_ENABLE;
     // disable interrupt
-    lnDisableInterrupt(_dmaIrqs[dma][channel]);   
+    lnDisableInterrupt(_dmaIrqs[dma][channel]);
 
     lnDMA *l=_lnDmas[dma][channel];
     xAssert(l);
     l->invokeCallback();
-    return;       
+    return;
 }
 
 

@@ -29,8 +29,10 @@
 #define FREERTOS_CONFIG_H
 
 extern uint32_t SystemCoreClock;
+
 extern void do_assert(const char *a);
-#define configASSERT(a)  if(!(a)) {do_assert(#a);}
+//#define configASSERT(a)  if(!(a)) {do_assert(#a);}
+#define configASSERT(a)  if(!(a)) {do_assert("");}
 
 
 #include "freeRTOS_tuning.h"
@@ -42,7 +44,7 @@ extern void do_assert(const char *a);
  * application requirements.
  *
  * THESE PARAMETERS ARE DESCRIBED WITHIN THE 'CONFIGURATION' SECTION OF THE
- * FreeRTOS API DOCUMENTATION AVAILABLE ON THE FreeRTOS.org WEB SITE. 
+ * FreeRTOS API DOCUMENTATION AVAILABLE ON THE FreeRTOS.org WEB SITE.
  *
  * See http://www.freertos.org/a00110.html
  *----------------------------------------------------------*/
@@ -54,7 +56,7 @@ extern void do_assert(const char *a);
 #define configUSE_PREEMPTION                    1
 #define configUSE_IDLE_HOOK			0
 #define configUSE_TICK_HOOK			1 // MEANX
-#define configMAX_PRIORITIES                    ( 31 )
+#define configMAX_PRIORITIES                    ( 16 )
 #define configAPPLICATION_ALLOCATED_HEAP        1
 #define configMAX_TASK_NAME_LEN                 ( 16 )
 #define configUSE_TRACE_FACILITY                0
@@ -111,4 +113,3 @@ NVIC value of 255. */
 #endif
 
 #endif /* FREERTOS_CONFIG_H */
-

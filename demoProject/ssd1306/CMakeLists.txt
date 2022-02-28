@@ -13,7 +13,7 @@ include(${AF_FOLDER}/setup.cmake)
 SET( SSD1306 ${AF_FOLDER}/libraries/simplerSSD1306 )
 INCLUDE_DIRECTORIES( ${SSD1306} )
 
-SET(LIBSSD ${SSD1306}/ssd1306_base.cpp ${SSD1306}/ssd1306_ex.cpp ${SSD1306}/ssd1306_i2c_lnGd32vf103.cpp)
+SET(LIBSSD ${SSD1306}/ssd1306_ex_ll.cpp ${SSD1306}/ssd1306_base.cpp ${SSD1306}/ssd1306_ex.cpp ${SSD1306}/ssd1306_i2c_lnGd32vf103.cpp)
         
-GENERATE_GD32_FIRMWARE(ssd1306 hello.cpp ${LIBSSD} )       
+GENERATE_GD32_FIRMWARE(ssd1306 hello.cpp ${LIBSSD} )      
         

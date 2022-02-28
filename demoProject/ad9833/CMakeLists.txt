@@ -3,9 +3,7 @@ cmake_minimum_required(VERSION 3.0)
 
 include(../common_CMakeLists.cmake)
 
-PROJECT(Hello_gd32_freetos NONE) # the NONE is very important !
-
-enable_language(C CXX ASM) # this is important too!
+PROJECT(Hello_gd32_freetos C CXX ASM)
 include_directories(${CMAKE_SOURCE_DIR})        
 add_subdirectory(${AF_FOLDER})
 
