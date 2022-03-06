@@ -33,9 +33,23 @@ int lnUsbCDC::read(uint8_t *buffer, int maxSize)
 */
 int lnUsbCDC::write(uint8_t *buffer, int size)
 {
-  int n= tud_cdc_n_write(_instance,buffer, size);
+  int sent=0;
+  while(size)
+  {
+    int n= tud_cdc_n_write(_instance,buffer, size);
+    if(n<0) return -1;
+    if(n==0)
+      lnDelayMs(1);
+    buffer+=n;
+    size-=n;
+    sent+=n;
+  }
+  return sent;
+}
+int write(uint8_t *buffer, int maxSize);
+void lnUsbCDC::flush()
+{
   tud_cdc_n_write_flush(_instance);
-  return n;
 }
 
 
