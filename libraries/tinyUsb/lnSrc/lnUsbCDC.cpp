@@ -37,9 +37,14 @@ int lnUsbCDC::write(uint8_t *buffer, int size)
   while(size)
   {
     int n= tud_cdc_n_write(_instance,buffer, size);
-    if(n<0) return -1;
-    if(n==0)
-      lnDelayMs(1);
+    if(n<0)
+      return -1;
+    if(!n)
+    {
+      tud_cdc_n_write_flush(_instance);
+      lnDelay(1); // dont busy loop
+      continue;
+    }
     buffer+=n;
     size-=n;
     sent+=n;
@@ -47,6 +52,8 @@ int lnUsbCDC::write(uint8_t *buffer, int size)
   return sent;
 }
 int write(uint8_t *buffer, int maxSize);
+/**
+*/
 void lnUsbCDC::flush()
 {
   tud_cdc_n_write_flush(_instance);
