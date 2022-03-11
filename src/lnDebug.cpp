@@ -36,6 +36,8 @@ void Logger(const char *fmt...)
 {
     static char buffer[128];
 
+    if(fmt[0]==0) return;
+
     va_list va;
     va_start(va,fmt);
     vsnprintf(buffer,127,fmt,va);
