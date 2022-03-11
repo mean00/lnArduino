@@ -31,7 +31,7 @@ int lnUsbCDC::read(uint8_t *buffer, int maxSize)
 }
 /**
 */
-int lnUsbCDC::write(uint8_t *buffer, int size)
+int lnUsbCDC::write(const uint8_t *buffer, int size)
 {
   int sent=0;
   while(size)

@@ -16,7 +16,7 @@ public:
 public:
               lnUsbCDC(int instance);
           int read(uint8_t *buffer, int maxSize);
-          int write(uint8_t *buffer, int maxSize);
+          int write(const uint8_t *buffer, int maxSize);
           void flush();
           void setEventHandler(lnUsbCDCEventsHandler *h, void *cookie)
           {
