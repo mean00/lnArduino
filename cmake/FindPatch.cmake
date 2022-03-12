@@ -33,8 +33,8 @@ endmacro(patch_file)
 #
 #
 macro(patch_file_p p baseDir patchFile)
-				MESSAGE(STATUS "COMMAND ${PATCH_EXECUTABLE} -p ${p}  -i ${patchFile} WORKING_DIRECTORY ${baseDir}")
-								
+				#MESSAGE(STATUS "COMMAND ${PATCH_EXECUTABLE} -p ${p}  -i ${patchFile} WORKING_DIRECTORY ${baseDir}")
+
 				execute_process(COMMAND ${PATCH_EXECUTABLE} -p ${p}  -i "${patchFile}"
 									WORKING_DIRECTORY "${baseDir}"
                   RESULT_VARIABLE   res
