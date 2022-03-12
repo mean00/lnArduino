@@ -25,6 +25,8 @@ public:
           }
 // internal API
           void incomingEvent(lnUsbCDCEvents ev);
+          void encodingChanged(const void *newEncoding); // this is a const  cdc_line_coding_t * in disguise
+
 protected:
         int _instance;
         lnUsbCDCEventsHandler *_eventHandler;

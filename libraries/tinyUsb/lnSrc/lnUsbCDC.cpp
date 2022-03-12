@@ -24,6 +24,15 @@ void lnUsbCDC::incomingEvent(lnUsbCDCEvents ev)
   }
 }
 /**
+
+*/
+void lnUsbCDC::encodingChanged(const void *newEncoding)
+{
+  const cdc_line_coding_t *enc=(const cdc_line_coding_t *)newEncoding;
+  Logger("CDC Encoding changed speed=%d \n",enc->bit_rate);
+}
+
+/**
 */
 int lnUsbCDC::read(uint8_t *buffer, int maxSize)
 {
@@ -58,24 +67,36 @@ void lnUsbCDC::flush()
 {
   tud_cdc_n_write_flush(_instance);
 }
+//---- hooks ---
+#define PREMABLE(itf) lnUsbCDC *me=_cdc_instances[itf]; xAssert(me);
+#define FORWARD_EVENT(ifg,event) PREMABLE(itf);  me->incomingEvent(event);
+//---
+
+//void tud_cdc_rx_wanted_cb(uint8_t itf, char wanted_char);
+//void tud_cdc_tx_complete_cb(uint8_t itf);
+//void tud_cdc_send_break_cb(uint8_t itf, uint16_t duration_ms);
+void tud_cdc_line_coding_cb(uint8_t itf, cdc_line_coding_t const* p_line_coding)
+{
+  PREMABLE(itf);
+  return me->encodingChanged(p_line_coding);
+}
 
 
+//---
 void tud_cdc_line_state_cb(uint8_t itf, bool dtr, bool rts)
 {
-  lnUsbCDC *me=_cdc_instances[itf];
-  xAssert(me);
+  Logger("DTR=%d RTS=%d\n");
+  PREMABLE(itf);
   if(dtr)
     me->incomingEvent(lnUsbCDC::CDC_SESSION_START);
   else
     me->incomingEvent(lnUsbCDC::CDC_SESSION_END);
-
 }
+//---
 // Invoked when CDC interface received data from host
 void tud_cdc_rx_cb(uint8_t itf)
 {
-  lnUsbCDC *me=_cdc_instances[itf];
-  xAssert(me);
-  me->incomingEvent(lnUsbCDC::CDC_DATA_AVAILABLE);
+  FORWARD_EVENT(itf,lnUsbCDC::CDC_DATA_AVAILABLE);
 }
 
 //EOF
