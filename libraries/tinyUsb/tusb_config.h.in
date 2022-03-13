@@ -10,9 +10,9 @@
 
 // CDC for the moment
 
-#define CFG_TUD_CDC              1
+#define CFG_TUD_CDC              @LN_USB_NB_CDC@ 
 #define CFG_TUD_MSC              0
-#define CFG_TUD_HID              0
+#define CFG_TUD_HID              @LN_USB_NB_HID@
 #define CFG_TUD_MIDI             0
 #define CFG_TUD_VENDOR           0
 

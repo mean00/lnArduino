@@ -12,6 +12,17 @@ include_directories( ${TUSB}/common)
 include_directories( ${TUSB}/device)
 include_directories( ${TUSB}/class/device/cdc)
 
+IF(NOT DEFINED LN_USB_NB_CDC)
+    MESSAGE(FATAL_ERROR "SET LN_USB_NB_CDC to the number of CDC interface you use")
+ENDIF(NOT DEFINED LN_USB_NB_CDC)
+
+IF(NOT DEFINED LN_USB_NB_HID)
+    MESSAGE(FATAL_ERROR "SET LN_USB_NB_CDC to the number of CDC interface you use")
+ENDIF(NOT DEFINED LN_USB_NB_HID)
+
+configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/tusb_config.h.in ${CMAKE_BINARY_DIR}/tusb_config.h @ONLY)
+
+
 
 IF(FALSE)
     ADD_DEFINITIONS("-DCFG_TUSB_DEBUG=3")
@@ -27,3 +38,4 @@ SET(SRCS  ${TUSB}/tusb.c
           ${LNSRC}/lnUsbCDC.cpp
           )
 add_library(tinyUsb STATIC ${SRCS})
+target_include_directories(tinyUsb PRIVATE ${CMAKE_BINARY_DIR})
