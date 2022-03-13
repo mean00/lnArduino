@@ -55,7 +55,7 @@ void Logger(const char *fmt...)
  */
 void LoggerInit()
 {
-    serial0=new lnSerial(0);
+    serial0=new lnSerial(0,16); // Tx only...
     serial0->init();
     serial0->setSpeed(115200);
 }

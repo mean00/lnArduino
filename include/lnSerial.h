@@ -23,16 +23,23 @@ public:
         txInterrupt,
         txDma
     };
-         lnSerial(int instance);    
+         lnSerial(int instance, int rxBufferSize=128);
     bool init();
     bool setSpeed(int speed);
-    bool enableTx(txMode mode);
+
+    bool enableRx(bool enabled);
     bool transmit(int size,uint8_t *buffer);
     bool dmaTransmit(int size,uint8_t *buffer);
+    void purgeRx();
     void _interrupt(void);
-    
+
  static void interrupts(int instance);
 protected:
+    void txInterruptHandler(void);
+    void rxInterruptHandler(void);
+
+protected:
+    bool _enableTx(txMode mode);
     int _instance;
     LnIRQ _irq;
     bool _stateTx;
@@ -42,10 +49,14 @@ protected:
     uint8_t *_cur,*_tail;
     txState _txState;
     lnDMA   _txDma;
-    
-protected:    
+    int     _rxBufferSize;
+    int     _rxHead,_rxTail;
+    uint8_t *_rxBuffer;
+    xMutex   _rxMutex;
+
+protected:
     void txDmaCb();
  static    void _dmaCallback(void *c,lnDMA::DmaInterruptType it);
-    
-    
+
+
 };
