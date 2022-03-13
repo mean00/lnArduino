@@ -19,13 +19,13 @@ public:
         bool tryTake();
         bool take(int timeoutMs);
         bool give();
-  
+
 protected:
         SemaphoreHandle_t _handle;
 };
 /**
- * @brief 
- * 
+ * @brief
+ *
  */
 class xTask
 {
@@ -44,10 +44,10 @@ protected:
                 TaskHandle_t    _taskHandle;
                 const char      *_name;
                 int             _priority;
-                int             _taskSize;                
+                int             _taskSize;
 };
 /**
- * 
+ *
  */
 class xEventGroup
 {
@@ -63,7 +63,7 @@ protected:
 
 
 /**
- * 
+ *
  */
 class xFastEventGroup
 {
@@ -76,15 +76,15 @@ public:
     uint32_t    readEvents(uint32_t maskInt); // it is also cleared automatically !
 protected:
     uint32_t    _value;
-    uint32_t    _mask;    
+    uint32_t    _mask;
     TaskHandle_t _waitingTask;
-           
+
 };
 
 
 
 /**
- * 
+ *
  */
 class xMutex
 {
@@ -98,12 +98,12 @@ protected:
 
 
 /**
- * 
+ *
  * @param tex
  */
 class xAutoMutex
 {
-public:    
+public:
     xAutoMutex(xMutex *tex)
     {
         _tex=tex;
@@ -114,13 +114,13 @@ public:
         _tex->unlock();
         _tex=NULL;
     }
-protected:    
+protected:
     xMutex *_tex;
 };
 
 
 void xDelay(int ms);
 
-extern "C" 
+extern "C"
 {void do_assert(const char *a); }
 #define xAssert(a) if(!(a)) {do_assert(#a);}
