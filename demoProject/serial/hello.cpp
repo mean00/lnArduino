@@ -14,7 +14,7 @@ int rx=0,tx=0;
 class rxTask : public xTask
 {
 public:
-  rxTask(lnSerial *serial) : xTask("RX")
+  rxTask(lnSerial *serial) : xTask("RX",3,800)
   {
       _ser=serial;
   }
@@ -33,11 +33,15 @@ public:
     _evGroup->takeOwnership();
     _ser->setCallback(cb,this);
     _ser->enableRx(true);
-    uint8_t c[4];
+    uint8_t c[256];
     while(1)
     {
-      int r=_ser->read(3,c);
-      if(r) rx+=r;
+      int r=_ser->read(256,c);
+      if(r)
+      {
+        rx+=r;
+        lnDelay(54);
+      }
       else
       {
         _evGroup->waitEvents(1,10);
@@ -59,12 +63,18 @@ void loop()
     serial.setSpeed(115200);
     rxTask receiveTask(&serial);
     receiveTask.start();
+    int count=0;
     while(1)
     {
             serial.transmit(4,(const uint8_t *)"ABCD");
             tx+=4;
-            lnDelayMs(100);
+            lnDelayMs(72);
             lnDigitalToggle(LED);
-            //Logger("*\n");
+            count++;
+            if(count>15)
+            {
+              Logger("Rx: %d Tx:%d\n",rx,tx);
+              count=0;
+            }
     }
 }

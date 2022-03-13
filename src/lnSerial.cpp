@@ -113,15 +113,24 @@ bool lnSerial::init()
     return true;
 }
 /**
-
+  \brief purge fifo and uart registers
 */
 void lnSerial::purgeRx()
 {
+  LN_USART_Registers *d=(LN_USART_Registers *)_adr;
   disableInterrupt();
   _rxHead=_rxTail=0;
+  volatile uint32_t stat=d->STAT;
+  while(stat & (LN_USART_STAT_RBNE))
+  {
+    uint8_t c=d->DATA;
+    stat=d->STAT;
+  }
   enableInterrupt();
 }
+/**
 
+*/
 bool lnSerial::enableRx(bool enabled)
 {
   LN_USART_Registers *d=(LN_USART_Registers *)_adr;
@@ -302,9 +311,8 @@ void lnSerial::rxInterruptHandler(void)
     uint8_t c=d->DATA;
     // do we have space in the ring buffer ?
     int next=modulo(_rxTail+1);
-    if(next!=_rxHead)
+    if(next!=_rxHead) // is it full ?
     {
-      // Else full...
       _rxBuffer[next]=c;
       _rxTail=next;
       pushed++;
@@ -396,13 +404,13 @@ int lnSerial::read(int max, uint8_t *to)
     z=_rxBufferSize-_rxHead;
     if(z>max) z=max;
     memcpy(to,_rxBuffer+_rxHead,z);
-    _rxHead=0;
+    _rxHead=modulo(_rxHead+z);
   }else
   {
     z=_rxTail-_rxHead;
     if(z>max) z=max;
     memcpy(to,_rxBuffer+_rxHead,z);
-    _rxHead+=z;
+    _rxHead+=z; // cannot wrap here...
   }
   enableInterrupt();
   return z;
