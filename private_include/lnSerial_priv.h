@@ -25,7 +25,7 @@ typedef volatile LN_USART_Registersx LN_USART_Registers;
 
 #define LN_USART_STAT_ERROR_MASK (0xf)
 
-
+#define LN_USART_STAT_OVERR (1<<3) // Overrun
 #define LN_USART_STAT_IDLEF (1<<4) // Frame detect
 #define LN_USART_STAT_RBNE  (1<<5) // Read buffer not empty
 #define LN_USART_STAT_TC    (1<<6) // Tx complete

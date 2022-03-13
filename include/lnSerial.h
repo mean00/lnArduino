@@ -8,9 +8,16 @@
 #include "lnDma.h"
 /**
  */
+
+
+
 class lnSerial
 {
 public:
+    enum Event
+    {
+      dataAvailable,
+    };
     enum txState
     {
         txIdle,
@@ -26,13 +33,20 @@ public:
          lnSerial(int instance, int rxBufferSize=128);
     bool init();
     bool setSpeed(int speed);
-
     bool enableRx(bool enabled);
-    bool transmit(int size,uint8_t *buffer);
-    bool dmaTransmit(int size,uint8_t *buffer);
+    bool transmit(int size,const uint8_t *buffer);
+    bool dmaTransmit(int size,const uint8_t *buffer);
+    void disableInterrupt();
+    void enableInterrupt();
     void purgeRx();
     void _interrupt(void);
-
+    int   read(int max, uint8_t *to);
+typedef void lnSerialCallback(void *cookie, lnSerial::Event event);
+    void setCallback(lnSerialCallback *cb, void *cookie)
+            {
+              _cb=cb;
+              _cbCookie=cookie;
+            }
  static void interrupts(int instance);
 protected:
     void txInterruptHandler(void);
@@ -46,13 +60,15 @@ protected:
     uint32_t _adr;
     xMutex _mutex;
     xBinarySemaphore _txDone;
-    uint8_t *_cur,*_tail;
+    const uint8_t *_cur,*_tail;
     txState _txState;
     lnDMA   _txDma;
     int     _rxBufferSize;
     int     _rxHead,_rxTail;
     uint8_t *_rxBuffer;
-    xMutex   _rxMutex;
+    int     modulo(int in);
+    lnSerialCallback   *_cb;
+    void               *_cbCookie;
 
 protected:
     void txDmaCb();

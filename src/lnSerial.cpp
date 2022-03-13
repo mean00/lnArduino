@@ -26,6 +26,7 @@ struct UsartMapping
 };
 static const UsartMapping usartMapping[3]=
 {
+    // Adr        DMA CH IRQ         TX   RX   periperal
     {LN_USART0_ADR, 0,3,LN_IRQ_USART0,PA9,PA10,pUART0},
     {LN_USART1_ADR, 0,6,LN_IRQ_USART1,PA2,PA3,pUART1},
     {LN_USART2_ADR, 0,1,LN_IRQ_USART2,PB10,PB11,pUART2},
@@ -48,8 +49,20 @@ lnSerial::lnSerial(int instance, int rxBufferSize) :  _txDma(lnDMA::DMA_MEMORY_T
     SerialInstance[instance]=this;
     _txState=txIdle;
     _rxBufferSize=rxBufferSize;
+    _rxTail=_rxHead=0;
     _rxBuffer=new uint8_t [_rxBufferSize];
+    _cbCookie=NULL;
+    _cb=NULL;
 }
+/**
+*/
+int    lnSerial::modulo(int in)
+{
+  if(in>=_rxBufferSize)
+    return in-_rxBufferSize;
+  return in;
+}
+
 /**
  *
  * @param speed
@@ -78,6 +91,7 @@ bool lnSerial::init()
 {
     LN_USART_Registers *d=(LN_USART_Registers *)_adr;
     const UsartMapping *e=usartMapping+_instance;
+
     switch(_instance)
     {
         case 0:
@@ -103,9 +117,9 @@ bool lnSerial::init()
 */
 void lnSerial::purgeRx()
 {
-  _rxMutex.lock();
+  disableInterrupt();
   _rxHead=_rxTail=0;
-  _rxMutex.unlock();
+  enableInterrupt();
 }
 
 bool lnSerial::enableRx(bool enabled)
@@ -169,7 +183,7 @@ bool lnSerial::_enableTx(txMode mode)
  * @param buffer
  * @return
  */
-bool lnSerial::transmit(int size,uint8_t *buffer)
+bool lnSerial::transmit(int size,const uint8_t *buffer)
 {
     //return true;
     LN_USART_Registers *d=(LN_USART_Registers *)_adr;
@@ -221,7 +235,7 @@ void lnSerial::_dmaCallback(void *c,lnDMA::DmaInterruptType it)
  * @param buffer
  * @return
  */
-bool lnSerial::dmaTransmit(int size,uint8_t *buffer)
+bool lnSerial::dmaTransmit(int size,const uint8_t *buffer)
 {
     //return true;
     LN_USART_Registers *d=(LN_USART_Registers *)_adr;
@@ -265,6 +279,7 @@ void lnSerial::_interrupt(void)
     volatile int stat=d->STAT;
     if(stat & (LN_USART_STAT_TC+LN_USART_STAT_TBE))
     {
+      if(_txState!=txIdle)
         txInterruptHandler();
     }
     if(stat & (LN_USART_STAT_RBNE))
@@ -278,37 +293,30 @@ void lnSerial::_interrupt(void)
 */
 void lnSerial::rxInterruptHandler(void)
 {
-  #if 0
   LN_USART_Registers *d=(LN_USART_Registers *)_adr;
   volatile int stat=d->STAT;
-  volatile int ctl0=d->CTL0;
-  switch(_txState)
+  bool empty=(_rxTail==_rxHead);
+  int pushed=0;
+  while(stat & (LN_USART_STAT_RBNE))
   {
-      case txTransmitting:
-           xAssert(stat & LN_USART_STAT_TBE) ;
-           d->DATA=(uint32_t )*_cur;
-          _cur++;
-          if(_cur==_tail)
-          {
-              d->CTL0|=LN_USART_CTL0_TCIE;
-              d->CTL0&=~(LN_USART_CTL0_TBIE ) ; // only let the Transmission complete bit
-              _txState=txLast;
-          }
-          return;
-          break;
-      case txLast:
-           xAssert(stat & LN_USART_STAT_TC) ;
-           d->CTL0&=~( LN_USART_CTL0_TBIE +LN_USART_CTL0_TCIE);
-           d->STAT&=~(LN_USART_STAT_TC);
-          _txState=txIdle;
-          _txDone.give();
-          return;
-          break;
-      default:
-          xAssert(0);
-          break;
+    uint8_t c=d->DATA;
+    // do we have space in the ring buffer ?
+    int next=modulo(_rxTail+1);
+    if(next!=_rxHead)
+    {
+      // Else full...
+      _rxBuffer[next]=c;
+      _rxTail=next;
+      pushed++;
+    }
+    stat=d->STAT;
   }
-  #endif
+  if(empty && pushed)
+  {
+      // wakeup receiver...
+      if(_cb)
+        _cb(_cbCookie,dataAvailable);
+  }
 }
 /**
 
@@ -333,7 +341,8 @@ void lnSerial::txInterruptHandler(void)
           return;
           break;
       case txLast:
-           xAssert(stat & LN_USART_STAT_TC) ;
+           if(!(stat & LN_USART_STAT_TC))
+              return; // we got here due to RX interrupt...
            d->CTL0&=~( LN_USART_CTL0_TBIE +LN_USART_CTL0_TCIE);
            d->STAT&=~(LN_USART_STAT_TC);
           _txState=txIdle;
@@ -348,12 +357,58 @@ void lnSerial::txInterruptHandler(void)
 /**
 
 */
+void lnSerial::disableInterrupt()
+{
+  const UsartMapping *m=usartMapping+_instance;
+  lnDisableInterrupt(m->irq);
+}
+/**
+
+*/
+void lnSerial::enableInterrupt()
+{
+  const UsartMapping *m=usartMapping+_instance;
+  lnEnableInterrupt(m->irq);
+}
+/**
+
+*/
 void lnSerial::interrupts(int instance)
 {
     lnSerial *inst=SerialInstance[instance];
     xAssert(inst);
     inst->_interrupt();
 }
+/**
+
+*/
+int lnSerial::read(int max, uint8_t *to)
+{
+  int z=0;
+  disableInterrupt();
+  if(_rxHead==_rxTail)
+  {
+      enableInterrupt();
+      return 0;
+  }
+  if(_rxHead>_rxTail)
+  {
+    z=_rxBufferSize-_rxHead;
+    if(z>max) z=max;
+    memcpy(to,_rxBuffer+_rxHead,z);
+    _rxHead=0;
+  }else
+  {
+    z=_rxTail-_rxHead;
+    if(z>max) z=max;
+    memcpy(to,_rxBuffer+_rxHead,z);
+    _rxHead+=z;
+  }
+  enableInterrupt();
+  return z;
+
+}
+
 
 #define IRQHANDLER(x) extern "C"{  void USART##x##_IRQHandler () LN_INTERRUPT_TYPE ;void USART##x##_IRQHandler () {    lnSerial::interrupts(x);} }
 
