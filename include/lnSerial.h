@@ -60,7 +60,7 @@ protected:
     uint32_t _adr;
     xMutex _mutex;
     xBinarySemaphore _txDone;
-    const uint8_t *_cur,*_tail;
+    volatile const uint8_t *_cur,*_tail;
     txState _txState;
     lnDMA   _txDma;
     int     _rxBufferSize;

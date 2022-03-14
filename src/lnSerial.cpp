@@ -285,8 +285,8 @@ void lnSerial::_interrupt(void)
 {
     serialRound++;
     LN_USART_Registers *d=(LN_USART_Registers *)_adr;
-    volatile int stat=d->STAT;
-    if(stat & (LN_USART_STAT_TC+LN_USART_STAT_TBE))
+    volatile int stat=d->STAT &   d->CTL0 & 0x1f0; // filter enabled interrupt only
+    if(stat &  (LN_USART_STAT_TC+LN_USART_STAT_TBE))
     {
       if(_txState!=txIdle)
         txInterruptHandler();
