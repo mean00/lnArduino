@@ -16,11 +16,11 @@ lnUsbCDC::lnUsbCDC(int instance)
   _eventCookie=NULL;
   _eventHandler=NULL;
 }
-void lnUsbCDC::incomingEvent(lnUsbCDCEvents ev)
+void lnUsbCDC::incomingEvent(lnUsbCDCEvents ev,uint32_t payload)
 {
   if(_eventHandler)
   {
-    _eventHandler(_eventCookie,_instance,ev);
+    _eventHandler(_eventCookie,_instance,ev,payload);
   }
 }
 /**
@@ -30,6 +30,7 @@ void lnUsbCDC::encodingChanged(const void *newEncoding)
 {
   const cdc_line_coding_t *enc=(const cdc_line_coding_t *)newEncoding;
   Logger("CDC Encoding changed speed=%d \n",enc->bit_rate);
+  incomingEvent(lnUsbCDC::CDC_SET_SPEED,enc->bit_rate);
 }
 
 /**

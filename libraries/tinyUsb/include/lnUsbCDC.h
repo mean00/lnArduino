@@ -10,9 +10,10 @@ public:
       {
         CDC_DATA_AVAILABLE,
         CDC_SESSION_START,
-        CDC_SESSION_END
+        CDC_SESSION_END,
+        CDC_SET_SPEED
       };
-      typedef void lnUsbCDCEventsHandler(void *cookie, int interface,lnUsbCDCEvents event);
+      typedef void lnUsbCDCEventsHandler(void *cookie, int interface,lnUsbCDCEvents event, uint32_t payload);
 public:
               lnUsbCDC(int instance);
           int read(uint8_t *buffer, int maxSize);
@@ -24,7 +25,7 @@ public:
               _eventCookie=cookie;
           }
 // internal API
-          void incomingEvent(lnUsbCDCEvents ev);
+          void incomingEvent(lnUsbCDCEvents ev,uint32_t payload=0);
           void encodingChanged(const void *newEncoding); // this is a const  cdc_line_coding_t * in disguise
 
 protected:
