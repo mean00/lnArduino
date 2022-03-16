@@ -38,22 +38,32 @@ static const UsartMapping usartMapping[3]=
  */
 #define M(x) usartMapping[instance].x
 
-lnSerial::lnSerial(int instance, int rxBufferSize) :  _txDma(lnDMA::DMA_MEMORY_TO_PERIPH, M(dmaEngine),M(dmaTxChannel),8,32)
+lnSerial::lnSerial(int instance, int rxBufferSize) :
+ _txDma(lnDMA::DMA_MEMORY_TO_PERIPH, M(dmaEngine),M(dmaTxChannel),8,32)
 {
     const UsartMapping *m=usartMapping+instance;
     _instance=instance;
     _irq=m->irq;
-    _stateTx=false;
     _adr=m->usartEngine;
     xAssert(SerialInstance[instance]==NULL) ;
     SerialInstance[instance]=this;
-    _txState=txIdle;
+    _txState=txTransmittingIdle;
     _rxBufferSize=rxBufferSize;
     _rxTail=_rxHead=0;
     _rxBuffer=new uint8_t [_rxBufferSize];
+    _rxEnabled=false;
     _cbCookie=NULL;
     _cb=NULL;
 }
+
+void lnSerial::enableInterrupt(bool tx)
+{
+    if(tx || _rxEnabled)
+      lnEnableInterrupt(_irq);
+    else
+      lnDisableInterrupt(_irq);
+}
+
 /**
 */
 int    lnSerial::modulo(int in)
@@ -115,6 +125,8 @@ bool lnSerial::init()
 /**
   \brief purge fifo and uart registers
 */
+#define RE_ENABLE_INTERRUPT() enableInterrupt(_txState==txTransmittingInterrupt || _txState==txTransmittingLast )
+
 void lnSerial::purgeRx()
 {
   LN_USART_Registers *d=(LN_USART_Registers *)_adr;
@@ -126,7 +138,7 @@ void lnSerial::purgeRx()
     uint8_t c=d->DATA;
     stat=d->STAT;
   }
-  enableInterrupt();
+   RE_ENABLE_INTERRUPT();
 }
 /**
 
@@ -137,12 +149,18 @@ bool lnSerial::enableRx(bool enabled)
   d->CTL0&=~LN_USART_CTL0_UEN;
   if(enabled)
   {
+      disableInterrupt();
+      _rxEnabled=true;
       d->CTL0|=LN_USART_CTL0_RBNEIE;
       d->CTL0|=LN_USART_CTL0_REN;
+      enableInterrupt(true);
   }else
   {
-     d->CTL0&=~LN_USART_CTL0_REN;
-     d->CTL0&=~LN_USART_CTL0_RBNEIE;
+      disableInterrupt();
+      _rxEnabled=false;
+       d->CTL0&=~LN_USART_CTL0_REN;
+       d->CTL0&=~LN_USART_CTL0_RBNEIE;
+       RE_ENABLE_INTERRUPT();
   }
   d->CTL0|=LN_USART_CTL0_UEN;
   return true;
@@ -152,32 +170,45 @@ bool lnSerial::enableRx(bool enabled)
  *
  * @return
  */
-bool lnSerial::_enableTx(txMode mode)
+bool lnSerial::_programTx()
 {
     LN_USART_Registers *d=(LN_USART_Registers *)_adr;
     d->CTL0&=~LN_USART_CTL0_UEN;
-    switch(mode)
+    switch(_txState)
     {
-        case txInterrupt:
+        case txTransmittingLast:
+            disableInterrupt();
              // disable TC & TE tx interrupt
             d->CTL0&=~( LN_USART_CTL0_TBIE +LN_USART_CTL0_TCIE);
             // enable Tx
-            d->CTL2&=~LN_USART_CTL2_DMA_TX;    // disable TX DMA
-            d->CTL0|=LN_USART_CTL0_TEN; // enable TX
-            d->CTL0|= LN_USART_CTL0_TBIE; // enable TBIE
-            lnEnableInterrupt(_irq);      // enable eclic
+            d->CTL2 &=~LN_USART_CTL2_DMA_TX;    // disable TX DMA
+            d->CTL0 |= LN_USART_CTL0_TEN; // enable TX
+            d->CTL0 |= LN_USART_CTL0_TCIE; // enable TBIE
+            enableInterrupt(true);      // enable tx part of interrupt
             break;
-        case txNone:
-             lnDisableInterrupt(_irq);
+        case txTransmittingInterrupt:
+            disableInterrupt();
+             // disable TC & TE tx interrupt
+            d->CTL0&=~( LN_USART_CTL0_TBIE +LN_USART_CTL0_TCIE);
+            // enable Tx
+            d->CTL2 &=~LN_USART_CTL2_DMA_TX;    // disable TX DMA
+            d->CTL0 |= LN_USART_CTL0_TEN; // enable TX
+            d->CTL0 |= LN_USART_CTL0_TBIE; // enable TBIE
+            enableInterrupt(true);      // enable tx part of interrupt
+            break;
+        case txTransmittingIdle:
+             disableInterrupt();
              d->CTL0&=~LN_USART_CTL0_TEN; // disable TX
              d->CTL2&=~LN_USART_CTL2_DMA_TX; // disable TX DMA
              d->CTL0&=~( LN_USART_CTL0_TBIE +LN_USART_CTL0_TCIE);
+             enableInterrupt(false);   // disable tx part of interrupt
              break;
-        case txDma:
-            lnDisableInterrupt(_irq);
+        case txTransmittingDMA:
+            disableInterrupt();
             d->CTL0|=( LN_USART_CTL0_TBIE +LN_USART_CTL0_TCIE);
             d->CTL0|=LN_USART_CTL0_TEN; // enable TX
             d->CTL2|=LN_USART_CTL2_DMA_TX; // enable TX DMA
+            enableInterrupt(false);
             break;
         default:
             xAssert(0);
@@ -196,20 +227,27 @@ bool lnSerial::transmit(int size,const uint8_t *buffer)
 {
     //return true;
     LN_USART_Registers *d=(LN_USART_Registers *)_adr;
-    _mutex.lock();
+    _txMutex.lock();
     ENTER_CRITICAL();
-    _txState=txTransmitting;
+    _lastTransferSize=size;
     _tail=buffer+size;
     _cur=buffer+1;
-    // Clear TC
+    if(size==1)
+    {
+      _txState=txTransmittingLast;
+    }
+    else
+    {
+      _txState=txTransmittingInterrupt;
+    }
     d->STAT&=~(LN_USART_STAT_TC);
     // send 1st byte
     d->DATA=(uint32_t )buffer[0];
     // enable TB interrupt
-    _enableTx(txInterrupt);
+    _programTx();
     EXIT_CRITICAL();
     _txDone.take();
-    _mutex.unlock();
+    _txMutex.unlock();
     return true;
 }
 
@@ -225,7 +263,7 @@ void lnSerial::txDmaCb()
     // nope d->STAT&=~(LN_USART_STAT_TC);
     // clear DMA
     d->CTL2&=~(LN_USART_CTL2_DMA_TX);
-    _txState=txIdle;
+    _txState=txTransmittingIdle;
     _txDone.give();
 }
 /**
@@ -248,11 +286,12 @@ bool lnSerial::dmaTransmit(int size,const uint8_t *buffer)
 {
     //return true;
     LN_USART_Registers *d=(LN_USART_Registers *)_adr;
-    _mutex.lock(); // lock uart
+    _txMutex.lock(); // lock uart
     _txDma.beginTransfer(); // lock dma
     ENTER_CRITICAL();
-    _txState=txTransmitting;
-    _enableTx(txDma);
+    _lastTransferSize=size;
+    _txState=txTransmittingDMA;
+    _programTx();
     d->STAT&=~LN_USART_STAT_TC;
     _txDma.attachCallback(_dmaCallback,this);
     EXIT_CRITICAL();
@@ -269,8 +308,7 @@ bool lnSerial::dmaTransmit(int size,const uint8_t *buffer)
     }
     d->STAT&=~(LN_USART_STAT_TC);
 
-
-    _mutex.unlock();
+    _txMutex.unlock();
     return true;
 }
 
@@ -285,13 +323,14 @@ void lnSerial::_interrupt(void)
 {
     serialRound++;
     LN_USART_Registers *d=(LN_USART_Registers *)_adr;
-    volatile int stat=d->STAT &   d->CTL0 & 0x1f0; // filter enabled interrupt only
+#define ALL_INTERRUPTS (LN_USART_STAT_RBNE+LN_USART_STAT_TC+LN_USART_STAT_TBE+LN_USART_STAT_OVERR)
+    volatile int stat=d->STAT &   d->CTL0 & ALL_INTERRUPTS; // filter enabled interrupt only
     if(stat &  (LN_USART_STAT_TC+LN_USART_STAT_TBE))
     {
-      if(_txState!=txIdle)
+      if(  _txState==txTransmittingInterrupt || _txState == txTransmittingLast)
         txInterruptHandler();
     }
-    if(stat & (LN_USART_STAT_RBNE))
+    if(stat & (LN_USART_STAT_RBNE) && _rxEnabled)
     {
         rxInterruptHandler();
     }
@@ -336,24 +375,25 @@ void lnSerial::txInterruptHandler(void)
   volatile int ctl0=d->CTL0;
   switch(_txState)
   {
-      case txTransmitting:
+      case txTransmittingInterrupt:
            xAssert(stat & LN_USART_STAT_TBE) ;
            d->DATA=(uint32_t )*_cur;
           _cur++;
+          if(_cur>_tail) xAssert(0);
           if(_cur==_tail)
           {
               d->CTL0|=LN_USART_CTL0_TCIE;
               d->CTL0&=~(LN_USART_CTL0_TBIE ) ; // only let the Transmission complete bit
-              _txState=txLast;
+              _txState=txTransmittingLast;
           }
           return;
           break;
-      case txLast:
+      case txTransmittingLast:
            if(!(stat & LN_USART_STAT_TC))
-              return; // we got here due to RX interrupt...
+              xAssert(0); // we got here due to RX interrupt...
            d->CTL0&=~( LN_USART_CTL0_TBIE +LN_USART_CTL0_TCIE);
            d->STAT&=~(LN_USART_STAT_TC);
-          _txState=txIdle;
+          _txState=txTransmittingIdle;
           _txDone.give();
           return;
           break;
@@ -373,14 +413,6 @@ void lnSerial::disableInterrupt()
 /**
 
 */
-void lnSerial::enableInterrupt()
-{
-  const UsartMapping *m=usartMapping+_instance;
-  lnEnableInterrupt(m->irq);
-}
-/**
-
-*/
 void lnSerial::interrupts(int instance)
 {
     lnSerial *inst=SerialInstance[instance];
@@ -396,7 +428,7 @@ int lnSerial::read(int max, uint8_t *to)
   disableInterrupt();
   if(_rxHead==_rxTail)
   {
-      enableInterrupt();
+      RE_ENABLE_INTERRUPT();
       return 0;
   }
   if(_rxHead>_rxTail)
@@ -412,7 +444,7 @@ int lnSerial::read(int max, uint8_t *to)
     memcpy(to,_rxBuffer+_rxHead,z);
     _rxHead+=z; // cannot wrap here...
   }
-  enableInterrupt();
+  RE_ENABLE_INTERRUPT();
   return z;
 
 }

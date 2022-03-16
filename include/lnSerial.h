@@ -20,15 +20,10 @@ public:
     };
     enum txState
     {
-        txIdle,
-        txTransmitting,
-        txLast
-    };
-    enum txMode
-    {
-        txNone,
-        txInterrupt,
-        txDma
+        txTransmittingIdle,
+        txTransmittingInterrupt,
+        txTransmittingDMA,
+        txTransmittingLast
     };
          lnSerial(int instance, int rxBufferSize=128);
     bool init();
@@ -37,7 +32,7 @@ public:
     bool transmit(int size,const uint8_t *buffer);
     bool dmaTransmit(int size,const uint8_t *buffer);
     void disableInterrupt();
-    void enableInterrupt();
+    void enableInterrupt(bool txInterruptEnabled);
     void purgeRx();
     void _interrupt(void);
     int   read(int max, uint8_t *to);
@@ -51,28 +46,34 @@ typedef void lnSerialCallback(void *cookie, lnSerial::Event event);
 protected:
     void txInterruptHandler(void);
     void rxInterruptHandler(void);
+    bool _programTx(void);
 
 protected:
-    bool _enableTx(txMode mode);
-    int _instance;
-    LnIRQ _irq;
-    bool _stateTx;
-    uint32_t _adr;
-    xMutex _mutex;
+    bool      _enableTx(txState mode);
+    int       _instance;
+    LnIRQ     _irq;
+    uint32_t  _adr;
+    // tx
+    xMutex    _txMutex;
     xBinarySemaphore _txDone;
     volatile const uint8_t *_cur,*_tail;
     txState _txState;
     lnDMA   _txDma;
+    int     _lastTransferSize;
+    // rx
     int     _rxBufferSize;
     int     _rxHead,_rxTail;
     uint8_t *_rxBuffer;
+    bool    _rxEnabled;
+    //
     int     modulo(int in);
     lnSerialCallback   *_cb;
     void               *_cbCookie;
 
+
+
 protected:
     void txDmaCb();
- static    void _dmaCallback(void *c,lnDMA::DmaInterruptType it);
-
-
+static void _dmaCallback(void *c,lnDMA::DmaInterruptType it);
 };
+// EOF
