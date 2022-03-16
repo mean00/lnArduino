@@ -65,6 +65,7 @@ protected:
     int     _rxHead,_rxTail;
     uint8_t *_rxBuffer;
     bool    _rxEnabled;
+    int     _rxError;
     //
     int     modulo(int in);
     lnSerialCallback   *_cb;

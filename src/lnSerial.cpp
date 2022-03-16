@@ -54,6 +54,7 @@ lnSerial::lnSerial(int instance, int rxBufferSize) :
     _rxEnabled=false;
     _cbCookie=NULL;
     _cb=NULL;
+    _rxError=0;
 }
 
 void lnSerial::enableInterrupt(bool tx)
@@ -108,7 +109,7 @@ bool lnSerial::init()
         case 1:
         case 2:
             lnPinMode(e->tx,lnALTERNATE_PP);
-            lnPinMode(e->rx,lnFLOATING);
+            // ? lnPinMode(e->rx,lnALTERNATE_OD);
             lnPeripherals::enable(e->periph);
             break;
         default:
@@ -348,13 +349,19 @@ void lnSerial::rxInterruptHandler(void)
   while(stat & (LN_USART_STAT_RBNE))
   {
     uint8_t c=d->DATA;
-    // do we have space in the ring buffer ?
-    int next=modulo(_rxTail+1);
-    if(next!=_rxHead) // is it full ?
+    if(stat & (LN_USART_STAT_FERR+LN_USART_STAT_NERR))
     {
-      _rxBuffer[next]=c;
-      _rxTail=next;
-      pushed++;
+      _rxError++;
+    }else
+    {
+      // do we have space in the ring buffer ?
+      int next=modulo(_rxTail+1);
+      if(next!=_rxHead) // is it full ?
+      {
+        _rxBuffer[next]=c;
+        _rxTail=next;
+        pushed++;
+      }
     }
     stat=d->STAT;
   }
