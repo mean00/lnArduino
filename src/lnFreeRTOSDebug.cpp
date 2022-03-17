@@ -6,7 +6,8 @@
 
 extern const uint32_t *lnGetFreeRTOSDebug() LN_USED;
 
-static const lnFreeRTOSDebug freeRTOSDebug LN_USED={
+extern "C" const lnFreeRTOSDebug freeRTOSDebug;
+const lnFreeRTOSDebug freeRTOSDebug ={
   0x1FEEBAEUL,
   configMAX_PRIORITIES,//int NB_OF_PRIORITIES;
   0, //int MPU_ENABLED;
