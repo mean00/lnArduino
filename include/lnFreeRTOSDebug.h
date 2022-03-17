@@ -2,7 +2,7 @@
 #include "lnArduino.h"
 
 
-typedef struct lnFreeRTOSDebug
+struct lnFreeRTOSDebug
 {
   int NB_OF_PRIORITIES;
   int MPU_ENABLED;
