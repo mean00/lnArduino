@@ -340,5 +340,11 @@ uint32_t xFastEventGroup::readEvents(uint32_t maskInt)
     END_LOCK();
     return v;
 }
-
+// this makes sure the freeRTOSDebug symbol is not removed
+#include "lnFreeRTOSDebug.h"
+extern const lnFreeRTOSDebug freeRTOSDebug;
+const void *getFreeRTOSDebug()
+{
+  return &freeRTOSDebug;
+}
  //EOF

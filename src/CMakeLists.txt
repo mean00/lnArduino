@@ -21,7 +21,7 @@ SET(OVERLAY_SRCS       MapleFreeRTOS1000_pp.cpp systemAlloc.cpp lnDebug.cpp lnSe
                        lnADC_base.cpp
                        lnADC_timing.cpp
                        lnFMC.cpp
-                       
+                       lnFreeRTOSDebug.cpp                       
                        ../legacy/boards/${GD32_BOARD}/lnPinMapping.cpp
                     )
 
