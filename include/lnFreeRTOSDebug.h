@@ -1,6 +1,7 @@
 #pragma once
 #include "lnArduino.h"
 
+#define LN_FREERTOS_MAGIC  0x1FEEBAEUL
 
 struct lnFreeRTOSDebug
 {

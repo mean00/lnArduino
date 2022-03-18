@@ -8,7 +8,7 @@ extern const uint32_t *lnGetFreeRTOSDebug() LN_USED;
 
 extern "C" const lnFreeRTOSDebug freeRTOSDebug;
 const lnFreeRTOSDebug freeRTOSDebug ={
-  0x1FEEBAEUL,
+  LN_FREERTOS_MAGIC,
   configMAX_PRIORITIES,//int NB_OF_PRIORITIES;
   0, //int MPU_ENABLED;
   configMAX_TASK_NAME_LEN, // MAX_TASK_NAME_LEN
