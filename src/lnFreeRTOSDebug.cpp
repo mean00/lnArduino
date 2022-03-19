@@ -4,6 +4,35 @@
  * */
 #include "lnFreeRTOSDebug.h"
 
+struct copyOfTcbStruct       /* The old naming convention is used to prevent breaking kernel aware debuggers. */
+{
+    volatile StackType_t * pxTopOfStack; /*< Points to the location of the last item placed on the tasks stack.  THIS MUST BE THE FIRST MEMBER OF THE TCB STRUCT. */
+
+    #if ( portUSING_MPU_WRAPPERS == 1 )
+        xMPU_SETTINGS xMPUSettings; /*< The MPU settings are defined as part of the port layer.  THIS MUST BE THE SECOND MEMBER OF THE TCB STRUCT. */
+    #endif
+
+    ListItem_t xStateListItem;                  /*< The list that the state list item of a task is reference from denotes the state of that task (Ready, Blocked, Suspended ). */
+    ListItem_t xEventListItem;                  /*< Used to reference a task from an event list. */
+    UBaseType_t uxPriority;                     /*< The priority of the task.  0 is the lowest priority. */
+    StackType_t * pxStack;                      /*< Points to the start of the stack. */
+    char pcTaskName[ configMAX_TASK_NAME_LEN ]; /*< Descriptive name given to the task when created.  Facilitates debugging only. */ /*lint !e971 Unqualified char types are allowed for strings and single characters only. */
+
+    #if ( ( portSTACK_GROWTH > 0 ) || ( configRECORD_STACK_HIGH_ADDRESS == 1 ) )
+        StackType_t * pxEndOfStack; /*< Points to the highest valid address for the stack. */
+    #endif
+
+    #if ( portCRITICAL_NESTING_IN_TCB == 1 )
+        UBaseType_t uxCriticalNesting; /*< Holds the critical section nesting depth for ports that do not maintain their own count in the port layer. */
+    #endif
+
+    #if ( configUSE_TRACE_FACILITY == 1 )
+        UBaseType_t uxTCBNumber;  /*< Stores a number that increments each time a TCB is created.  It allows debuggers to determine when a task has been deleted and then recreated. */
+        UBaseType_t uxTaskNumber; /*< Stores a number specifically for use by third party trace code. */
+    #endif
+};
+
+
 extern const uint32_t *lnGetFreeRTOSDebug() LN_USED;
 
 extern "C" const lnFreeRTOSDebug freeRTOSDebug;
@@ -12,6 +41,7 @@ const lnFreeRTOSDebug freeRTOSDebug ={
   configMAX_PRIORITIES,//int NB_OF_PRIORITIES;
   0, //int MPU_ENABLED;
   configMAX_TASK_NAME_LEN, // MAX_TASK_NAME_LEN
+  offsetof(copyOfTcbStruct,uxTCBNumber),
 };
 /*
   dummy function to prevent the linker from removing it
