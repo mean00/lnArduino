@@ -57,4 +57,4 @@ extern "C"
 #define LN_ALIGN(x) __attribute__ ((aligned(x)))
 #define LN_USED __attribute__((used))
 
-extern "C" void free(void *a);
+extern "C" void free(void *a) __THROW;
