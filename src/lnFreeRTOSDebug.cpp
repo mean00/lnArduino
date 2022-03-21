@@ -38,10 +38,18 @@ extern const uint32_t *lnGetFreeRTOSDebug() LN_USED;
 extern "C" const lnFreeRTOSDebug freeRTOSDebug;
 const lnFreeRTOSDebug freeRTOSDebug ={
   LN_FREERTOS_MAGIC,
-  configMAX_PRIORITIES,//int NB_OF_PRIORITIES;
-  0, //int MPU_ENABLED;
-  configMAX_TASK_NAME_LEN, // MAX_TASK_NAME_LEN
-  offsetof(copyOfTcbStruct,uxTCBNumber),
+  offsetof(xLIST_ITEM,pxNext),             //OFFSET_LIST_ITEM_NEXT;
+  offsetof(xLIST_ITEM,pvOwner),            //OFFSET_LIST_ITEM_OWNER;
+
+
+  offsetof(xLIST,uxNumberOfItems),            //OFFSET_LIST_NUMBER_OF_ITEM;
+  offsetof(xLIST,pxIndex),            //OFFSET_LIST_INDEX;
+
+  configMAX_PRIORITIES,                  //NB_OF_PRIORITIES;
+  0,                                     //MPU_ENABLED;
+  configMAX_TASK_NAME_LEN,               //MAX_TASK_NAME_LEN
+  offsetof(copyOfTcbStruct,pcTaskName),  //OFFSET_TASK_NAME
+  offsetof(copyOfTcbStruct,uxTCBNumber), //OFFSET_TASK_NUM
 };
 /*
   dummy function to prevent the linker from removing it
