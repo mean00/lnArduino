@@ -16,6 +16,7 @@
 struct lnFreeRTOSDebug
 {
   int MAGIC;
+  int LIST_SIZE;
   int OFFSET_LIST_ITEM_NEXT;
   int OFFSET_LIST_ITEM_OWNER;
 

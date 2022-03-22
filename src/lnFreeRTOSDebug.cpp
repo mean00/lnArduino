@@ -38,6 +38,7 @@ extern const uint32_t *lnGetFreeRTOSDebug() LN_USED;
 extern "C" const lnFreeRTOSDebug freeRTOSDebug;
 const lnFreeRTOSDebug freeRTOSDebug ={
   LN_FREERTOS_MAGIC,
+  sizeof(List_t), //LIST_SIZE
   offsetof(xLIST_ITEM,pxNext),             //OFFSET_LIST_ITEM_NEXT;
   offsetof(xLIST_ITEM,pvOwner),            //OFFSET_LIST_ITEM_OWNER;
 
