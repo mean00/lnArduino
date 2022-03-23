@@ -58,3 +58,4 @@ extern "C"
 #define LN_USED __attribute__((used))
 
 extern "C" void free(void *a) __THROW;
+extern "C" void *malloc(size_t size)  __THROW __attribute_malloc__;
