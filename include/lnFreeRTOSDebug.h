@@ -24,7 +24,7 @@ struct lnFreeRTOSDebug
   int OFFSET_LIST_INDEX;
 
   int NB_OF_PRIORITIES;
-  int MPU_ENABLED;
+  int MPU_ENABLED;        // that one selects the register/stacking : 0 :=> M0 or M3, 1=> M4 + FPU
   int MAX_TASK_NAME_LEN;
   int OFFSET_TASK_NAME;
   int OFFSET_TASK_NUM;

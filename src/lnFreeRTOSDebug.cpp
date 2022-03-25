@@ -47,7 +47,15 @@ const lnFreeRTOSDebug freeRTOSDebug ={
   offsetof(xLIST,pxIndex),            //OFFSET_LIST_INDEX;
 
   configMAX_PRIORITIES,                  //NB_OF_PRIORITIES;
-  0,                                     //MPU_ENABLED;
+#ifdef __arm__
+      #if defined( __thumb2__ ) && defined(__SOFTFP__) && (__ARM_ARCH==7 || __ARM_ARCH ==6)
+      0, // M0 or M3
+      #else
+      1, // M4
+      #endif
+#else
+  0,
+#endif
   configMAX_TASK_NAME_LEN,               //MAX_TASK_NAME_LEN
   offsetof(copyOfTcbStruct,pcTaskName),  //OFFSET_TASK_NAME
   offsetof(copyOfTcbStruct,uxTCBNumber), //OFFSET_TASK_NUM
