@@ -40,22 +40,26 @@ public:
 /**
 
 */
-bool  fastUnlock()
+bool  CH32_fastUnlock()
 {
-   // reset fast unlock
-    if(!(aFMC->CTL & LN_FMC_CTL_CH32_FASTUNLOCK)) return true; // already cleared
     // send unlock sequence
     aFMC->KEY=0x45670123;
     aFMC->KEY=0xCDEF89AB;
-    lnDelayUs(2);
     // send fast unlock sequence
     volatile uint32_t *CHF103=(uint32_t *)LN_FMC_ADR;
     CHF103[9]=0x45670123;
     CHF103[9]=0xCDEF89AB;
-    lnDelayUs(2);
 
     uint32_t v=aFMC->CTL;
     return !(v  & LN_FMC_CTL_CH32_FASTUNLOCK);
+}
+//
+//
+//
+bool CH32_fastLock()
+{
+    aFMC->CTL|=LN_FMC_CTL_LK;
+    return true;
 }
 // this check if the fast unlock bit is settable
 // it is called early in the boot so it cannot use high level calls
@@ -143,7 +147,7 @@ bool lnFMC::eraseCh32(const uint32_t startAddress, int sizeInKBytes)
     // check the start address is 1 kB aligned
     xAssert(!(adr & ((1<<10)-1)));
     autoNoInterrupt noInt;
-    fastUnlock();
+    CH32_fastUnlock();
     // Erase each page
     for(int i=0;i<sizeInKBytes*8;i++)
     {
