@@ -15,6 +15,7 @@
  * 
  */
 
+#define AIRCR_KEY (0x5FA<<16)
 
 #define LN_NB_INTERRUPT 68
 #define LN_VECTOR_OFFSET 16
@@ -61,7 +62,35 @@ void unsupportedInterrupt2()
     
     xAssert(0);
 }
+/**
+ *  \brief SoftReset, only resets the core
+ * */
+void lnSoftSystemReset()
+{
+    uint32_t aircr=aSCB->AIRCR;
+    aircr= AIRCR_KEY+(1<<0); // VECTRESET
+    aSCB->VTOR=0; // boot to bootloader, not the app
+    aSCB->AIRCR= aircr;
+    while(1)
+    {
 
+    }
+}
+
+/**
+ * \brief Full reset, reset the full MCU
+ */
+void lnHardSystemReset()
+{
+    uint32_t aircr=aSCB->AIRCR;
+    aircr= AIRCR_KEY+(1<<2); // SYSREQRESET
+    aSCB->VTOR=0; // boot to bootloader, not the app
+    aSCB->AIRCR= aircr;
+    while(1)
+    {
+
+    }
+}
 /**
  * 
  * @param irq
@@ -332,7 +361,7 @@ void lnIrqSysInit()
     
     // Set AIRCR to 3 (i.e. 4 bits), see https://interrupt.memfault.com/blog/arm-cortex-m-exceptions-and-nvic
     uint32_t aircr=aSCB->AIRCR&7;
-    aircr|=(0x05FA<<16)+(3<<8);
+    aircr|=AIRCR_KEY+(3<<8);
     aSCB->AIRCR=aircr;
    
 
