@@ -16,3 +16,7 @@
 [submodule "freeRTOS_gdb_support"]
 	path = freeRTOS_gdb_support
 	url = https://github.com/mean00/lnArduino_FreeRTOS_gdb.git
+[submodule "libraries/tinyUsb/src"]
+	path = libraries/tinyUsb/src
+	url = https://github.com/hathach/tinyusb.git
+    ignore = dirty
