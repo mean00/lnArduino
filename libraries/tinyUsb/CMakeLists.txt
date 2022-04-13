@@ -1,7 +1,7 @@
 
 # CFG_TUSB_OS == OPT_OS_FREERTOS
 
-SET(TUSB ${CMAKE_CURRENT_SOURCE_DIR}/src)
+SET(TUSB ${CMAKE_CURRENT_SOURCE_DIR}/src/src)
 SET(LNSRC ${CMAKE_CURRENT_SOURCE_DIR}/lnSrc)
 include_directories( ${AF_FOLDER}/private_include)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
