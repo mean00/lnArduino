@@ -5,7 +5,9 @@ SET(ARDUINO_GD32_FREERTOS ${CMAKE_CURRENT_SOURCE_DIR} CACHE INTERNAL "")
 MESSAGE(STATUS "ARDUINO_GD32_FREERTOS is ${ARDUINO_GD32_FREERTOS}")
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${AF_FOLDER}/cmake CACHE INTERNAL "")
+include(applyPatch)
 
+APPLY_PATCH_IF_NEEDED(patch_tinyusb0 tinyusb_no_static.patch        libraries/tinyUsb      "dont use freertos static constructs ")
 
 OPTION(LN_ENABLE_USBD "Enable USBD support")
 OPTION(LN_ENABLE_I2C  "Enable I2C support" ON)
@@ -18,6 +20,8 @@ include(./arduino.cmake)
 include(./embeddedPrintf.cmake)
 
 add_subdirectory(src)
+
+
 
 IF(LN_ENABLE_RUST)
     add_subdirectory(rust)
