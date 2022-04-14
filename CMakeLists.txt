@@ -15,6 +15,14 @@ OPTION(LN_ENABLE_SPI  "Enable SPI support" ON)
 
 OPTION(LN_ENABLE_RUST "Enable rust support" OFF)
 
+IF(LN_BOOTLOADER_SIZE)
+        SET(LN_BOOTLOADER_SIZE ${LN_BOOTLOADER_SIZE} CACHE INTERNAL "")
+ELSE(LN_BOOTLOADER_SIZE)
+        MESSAGE(STATUS "No bootloader reserved space.")
+        SET(LN_BOOTLOADER_SIZE 0 CACHE INTERNAL "")
+ENDIF(LN_BOOTLOADER_SIZE)
+
+
 include(./freeRTOS.cmake)
 include(./arduino.cmake)
 include(./embeddedPrintf.cmake)

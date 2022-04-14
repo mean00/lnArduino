@@ -14,6 +14,14 @@ MACRO(GENERATE_GD32_FIRMWARE target)
         SET(SCRIPT "${CMAKE_BINARY_DIR}/linker_script.ld" CACHE INTERNAL "")
     ENDIF()
     TARGET_LINK_OPTIONS(${target}  PRIVATE "-T${SCRIPT}")
+
+    add_custom_command(TARGET ${target}
+                   POST_BUILD
+                   COMMAND ${CMAKE_OBJCOPY} -Obinary $<TARGET_FILE:${target}> $<TARGET_FILE:${target}>.bin
+                   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+                   COMMENT "Generating bin file"
+    )
+
 ENDMACRO(GENERATE_GD32_FIRMWARE target)
 
 MACRO(USE_LIBRARY lib)
