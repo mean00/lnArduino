@@ -36,5 +36,6 @@ __stm32_vector_table:
 /* CM3 core interrupts */
 	.long	__msp_init-4
 	.long	__exc_reset
-
+    .long   0 // size
+    .long   0 // hash
 	.size	__stm32_vector_table, . - __stm32_vector_table
