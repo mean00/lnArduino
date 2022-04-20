@@ -385,7 +385,7 @@ LN_NVM_SECTOR_STATE lnNvm::getSectorState(int sector)
     if(0==a && LN_NVM_ALLONES==b) return Nvm_Prep;
     if(0==a && 0==b) return Nvm_Active;
     if(LN_NVM_ALLONES==a && LN_NVM_ALLONES==b) return Nvm_Erased;
-    return Nvm_Erased;
+    return Nvm_Error;
 }
 /**
  *
