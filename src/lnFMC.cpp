@@ -64,9 +64,13 @@ bool CH32_fastLock()
 // this check if the fast unlock bit is settable
 // it is called early in the boot so it cannot use high level calls
 bool  FMC_hasFastUnlock()
-{
+{    
   // reset fast unlock
-    aFMC->CTL|=LN_FMC_CTL_CH32_FASTUNLOCK; // clear fast unlock
+    aFMC->CTL|=LN_FMC_CTL_CH32_FASTUNLOCK; // clear fast unlock, the bit should go to '1'
+    if(!(aFMC->CTL & LN_FMC_CTL_CH32_FASTUNLOCK))
+    {
+        return false;
+    }
     // send unlock sequence
     aFMC->KEY=0x45670123;
     aFMC->KEY=0xCDEF89AB;
