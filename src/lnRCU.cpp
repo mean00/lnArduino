@@ -13,8 +13,8 @@ LN_RCU *arcu=(LN_RCU *)LN_RCU_ADR;
  */
 struct RCU_Peripheral
 {
-    Peripherals                 periph;
-    int                         AHB_APB; // 1=APB 1, 2=APB2,8=AHB
+    uint8_t                     periph;
+    uint8_t                     AHB_APB; // 1=APB 1, 2=APB2,8=AHB
     uint32_t                    enable;
 };
 
