@@ -12,6 +12,8 @@ LN_Timers_Registers     *aTimer2=(LN_Timers_Registers *)(LN_TIMER2_ADR);
 LN_Timers_Registers     *aTimer3=(LN_Timers_Registers *)(LN_TIMER3_ADR);
 LN_Timers_Registers     *aTimer4=(LN_Timers_Registers *)(LN_TIMER4_ADR);
 
+#define PMW_RANGE 100
+
 #define aTimer(x) abTimers[x]
 
 #define READ_CHANNEL_CTL(channel)       (((  t->CHCTLs[channel>>1])>>(8*(channel&1)))&0xFF)
@@ -74,7 +76,7 @@ lnTimer::~lnTimer()
 void lnTimer::setPwmFrequency(int fqInHz)
 {
 //--
-  LN_Timers_Registers *t=aTimers(_timer);;
+    LN_Timers_Registers *t=aTimers(_timer);;
     Peripherals per=pTIMER1;
     per=(Peripherals)((int)per+_timer-1);
     uint32_t clock=lnPeripherals::getClock(per);
@@ -82,17 +84,11 @@ void lnTimer::setPwmFrequency(int fqInHz)
     // disable
     t->CTL0&=~LN_TIMER_CTL0_CEN;
     
-    int divider=(clock+(fqInHz*512))/(fqInHz*1024);
-    divider*=2;
-    while(divider>65535)
-    {
-        divider=divider/2;
-    }
+    int divider=(2*clock+(fqInHz*PMW_RANGE/2))/(fqInHz*PMW_RANGE);
     
-    uint32_t ctl0=t->CTL0;    
     if(!divider) divider=1;
     t->PSC=divider-1;    
-    t->CAR=1024;
+    t->CAR=PMW_RANGE-1;
 }
 /**
  * 
@@ -143,14 +139,14 @@ void lnTimer::setMode(lnTimerMode mode)
  * @param timer
  * @param channel
  */
-void lnTimer::setPwmMode(int ratio1024)
+void lnTimer::setPwmMode(int ratio1000)
 {
   LN_Timers_Registers *t=aTimers(_timer);;
   
   
   setMode(lnTimerModePwm1);
     
-  t->CHCVs[_channel] =ratio1024; // A/R
+  t->CHCVs[_channel] =ratio1000; // A/R
 #if 0  
   t->CHCTL2 |=LN_TIMER_CHTL2_CHxP(_channel);
 #else
@@ -208,7 +204,7 @@ void lnTimer::singleShot(int durationMs, bool down)
    // noInterrupts();
     disable();
     setTickFrequency(10*1000*SPEEDUP); // 1 tick=1ms
-    t->CAR=10000;
+    t->CAR=10000-1;
     t->CNT=0;
     
     uint32_t chCtl=READ_CHANNEL_CTL(_channel);
@@ -220,7 +216,7 @@ void lnTimer::singleShot(int durationMs, bool down)
     t->CHCVs[_channel] =durationMs*10; // high then low when timer elapsed
     noInterrupts();
     //t->CTL0|=LN_TIMER_CTL0_SPM; // sign
-    t->CNT=t->CAR-2;
+    t->CNT=t->CAR-1;
     t->CTL0|=LN_TIMER_CTL0_CEN;
     t->CHCTL2 |=LN_TIMER_CHTL2_CHxEN(_channel); // basic enable, active high
     interrupts();
@@ -282,4 +278,38 @@ void lnAdcTimer::setPwmFrequency(int fqInHz)
     t->CHCTL2 &=~(LN_TIMER_CHTL2_CHxP(_channel)); // active high ?
     
 }
+
+/**
+ * 
+ * @param timer
+ */
+
+void lnSquareSignal::setFrequency(int fqInHz)
+{
+    LN_Timers_Registers *t=aTimers(_timer);;
+    Peripherals per=pTIMER1;    
+
+    t->CTL0&=~LN_TIMER_CTL0_CEN; // disable  
+    setMode(lnTimerModePwm1);
+    
+    t->CHCVs[_channel] = PMW_RANGE/2; // A/R
+    t->CHCTL2 &=~(LN_TIMER_CHTL2_CHxP(_channel)); // active low
+   //--
+    
+   
+   
+    per=(Peripherals)((int)per+_timer-1);
+    uint32_t clock=lnPeripherals::getClock(per);
+    // If ABP1 prescale=1, clock*=2 ???? see 5.2 in GD32VF103
+    // disable
+    if(_timer) clock*=2;
+    
+    int divider=(clock+(fqInHz*PMW_RANGE/2))/(fqInHz*PMW_RANGE);
+         
+    if(!divider) divider=1;
+    t->PSC=divider-1;    
+    t->CAR=PMW_RANGE-1;
+}
+
+
 //EOF

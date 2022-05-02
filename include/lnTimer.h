@@ -26,9 +26,9 @@ public:
              lnTimer(int pin);
     virtual ~lnTimer();
         // PWM
-        void setPwmMode(int ratio1024);
+        void setPwmMode(int ratio100);
         void setPwmFrequency(int fqInHz); // This program the timer fq with a tick of 1024, i.e. internal fq is 1024* the given fq
-        void setChannelRatio(int ratio1024); // Ratio=1024 => 100%, 512 => 50%, 0 => 0%
+        void setChannelRatio(int ratio100); // Ratio=100 => 100%, 50 => 50%, 0 => 0%
         //
         void singleShot(int durationMs, bool down=false);
         void setForceState(bool forceHigh=false);
@@ -61,6 +61,23 @@ public:
         int getPwmFrequency();
 protected:
         int _actualPwmFrequency;
+};
+/**
+ * 
+ */
+class lnSquareSignal : public lnTimer
+{
+public:
+        lnSquareSignal(int timer,int channel) : lnTimer(timer, channel)
+        {
+
+        }    
+        lnSquareSignal(int pin) : lnTimer(pin)
+        {
+
+        }    
+        // this is a single pulse timer
+        void setFrequency(int fqInHz);         
 };
 
 
