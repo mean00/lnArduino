@@ -86,7 +86,7 @@ bool lnSerial::setSpeed(int speed)
     Peripherals periph=( Peripherals)((int)pUART0+_instance);
     freq=lnPeripherals::getClock(periph);
     // compute closest divider
-    int divider=(freq+speed/2)/speed;
+    int divider=(freq+(speed/2))/speed;
     // Fixed 4 buts decimal, just ignore since we oversample by 16
     LN_USART_Registers *d=(LN_USART_Registers *)_adr;
     d->CTL0&=~LN_USART_CTL0_UEN;
