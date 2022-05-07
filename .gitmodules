@@ -19,6 +19,6 @@
 [submodule "libraries/tinyUsb/src"]
 	path = libraries/tinyUsb/src
 	url = https://github.com/hathach/tinyusb.git
-		ignore = dirty
-		fetchRecurseSubmodules = false
+    ignore = dirty
+    fetchRecurseSubmodules = false
 
