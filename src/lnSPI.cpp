@@ -53,6 +53,23 @@ void updateMode(LN_SPI_Registers *d,bool rxTx)
     d->CTL0=reg;
 
 }
+void updateModeRx1Wire(LN_SPI_Registers *d,bool isRx)
+{
+    
+    uint32_t reg=d->CTL0;
+    reg&=~(LN_SPI_CTL0_BDOEN | LN_SPI_CTL0_BDEN | LN_SPI_CTL0_RO);
+    if(isRx)
+    {
+        // Rx Only: unidirectional, transmit only, 
+        reg|=LN_SPI_CTL0_BDEN ;
+    }else
+    {   // Tx Only: unidirectional, transmit only, 
+        reg|=LN_SPI_CTL0_BDOEN | LN_SPI_CTL0_BDEN;
+    }
+    volatile uint32_t s=d->STAT;
+    d->CTL0=reg;
+
+}
 /**
  * 
  * @param adr
@@ -335,8 +352,7 @@ void hwlnSPIClass::waitForCompletion()
 
                     }
             break;
-        case 2: // receive only
-            xAssert(0);
+        case 2: // receive only            
             break;
         case 3: //  t only
             while(txbusy())
@@ -350,6 +366,38 @@ void hwlnSPIClass::waitForCompletion()
             break;
     }
 }
+/**
+ * 
+ */
+bool hwlnSPIClass::read1wire( int nbRead, uint8_t *rd)
+{
+    LN_SPI_Registers *d=(LN_SPI_Registers *)_adr;
+    
+    updateModeRx1Wire(d,true); //1 Wire RX
+    updateDataSize(d,8);
+    
+    // clear stuff (not sure it is useful)
+    uint32_t dummy;
+    while ((d->STAT & LN_SPI_STAT_RBNE) )
+    {    
+        dummy= d->DATA;  
+    }
+    senable();
+    csOn();
+    for (int i = 0; i < nbRead; i++) 
+    {
+        while (!(d->STAT & LN_SPI_STAT_RBNE) )
+        {        
+            __asm__("nop");
+        }
+        rd[i] = d->DATA;
+    }
+    waitForCompletion();
+    csOff();
+    sdisable();
+    return true;
+}
+
 /**
  */
 bool hwlnSPIClass::transfer(int nbBytes, uint8_t *dataOut, uint8_t *dataIn)

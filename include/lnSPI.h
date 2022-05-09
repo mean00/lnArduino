@@ -85,15 +85,14 @@ class hwlnSPIClass
     bool dmaWrite16(int nbBytes, const uint16_t *data);
     bool dmaWrite16Repeat(int nbBytes, const uint16_t data);
     bool dmaWrite(int nbBytes, const uint8_t *data);
-    
-    
     bool transfer(int nbBytes, uint8_t *dataOut, uint8_t *dataIn);
 
     bool asyncWrite(int nbBytes, const uint8_t *data,lnSpiCallback *callback,void *cookie);
     bool asyncTransfer(int nbBytes, uint8_t *dataOut, uint8_t *dataIn,lnSpiCallback *callback,void *cookie);
 
     void waitForCompletion(); // wait for everything to be COMPLETELY done
-    
+    // this one is the same as transfer but it only reads over the MOSI pin, i.e. only MOSI + CLK, no MISO
+    bool read1wire( int nbRead, uint8_t *rd); // read, reuse MOSI
     //
     int getInstance() {return _instance;}
     int getPeripheralClock();
