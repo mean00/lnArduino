@@ -271,21 +271,48 @@ bool hwlnSPIClass::writeInternal(int sz, int data)
 
 /**
  */
-bool hwlnSPIClass::writesInternal(int sz, int nbBytes, const uint8_t *data)
+bool hwlnSPIClass::writesInternal(int sz, int nb, const uint8_t *data,bool repeat)
 {
     LN_SPI_Registers *d=(LN_SPI_Registers *)_adr;
     updateMode(d,false);
     updateDataSize(d,sz);
     senable();
     csOn();
-    for (size_t i = 0; i < nbBytes; i++) 
+    switch(sz)
     {
-        while (sbusy()) 
+        default:
+            xAssert(0);
+            break;
+        case 8:
         {
+                const uint8_t  *p=data;
+                int inc=!repeat;
+                for (size_t i = 0; i < nb; i++)
+                {
+                    while (sbusy())
+                    {
+                    }
+                    d->DATA=*p;
+                    p+=inc;
+                }
+                break;
         }
-        d->DATA=data[i];
-        int dummy=d->DATA;
+        case 16:
+        {
+                const uint16_t  *p=( const uint16_t  *)data;
+                int inc=!repeat;
+                for (size_t i = 0; i < nb; i++)
+                {
+                    while (sbusy())
+                    {
+                    }        
+                    d->DATA=*p;
+                    p+=inc;
+                }
+                break;
+        }
     }
+    
     waitForCompletion();
     csOff();
     sdisable();
@@ -309,12 +336,18 @@ bool hwlnSPIClass::write16(int z)
 {
     return writeInternal(16,z);
 }
-
+/**
+ * 
+ */
+ bool hwlnSPIClass::write16Repeat(int nb, const uint16_t pattern)
+ {
+     return writesInternal(16,nb,(const uint8_t *)&pattern,true);
+ }
 /**
  */
-bool hwlnSPIClass::write(int nbBytes, const uint8_t *data)
+bool hwlnSPIClass::write(int nbBytes, const uint8_t *data,bool repeat)
 {
-   return writesInternal(8,nbBytes,data);
+   return writesInternal(8,nbBytes,data,repeat);
 }
 /**
  * 
