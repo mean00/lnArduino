@@ -81,7 +81,8 @@ class hwlnSPIClass
    //--
     bool write(int z);
     bool write16(int z);
-    bool write(int nbBytes, const uint8_t *data);
+    bool write16Repeat(int nb, const uint16_t pattern);
+    bool write(int nbBytes, const uint8_t *data,bool repeat=false);
     bool dmaWrite16(int nbBytes, const uint16_t *data);
     bool dmaWrite16Repeat(int nbBytes, const uint16_t data);
     bool dmaWrite(int nbBytes, const uint8_t *data);
@@ -124,7 +125,7 @@ class hwlnSPIClass
     // callbacks
     static void exTxDone(void *c,lnDMA::DmaInterruptType it);
     bool writeInternal(int sz, int data);
-    bool writesInternal(int sz, int nbBytes, const uint8_t *data);
+    bool writesInternal(int sz, int nbBytes, const uint8_t *data,bool repeat=false);
     bool dmaWriteInternal(int wordSize,int nbBytes, const uint8_t *data,bool repeat);
     
     
