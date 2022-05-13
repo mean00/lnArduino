@@ -78,11 +78,18 @@ class hwlnSPIClass
     // DMA ones
     void setDataSize(int dataSize); // 8 or 16
     
-   //--
+   //-- AsyncDma
+   bool asyncDmaWrite16(int nbBytes, const uint16_t *data,lnSpiCallback *cb,void *cookie,bool repeat=false);
+   bool nextDmaWrite16(int nbBytes, const uint16_t *data,lnSpiCallback *cb,void *cookie,bool repeat=false);
+   bool finishAsyncDma();
+   bool waitForAsyncDmaDone();
+
+   //
     bool write(int z);
     bool write16(int z);
     bool write16Repeat(int nb, const uint16_t pattern);
     bool write(int nbBytes, const uint8_t *data,bool repeat=false);
+
     bool dmaWrite16(int nbBytes, const uint16_t *data);
     bool dmaWrite16Repeat(int nbBytes, const uint16_t data);
     bool dmaWrite(int nbBytes, const uint8_t *data);
@@ -131,6 +138,7 @@ class hwlnSPIClass
     
 public:
     void                txDone();
+    void                invokeCallback();
 };
 // EOF
 

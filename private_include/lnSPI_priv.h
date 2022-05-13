@@ -67,9 +67,11 @@ typedef volatile LN_SPI_Registersx LN_SPI_Registers;
 //-- Others are CRC/I2S registers, wec dont use that for now ---
 
 #define senable()  { if(d->CTL0 &LN_SPI_CTL0_SPIEN) xAssert(0); (d->CTL0 |=LN_SPI_CTL0_SPIEN);}
+#define txbusy()    (!(d->STAT&LN_SPI_STAT_TBE))
+
 #define sdisable() (d->CTL0&=~LN_SPI_CTL0_SPIEN)
 #define sbusy()    (d->STAT&LN_SPI_STAT_TRANS)
-#define txbusy()    (!(d->STAT&LN_SPI_STAT_TBE))
+
 
 
 

@@ -336,6 +336,9 @@ bool hwlnSPIClass::write16(int z)
 {
     return writeInternal(16,z);
 }
+
+
+
 /**
  * 
  */
@@ -387,7 +390,7 @@ void hwlnSPIClass::waitForCompletion()
             break;
         case 2: // receive only            
             break;
-        case 3: //  t only
+        case 3: //  tx only
             while(txbusy())
             {
                 __asm__("nop");
