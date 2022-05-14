@@ -353,6 +353,13 @@ bool hwlnSPIClass::write(int nbBytes, const uint8_t *data,bool repeat)
    return writesInternal(8,nbBytes,data,repeat);
 }
 /**
+ */
+bool hwlnSPIClass::write16(int nbWord, const uint16_t *data,bool repeat)
+{
+    return writesInternal(16,nbWord,(const uint8_t *)data,repeat);
+}
+
+/**
  * 
  */
 void hwlnSPIClass::csOn()
