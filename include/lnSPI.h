@@ -89,6 +89,7 @@ class hwlnSPIClass
     bool write16(int z);
     bool write16Repeat(int nb, const uint16_t pattern);
     bool write(int nbBytes, const uint8_t *data,bool repeat=false);
+    bool write16(int nbWord, const uint16_t *data,bool repeat=false);
 
     bool dmaWrite16(int nbBytes, const uint16_t *data);
     bool dmaWrite16Repeat(int nbBytes, const uint16_t data);
