@@ -69,8 +69,8 @@ class hwlnSPIClass
     void end(void);
 
     // The settings structure must stay valid while the transaction is on !
-    void beginTransaction(lnSPISettings &settings);
-    void endTransaction();
+    void beginWriteTransaction(int bitSize);
+    void endWriteTransaction();
 
     void setBitOrder(spiBitOrder order)    ;
     void setDataMode(spiDataMode mode);
@@ -128,6 +128,7 @@ class hwlnSPIClass
     int                 _instance;
     uint32_t            _adr;
     LnIRQ               _irq;
+    bool                _inSession;
     
     lnDMA               txDma;
     // callbacks
