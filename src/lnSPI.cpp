@@ -192,11 +192,9 @@ void hwlnSPIClass::end(void)
 }    
 
 
-void hwlnSPIClass::beginWriteTransaction(int bitSize)
-{
-    _mutex.lock();
+void hwlnSPIClass::beginSession(int bitSize)
+{    
     _inSession=true;
-
     setup();
     LN_SPI_Registers *d=(LN_SPI_Registers *)_adr;
     updateMode(d,false);
@@ -205,12 +203,29 @@ void hwlnSPIClass::beginWriteTransaction(int bitSize)
     csOn();
 }
 /**
+ * 
  */
-void hwlnSPIClass::endWriteTransaction()
+void hwlnSPIClass::beginTransaction(lnSPISettings &settings)
+{
+    _mutex.lock();
+    _currentSetting=settings;
+    _settings=&_currentSetting;    
+    setup();
+}
+void hwlnSPIClass::endTransaction()
+{
+    _settings=&_internalSettings;
+    setup(); // restore settings
+    _mutex.unlock();
+}
+
+
+/**
+ */
+void hwlnSPIClass::endSession()
 {
     LN_SPI_Registers *d=(LN_SPI_Registers *)_adr;
     _inSession=false;
-    _mutex.unlock();
     csOff();
     sdisable();
 }

@@ -1,6 +1,19 @@
 /*
  *  (C) 2021 MEAN00 fixounet@free.fr
  *  See license file
+ * 
+ * Normal usage :
+ * --------------
+ *    setup()
+ *    begin()
+ *    beginSession()
+ *    write
+ *    write
+ *    read
+ *    endSession()
+ *    
+ * 
+ * 
  */
 
 #pragma once
@@ -27,6 +40,7 @@ enum spiBitOrder
     SPI_MSBFIRST=1
 };
 /**
+ * This is not really used
  */
 class lnSPISettings 
 {
@@ -68,9 +82,13 @@ class hwlnSPIClass
     void begin();
     void end(void);
 
+    //
+    void beginTransaction(lnSPISettings &settings);
+    void endTransaction();
+
     // The settings structure must stay valid while the transaction is on !
-    void beginWriteTransaction(int bitSize);
-    void endWriteTransaction();
+    void beginSession(int bitSize);
+    void endSession();
 
     void setBitOrder(spiBitOrder order)    ;
     void setDataMode(spiDataMode mode);
@@ -79,12 +97,15 @@ class hwlnSPIClass
     void setDataSize(int dataSize); // 8 or 16
     
    //-- AsyncDma
+   // Do asyncDma
+   //   and in the callback either call nextDma or finishAsyncDma
+   // The caller can call waitForAsyncDmadone to wait till all is done
    bool asyncDmaWrite16(int nbBytes, const uint16_t *data,lnSpiCallback *cb,void *cookie,bool repeat=false);
    bool nextDmaWrite16(int nbBytes, const uint16_t *data,lnSpiCallback *cb,void *cookie,bool repeat=false);
    bool finishAsyncDma();
    bool waitForAsyncDmaDone();
 
-   //
+   // Helper Write functions, make sure you are under a session
     bool write(int z);
     bool write16(int z);
     bool write16Repeat(int nb, const uint16_t pattern);
@@ -94,13 +115,13 @@ class hwlnSPIClass
     bool dmaWrite16(int nbBytes, const uint16_t *data);
     bool dmaWrite16Repeat(int nbBytes, const uint16_t data);
     bool dmaWrite(int nbBytes, const uint8_t *data);
+
+    // slow read/write
     bool transfer(int nbBytes, uint8_t *dataOut, uint8_t *dataIn);
 
-    bool asyncWrite(int nbBytes, const uint8_t *data,lnSpiCallback *callback,void *cookie);
-    bool asyncTransfer(int nbBytes, uint8_t *dataOut, uint8_t *dataIn,lnSpiCallback *callback,void *cookie);
-
-    void waitForCompletion(); // wait for everything to be COMPLETELY done
-    // this one is the same as transfer but it only reads over the MOSI pin, i.e. only MOSI + CLK, no MISO
+    // wait for everything to be COMPLETELY done
+    void waitForCompletion(); 
+    // This reads over the MOSI pin, i.e. only when only 2 wires are used MOSI + CLK, no MISO
     bool read1wire( int nbRead, uint8_t *rd); // read, reuse MOSI
     //
     int getInstance() {return _instance;}
@@ -136,8 +157,6 @@ class hwlnSPIClass
     bool writeInternal(int sz, int data);
     bool writesInternal(int sz, int nbBytes, const uint8_t *data,bool repeat=false);
     bool dmaWriteInternal(int wordSize,int nbBytes, const uint8_t *data,bool repeat);
-    
-    
 public:
     void                txDone();
     void                invokeCallback();
