@@ -1,16 +1,26 @@
 /*
- *  (C) 2021 MEAN00 fixounet@free.fr
+ *  (C) 2021/2022 MEAN00 fixounet@free.fr
  *  See license file
  * 
  * Normal usage :
  * --------------
  *    setup()
  *    begin()
- *    beginSession()
- *    write
- *    write
- *    read
- *    endSession()
+ *    ...
+ *    ...
+ *    beginTransaction() <= Lock on a specific device till endTransaction
+    *    beginSession(8)  <= while in beginSession the SPI stays enabled and the CS stays on (if defined), 
+    *                             also the bus width stays the same (8/16 bits)
+    *    write8
+    *    write8
+    *    read8
+    *    endSession()
+    *    beginSession(16)
+    *    write16
+    *    write16
+    *    read16
+    *    endSession()
+    * endTransaction() <= Other devices can be used
  *    
  * 
  * 
