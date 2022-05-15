@@ -27,7 +27,7 @@ bool hwlnSPIClass::dmaWriteInternal(int wordSize,int nbTransfer, const uint8_t *
     LN_SPI_Registers *d=(LN_SPI_Registers *)_adr;
     
     // that will clear errror
-    updateMode(d,false); // tx only
+    updateMode(d,lnTxOnly); // tx only
     
     // 1- Configure DMA
     txDma.beginTransfer();
@@ -36,7 +36,7 @@ bool hwlnSPIClass::dmaWriteInternal(int wordSize,int nbTransfer, const uint8_t *
     txDma.doMemoryToPeripheralTransferNoLock(nbTransfer, (uint16_t *)data, (uint16_t *)&d->DATA,repeat);        
     
     // 2- Configure SPI
-    updateMode(d,false); // tx only
+    updateMode(d,lnTxOnly); // tx only
     updateDataSize(d,wordSize);// 16 bits at a time
     updateDmaTX(d,true); // activate DMA
 
@@ -112,7 +112,7 @@ bool hwlnSPIClass::asyncDmaWrite16(int nbTransfer, const uint16_t *data,lnSpiCal
     LN_SPI_Registers *d=(LN_SPI_Registers *)_adr;
     
     // that will clear errror
-    updateMode(d,false); // tx only
+    updateMode(d,lnTxOnly); // tx only
     
     // 1- Configure DMA
     txDma.beginTransfer();
@@ -180,7 +180,7 @@ bool hwlnSPIClass::nextDmaWrite16(int nbTransfer, const uint16_t *data,lnSpiCall
     txDma.doMemoryToPeripheralTransferNoLock(nbTransfer, (uint16_t *)data, (uint16_t *)&d->DATA,repeat);        
     
     // 2- Configure SPI
-    updateMode(d,false); // tx only    
+    updateMode(d,lnTxOnly); // tx only    
     updateDmaTX(d,true); // activate DMA
     d->CTL0 |=LN_SPI_CTL0_SPIEN;
     return true;

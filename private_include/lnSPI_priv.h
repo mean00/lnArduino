@@ -74,7 +74,14 @@ typedef volatile LN_SPI_Registersx LN_SPI_Registers;
 
 
 
+enum lnSpiDirection
+{
+    lnDuplex=0,
+    lnTxOnly=1,
+    lnRxOnly=2
+};
 
-void updateMode(LN_SPI_Registers *d,bool rxTx);
+
+void updateMode(LN_SPI_Registers *d,lnSpiDirection dir);
 void updateDataSize(LN_SPI_Registers *d,int bits);
 void updateDmaTX(LN_SPI_Registers *d,bool onoff);
