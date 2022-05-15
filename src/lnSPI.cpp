@@ -36,39 +36,20 @@ static LN_SPI_Registers *aspi2=(LN_SPI_Registers *)LN_SPI2_ADR;
  */
 
 
-
-void updateMode(LN_SPI_Registers *d,bool rxTx)
+void updateMode(LN_SPI_Registers *d,lnSpiDirection dir)
 {
     
     uint32_t reg=d->CTL0;
-    reg&=~(LN_SPI_CTL0_BDOEN | LN_SPI_CTL0_BDEN | LN_SPI_CTL0_RO);
-    if(rxTx)
-    {
-        reg|=0; // 0 all bits = full duplex
-    }else
-    {   // Tx Only: unidirectional, transmit only, 
-        reg|=LN_SPI_CTL0_BDOEN | LN_SPI_CTL0_BDEN;
-    }
-    volatile uint32_t s=d->STAT;
-    d->CTL0=reg;
-
-}
-void updateModeRx1Wire(LN_SPI_Registers *d,bool isRx)
-{
     
-    uint32_t reg=d->CTL0;
-    reg&=~(LN_SPI_CTL0_BDOEN | LN_SPI_CTL0_BDEN | LN_SPI_CTL0_RO);
-    if(isRx)
+    reg&=~(LN_SPI_CTL0_BDOEN | LN_SPI_CTL0_BDEN | LN_SPI_CTL0_RO );
+    switch(dir)
     {
-        // Rx Only: unidirectional, transmit only, 
-        reg|=LN_SPI_CTL0_BDEN ;
-    }else
-    {   // Tx Only: unidirectional, transmit only, 
-        reg|=LN_SPI_CTL0_BDOEN | LN_SPI_CTL0_BDEN;
+            case lnDuplex:   reg|=0; break; // 0 all bits = full duplex
+            case lnTxOnly:   reg|=LN_SPI_CTL0_BDOEN | LN_SPI_CTL0_BDEN; break;
+            case lnRxOnly:   reg|=LN_SPI_CTL0_BDEN ;break;
+            default: xAssert(0);break;
     }
-    volatile uint32_t s=d->STAT;
     d->CTL0=reg;
-
 }
 /**
  * 
@@ -197,7 +178,7 @@ void hwlnSPIClass::beginSession(int bitSize)
     _inSession=true;
     setup();
     LN_SPI_Registers *d=(LN_SPI_Registers *)_adr;
-    updateMode(d,false);
+    updateMode(d,lnTxOnly);
     updateDataSize(d,bitSize);
     senable();
     csOn();
@@ -253,6 +234,7 @@ bool hwlnSPIClass::writeInternal(int sz, int data)
     waitForCompletion();
     return true;
 }
+
 
 /**
  */
@@ -377,10 +359,12 @@ void hwlnSPIClass::waitForCompletion()
         case 2: // receive only            
             break;
         case 3: //  tx only
+        
             while(txbusy())
             {
                 __asm__("nop");
-            }           
+            }     
+                  
             while(sbusy())
             {
                 __asm__("nop");
@@ -393,17 +377,10 @@ void hwlnSPIClass::waitForCompletion()
  */
 bool hwlnSPIClass::read1wire( int nbRead, uint8_t *rd)
 {
-    LN_SPI_Registers *d=(LN_SPI_Registers *)_adr;
+    LN_SPI_Registers *d=(LN_SPI_Registers *)_adr;   
+    updateMode(d,lnRxOnly); //1 Wire RX    
     
-    updateModeRx1Wire(d,true); //1 Wire RX
-    updateDataSize(d,8);
-    
-    // clear stuff (not sure it is useful)
-    uint32_t dummy;
-    while ((d->STAT & LN_SPI_STAT_RBNE) )
-    {    
-        dummy= d->DATA;  
-    }
+    // clear stuff (not sure it is useful)    
     for (int i = 0; i < nbRead; i++) 
     {
         while (!(d->STAT & LN_SPI_STAT_RBNE) )
@@ -518,7 +495,7 @@ void hwlnSPIClass::setup()
     sp&=~(7<<3);
     sp|=psc<<3;
     d->CTL0=sp;
-    updateMode(d,false); // Tx only by default    
+    updateMode(d,lnTxOnly); // Tx only by default    
 }
 /**
  * 
