@@ -316,7 +316,7 @@ uint32_t xFastEventGroup::waitEvents(uint32_t maskint, int timeout )
         // got it
         BEGIN_LOCK();
         set = maskint & _value;
-        xAssert(set);
+        // race can cause this to trigger ? xAssert(set);
         _value &= ~set;
         _mask=0;         // no need to clear waitintTask, it must be the same !
         END_LOCK();
