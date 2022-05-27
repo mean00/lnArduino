@@ -66,7 +66,7 @@ vector_base:
 	UNHANDLED(44) //.word     unhandledException //TIMER0_UP_IRQHandler
 	UNHANDLED(45) //.word     unhandledException //TIMER0_TRG_CMT_IRQHandler
 	UNHANDLED(46) //.word     unhandledException //TIMER0_Channel_IRQHandler
-	UNHANDLED(47) //.word     unhandledException //TIMER1_IRQHandler
+	.word TIMER1_IRQHandler // UNHANDLED(47) //.word     unhandledException //TIMER1_IRQHandler
 	UNHANDLED(48) //.word     unhandledException //TIMER2_IRQHandler
 	UNHANDLED(49) //.word     unhandledException //TIMER3_IRQHandler
 	.word I2C0_EV_IRQHandler  //UNHANDLED(50) //.word     unhandledException //I2C0_EV_IRQHandler
