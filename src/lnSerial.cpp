@@ -335,6 +335,11 @@ void lnSerial::_interrupt(void)
     {
         rxInterruptHandler();
     }
+    else
+    if(stat & (LN_USART_STAT_NERR+LN_USART_STAT_PERR+LN_USART_STAT_FERR+LN_USART_STAT_ORERR)) // Error
+    {
+        volatile uint32_t clear=d->DATA;
+    }
 }
 
 /**
