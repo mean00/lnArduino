@@ -42,6 +42,10 @@ typedef void lnSerialCallback(void *cookie, lnSerial::Event event);
               _cb=cb;
               _cbCookie=cookie;
             }
+     // no copy interface
+    int     getReadPointer(uint8_t **to);
+    void    consume(int n);
+       
  static void interrupts(int instance);
 protected:
     void txInterruptHandler(void);

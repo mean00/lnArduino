@@ -429,31 +429,70 @@ void lnSerial::interrupts(int instance)
 /**
 
 */
+
+/**
+ * \fn int read(int max, uint8_t *to)
+*/
 int lnSerial::read(int max, uint8_t *to)
 {
-  int z=0;
-  disableInterrupt();
-  if(_rxHead==_rxTail)
-  {
-      RE_ENABLE_INTERRUPT();
-      return 0;
-  }
-  if(_rxHead>_rxTail)
-  {
-    z=_rxBufferSize-_rxHead;
-    if(z>max) z=max;
-    memcpy(to,_rxBuffer+_rxHead,z);
-    _rxHead=modulo(_rxHead+z);
-  }else
-  {
-    z=_rxTail-_rxHead;
-    if(z>max) z=max;
-    memcpy(to,_rxBuffer+_rxHead,z);
-    _rxHead+=z; // cannot wrap here...
-  }
-  RE_ENABLE_INTERRUPT();
-  return z;
+  int total=0;
+  while(1)
+   {
+    disableInterrupt();
+    if( (_rxHead==_rxTail) || !max) // source empty or target full
+    {
+        RE_ENABLE_INTERRUPT();
+        return total;
+    }
+    int z=0;
+    if(_rxHead>_rxTail)
+    {
+      z=_rxBufferSize-_rxHead;     
+    }else
+    {
+      z=_rxTail-_rxHead;
+    }
+     if(z>max) z=max;
+     memcpy(to,_rxBuffer+_rxHead,z);
+     _rxHead=modulo(_rxHead+z);
+    RE_ENABLE_INTERRUPT();    
+    total+=z;
+    to+=z;
+    max-=z;    
+   }
+  xAssert(0);
+  return 0;
+}
 
+/**
+ * 
+ */
+int lnSerial::getReadPointer(uint8_t **to)
+{
+    disableInterrupt();
+    if( (_rxHead==_rxTail)) // source empty or target full
+    {
+        RE_ENABLE_INTERRUPT();
+        return 0;
+    }
+    int z=0;
+    if(_rxHead>_rxTail)
+    {
+      z=_rxBufferSize-_rxHead;     
+    }else
+    {
+      z=_rxTail-_rxHead;
+    }    
+    *to=_rxBuffer+_rxHead;
+    RE_ENABLE_INTERRUPT();
+    return z;
+}
+ 
+void lnSerial::consume(int n)
+{
+    disableInterrupt();
+    _rxHead=modulo(_rxHead+n);
+    RE_ENABLE_INTERRUPT();    
 }
 
 
