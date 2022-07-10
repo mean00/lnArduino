@@ -399,7 +399,7 @@ bool lnTwoWire::initiateTx()
     
     xAssert(size<=65535);
     
-    if( size<3)  // plain interrupt
+    if( size<8)  // plain interrupt
     {
         setInterruptMode(true,false,true); // event, no DMA, tx interrupt
         _txState=I2C_TX_DATA;
@@ -498,6 +498,7 @@ void lnTwoWire::irq(int evt)
                 break;
     }    
     lastI2cStat=(_d->adr->STAT0);
+    if(!lastI2cStat) return; // spurious
     volatile uint32_t v1;
     switch(_txState)
     {
@@ -575,12 +576,12 @@ void lnTwoWire::irq(int evt)
                        _txState=I2C_TX_STOP;
                        _d->adr->CTL1&=~( LN_I2C_CTL1_BUFIE);
                    }
-                  else
-                  {
+                   else
+                   {
                       _txState=I2C_TX_DATA;
-                  }
-                  return;
-                  break;
+                   }
+                   return;
+                   break;
         
         case I2C_TX_STOP:
                     xAssert(lastI2cStat&LN_I2C_STAT0_BTC);
