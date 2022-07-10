@@ -260,7 +260,7 @@ bool lnTwoWire::multiWrite(int target, int nbSeqn,int *seqLength, uint8_t **seqD
 {
     volatile uint32_t stat1,stat0;
     // Send start
-    
+    _dmaTx.beginTransfer(); // lock down i2c also, deals with re-entrency
     LN_I2C_Registers *adr=_d->adr;
      lnI2CSession session(target,nbSeqn,seqLength,seqData);
     _session=&session;
@@ -270,8 +270,8 @@ bool lnTwoWire::multiWrite(int target, int nbSeqn,int *seqLength, uint8_t **seqD
     _d->adr->STAT0=stat0;    
     _txState=I2C_TX_START;
     stat1=_d->adr->STAT1;
-    // enable interrupt
-    _dmaTx.beginTransfer();
+    
+    
     startIrq();
     adr->CTL0|=LN_I2C_CTL0_START; // send start    
     bool r=_sem.take(100);
@@ -314,6 +314,9 @@ bool lnTwoWire::write(int target, int n, uint8_t *data)
 bool lnTwoWire::multiRead(int target, int nbSeqn,int *seqLength, uint8_t **seqData)
 {
      volatile uint32_t stat1,stat0;
+    _dmaRx.beginTransfer(); // we dont actually use dma, but we use the dma mutex to protect against re-entrency
+                            // ugly, i know
+    
     // Send start
     
     LN_I2C_Registers *adr=_d->adr;
@@ -325,8 +328,7 @@ bool lnTwoWire::multiRead(int target, int nbSeqn,int *seqLength, uint8_t **seqDa
     _d->adr->STAT0=stat0;    
     _txState=I2C_RX_START;
     stat1=_d->adr->STAT1;
-    // enable interrupt
-    _dmaRx.beginTransfer();
+    
     startRxIrq();
     adr->CTL0|=LN_I2C_CTL0_START; // send start    
     bool r=_sem.take(100);
