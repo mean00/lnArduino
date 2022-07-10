@@ -532,7 +532,7 @@ void lnTwoWire::irq(int evt)
         case I2C_RX_ADDR_SENT:                  
         case I2C_TX_ADDR_SENT:
                   i2cIrqStats[_instance][1]++;
-                  if(!lastI2cStat&LN_I2C_STAT0_ADDSEND)
+                  if(!(lastI2cStat&LN_I2C_STAT0_ADDSEND))
                   {                     
                       xAssert(0);
                   }
@@ -592,6 +592,8 @@ sendStop:
                     _d->adr->CTL0|=LN_I2C_CTL0_STOP;  
                     switch(_txState)
                     {
+                        case I2C_TX_DATA: // We only get here with empty payload, i.e. scanner
+                                            xAssert(_session->transactionSize[0]==0);
                         case I2C_TX_STOP:  _txState=I2C_TX_END;break;
                         case I2C_RX_STOP:  _txState=I2C_RX_END;break;
                         default:           xAssert(0);break;
