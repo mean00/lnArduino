@@ -29,22 +29,27 @@ ENDIF()
 
 configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/tusb_config.h.in ${CMAKE_BINARY_DIR}/tusb_config.h @ONLY)
 
-
+IF( LN_USB_NB_CDC GREATER 0 )
+        SET(CLASS_FILES ${CLASS_FILES} ${TUSB}/class/cdc/cdc_device.c ${LNSRC}/lnUsbCDC.cpp )
+ENDIF()        
+IF( LN_USB_NB_HID GREATER 0 )
+        #SET(CLASS_FILES ${CLASS_FILES} ${TUSB}/class/cdc/cdc_device.c
+ENDIF()        
+IF( LN_USB_DFU_RUNTIME GREATER 0 )
+        SET(CLASS_FILES ${CLASS_FILES} ${TUSB}/class/dfu/dfu_rt_device.c ${LNSRC}/lnUsbDFUrt.cpp)
+ENDIF()        
 
 IF(FALSE)
     ADD_DEFINITIONS("-DCFG_TUSB_DEBUG=3")
     ADD_DEFINITIONS("-DCFG_TUSB_DEBUG_PRINTF=Logger_C")
 ENDIF()
-SET(SRCS  ${TUSB}/tusb.c
+SET(SRCS  ${CLASS_FILES} 
+          ${TUSB}/tusb.c
           ${TUSB}/device/usbd_control.c
           ${TUSB}/device/usbd.c
           ${TUSB}/common/tusb_fifo.c
-          ${TUSB}/class/cdc/cdc_device.c
-          ${TUSB}/class/dfu/dfu_rt_device.c
           ${LNSRC}/lnTinyUsbImpl.cpp
           ${LNSRC}/lnUsbStack.cpp
-          ${LNSRC}/lnUsbCDC.cpp
-          ${LNSRC}/lnUsbDFUrt.cpp
           )
 add_library(tinyUsb STATIC ${SRCS})
 target_include_directories(tinyUsb PRIVATE ${CMAKE_BINARY_DIR})
