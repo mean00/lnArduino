@@ -43,7 +43,7 @@ lnTimingAdc::~lnTimingAdc()
  * @param fq
  * @return 
  */
-bool     lnTimingAdc::setSource( int timer, int channel, int fq,int nbPins, lnPin *pins)
+bool     lnTimingAdc::setSource( int timer, int channel, int fq,int nbPins, const lnPin *pins)
 {
     LN_ADC_Registers *adc=lnAdcDesc[_instance].registers;
     _fq=fq;
