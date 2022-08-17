@@ -16,14 +16,14 @@ enum lnADC_DIVIDER
     //lnADC_CLOCK_DIV_BY_2=4,
     lnADC_CLOCK_DIV_BY_12=5,
     //lnADC_CLOCK_DIV_BY_8=6,
-    lnADC_CLOCK_DIV_BY_16=7,    
+    lnADC_CLOCK_DIV_BY_16=7,
 };
 
 class lnPeripherals
 {
 public:
-   
-public:            
+
+public:
     static void reset(const Peripherals periph);
     static void enable(const Peripherals periph);
     static void disable(const Peripherals periph);
@@ -31,5 +31,3 @@ public:
     static void setAdcDivider(lnADC_DIVIDER divider);
     static void enableUsb48Mhz(); // Call this once so that the usb clock is 48 Mhz, you still have to enable/disable the usbd clock
 };
-
-

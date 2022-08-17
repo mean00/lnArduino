@@ -13,8 +13,8 @@ LN_RCU *arcu=(LN_RCU *)LN_RCU_ADR;
  */
 struct RCU_Peripheral
 {
-    Peripherals                 periph;
-    int                         AHB_APB; // 1=APB 1, 2=APB2,8=AHB
+    uint8_t                     periph;
+    uint8_t                     AHB_APB; // 1=APB 1, 2=APB2,8=AHB
     uint32_t                    enable;
 };
 
@@ -34,13 +34,13 @@ static const RCU_Peripheral _peripherals[]=
     {        pUART1,         1,          LN_RCU_APB1_USART1EN},
     {        pUART2,         1,          LN_RCU_APB1_USART2EN},
     {        pUART3,         1,          LN_RCU_APB1_USART3EN},
-    {        pUART4,         1,          LN_RCU_APB1_USART4EN},   
-    {        pI2C0,          1,          LN_RCU_APB1_I2C0EN},   
-    {        pI2C1,          1,          LN_RCU_APB1_I2C1EN},   
-    {        pCAN0,          1,          LN_RCU_APB1_CAN0EN}, 
-    {        pCAN1,          1,          LN_RCU_APB1_CAN1EN},  
-    {        pDAC,           1,          LN_RCU_APB1_DACEN},         
-    {        pPMU,           1,          LN_RCU_APB1_PMUEN},       
+    {        pUART4,         1,          LN_RCU_APB1_USART4EN},
+    {        pI2C0,          1,          LN_RCU_APB1_I2C0EN},
+    {        pI2C1,          1,          LN_RCU_APB1_I2C1EN},
+    {        pCAN0,          1,          LN_RCU_APB1_CAN0EN},
+    {        pCAN1,          1,          LN_RCU_APB1_CAN1EN},
+    {        pDAC,           1,          LN_RCU_APB1_DACEN},
+    {        pPMU,           1,          LN_RCU_APB1_PMUEN},
     {        pBKPI,          1,          LN_RCU_APB1_BKPIEN},
     {        pWWDGT,         1,          LN_RCU_APB1_WWDGTEN},
     {        pTIMER0,        2,          LN_RCU_APB2_TIMER0EN},
@@ -51,21 +51,21 @@ static const RCU_Peripheral _peripherals[]=
     {        pTIMER5,        1,          LN_RCU_APB1_TIMER5EN},
     {        pTIMER6,        1,          LN_RCU_APB1_TIMER6EN},
     {        pUSB,           1,          LN_RCU_APB1_USBDEN}, // not sure
-            // PERIP        AHB/APB         APB         BIT        
+            // PERIP        AHB/APB         APB         BIT
     {        pADC0  ,        2,          LN_RCU_APB2_ADC0EN},
     {        pADC1  ,        2,          LN_RCU_APB2_ADC1EN},
-           
+
     {        pGPIOA,         2,          LN_RCU_APB2_PAEN},
     {        pGPIOB,         2,          LN_RCU_APB2_PBEN},
     {        pGPIOC,         2,          LN_RCU_APB2_PCEN},
     {        pGPIOD,         2,          LN_RCU_APB2_PDEN},
     {        pGPIOE,         2,          LN_RCU_APB2_PEEN},
     {        pAF,            2,          LN_RCU_APB2_AFEN},
-            // PERIP        AHB/APB         APB         BIT        
+            // PERIP        AHB/APB         APB         BIT
     {        pDMA0,          8,          LN_RCU_AHB_DMA0EN},
     {        pDMA1,          8,          LN_RCU_AHB_DMA1EN},
     //
-    
+
     //
 };
 
@@ -90,19 +90,19 @@ static void _rcuAction(const Peripherals periph, int action)
                 case RCU_ENABLE: arcu->APB1EN |= o->enable;break;
                 case RCU_DISABLE: arcu->APB1EN &=~o->enable;break;
                 default : xAssert(0);break;
-            }            
+            }
             break;
         case 2: // APB2
             switch(action)
             {
-                case RCU_RESET: 
+                case RCU_RESET:
                         arcu->APB2RST|= o->enable;
                         arcu->APB2RST&=~( o->enable); // not sure if it auto clears itself
                         break;
                 case RCU_ENABLE: arcu->APB2EN |= o->enable;break;
                 case RCU_DISABLE: arcu->APB2EN &=~o->enable;break;
                 default : xAssert(0);break;
-            }            
+            }
             break;
         case 8: // AHB
             switch(action)
@@ -115,7 +115,7 @@ static void _rcuAction(const Peripherals periph, int action)
                 case RCU_ENABLE: arcu->AHBEN |= o->enable;break;
                 case RCU_DISABLE: arcu->AHBEN &=~o->enable;break;
                 default : xAssert(0);break;
-            }            
+            }
 
             break;
         default:
@@ -124,7 +124,7 @@ static void _rcuAction(const Peripherals periph, int action)
 }
 
 /**
- * 
+ *
  * @param periph
  */
 void lnPeripherals::reset(const Peripherals periph)
@@ -132,7 +132,7 @@ void lnPeripherals::reset(const Peripherals periph)
     _rcuAction(periph,RCU_RESET);
 }
 /**
- * 
+ *
  * @param periph
  */
 void lnPeripherals::enable(const Peripherals periph)
@@ -140,7 +140,7 @@ void lnPeripherals::enable(const Peripherals periph)
     _rcuAction(periph,RCU_ENABLE);
 }
 /**
- * 
+ *
  * @param periph
  */
 void lnPeripherals::disable(const Peripherals periph)
@@ -169,11 +169,12 @@ void lnPeripherals::enableUsb48Mhz()
       default:
         xAssert(0); // invalid sys clock
         break;
-  }   
+  }
 
-  if(lnCpuID::vendor()==lnCpuID::LN_MCU_STM32)
+  if(lnCpuID::vendor()!=lnCpuID::LN_MCU_GD32)
   {
     if(x>1) xAssert(0); // STM32F1 chip only supports div by 1 and div by 1.5, i.e. x=0 or 1
+                        // only GD32 has more dividers
   }
   uint32_t cfg0=arcu->CFG0;
   cfg0&=LN_RCU_CFG0_USBPSC_MASK;
@@ -181,31 +182,30 @@ void lnPeripherals::enableUsb48Mhz()
   arcu->CFG0=cfg0;
 }
 /**
- * 
+ *
  * @param divider
  */
 void lnPeripherals::setAdcDivider(lnADC_DIVIDER divider)
 {
     uint32_t val=arcu->CFG0;
-    
+
     val&=LN_RCU_ADC_PRESCALER_MASK;
     int r=(int)divider;
     if(r&4)
     {
-        if(lnCpuID::vendor()==lnCpuID::LN_MCU_STM32) // only up to 8
+        if(lnCpuID::vendor()==lnCpuID::LN_MCU_GD32) // only up to 8
         {
-            val |=LN_RCU_ADC_PRESCALER_LOWBIT(lnADC_CLOCK_DIV_BY_8);            
-        }else
-        {
-            val|=LN_RCU_ADC_PRESCALER_HIGHBIT;
-            val|=LN_RCU_ADC_PRESCALER_LOWBIT(r&3);
+          val|=LN_RCU_ADC_PRESCALER_HIGHBIT;
+          val|=LN_RCU_ADC_PRESCALER_LOWBIT(r&3);
         }
+        else
+            val |=LN_RCU_ADC_PRESCALER_LOWBIT(lnADC_CLOCK_DIV_BY_8);
     }
     else
     {
         val|=LN_RCU_ADC_PRESCALER_LOWBIT(r);
     }
     arcu->CFG0=val;
-    
+
 }
 // EOF

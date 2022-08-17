@@ -7,11 +7,17 @@
 #include "lnFMC.h"
 #include "lnFMC_priv.h"
 #include "lnPeripheral_priv.h"
-
+#include "lnCpuID.h"
 
 LN_FMC *aFMC=(LN_FMC *)LN_FMC_ADR;
+
+// extra bits for CH32 chips
+#define LN_FMC_CTL_CH32_FASTUNLOCK (1<<15)
+#define LN_FMC_CTL_CH32_FASTERASE  (1<<17)
+
+
 /**
- * 
+ *
  */
 class autoNoInterrupt
 {
@@ -25,6 +31,59 @@ public:
             interrupts();
         }
 };
+
+/**
+ * \fn FMCX_hasFastUnlock
+ * \brief This tries to do a fast unlock. it is one way to detect CH32F103 chips
+ */
+
+/**
+
+*/
+bool  CH32_fastUnlock()
+{
+    // send unlock sequence
+    aFMC->KEY=0x45670123;
+    aFMC->KEY=0xCDEF89AB;
+    // send fast unlock sequence
+    volatile uint32_t *CHF103=(uint32_t *)LN_FMC_ADR;
+    CHF103[9]=0x45670123;
+    CHF103[9]=0xCDEF89AB;
+
+    uint32_t v=aFMC->CTL;
+    return !(v  & LN_FMC_CTL_CH32_FASTUNLOCK);
+}
+//
+//
+//
+bool CH32_fastLock()
+{
+    aFMC->CTL|=LN_FMC_CTL_LK;
+    return true;
+}
+// this check if the fast unlock bit is settable
+// it is called early in the boot so it cannot use high level calls
+bool  FMC_hasFastUnlock()
+{    
+  // reset fast unlock
+    aFMC->CTL|=LN_FMC_CTL_CH32_FASTUNLOCK; // clear fast unlock, the bit should go to '1'
+    if(!(aFMC->CTL & LN_FMC_CTL_CH32_FASTUNLOCK))
+    {
+        return false;
+    }
+    // send unlock sequence
+    aFMC->KEY=0x45670123;
+    aFMC->KEY=0xCDEF89AB;
+    for(int i=0;i<50;i++)  __asm__("nop");
+    // send fast unlock sequence
+    volatile uint32_t *CHF103=(uint32_t *)LN_FMC_ADR;
+    CHF103[9]=0x45670123;
+    CHF103[9]=0xCDEF89AB;
+    for(int i=0;i<50;i++) __asm__("nop");
+
+    uint32_t v=aFMC->CTL;
+    return !(v  & LN_FMC_CTL_CH32_FASTUNLOCK);
+}
 
 /**
  * \fn unlock
@@ -54,21 +113,17 @@ static void waitNotBusy()
             return;
     }
 }
-
 /**
- * 
- * @param startAddress
- * @param sizeInKBytes
- * @return 
- */
-bool lnFMC::erase(const uint32_t startAddress, int sizeInKBytes)
+
+*/
+bool lnFMC::eraseStm(const uint32_t startAddress, int sizeInKBytes)
 {
     uint32_t adr=startAddress;
     // Check we target an area within the flash (up to 256 kB)
     xAssert(adr>=0x800*0x10000);
     xAssert(adr<(0x800*0x10000+256*1024));
     // check the start address is 1 kB aligned
-    xAssert(!(adr & ((1<<10)-1))); 
+    xAssert(!(adr & ((1<<10)-1)));
     autoNoInterrupt noInt;
     unlock();
     // Erase each page
@@ -81,14 +136,56 @@ bool lnFMC::erase(const uint32_t startAddress, int sizeInKBytes)
         adr+=1024;
         aFMC->CTL&=~LN_FMC_CTL_PER;
     }
-    
+
     return true;
 }
+/**
+  \brief Erase using 128 bytes chunk, CH32 specific operation
+*/
+bool lnFMC::eraseCh32(const uint32_t startAddress, int sizeInKBytes)
+{
+    uint32_t adr=startAddress;
+    // Check we target an area within the flash (up to 256 kB)
+    xAssert(adr>=0x800*0x10000);
+    xAssert(adr<(0x800*0x10000+256*1024));
+    // check the start address is 1 kB aligned
+    xAssert(!(adr & ((1<<10)-1)));
+    autoNoInterrupt noInt;
+    CH32_fastUnlock();
+    // Erase each page
+    for(int i=0;i<sizeInKBytes*8;i++)
+    {
+        aFMC->CTL|=LN_FMC_CTL_CH32_FASTERASE;
+        aFMC->ADDR=adr;
+        aFMC->CTL|=LN_FMC_CTL_START;
+        waitNotBusy();
+        adr+=128;
+        aFMC->STAT|=LN_FMC_STAT_WP_ENDF; // clear end of process bit
+        aFMC->CTL&=~LN_FMC_CTL_CH32_FASTERASE;
+        aFMC->CTL&=~LN_FMC_CTL_START; // clear start
+    }
+    return true;
+}
+
+/**
+ *
+ * @param startAddress
+ * @param sizeInKBytes
+ * @return
+ */
+bool lnFMC::erase(const uint32_t startAddress, int sizeInKBytes)
+{
+  if(lnCpuID::vendor()==lnCpuID::LN_MCU_CH32) return eraseCh32(startAddress,sizeInKBytes);
+  return eraseStm(startAddress,sizeInKBytes);
+}
+/**
+
+*/
 
 static bool checkWriting()
 {
     uint32_t stat=aFMC->STAT;
-       
+
         aFMC->CTL&=~LN_FMC_CTL_PG;
        if(stat & (LN_FMC_STAT_PG_ERR+LN_FMC_STAT_WP_ERR))
        {
@@ -101,11 +198,11 @@ static bool checkWriting()
        return true;
 }
 /**
- * 
+ *
  * @param startAddress
  * @param data
  * @param sizeInBytes
- * @return 
+ * @return
  */
 bool lnFMC::write(const uint32_t startAddress, const uint8_t *data, int sizeInBytes)
 {
@@ -115,7 +212,7 @@ bool lnFMC::write(const uint32_t startAddress, const uint8_t *data, int sizeInBy
     xAssert(adr<(0x800*0x10000+256*1024));
     autoNoInterrupt noInt;
     unlock();
-    
+
     // if not aligned at the beginning
     if(adr&1)
     {
@@ -151,7 +248,7 @@ bool lnFMC::write(const uint32_t startAddress, const uint8_t *data, int sizeInBy
     {
         // it is the low byte of the NEXT adr
         uint8_t *next=(uint8_t *)adr16;
-       
+
         uint16_t data16=(data[0])+(0xff<<8); // we let the other byte as is
         // write it
         aFMC->CTL|=LN_FMC_CTL_PG;

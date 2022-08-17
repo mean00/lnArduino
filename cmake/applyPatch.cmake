@@ -1,0 +1,11 @@
+include(FindPatch)
+
+MACRO(APPLY_PATCH_IF_NEEDED markerFile patchFile subdir description)
+  #MESSAGE(STATUS "Checking for ${CMAKE_SOURCE_DIR}/${subdir}/${markerFile}")
+  IF(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${subdir}/${markerFile}")
+      MESSAGE(STATUS "Patching file in ${subdir} ${description}")
+      #MESSAGE(STATUS " patch_file_p(1::: ${subdir}::: ${CMAKE_SOURCE_DIR}/patches/${patchFile}")
+      patch_file_p(1 "${CMAKE_CURRENT_SOURCE_DIR}/${subdir}" "${CMAKE_CURRENT_SOURCE_DIR}/patches/${patchFile}")
+      file(WRITE "${CMAKE_CURRENT_SOURCE_DIR}/${subdir}/${markerFile}" "patched")
+  ENDIF(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${subdir}/${markerFile}")
+ENDMACRO(APPLY_PATCH_IF_NEEDED markerFile patchFile subdir description)

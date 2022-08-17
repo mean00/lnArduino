@@ -77,7 +77,7 @@ class lnTimingAdc : public lnBaseAdc
 public:
                 lnTimingAdc(int instance);
    virtual      ~lnTimingAdc();
-   bool         setSource(int timer, int channel,int fq,int nbPins, lnPin *pins);
+   bool         setSource(int timer, int channel,int fq,int nbPins, const lnPin *pins);
    bool         multiRead(int nbSamplePerChannel, uint16_t *output); // read N pins in one go POLLING
 public:
     static void dmaDone_(void *foo, lnDMA::DmaInterruptType typ);

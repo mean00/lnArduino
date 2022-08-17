@@ -67,12 +67,21 @@ typedef volatile LN_SPI_Registersx LN_SPI_Registers;
 //-- Others are CRC/I2S registers, wec dont use that for now ---
 
 #define senable()  { if(d->CTL0 &LN_SPI_CTL0_SPIEN) xAssert(0); (d->CTL0 |=LN_SPI_CTL0_SPIEN);}
-#define sdisable() (d->CTL0&=~LN_SPI_CTL0_SPIEN)
-#define sbusy()    (d->STAT&LN_SPI_STAT_TRANS)
 #define txbusy()    (!(d->STAT&LN_SPI_STAT_TBE))
 
+#define sdisable() (d->CTL0&=~LN_SPI_CTL0_SPIEN)
+#define sbusy()    (d->STAT&LN_SPI_STAT_TRANS)
 
 
-void updateMode(LN_SPI_Registers *d,bool rxTx);
+
+enum lnSpiDirection
+{
+    lnDuplex=0,
+    lnTxOnly=1,
+    lnRxOnly=2
+};
+
+
+void updateMode(LN_SPI_Registers *d,lnSpiDirection dir);
 void updateDataSize(LN_SPI_Registers *d,int bits);
 void updateDmaTX(LN_SPI_Registers *d,bool onoff);

@@ -260,7 +260,7 @@ bool lnTwoWire::multiWrite(int target, int nbSeqn,int *seqLength, uint8_t **seqD
 {
     volatile uint32_t stat1,stat0;
     // Send start
-    
+    _dmaTx.beginTransfer(); // lock down i2c also, deals with re-entrency
     LN_I2C_Registers *adr=_d->adr;
      lnI2CSession session(target,nbSeqn,seqLength,seqData);
     _session=&session;
@@ -270,8 +270,8 @@ bool lnTwoWire::multiWrite(int target, int nbSeqn,int *seqLength, uint8_t **seqD
     _d->adr->STAT0=stat0;    
     _txState=I2C_TX_START;
     stat1=_d->adr->STAT1;
-    // enable interrupt
-    _dmaTx.beginTransfer();
+    
+    
     startIrq();
     adr->CTL0|=LN_I2C_CTL0_START; // send start    
     bool r=_sem.take(100);
@@ -314,6 +314,9 @@ bool lnTwoWire::write(int target, int n, uint8_t *data)
 bool lnTwoWire::multiRead(int target, int nbSeqn,int *seqLength, uint8_t **seqData)
 {
      volatile uint32_t stat1,stat0;
+    _dmaRx.beginTransfer(); // we dont actually use dma, but we use the dma mutex to protect against re-entrency
+                            // ugly, i know
+    
     // Send start
     
     LN_I2C_Registers *adr=_d->adr;
@@ -325,8 +328,7 @@ bool lnTwoWire::multiRead(int target, int nbSeqn,int *seqLength, uint8_t **seqDa
     _d->adr->STAT0=stat0;    
     _txState=I2C_RX_START;
     stat1=_d->adr->STAT1;
-    // enable interrupt
-    _dmaRx.beginTransfer();
+    
     startRxIrq();
     adr->CTL0|=LN_I2C_CTL0_START; // send start    
     bool r=_sem.take(100);
@@ -399,7 +401,7 @@ bool lnTwoWire::initiateTx()
     
     xAssert(size<=65535);
     
-    if( size<3)  // plain interrupt
+    if( size<8)  // plain interrupt
     {
         setInterruptMode(true,false,true); // event, no DMA, tx interrupt
         _txState=I2C_TX_DATA;
@@ -498,6 +500,7 @@ void lnTwoWire::irq(int evt)
                 break;
     }    
     lastI2cStat=(_d->adr->STAT0);
+    if(!lastI2cStat) return; // spurious
     volatile uint32_t v1;
     switch(_txState)
     {
@@ -531,7 +534,7 @@ void lnTwoWire::irq(int evt)
         case I2C_RX_ADDR_SENT:                  
         case I2C_TX_ADDR_SENT:
                   i2cIrqStats[_instance][1]++;
-                  if(!lastI2cStat&LN_I2C_STAT0_ADDSEND)
+                  if(!(lastI2cStat&LN_I2C_STAT0_ADDSEND))
                   {                     
                       xAssert(0);
                   }
@@ -575,12 +578,12 @@ void lnTwoWire::irq(int evt)
                        _txState=I2C_TX_STOP;
                        _d->adr->CTL1&=~( LN_I2C_CTL1_BUFIE);
                    }
-                  else
-                  {
+                   else
+                   {
                       _txState=I2C_TX_DATA;
-                  }
-                  return;
-                  break;
+                   }
+                   return;
+                   break;
         
         case I2C_TX_STOP:
                     xAssert(lastI2cStat&LN_I2C_STAT0_BTC);
@@ -591,6 +594,8 @@ sendStop:
                     _d->adr->CTL0|=LN_I2C_CTL0_STOP;  
                     switch(_txState)
                     {
+                        case I2C_TX_DATA: // We only get here with empty payload, i.e. scanner
+                                            xAssert(_session->transactionSize[0]==0);
                         case I2C_TX_STOP:  _txState=I2C_TX_END;break;
                         case I2C_RX_STOP:  _txState=I2C_RX_END;break;
                         default:           xAssert(0);break;

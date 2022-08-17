@@ -36,22 +36,20 @@ static LN_SPI_Registers *aspi2=(LN_SPI_Registers *)LN_SPI2_ADR;
  */
 
 
-
-void updateMode(LN_SPI_Registers *d,bool rxTx)
+void updateMode(LN_SPI_Registers *d,lnSpiDirection dir)
 {
     
     uint32_t reg=d->CTL0;
-    reg&=~(LN_SPI_CTL0_BDOEN | LN_SPI_CTL0_BDEN | LN_SPI_CTL0_RO);
-    if(rxTx)
+    
+    reg&=~(LN_SPI_CTL0_BDOEN | LN_SPI_CTL0_BDEN | LN_SPI_CTL0_RO );
+    switch(dir)
     {
-        reg|=0; // 0 all bits = full duplex
-    }else
-    {   // Tx Only: unidirectional, transmit only, 
-        reg|=LN_SPI_CTL0_BDOEN | LN_SPI_CTL0_BDEN;
+            case lnDuplex:   reg|=0; break; // 0 all bits = full duplex
+            case lnTxOnly:   reg|=LN_SPI_CTL0_BDOEN | LN_SPI_CTL0_BDEN; break;
+            case lnRxOnly:   reg|=LN_SPI_CTL0_BDEN ;break;
+            default: xAssert(0);break;
     }
-    volatile uint32_t s=d->STAT;
     d->CTL0=reg;
-
 }
 /**
  * 
@@ -110,7 +108,7 @@ hwlnSPIClass::hwlnSPIClass(int instance, int pinCs) : _internalSettings(1000000,
     lnPinMode( s->mosi, lnALTERNATE_PP);
     lnPinMode( s->miso, lnFLOATING);
     lnPinMode( s->clk,  lnALTERNATE_PP);
-       
+    _inSession=false;
     
     if(pinCs!=-1)
     {
@@ -175,50 +173,42 @@ void hwlnSPIClass::end(void)
 }    
 
 
+void hwlnSPIClass::beginSession(int bitSize)
+{    
+    _inSession=true;
+    setup();
+    LN_SPI_Registers *d=(LN_SPI_Registers *)_adr;
+    updateMode(d,lnTxOnly);
+    updateDataSize(d,bitSize);
+    senable();
+    csOn();
+}
+/**
+ * 
+ */
 void hwlnSPIClass::beginTransaction(lnSPISettings &settings)
 {
     _mutex.lock();
     _currentSetting=settings;
     _settings=&_currentSetting;    
-    // setup
     setup();
 }
-/**
- */
 void hwlnSPIClass::endTransaction()
 {
     _settings=&_internalSettings;
     setup(); // restore settings
     _mutex.unlock();
 }
+
+
 /**
- * 
- * @param nbBytes
- * @param data
- * @param callback
- * @return 
  */
-bool hwlnSPIClass::asyncWrite(int nbBytes, const uint8_t *data,lnSpiCallback *callback,void *cookie)
+void hwlnSPIClass::endSession()
 {
-    xAssert(callback);
-    _callback=callback;
-    _callbackCookie=cookie;
-    return write(nbBytes,data);
-}
-/**
- * 
- * @param nbBytes
- * @param dataOut
- * @param dataIn
- * @param callback
- * @return 
- */
-bool hwlnSPIClass::asyncTransfer(int nbBytes, uint8_t *dataOut, uint8_t *dataIn,lnSpiCallback *callback,void *cookie)
-{
-    xAssert(callback);
-    _callback=callback;
-    _callbackCookie=cookie;
-    return transfer(nbBytes,dataOut,dataIn);
+    LN_SPI_Registers *d=(LN_SPI_Registers *)_adr;
+    _inSession=false;
+    csOff();
+    sdisable();
 }
 /**
  * 
@@ -229,49 +219,64 @@ bool hwlnSPIClass::asyncTransfer(int nbBytes, uint8_t *dataOut, uint8_t *dataIn,
 bool hwlnSPIClass::writeInternal(int sz, int data)
 {
     LN_SPI_Registers *d=(LN_SPI_Registers *)_adr;
-    updateDataSize(d,sz);
-    updateMode(d,false);
-    
+    xAssert(_inSession);
     if(d->STAT & LN_SPI_STAT_CONFERR )
     {
         Logger("Conf Error\n");
         return false;
     }
     
-    senable();
-    csOn();
     while (sbusy()) 
     {
     }
     d->DATA=data;
     
     waitForCompletion();
-    int dummy=d->DATA;
-    csOff();
-    sdisable();
     return true;
 }
 
+
 /**
  */
-bool hwlnSPIClass::writesInternal(int sz, int nbBytes, const uint8_t *data)
+bool hwlnSPIClass::writesInternal(int sz, int nb, const uint8_t *data,bool repeat)
 {
     LN_SPI_Registers *d=(LN_SPI_Registers *)_adr;
-    updateMode(d,false);
-    updateDataSize(d,sz);
-    senable();
-    csOn();
-    for (size_t i = 0; i < nbBytes; i++) 
+    switch(sz)
     {
-        while (sbusy()) 
+        default:
+            xAssert(0);
+            break;
+        case 8:
         {
+                const uint8_t  *p=data;
+                int inc=!repeat;
+                for (size_t i = 0; i < nb; i++)
+                {
+                    while (sbusy())
+                    {
+                    }
+                    d->DATA=*p;
+                    p+=inc;
+                }
+                break;
         }
-        d->DATA=data[i];
-        int dummy=d->DATA;
+        case 16:
+        {
+                const uint16_t  *p=( const uint16_t  *)data;
+                int inc=!repeat;
+                for (size_t i = 0; i < nb; i++)
+                {
+                    while (sbusy())
+                    {
+                    }        
+                    d->DATA=*p;
+                    p+=inc;
+                }
+                break;
+        }
     }
+    
     waitForCompletion();
-    csOff();
-    sdisable();
     return true;
 }
 /**
@@ -293,12 +298,28 @@ bool hwlnSPIClass::write16(int z)
     return writeInternal(16,z);
 }
 
+
+
+/**
+ * 
+ */
+ bool hwlnSPIClass::write16Repeat(int nb, const uint16_t pattern)
+ {
+     return writesInternal(16,nb,(const uint8_t *)&pattern,true);
+ }
 /**
  */
-bool hwlnSPIClass::write(int nbBytes, const uint8_t *data)
+bool hwlnSPIClass::write(int nbBytes, const uint8_t *data,bool repeat)
 {
-   return writesInternal(8,nbBytes,data);
+   return writesInternal(8,nbBytes,data,repeat);
 }
+/**
+ */
+bool hwlnSPIClass::write16(int nbWord, const uint16_t *data,bool repeat)
+{
+    return writesInternal(16,nbWord,(const uint8_t *)data,repeat);
+}
+
 /**
  * 
  */
@@ -335,14 +356,15 @@ void hwlnSPIClass::waitForCompletion()
 
                     }
             break;
-        case 2: // receive only
-            xAssert(0);
+        case 2: // receive only            
             break;
-        case 3: //  t only
+        case 3: //  tx only
+        
             while(txbusy())
             {
                 __asm__("nop");
-            }           
+            }     
+                  
             while(sbusy())
             {
                 __asm__("nop");
@@ -351,17 +373,35 @@ void hwlnSPIClass::waitForCompletion()
     }
 }
 /**
+ * 
+ */
+bool hwlnSPIClass::read1wire( int nbRead, uint8_t *rd)
+{
+    LN_SPI_Registers *d=(LN_SPI_Registers *)_adr;   
+    updateMode(d,lnRxOnly); //1 Wire RX    
+    
+    // clear stuff (not sure it is useful)    
+    for (int i = 0; i < nbRead; i++) 
+    {
+        while (!(d->STAT & LN_SPI_STAT_RBNE) )
+        {        
+            __asm__("nop");
+        }
+        rd[i] = d->DATA;
+    }
+    waitForCompletion();
+    return true;
+}
+
+/**
  */
 bool hwlnSPIClass::transfer(int nbBytes, uint8_t *dataOut, uint8_t *dataIn)
 {
     LN_SPI_Registers *d=(LN_SPI_Registers *)_adr;
-    updateMode(d,true);
-    updateDataSize(d,8);
-    senable();
-    csOn();
+    xAssert(_inSession);
     for (size_t i = 0; i < nbBytes; i++) 
     {
-        while (!d->STAT & LN_SPI_STAT_TBE) 
+        while (!(d->STAT & LN_SPI_STAT_TBE)) 
         {
         }
         d->DATA=dataOut[i];
@@ -372,8 +412,6 @@ bool hwlnSPIClass::transfer(int nbBytes, uint8_t *dataOut, uint8_t *dataIn)
         dataIn[i] = d->DATA;
     }
     waitForCompletion();
-    csOff();
-    sdisable();
     return true;
 }
 /**
@@ -457,7 +495,7 @@ void hwlnSPIClass::setup()
     sp&=~(7<<3);
     sp|=psc<<3;
     d->CTL0=sp;
-    updateMode(d,false); // Tx only by default    
+    updateMode(d,lnTxOnly); // Tx only by default    
 }
 /**
  * 

@@ -1,6 +1,7 @@
 *.sw*
 *.tmp
 *.gch
+*.tmp
 *.*~
 nbproject/*
 nbproject
@@ -19,3 +20,4 @@ demoProject/*/Arduino_gd32_freeRTOS
 demoProject/*/lnArduino
 */.ccls-cache/
 *.gch
+libraries/tinyUsb/pat*

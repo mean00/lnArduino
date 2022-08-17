@@ -12,7 +12,6 @@ ENDMACRO (LN_APPEND_FLAGS)
 
 
 
-
 MACRO(USE_LIBRARY lib)
     add_subdirectory(${AF_FOLDER}/libraries/${lib})
     include_directories(${AF_FOLDER}/libraries/${lib})

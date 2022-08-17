@@ -17,11 +17,11 @@ extern void deadEnd(int code);
 void do_assert(const char *a)
 {
     deadEnd(0xA000);
-    
+
 }
 #define xAssert(a) if(!(a)) {do_assert(#a);}
 /**
- * 
+ *
  */
 void vApplicationMallocFailedHook( void )
 {
@@ -31,7 +31,7 @@ void vApplicationMallocFailedHook( void )
 //-- Binary Semaphor --
 
 /**
- * 
+ *
  */
 xBinarySemaphore::xBinarySemaphore()
 {
@@ -39,17 +39,17 @@ xBinarySemaphore::xBinarySemaphore()
     xAssert(_handle);
 }
 /**
- * 
- * @return 
+ *
+ * @return
  */
 bool xBinarySemaphore::take()
 {
   return (bool) xSemaphoreTake(_handle,portMAX_DELAY);
 }
 /**
- * 
+ *
  * @param timeoutMs
- * @return 
+ * @return
  */
 bool xBinarySemaphore::take(int timeoutMs)
 {
@@ -57,35 +57,35 @@ bool xBinarySemaphore::take(int timeoutMs)
   return (bool) xSemaphoreTake(_handle,ticks);
 }
 /**
- * 
+ *
  * @param timeoutMs
- * @return 
+ * @return
  */
 bool xBinarySemaphore::tryTake()
 {
      return (bool) xSemaphoreTake(_handle,0);
 }
-  
+
 
 /**
- * 
- * @return 
+ *
+ * @return
  */
  bool xBinarySemaphore::give()
-{   
+{
   if(!underInterrupt)
   {
     xAssert(xSemaphoreGive(_handle)); // should never fail
   }else
   {
     BaseType_t awake;
-    xSemaphoreGiveFromISR(_handle,&awake); // should never fail... 
+    xSemaphoreGiveFromISR(_handle,&awake); // should never fail...
     portYIELD_FROM_ISR(awake); // reschedule
   }
   return true;
 }
  /**
-  * 
+  *
   * @param ms
   */
  void xDelay(int ms)
@@ -94,7 +94,7 @@ bool xBinarySemaphore::tryTake()
       vTaskDelay(xDelay);
  }
 
- 
+
  xMutex::xMutex()
  {
      _handle=xSemaphoreCreateRecursiveMutex();
@@ -113,11 +113,11 @@ bool xBinarySemaphore::tryTake()
 // Task
 /**
  * @brief Construct a new x Task::X Task object
- * 
- * @param name 
- * @param entryPoint 
- * @param priority 
- * @param taskSize 
+ *
+ * @param name
+ * @param entryPoint
+ * @param priority
+ * @param taskSize
  */
 xTask::xTask(const char *name,  int priority, int taskSize)
 {
@@ -126,16 +126,16 @@ xTask::xTask(const char *name,  int priority, int taskSize)
     _name=name;
 }
 /**
- * 
+ *
  */
 void xTask::start()
 {
     BaseType_t er=xTaskCreate(xTask::Trampoline,_name,_taskSize, this,_priority,&_taskHandle);
-    xAssert(er==pdPASS);    
+    xAssert(er==pdPASS);
 }
 /**
  * @brief Destroy the x Taskx Task object
- * 
+ *
  */
 xTask::~xTask()
 {
@@ -143,15 +143,15 @@ xTask::~xTask()
 }
 #if 0
 /**
- * 
+ *
  */
 xEventGroup::xEventGroup()
 {
     _handle=xEventGroupCreate();
-    
+
 }
 /**
- * 
+ *
  */
 xEventGroup::~xEventGroup()
 {
@@ -160,7 +160,7 @@ xEventGroup::~xEventGroup()
     _handle=0;
 }
 /**
- * 
+ *
  * @param events
  */
 void        xEventGroup::setEvents(uint32_t events)
@@ -172,18 +172,18 @@ void        xEventGroup::setEvents(uint32_t events)
     {
         BaseType_t wakeUp ;
         xEventGroupSetBitsFromISR(_handle,events,&wakeUp);
-        portYIELD_FROM_ISR(wakeUp);  
+        portYIELD_FROM_ISR(wakeUp);
     }
 }
 /**
- * 
+ *
  * @param maskint
  * @param timeout
- * @return 
+ * @return
  */
 uint32_t    xEventGroup::waitEvents(uint32_t maskint, int timeout)
 {
-    if(timeout==0) 
+    if(timeout==0)
         timeout=portMAX_DELAY-1;
     else
         timeout=fos_ms2tick(timeout);
@@ -194,12 +194,12 @@ uint32_t    xEventGroup::waitEvents(uint32_t maskint, int timeout)
                        pdFALSE, // any but
                        timeout );
     return res;
-        
+
 }
 /**
- * 
+ *
  * @param maskInt
- * @return 
+ * @return
  */
 uint32_t    xEventGroup::readEvents(uint32_t maskInt) // it is also cleared automatically !
 {
@@ -208,14 +208,14 @@ uint32_t    xEventGroup::readEvents(uint32_t maskInt) // it is also cleared auto
      if(ev)
      {
          xEventGroupClearBits(_handle,ev); // Race ?
-     }     
+     }
      return ev;
 
 }
 #endif
 //--------------------------------
 /**
- * 
+ *
  */
 #define BEGIN_LOCK() ENTER_CRITICAL()
 #define END_LOCK()   EXIT_CRITICAL()
@@ -223,28 +223,28 @@ uint32_t    xEventGroup::readEvents(uint32_t maskInt) // it is also cleared auto
 
 
 #define INVALID_TASK (TaskHandle_t)-1
-xFastEventGroup::xFastEventGroup() 
+xFastEventGroup::xFastEventGroup()
 {
     _value = _mask = 0;
     _waitingTask=INVALID_TASK;
 }
 
 /**
- * 
+ *
  */
-xFastEventGroup::~xFastEventGroup() 
+xFastEventGroup::~xFastEventGroup()
 {
 
 }
 /**
- * 
+ *
  */
 void        xFastEventGroup::takeOwnership()
 {
-    _waitingTask=xTaskGetCurrentTaskHandle(); 
+    _waitingTask=xTaskGetCurrentTaskHandle();
 }
 /**
- * 
+ *
  * @param events
  */
 
@@ -252,17 +252,17 @@ void        xFastEventGroup::takeOwnership()
 #define END_LOCK()   EXIT_CRITICAL()
 
 
-void xFastEventGroup::setEvents(uint32_t events) 
+void xFastEventGroup::setEvents(uint32_t events)
 {
     if(underInterrupt)
-    {       
-#warning : Could we have a race here between different interrupts ? probably        
+    {
+#warning : Could we have a race here between different interrupts ? probably
         _value = _value | events;
-        bool w = _value & _mask;        
+        bool w = _value & _mask;
         if (!w || _waitingTask==INVALID_TASK) // no need to wake up task
-        {     
+        {
              return;
-        }   
+        }
         BaseType_t awake;
         vTaskNotifyGiveIndexedFromISR(_waitingTask,EVENT_INDEX,&awake);
         portYIELD_FROM_ISR(awake); // reschedule
@@ -277,37 +277,38 @@ void xFastEventGroup::setEvents(uint32_t events)
     {
         END_LOCK();
         return;
-    }   
+    }
     END_LOCK();
-    xTaskNotifyGiveIndexed(_waitingTask,EVENT_INDEX);  
-    return;    
+    xTaskNotifyGiveIndexed(_waitingTask,EVENT_INDEX);
+    return;
 }
 /**
- * 
+ *
  * @param maskint
  * @param timeout
- * @return 
+ * @return
  */
 
 
 uint32_t xFastEventGroup::waitEvents(uint32_t maskint, int timeout )
-{   
+{
     xAssert(_waitingTask!=INVALID_TASK);
     xAssert(!underInterrupt);
     while(1)
     {
-        BEGIN_LOCK();         
+        BEGIN_LOCK();
         uint32_t set = maskint & _value;
-        if (set) 
-        {            
+        if (set)
+        {
             _value &= ~set;
-            _mask=0;        
+            _mask=0;
             END_LOCK();
-            xTaskNotifyStateClearIndexed(xTaskGetCurrentTaskHandle(),EVENT_INDEX);            
+            xTaskNotifyStateClearIndexed(xTaskGetCurrentTaskHandle(),EVENT_INDEX);
             return set;
         }
-        _mask=maskint;        
-        END_LOCK(); 
+        _mask=maskint;
+        END_LOCK();
+        if(timeout==-1) timeout=0x7fffffff;
         if(pdFALSE==ulTaskNotifyTakeIndexed(EVENT_INDEX, pdTRUE,timeout)) // cleared on exit
         { // timeout
             return 0;
@@ -315,29 +316,28 @@ uint32_t xFastEventGroup::waitEvents(uint32_t maskint, int timeout )
         // got it
         BEGIN_LOCK();
         set = maskint & _value;
-        xAssert(set);
+        // race can cause this to trigger ? xAssert(set);
         _value &= ~set;
         _mask=0;         // no need to clear waitintTask, it must be the same !
         END_LOCK();
         return set;
-        
+
     }
 }
 
 /**
- * 
+ *
  * @param maskInt
- * @return 
+ * @return
  */
-uint32_t xFastEventGroup::readEvents(uint32_t maskInt) 
+uint32_t xFastEventGroup::readEvents(uint32_t maskInt)
 {
-    BEGIN_LOCK();    
+    BEGIN_LOCK();
     uint32_t v = _value & maskInt;
     _value &= ~maskInt;
     _mask = 0;
     xTaskNotifyStateClearIndexed(xTaskGetCurrentTaskHandle(),EVENT_INDEX);
-    END_LOCK(); 
+    END_LOCK();
     return v;
 }
-
  //EOF

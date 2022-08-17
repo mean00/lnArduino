@@ -11,10 +11,10 @@
 
 void setup()
 {
-    pinMode(LN_SYSTEM_LED,OUTPUT);    
+    pinMode(LN_SYSTEM_LED,OUTPUT);
 }
 /**
- * 
+ *
  */
 
 void stop()
@@ -26,19 +26,19 @@ void stop()
     }
 }
 
-#define TAIST(x) {bool result=x;if(!result) {Logger("FAILURE of %s at line \n",#x,__LINE__);stop();return;}}
+#define TAIST(x) {bool result=x;if(!result) {Logger("FAILURE of %s at line %d \n",#x,__LINE__);stop();return;}}
 
       int val;
-      
+
 void InitNvm(lnNvmGd32 &nvm)
 {
-    
+
    uint8_t v=1;
    TAIST(nvm.write(1,1,&v));
    v=0;
-   
+
    nvm.dumpEntries(-1);
-   
+
    TAIST(nvm.read(1,1,&v));
    TAIST(v==1);
 
@@ -66,7 +66,7 @@ void TestNvm()
     TAIST(nvm.read(1,1,&v));
     TAIST(v==3);
 }
-   int roundx;   
+   int roundx;
 void loop()
 {
    lnNvmGd32 nvm;
@@ -75,18 +75,19 @@ void loop()
    Logger("Starting...\n");
    if(!nvm.begin())
    {
+      Logger("Formating\n");
        nvm.format();
    }
-   
-   for(int roundx=0;roundx<40*3;roundx++)
+
+   for(int roundx=0;roundx<10;roundx++)
    {
        Logger("Round %d  \n",roundx);
        InitNvm(nvm);
    }
 
- 
-   
-   Logger("End\n");
+
+
+   Logger("End => ALL OK !\n");
    while(1)
    {
        delay(10);

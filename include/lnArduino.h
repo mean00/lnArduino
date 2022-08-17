@@ -21,7 +21,7 @@
     #define LN_FENCE()  __asm volatile("fence.i")
     #define LN_IOWRITE(adr,value)  {*adr=value;}
 #else
-    #if LN_ARCH == LN_ARCH_ARM        
+    #if LN_ARCH == LN_ARCH_ARM
         #define LN_FENCE() {} // no need for fence on arm
         #define LN_IOWRITE(adr,value) {*adr=value;}
     #else
@@ -38,7 +38,7 @@ extern "C"
 #include "queue.h"
 #include "semphr.h"
 #include "event_groups.h"
-   
+
 }
 
 
@@ -57,7 +57,5 @@ extern "C"
 #define LN_ALIGN(x) __attribute__ ((aligned(x)))
 #define LN_USED __attribute__((used))
 
-
-
-
-
+extern "C" void free(void *a) __THROW;
+extern "C" void *malloc(size_t size)  __THROW __attribute_malloc__;
