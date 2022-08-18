@@ -33,7 +33,7 @@ void vApplicationMallocFailedHook( void )
 /**
  *
  */
-xBinarySemaphore::xBinarySemaphore()
+lnBinarySemaphore::lnBinarySemaphore()
 {
     _handle=xSemaphoreCreateBinary();
     xAssert(_handle);
@@ -42,7 +42,7 @@ xBinarySemaphore::xBinarySemaphore()
  *
  * @return
  */
-bool xBinarySemaphore::take()
+bool lnBinarySemaphore::take()
 {
   return (bool) xSemaphoreTake(_handle,portMAX_DELAY);
 }
@@ -51,7 +51,7 @@ bool xBinarySemaphore::take()
  * @param timeoutMs
  * @return
  */
-bool xBinarySemaphore::take(int timeoutMs)
+bool lnBinarySemaphore::take(int timeoutMs)
 {
   int ticks=1+(timeoutMs*configTICK_RATE_HZ+500)/1000;
   return (bool) xSemaphoreTake(_handle,ticks);
@@ -61,7 +61,7 @@ bool xBinarySemaphore::take(int timeoutMs)
  * @param timeoutMs
  * @return
  */
-bool xBinarySemaphore::tryTake()
+bool lnBinarySemaphore::tryTake()
 {
      return (bool) xSemaphoreTake(_handle,0);
 }
@@ -71,7 +71,7 @@ bool xBinarySemaphore::tryTake()
  *
  * @return
  */
- bool xBinarySemaphore::give()
+ bool lnBinarySemaphore::give()
 {
   if(!underInterrupt)
   {
@@ -88,23 +88,23 @@ bool xBinarySemaphore::tryTake()
   *
   * @param ms
   */
- void xDelay(int ms)
+ void lnDelay(int ms)
  {
       const TickType_t xDelay = 1+( ms/ portTICK_PERIOD_MS);
       vTaskDelay(xDelay);
  }
 
 
- xMutex::xMutex()
+ lnMutex::lnMutex()
  {
      _handle=xSemaphoreCreateRecursiveMutex();
  }
- bool xMutex::lock()
+ bool lnMutex::lock()
  {
     xAssert(xSemaphoreTakeRecursive(_handle,portMAX_DELAY)); // should never fail
     return true;
  }
- bool xMutex::unlock()
+ bool lnMutex::unlock()
  {
     xAssert(xSemaphoreGiveRecursive(_handle)); // should never fail
     return true;
@@ -119,7 +119,7 @@ bool xBinarySemaphore::tryTake()
  * @param priority
  * @param taskSize
  */
-xTask::xTask(const char *name,  int priority, int taskSize)
+lnTask::lnTask(const char *name,  int priority, int taskSize)
 {
     _priority=priority;
     _taskSize=taskSize;
@@ -128,7 +128,7 @@ xTask::xTask(const char *name,  int priority, int taskSize)
 /**
  *
  */
-void xTask::start()
+void lnTask::start()
 {
     BaseType_t er=xTaskCreate(xTask::Trampoline,_name,_taskSize, this,_priority,&_taskHandle);
     xAssert(er==pdPASS);
@@ -137,7 +137,7 @@ void xTask::start()
  * @brief Destroy the x Taskx Task object
  *
  */
-xTask::~xTask()
+lnTask::~lnTask()
 {
   xAssert(0);
 }
@@ -223,7 +223,7 @@ uint32_t    xEventGroup::readEvents(uint32_t maskInt) // it is also cleared auto
 
 
 #define INVALID_TASK (TaskHandle_t)-1
-xFastEventGroup::xFastEventGroup()
+lnFastEventGroup::lnFastEventGroup()
 {
     _value = _mask = 0;
     _waitingTask=INVALID_TASK;
@@ -232,14 +232,14 @@ xFastEventGroup::xFastEventGroup()
 /**
  *
  */
-xFastEventGroup::~xFastEventGroup()
+lnFastEventGroup::~lnFastEventGroup()
 {
 
 }
 /**
  *
  */
-void        xFastEventGroup::takeOwnership()
+void        lnFastEventGroup::takeOwnership()
 {
     _waitingTask=xTaskGetCurrentTaskHandle();
 }
@@ -252,7 +252,7 @@ void        xFastEventGroup::takeOwnership()
 #define END_LOCK()   EXIT_CRITICAL()
 
 
-void xFastEventGroup::setEvents(uint32_t events)
+void lnFastEventGroup::setEvents(uint32_t events)
 {
     if(underInterrupt)
     {
@@ -290,7 +290,7 @@ void xFastEventGroup::setEvents(uint32_t events)
  */
 
 
-uint32_t xFastEventGroup::waitEvents(uint32_t maskint, int timeout )
+uint32_t lnFastEventGroup::waitEvents(uint32_t maskint, int timeout )
 {
     xAssert(_waitingTask!=INVALID_TASK);
     xAssert(!underInterrupt);
@@ -330,7 +330,7 @@ uint32_t xFastEventGroup::waitEvents(uint32_t maskint, int timeout )
  * @param maskInt
  * @return
  */
-uint32_t xFastEventGroup::readEvents(uint32_t maskInt)
+uint32_t lnFastEventGroup::readEvents(uint32_t maskInt)
 {
     BEGIN_LOCK();
     uint32_t v = _value & maskInt;

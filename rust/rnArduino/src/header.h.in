@@ -3,7 +3,11 @@
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
 use core::panic::PanicInfo;
+
 #[panic_handler]
-fn panic(info: &PanicInfo) -> ! {
- loop {}
+fn panic(_info: &PanicInfo) -> ! {
+    unsafe{
+    deadEnd(-10);
+    }
+    loop {}
 }

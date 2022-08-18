@@ -117,12 +117,12 @@ uint32_t lnGetMs()
     return myTick;
 }
 
-void xDelay(int a);
+void lnDelay(int a);
 /**
 */
-void lnDelay(int wait)
+void xDelay(int wait)
 {
-  xDelay(wait);
+  lnDelay(wait);
 }
 
 // EOF

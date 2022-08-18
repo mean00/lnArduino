@@ -11,10 +11,10 @@
 
 /**
  */
-class xBinarySemaphore
+class lnBinarySemaphore
 {
 public:
-        xBinarySemaphore();
+             lnBinarySemaphore();
         bool take();
         bool tryTake();
         bool take(int timeoutMs);
@@ -23,20 +23,22 @@ public:
 protected:
         SemaphoreHandle_t _handle;
 };
+#define xBinarySemaphore  lnBinarySemaphore
+
 /**
  * @brief
  *
  */
-class xTask
+class lnTask
 {
 public:
-                        xTask(const char *name,  int priority=3, int taskSize=100);
-                virtual ~xTask();
+                        lnTask(const char *name,  int priority=3, int taskSize=100);
+                virtual ~lnTask();
                 void    start();
                 virtual void run()=0; // Put your code here
                 static void Trampoline(void *param)
                 {
-                     xTask *tsk=(xTask *) param;
+                     lnTask *tsk=(lnTask *) param;
                      tsk->run();
                 }
 
@@ -46,30 +48,31 @@ protected:
                 int             _priority;
                 int             _taskSize;
 };
+#define xTask lnTask
 /**
  *
  */
-class xEventGroup
+class lnEventGroup
 {
 public:
-                xEventGroup();
-    virtual     ~xEventGroup();
+                lnEventGroup();
+    virtual     ~lnEventGroup();
     void        setEvents(uint32_t events);
     uint32_t    waitEvents(uint32_t maskint, int timeout=0); //  the events are cleared upon return from here ! returns  0 if timeout
     uint32_t    readEvents(uint32_t maskInt); // it is also cleared automatically !
 protected:
     EventGroupHandle_t _handle;
 };
-
+#define xEventGroup lnEventGroup
 
 /**
  *
  */
-class xFastEventGroup
+class lnFastEventGroup
 {
 public:
-                xFastEventGroup();
-    virtual     ~xFastEventGroup();
+                lnFastEventGroup();
+    virtual     ~lnFastEventGroup();
     void        takeOwnership(); // the task calling this will own the FastEventGroup
     void        setEvents(uint32_t events);
     // -1 timeout means wait forever
@@ -81,47 +84,46 @@ protected:
     TaskHandle_t _waitingTask;
 
 };
-
+#define xFastEventGroup lnFastEventGroup
 
 
 /**
  *
  */
-class xMutex
+class lnMutex
 {
 public:
-              xMutex();
+              lnMutex();
         bool lock();
         bool unlock();
 protected:
         SemaphoreHandle_t _handle;
 };
-
+#define xMutex lnMutex
 
 /**
  *
  * @param tex
  */
-class xAutoMutex
+class lnAutoMutex
 {
 public:
-    xAutoMutex(xMutex *tex)
+    lnAutoMutex(lnMutex *tex)
     {
         _tex=tex;
         _tex->lock();
     }
-    ~xAutoMutex()
+    ~lnAutoMutex()
     {
         _tex->unlock();
         _tex=NULL;
     }
 protected:
-    xMutex *_tex;
+    lnMutex *_tex;
 };
+#define xAutoMutex lnAutoMutex
 
-
-void xDelay(int ms);
-
+#define xDelay lnDelay
 extern "C"
 {void do_assert(const char *a); }
 #define xAssert(a) if(!(a)) {do_assert(#a);}

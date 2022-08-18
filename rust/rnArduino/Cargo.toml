@@ -2,17 +2,17 @@
 authors = ["mean00 <mean00@gmail.com>"]
 edition = "2021"
 readme = "README.md"
-name = "rnArduino"
+name = "rnarduino"
 version = "0.0.0"
 
 
 [dependencies]
-cty = "0.2.1"
+cty = "0.2.2"
 
 [lib]
-name = "rnArduino"
-path = "lib/rnArduino.rs"
-crate-type = ["staticlib"] # Creates static lib
+name = "rnarduino"
+path = "src/lib.rs"
+crate-type = ["rlib"] # Creates static lib
 
 [profile.dev]
 codegen-units = 1

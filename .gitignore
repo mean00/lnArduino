@@ -21,3 +21,4 @@ demoProject/*/lnArduino
 */.ccls-cache/
 *.gch
 libraries/tinyUsb/pat*
+rust/rnarduino/target
