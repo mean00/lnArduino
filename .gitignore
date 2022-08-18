@@ -22,3 +22,4 @@ demoProject/*/lnArduino
 *.gch
 libraries/tinyUsb/pat*
 rust/rnarduino/target
+rust/rnArduino/target
