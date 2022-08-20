@@ -11,7 +11,7 @@ cty = "0.2.2"
 
 [lib]
 name = "rnarduino"
-path = "src/lib.rs"
+path = "src/rnarduino.rs"
 crate-type = ["rlib"] # Creates static lib
 
 [profile.dev]
