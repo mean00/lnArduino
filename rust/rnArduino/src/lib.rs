@@ -7876,3 +7876,5 @@ pub struct __va_list_tag {
 pub struct __locale_data {
     pub _address: u8,
 }
+unsafe impl Send for lnFastEventGroup {}
+unsafe impl Sync for lnFastEventGroup {}
