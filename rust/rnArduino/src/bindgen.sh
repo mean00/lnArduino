@@ -7,7 +7,6 @@ echo "Processing $LN"
 \rm -f rnArduino.rs.tmp
 bindgen      --use-core --no-doc-comments \
      --no-layout-tests      lnAll.h \
-     --whitelist-function  "^[lLx][nN].*|deadEnd" \
     --ctypes-prefix cty \
     --no-default "uint32_t" \
    -o rnArduino.rs.tmp -- -x c++   -DLN_ARCH=LN_ARCH_ARM \
@@ -18,4 +17,5 @@ cat header.rs.in > ${out}
 cat rnArduino.rs.tmp >> ${out}
 cat tail.rs.in >> ${out}
 \rm -f rnArduino.rs.tmp
+     #--whitelist-function  "^[lLx][nN].*|deadEnd|Logger" \
 
