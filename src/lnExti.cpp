@@ -193,7 +193,7 @@ void EXTI_IrqHandler(int maskS,int maskE)
          aExiti->PD=1<<i;
          // call handler
          xAssert(d->cb);
-         d->cb(d->port*16+i,d->cookie);         
+         d->cb((lnPin)(d->port*16+i),d->cookie);         
     }
 }
 

@@ -909,87 +909,88 @@ extern "C" {
 extern "C" {
     pub fn strsignal(__signo: cty::c_int) -> *mut cty::c_char;
 }
-pub const PA0: cty::c_uint = 0;
-pub const PA1: cty::c_uint = 1;
-pub const PA2: cty::c_uint = 2;
-pub const PA3: cty::c_uint = 3;
-pub const PA4: cty::c_uint = 4;
-pub const PA5: cty::c_uint = 5;
-pub const PA6: cty::c_uint = 6;
-pub const PA7: cty::c_uint = 7;
-pub const PA8: cty::c_uint = 8;
-pub const PA9: cty::c_uint = 9;
-pub const PA10: cty::c_uint = 10;
-pub const PA11: cty::c_uint = 11;
-pub const PA12: cty::c_uint = 12;
-pub const PA13: cty::c_uint = 13;
-pub const PA14: cty::c_uint = 14;
-pub const PA15: cty::c_uint = 15;
-pub const PB0: cty::c_uint = 16;
-pub const PB1: cty::c_uint = 17;
-pub const PB2: cty::c_uint = 18;
-pub const PB3: cty::c_uint = 19;
-pub const PB4: cty::c_uint = 20;
-pub const PB5: cty::c_uint = 21;
-pub const PB6: cty::c_uint = 22;
-pub const PB7: cty::c_uint = 23;
-pub const PB8: cty::c_uint = 24;
-pub const PB9: cty::c_uint = 25;
-pub const PB10: cty::c_uint = 26;
-pub const PB11: cty::c_uint = 27;
-pub const PB12: cty::c_uint = 28;
-pub const PB13: cty::c_uint = 29;
-pub const PB14: cty::c_uint = 30;
-pub const PB15: cty::c_uint = 31;
-pub const PC0: cty::c_uint = 32;
-pub const PC1: cty::c_uint = 33;
-pub const PC2: cty::c_uint = 34;
-pub const PC3: cty::c_uint = 35;
-pub const PC4: cty::c_uint = 36;
-pub const PC5: cty::c_uint = 37;
-pub const PC6: cty::c_uint = 38;
-pub const PC7: cty::c_uint = 39;
-pub const PC8: cty::c_uint = 40;
-pub const PC9: cty::c_uint = 41;
-pub const PC10: cty::c_uint = 42;
-pub const PC11: cty::c_uint = 43;
-pub const PC12: cty::c_uint = 44;
-pub const PC13: cty::c_uint = 45;
-pub const PC14: cty::c_uint = 46;
-pub const PC15: cty::c_uint = 47;
-pub const PD0: cty::c_uint = 48;
-pub const PD1: cty::c_uint = 49;
-pub const PD2: cty::c_uint = 50;
-pub const PD3: cty::c_uint = 51;
-pub const PD4: cty::c_uint = 52;
-pub const PD5: cty::c_uint = 53;
-pub const PD6: cty::c_uint = 54;
-pub const PD7: cty::c_uint = 55;
-pub const PD8: cty::c_uint = 56;
-pub const PD9: cty::c_uint = 57;
-pub const PD10: cty::c_uint = 58;
-pub const PD11: cty::c_uint = 59;
-pub const PD12: cty::c_uint = 60;
-pub const PD13: cty::c_uint = 61;
-pub const PD14: cty::c_uint = 62;
-pub const PD15: cty::c_uint = 63;
-pub const PE0: cty::c_uint = 64;
-pub const PE1: cty::c_uint = 65;
-pub const PE2: cty::c_uint = 66;
-pub const PE3: cty::c_uint = 67;
-pub const PE4: cty::c_uint = 68;
-pub const PE5: cty::c_uint = 69;
-pub const PE6: cty::c_uint = 70;
-pub const PE7: cty::c_uint = 71;
-pub const PE8: cty::c_uint = 72;
-pub const PE9: cty::c_uint = 73;
-pub const PE10: cty::c_uint = 74;
-pub const PE11: cty::c_uint = 75;
-pub const PE12: cty::c_uint = 76;
-pub const PE13: cty::c_uint = 77;
-pub const PE14: cty::c_uint = 78;
-pub const PE15: cty::c_uint = 79;
-pub type _bindgen_ty_1 = cty::c_uint;
+pub const lnPin_PA0: lnPin = 0;
+pub const lnPin_PA1: lnPin = 1;
+pub const lnPin_PA2: lnPin = 2;
+pub const lnPin_PA3: lnPin = 3;
+pub const lnPin_PA4: lnPin = 4;
+pub const lnPin_PA5: lnPin = 5;
+pub const lnPin_PA6: lnPin = 6;
+pub const lnPin_PA7: lnPin = 7;
+pub const lnPin_PA8: lnPin = 8;
+pub const lnPin_PA9: lnPin = 9;
+pub const lnPin_PA10: lnPin = 10;
+pub const lnPin_PA11: lnPin = 11;
+pub const lnPin_PA12: lnPin = 12;
+pub const lnPin_PA13: lnPin = 13;
+pub const lnPin_PA14: lnPin = 14;
+pub const lnPin_PA15: lnPin = 15;
+pub const lnPin_PB0: lnPin = 16;
+pub const lnPin_PB1: lnPin = 17;
+pub const lnPin_PB2: lnPin = 18;
+pub const lnPin_PB3: lnPin = 19;
+pub const lnPin_PB4: lnPin = 20;
+pub const lnPin_PB5: lnPin = 21;
+pub const lnPin_PB6: lnPin = 22;
+pub const lnPin_PB7: lnPin = 23;
+pub const lnPin_PB8: lnPin = 24;
+pub const lnPin_PB9: lnPin = 25;
+pub const lnPin_PB10: lnPin = 26;
+pub const lnPin_PB11: lnPin = 27;
+pub const lnPin_PB12: lnPin = 28;
+pub const lnPin_PB13: lnPin = 29;
+pub const lnPin_PB14: lnPin = 30;
+pub const lnPin_PB15: lnPin = 31;
+pub const lnPin_PC0: lnPin = 32;
+pub const lnPin_PC1: lnPin = 33;
+pub const lnPin_PC2: lnPin = 34;
+pub const lnPin_PC3: lnPin = 35;
+pub const lnPin_PC4: lnPin = 36;
+pub const lnPin_PC5: lnPin = 37;
+pub const lnPin_PC6: lnPin = 38;
+pub const lnPin_PC7: lnPin = 39;
+pub const lnPin_PC8: lnPin = 40;
+pub const lnPin_PC9: lnPin = 41;
+pub const lnPin_PC10: lnPin = 42;
+pub const lnPin_PC11: lnPin = 43;
+pub const lnPin_PC12: lnPin = 44;
+pub const lnPin_PC13: lnPin = 45;
+pub const lnPin_PC14: lnPin = 46;
+pub const lnPin_PC15: lnPin = 47;
+pub const lnPin_PD0: lnPin = 48;
+pub const lnPin_PD1: lnPin = 49;
+pub const lnPin_PD2: lnPin = 50;
+pub const lnPin_PD3: lnPin = 51;
+pub const lnPin_PD4: lnPin = 52;
+pub const lnPin_PD5: lnPin = 53;
+pub const lnPin_PD6: lnPin = 54;
+pub const lnPin_PD7: lnPin = 55;
+pub const lnPin_PD8: lnPin = 56;
+pub const lnPin_PD9: lnPin = 57;
+pub const lnPin_PD10: lnPin = 58;
+pub const lnPin_PD11: lnPin = 59;
+pub const lnPin_PD12: lnPin = 60;
+pub const lnPin_PD13: lnPin = 61;
+pub const lnPin_PD14: lnPin = 62;
+pub const lnPin_PD15: lnPin = 63;
+pub const lnPin_PE0: lnPin = 64;
+pub const lnPin_PE1: lnPin = 65;
+pub const lnPin_PE2: lnPin = 66;
+pub const lnPin_PE3: lnPin = 67;
+pub const lnPin_PE4: lnPin = 68;
+pub const lnPin_PE5: lnPin = 69;
+pub const lnPin_PE6: lnPin = 70;
+pub const lnPin_PE7: lnPin = 71;
+pub const lnPin_PE8: lnPin = 72;
+pub const lnPin_PE9: lnPin = 73;
+pub const lnPin_PE10: lnPin = 74;
+pub const lnPin_PE11: lnPin = 75;
+pub const lnPin_PE12: lnPin = 76;
+pub const lnPin_PE13: lnPin = 77;
+pub const lnPin_PE14: lnPin = 78;
+pub const lnPin_PE15: lnPin = 79;
+pub const lnPin_NoPin: lnPin = -1;
+pub type lnPin = cty::c_int;
 pub const GpioMode_lnFLOATING: GpioMode = 0;
 pub const GpioMode_lnINPUT_FLOATING: GpioMode = 0;
 pub const GpioMode_lnINPUT_PULLUP: GpioMode = 2;
@@ -1002,21 +1003,20 @@ pub const GpioMode_lnPWM: GpioMode = 7;
 pub const GpioMode_lnADC_MODE: GpioMode = 8;
 pub const GpioMode_lnDAC_MODE: GpioMode = 9;
 pub type GpioMode = cty::c_uint;
-pub type lnPin = cty::c_int;
 extern "C" {
-    #[link_name = "\u{1}_Z9lnPinModei8GpioMode"]
+    #[link_name = "\u{1}_Z9lnPinMode5lnPin8GpioMode"]
     pub fn lnPinMode(pin: lnPin, mode: GpioMode);
 }
 extern "C" {
-    #[link_name = "\u{1}_Z14lnDigitalWriteib"]
+    #[link_name = "\u{1}_Z14lnDigitalWrite5lnPinb"]
     pub fn lnDigitalWrite(pin: lnPin, value: bool);
 }
 extern "C" {
-    #[link_name = "\u{1}_Z13lnDigitalReadi"]
+    #[link_name = "\u{1}_Z13lnDigitalRead5lnPin"]
     pub fn lnDigitalRead(pin: lnPin) -> bool;
 }
 extern "C" {
-    #[link_name = "\u{1}_Z15lnDigitalTogglei"]
+    #[link_name = "\u{1}_Z15lnDigitalToggle5lnPin"]
     pub fn lnDigitalToggle(pin: lnPin);
 }
 extern "C" {
@@ -1047,7 +1047,7 @@ pub struct lnFastIO {
     pub _offbit: cty::c_ulong,
 }
 extern "C" {
-    #[link_name = "\u{1}_ZN8lnFastIOC1Ei"]
+    #[link_name = "\u{1}_ZN8lnFastIOC1E5lnPin"]
     pub fn lnFastIO_lnFastIO(this: *mut lnFastIO, p: lnPin);
 }
 impl lnFastIO {
@@ -1066,7 +1066,7 @@ pub type lnEdge = cty::c_uint;
 pub type lnExtiCallback =
     ::core::option::Option<unsafe extern "C" fn(pin: lnPin, cookie: *mut cty::c_void)>;
 extern "C" {
-    #[link_name = "\u{1}_Z21lnExtiAttachInterrupti6lnEdgePFviPvES0_"]
+    #[link_name = "\u{1}_Z21lnExtiAttachInterrupt5lnPin6lnEdgePFvS_PvES1_"]
     pub fn lnExtiAttachInterrupt(
         pin: lnPin,
         edge: lnEdge,
@@ -1075,15 +1075,15 @@ extern "C" {
     );
 }
 extern "C" {
-    #[link_name = "\u{1}_Z21lnExtiDetachInterrupti"]
+    #[link_name = "\u{1}_Z21lnExtiDetachInterrupt5lnPin"]
     pub fn lnExtiDetachInterrupt(pin: lnPin);
 }
 extern "C" {
-    #[link_name = "\u{1}_Z21lnExtiEnableInterrupti"]
+    #[link_name = "\u{1}_Z21lnExtiEnableInterrupt5lnPin"]
     pub fn lnExtiEnableInterrupt(pin: lnPin);
 }
 extern "C" {
-    #[link_name = "\u{1}_Z22lnExtiDisableInterrupti"]
+    #[link_name = "\u{1}_Z22lnExtiDisableInterrupt5lnPin"]
     pub fn lnExtiDisableInterrupt(pin: lnPin);
 }
 extern "C" {
@@ -2277,6 +2277,10 @@ pub struct lnAutoMutex {
     pub _tex: *mut lnMutex,
 }
 extern "C" {
+    #[link_name = "\u{1}_Z6xDelayi"]
+    pub fn xDelay(ms: cty::c_int);
+}
+extern "C" {
     #[link_name = "\u{1}_Z10LoggerInitv"]
     pub fn LoggerInit();
 }
@@ -2814,7 +2818,7 @@ extern "C" {
     pub fn lnBaseAdc_readVcc(this: *mut lnBaseAdc);
 }
 extern "C" {
-    #[link_name = "\u{1}_ZN9lnBaseAdc10adcChannelEi"]
+    #[link_name = "\u{1}_ZN9lnBaseAdc10adcChannelE5lnPin"]
     pub fn lnBaseAdc_adcChannel(pin: lnPin) -> cty::c_int;
 }
 impl lnBaseAdc {
@@ -2847,14 +2851,14 @@ extern "C" {
 #[derive(Debug)]
 pub struct lnSimpleADC {
     pub _base: lnBaseAdc,
-    pub _pin: cty::c_int,
+    pub _pin: lnPin,
 }
 extern "C" {
     #[link_name = "\u{1}_ZN11lnSimpleADC3pinEv"]
     pub fn lnSimpleADC_pin(this: *mut lnSimpleADC) -> lnPin;
 }
 extern "C" {
-    #[link_name = "\u{1}_ZN11lnSimpleADC6setPinEi"]
+    #[link_name = "\u{1}_ZN11lnSimpleADC6setPinE5lnPin"]
     pub fn lnSimpleADC_setPin(this: *mut lnSimpleADC, pin: lnPin) -> bool;
 }
 extern "C" {
@@ -2862,7 +2866,7 @@ extern "C" {
     pub fn lnSimpleADC_simpleRead(this: *mut lnSimpleADC) -> cty::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}_ZN11lnSimpleADC16pollingMultiReadEiPiPt"]
+    #[link_name = "\u{1}_ZN11lnSimpleADC16pollingMultiReadEiP5lnPinPt"]
     pub fn lnSimpleADC_pollingMultiRead(
         this: *mut lnSimpleADC,
         nbPins: cty::c_int,
@@ -2883,7 +2887,7 @@ extern "C" {
     pub fn lnSimpleADC_readVcc(this: *mut lnSimpleADC);
 }
 extern "C" {
-    #[link_name = "\u{1}_ZN11lnSimpleADCC1Eii"]
+    #[link_name = "\u{1}_ZN11lnSimpleADCC1Ei5lnPin"]
     pub fn lnSimpleADC_lnSimpleADC(this: *mut lnSimpleADC, instance: cty::c_int, pin: lnPin);
 }
 impl lnSimpleADC {
@@ -2948,7 +2952,7 @@ pub struct lnTimingAdc {
     pub _nbPins: cty::c_int,
 }
 extern "C" {
-    #[link_name = "\u{1}_ZN11lnTimingAdc9setSourceEiiiiPKi"]
+    #[link_name = "\u{1}_ZN11lnTimingAdc9setSourceEiiiiPK5lnPin"]
     pub fn lnTimingAdc_setSource(
         this: *mut lnTimingAdc,
         timer: cty::c_int,
@@ -4428,7 +4432,7 @@ extern "C" {
     pub fn lnDmaTimer_dmaInterrupt(this: *mut lnDmaTimer, h: bool);
 }
 extern "C" {
-    #[link_name = "\u{1}_ZN10lnDmaTimerC1Eii"]
+    #[link_name = "\u{1}_ZN10lnDmaTimerC1Ei5lnPin"]
     pub fn lnDmaTimer_lnDmaTimer(this: *mut lnDmaTimer, bits: cty::c_int, pin: lnPin);
 }
 impl lnDmaTimer {

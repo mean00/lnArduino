@@ -10,8 +10,9 @@ extern "C" uint64_t get_timer_value();
 extern "C" uint32_t SystemCoreClock ;
 
 
-void pinMode(uint8_t a, uint8_t b)
+void pinMode(uint8_t aa, uint8_t b)
 {
+    lnPin a=(lnPin )aa;
     switch(b)
     {
         case  INPUT:         lnPinMode(a,lnFLOATING);break;
@@ -26,12 +27,12 @@ void pinMode(uint8_t a, uint8_t b)
 
 int  digitalRead(uint8_t pin)
 {
-    return lnDigitalRead(pin);
+    return lnDigitalRead((lnPin)pin);
 }
 
 void digitalWrite(uint8_t pin, uint8_t val)
 {
-    lnDigitalWrite(pin,val);
+    lnDigitalWrite((lnPin)pin,val);
 }
 uint64_t millis(void)
 {
@@ -39,7 +40,7 @@ uint64_t millis(void)
 }
 void digitalToggle(uint8_t a)
 {
-    lnDigitalToggle(a);
+    lnDigitalToggle((lnPin)a);
 }
 /**
  * @brief micros
@@ -88,9 +89,9 @@ void attachInterrupt(uint8_t interruptNum, void (*userFunc)(void), int mode)
         case FALLING: oedge=LN_EDGE_FALLING;break;
         case RISING:  oedge=LN_EDGE_RISING;break;
     }
-    lnExtiAttachInterrupt(interruptNum, oedge, extiInternalCb, (void *)userFunc);
+    lnExtiAttachInterrupt((lnPin)interruptNum, oedge, extiInternalCb, (void *)userFunc);
 }
 void detachInterrupt(uint8_t interruptNum)
 {
-    lnExtiDetachInterrupt(interruptNum);
+    lnExtiDetachInterrupt((lnPin)interruptNum);
 }

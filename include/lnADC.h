@@ -64,7 +64,7 @@ public:
 protected:
     void    readVcc();
     void    setup();
-    int     _pin;
+    lnPin   _pin;
 
 };
 /**
