@@ -90,8 +90,8 @@ bool lnBinarySemaphore::tryTake()
   */
  void lnDelay(int ms)
  {
-      const TickType_t xDelay = 1+( ms/ portTICK_PERIOD_MS);
-      vTaskDelay(xDelay);
+      const TickType_t dely = 1+( ms/ portTICK_PERIOD_MS);
+      vTaskDelay(dely);
  }
 
 
