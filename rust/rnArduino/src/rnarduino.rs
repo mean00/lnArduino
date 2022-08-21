@@ -4552,5 +4552,3 @@ extern "C" {
 }
 unsafe impl Send for lnFastEventGroup {}
 unsafe impl Sync for lnFastEventGroup {}
-unsafe impl Send for lnAdcTimer {}
-unsafe impl Sync for lnAdcTimer {}
