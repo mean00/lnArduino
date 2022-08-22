@@ -16,7 +16,7 @@ public:
   };
   
   
-                    lnRotary(int pinPush,int pinA,int pinB );
+                    lnRotary(lnPin pinPush,lnPin pinA,lnPin pinB );
         void        start();
         int         getCount();
         EVENTS      readEvent();
@@ -27,10 +27,10 @@ public:
         void        pushInterrupt();
 protected:
         int          _count;
-        int          _pinA,_pinB,_pinPush;
-        int           _event;
-        uint32_t      _lastRead;
-        uint32_t      _down; // time down was detected
+        lnPin        _pinA,_pinB,_pinPush;
+        int          _event;
+        uint32_t     _lastRead;
+        uint32_t     _down; // time down was detected
         xFastEventGroup   _events;
         unsigned char _state;
         int           process();

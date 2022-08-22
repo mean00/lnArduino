@@ -3,7 +3,7 @@
 #define LED PA2
 #define BOOT0 PA8
 
-lnPin pin=-1;
+lnPin pin=NoPin;
 xBinarySemaphore *sem;
 
 void button0Cb(lnPin apin, void *cookie)
@@ -30,7 +30,7 @@ void loop()
     {
         sem->take();
         Logger("Got interrupt %d (%d)!\n",pin,BOOT0);
-        pin=-1;
+        pin=NoPin;
         lnExtiEnableInterrupt(BOOT0);
     }
     

@@ -25,7 +25,7 @@ void helloUsbEvent(void *cookie, lnUsbStack::lnUsbStackEvents event)
     }
 }
 lnUsbCDC *cdc=NULL;
-void cdcEventHandler(void *cookie, int interface,lnUsbCDC::lnUsbCDCEvents event)
+void cdcEventHandler(void *cookie, int interface,lnUsbCDC::lnUsbCDCEvents event,uint32_t payload)
 {
   uint8_t buffer[32];
 
