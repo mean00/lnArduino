@@ -1,0 +1,13 @@
+diff --git a/rust/rnArduino/src/rnarduino.rs b/rust/rnArduino/src/rnarduino.rs
+index 1134d33..4b63d5e 100644
+--- a/rust/rnArduino/src/rnarduino.rs
++++ b/rust/rnArduino/src/rnarduino.rs
+@@ -990,7 +990,7 @@ pub const lnPin_PE13: lnPin = 77;
+ pub const lnPin_PE14: lnPin = 78;
+ pub const lnPin_PE15: lnPin = 79;
+ pub const lnPin_NoPin: lnPin = -1;
+-pub type lnPin = cty::c_int;
++pub type lnPin = cty::int8_t;
+ pub const GpioMode_lnFLOATING: GpioMode = 0;
+ pub const GpioMode_lnINPUT_FLOATING: GpioMode = 0;
+ pub const GpioMode_lnINPUT_PULLUP: GpioMode = 2;

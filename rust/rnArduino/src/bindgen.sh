@@ -17,5 +17,6 @@ cat header.rs.in > ${out}
 cat rnArduino.rs.tmp >> ${out}
 cat tail.rs.in >> ${out}
 \rm -f rnArduino.rs.tmp
+patch -p4 < patched_lnPin_enum.diff 
      #--whitelist-function  "^[lLx][nN].*|deadEnd|Logger" \
 
