@@ -4,19 +4,9 @@
 #![allow(non_snake_case)]
 #![feature(default_alloc_error_handler)]
 
-use core::panic::PanicInfo;
 use core::alloc::{GlobalAlloc, Layout};
 extern crate alloc;
-
-
-#[panic_handler]
-fn panic(_info: &PanicInfo) -> ! {
-    unsafe{
-    deadEnd(-10);
-    }
-    loop {}
-}
-
+use panic_reset as _;
 
 
 pub struct FreeRtosAllocator;
