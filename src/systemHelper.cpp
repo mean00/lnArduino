@@ -69,6 +69,11 @@ extern "C"
           do_assert("core_exception_handler");
           return 0;
     }
+    void abort()
+    {
+        do_assert("abort");
+        while(1) {}
+    }
 
 
 }
