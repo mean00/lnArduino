@@ -1,23 +1,37 @@
 #!/bin/bash
+#set -x
 input=$1
 output=$2
-echo "$1 => $2"
+ME=$0
+export ME=`realpath $ME`
+export ME=`dirname $ME`
 export BINDGEN=/usr/bin/bindgen
-#export BINDGEN=/home/fx/workspace/rust-bindgen/./target/debug/bindgen
-
 export PLATFORM_TOOLCHAIN_PATH=/home/fx/Arduino_stm32/arm-gcc-2021q4/bin
-export  PATH=$PLATFORM_TOOLCHAIN_PATH:$PATH
-export LN=/home/fx/Arduino_gd32/lnPowerSupply/lnArduino
-echo "Processing $LN"
+export PATH=$PLATFORM_TOOLCHAIN_PATH:$PATH
+export LN=`realpath $ME/..` 
+#
+if [ "$#" -ne 2 ]; then
+    echo "rustgen.sh xxx.h xxx.rs"
+    exit 1
+fi
+#
+echo "Processing $1 using $LN as basedir"
+echo "$1 => $2"
 \rm -f rnArduino.rs.tmp
 $BINDGEN      --use-core --no-doc-comments \
      --no-layout-tests      $1 \
     --ctypes-prefix cty \
     --no-default "uint32_t" \
-   -o $2.tmp -- -x c++   -DLN_ARCH=LN_ARCH_ARM \
-    -I$LN -I$LN/include/  -I$LN/arduinoLayer/include/ -I$LN/FreeRTOS/include/  -I$LN/legacy/boards/bluepill/ -I$LN/FreeRTOS/portable/GCC/ARM_CM3/ \
+    -o $2.tmp \
+    -- -x c++   -DLN_ARCH=LN_ARCH_ARM \
+    -I$LN -I$LN/include/  -I$LN/arduinoLayer/include/ \
+    -I$LN/FreeRTOS/include/  \
+    -I$LN/legacy/boards/bluepill/ \
+    -I$LN/FreeRTOS/portable/GCC/ARM_CM3/ \
     -target "thumbv7m-none-eabi"  \
-    -I${PLATFORM_TOOLCHAIN_PATH}/../arm-none-eabi/include/ -D_UINT32_T_DECLARED -Duint32_t="unsigned long int"
+    -I${PLATFORM_TOOLCHAIN_PATH}/../arm-none-eabi/include/ \
+    -D_UINT32_T_DECLARED \
+    -Duint32_t="unsigned long int"
 cat header.rs.in > ${output}
 cat $2.tmp >> ${output}
 cat tail.rs.in >> ${output}
