@@ -1,14 +1,17 @@
 #!/bin/bash
-#set -x
+set -x
 input=$1
 output=$2
 ME=$0
 export ME=`realpath $ME`
 export ME=`dirname $ME`
 export BINDGEN=/usr/bin/bindgen
-export PLATFORM_TOOLCHAIN_PATH=/home/fx/Arduino_stm32/arm-gcc-2021q4/bin
 export PATH=$PLATFORM_TOOLCHAIN_PATH:$PATH
 export LN=`realpath $ME/..` 
+
+
+#export PLATFORM_TOOLCHAIN_PATH=/home/fx/Arduino_stm32/arm-gcc-2021q4/bin
+export PLATFORM_TOOLCHAIN_PATH=`cmake -DHOME=$LN -P $ME/toolchain_env.cmake`
 #
 if [ "$#" -ne 2 ]; then
     echo "rustgen.sh xxx.h xxx.rs"
