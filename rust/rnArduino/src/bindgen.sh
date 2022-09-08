@@ -5,9 +5,12 @@ export LN=` realpath $PWD/../../..`
 export out=rnarduino.rs
 echo "Processing $LN"
 \rm -f rnArduino.rs.tmp
+# rustified_enum
+
 bindgen      --use-core --no-doc-comments \
      --no-layout-tests      lnAll.h \
     --ctypes-prefix cty \
+    --rustified-enum "ln.*" \
     --no-default "uint32_t" \
    -o rnArduino.rs.tmp -- -x c++   -DLN_ARCH=LN_ARCH_ARM \
     -I$LN -I$LN/include/  -I$LN/arduinoLayer/include/ -I$LN/FreeRTOS/include/  -I$LN/legacy/boards/bluepill/ -I$LN/FreeRTOS/portable/GCC/ARM_CM3/ \
@@ -17,6 +20,6 @@ cat header.rs.in > ${out}
 cat rnArduino.rs.tmp >> ${out}
 cat tail.rs.in >> ${out}
 \rm -f rnArduino.rs.tmp
-patch -p4 < patched_lnPin_enum.diff 
+#patch -p4 < patched_lnPin_enum.diff 
      #--whitelist-function  "^[lLx][nN].*|deadEnd|Logger" \
 

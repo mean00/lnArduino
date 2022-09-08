@@ -924,88 +924,91 @@ extern "C" {
 extern "C" {
     pub fn strsignal(__signo: cty::c_int) -> *mut cty::c_char;
 }
-pub const lnPin_PA0: lnPin = 0;
-pub const lnPin_PA1: lnPin = 1;
-pub const lnPin_PA2: lnPin = 2;
-pub const lnPin_PA3: lnPin = 3;
-pub const lnPin_PA4: lnPin = 4;
-pub const lnPin_PA5: lnPin = 5;
-pub const lnPin_PA6: lnPin = 6;
-pub const lnPin_PA7: lnPin = 7;
-pub const lnPin_PA8: lnPin = 8;
-pub const lnPin_PA9: lnPin = 9;
-pub const lnPin_PA10: lnPin = 10;
-pub const lnPin_PA11: lnPin = 11;
-pub const lnPin_PA12: lnPin = 12;
-pub const lnPin_PA13: lnPin = 13;
-pub const lnPin_PA14: lnPin = 14;
-pub const lnPin_PA15: lnPin = 15;
-pub const lnPin_PB0: lnPin = 16;
-pub const lnPin_PB1: lnPin = 17;
-pub const lnPin_PB2: lnPin = 18;
-pub const lnPin_PB3: lnPin = 19;
-pub const lnPin_PB4: lnPin = 20;
-pub const lnPin_PB5: lnPin = 21;
-pub const lnPin_PB6: lnPin = 22;
-pub const lnPin_PB7: lnPin = 23;
-pub const lnPin_PB8: lnPin = 24;
-pub const lnPin_PB9: lnPin = 25;
-pub const lnPin_PB10: lnPin = 26;
-pub const lnPin_PB11: lnPin = 27;
-pub const lnPin_PB12: lnPin = 28;
-pub const lnPin_PB13: lnPin = 29;
-pub const lnPin_PB14: lnPin = 30;
-pub const lnPin_PB15: lnPin = 31;
-pub const lnPin_PC0: lnPin = 32;
-pub const lnPin_PC1: lnPin = 33;
-pub const lnPin_PC2: lnPin = 34;
-pub const lnPin_PC3: lnPin = 35;
-pub const lnPin_PC4: lnPin = 36;
-pub const lnPin_PC5: lnPin = 37;
-pub const lnPin_PC6: lnPin = 38;
-pub const lnPin_PC7: lnPin = 39;
-pub const lnPin_PC8: lnPin = 40;
-pub const lnPin_PC9: lnPin = 41;
-pub const lnPin_PC10: lnPin = 42;
-pub const lnPin_PC11: lnPin = 43;
-pub const lnPin_PC12: lnPin = 44;
-pub const lnPin_PC13: lnPin = 45;
-pub const lnPin_PC14: lnPin = 46;
-pub const lnPin_PC15: lnPin = 47;
-pub const lnPin_PD0: lnPin = 48;
-pub const lnPin_PD1: lnPin = 49;
-pub const lnPin_PD2: lnPin = 50;
-pub const lnPin_PD3: lnPin = 51;
-pub const lnPin_PD4: lnPin = 52;
-pub const lnPin_PD5: lnPin = 53;
-pub const lnPin_PD6: lnPin = 54;
-pub const lnPin_PD7: lnPin = 55;
-pub const lnPin_PD8: lnPin = 56;
-pub const lnPin_PD9: lnPin = 57;
-pub const lnPin_PD10: lnPin = 58;
-pub const lnPin_PD11: lnPin = 59;
-pub const lnPin_PD12: lnPin = 60;
-pub const lnPin_PD13: lnPin = 61;
-pub const lnPin_PD14: lnPin = 62;
-pub const lnPin_PD15: lnPin = 63;
-pub const lnPin_PE0: lnPin = 64;
-pub const lnPin_PE1: lnPin = 65;
-pub const lnPin_PE2: lnPin = 66;
-pub const lnPin_PE3: lnPin = 67;
-pub const lnPin_PE4: lnPin = 68;
-pub const lnPin_PE5: lnPin = 69;
-pub const lnPin_PE6: lnPin = 70;
-pub const lnPin_PE7: lnPin = 71;
-pub const lnPin_PE8: lnPin = 72;
-pub const lnPin_PE9: lnPin = 73;
-pub const lnPin_PE10: lnPin = 74;
-pub const lnPin_PE11: lnPin = 75;
-pub const lnPin_PE12: lnPin = 76;
-pub const lnPin_PE13: lnPin = 77;
-pub const lnPin_PE14: lnPin = 78;
-pub const lnPin_PE15: lnPin = 79;
-pub const lnPin_NoPin: lnPin = -1;
-pub type lnPin = cty::int8_t;
+#[repr(i32)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub enum lnPin {
+    PA0 = 0,
+    PA1 = 1,
+    PA2 = 2,
+    PA3 = 3,
+    PA4 = 4,
+    PA5 = 5,
+    PA6 = 6,
+    PA7 = 7,
+    PA8 = 8,
+    PA9 = 9,
+    PA10 = 10,
+    PA11 = 11,
+    PA12 = 12,
+    PA13 = 13,
+    PA14 = 14,
+    PA15 = 15,
+    PB0 = 16,
+    PB1 = 17,
+    PB2 = 18,
+    PB3 = 19,
+    PB4 = 20,
+    PB5 = 21,
+    PB6 = 22,
+    PB7 = 23,
+    PB8 = 24,
+    PB9 = 25,
+    PB10 = 26,
+    PB11 = 27,
+    PB12 = 28,
+    PB13 = 29,
+    PB14 = 30,
+    PB15 = 31,
+    PC0 = 32,
+    PC1 = 33,
+    PC2 = 34,
+    PC3 = 35,
+    PC4 = 36,
+    PC5 = 37,
+    PC6 = 38,
+    PC7 = 39,
+    PC8 = 40,
+    PC9 = 41,
+    PC10 = 42,
+    PC11 = 43,
+    PC12 = 44,
+    PC13 = 45,
+    PC14 = 46,
+    PC15 = 47,
+    PD0 = 48,
+    PD1 = 49,
+    PD2 = 50,
+    PD3 = 51,
+    PD4 = 52,
+    PD5 = 53,
+    PD6 = 54,
+    PD7 = 55,
+    PD8 = 56,
+    PD9 = 57,
+    PD10 = 58,
+    PD11 = 59,
+    PD12 = 60,
+    PD13 = 61,
+    PD14 = 62,
+    PD15 = 63,
+    PE0 = 64,
+    PE1 = 65,
+    PE2 = 66,
+    PE3 = 67,
+    PE4 = 68,
+    PE5 = 69,
+    PE6 = 70,
+    PE7 = 71,
+    PE8 = 72,
+    PE9 = 73,
+    PE10 = 74,
+    PE11 = 75,
+    PE12 = 76,
+    PE13 = 77,
+    PE14 = 78,
+    PE15 = 79,
+    NoPin = -1,
+}
 pub const GpioMode_lnFLOATING: GpioMode = 0;
 pub const GpioMode_lnINPUT_FLOATING: GpioMode = 0;
 pub const GpioMode_lnINPUT_PULLUP: GpioMode = 2;
@@ -1073,11 +1076,14 @@ impl lnFastIO {
         __bindgen_tmp.assume_init()
     }
 }
-pub const lnEdge_LN_EDGE_NONE: lnEdge = 0;
-pub const lnEdge_LN_EDGE_RISING: lnEdge = 1;
-pub const lnEdge_LN_EDGE_FALLING: lnEdge = 2;
-pub const lnEdge_LN_EDGE_BOTH: lnEdge = 3;
-pub type lnEdge = cty::c_uint;
+#[repr(u32)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub enum lnEdge {
+    LN_EDGE_NONE = 0,
+    LN_EDGE_RISING = 1,
+    LN_EDGE_FALLING = 2,
+    LN_EDGE_BOTH = 3,
+}
 pub type lnExtiCallback =
     ::core::option::Option<unsafe extern "C" fn(pin: lnPin, cookie: *mut cty::c_void)>;
 extern "C" {
@@ -2349,13 +2355,16 @@ pub const Peripherals_pAPB1: Peripherals = 100;
 pub const Peripherals_pAPB2: Peripherals = 101;
 pub const Peripherals_pSYSCLOCK: Peripherals = 102;
 pub type Peripherals = cty::c_uint;
-pub const lnADC_DIVIDER_lnADC_CLOCK_DIV_BY_2: lnADC_DIVIDER = 0;
-pub const lnADC_DIVIDER_lnADC_CLOCK_DIV_BY_4: lnADC_DIVIDER = 1;
-pub const lnADC_DIVIDER_lnADC_CLOCK_DIV_BY_6: lnADC_DIVIDER = 2;
-pub const lnADC_DIVIDER_lnADC_CLOCK_DIV_BY_8: lnADC_DIVIDER = 3;
-pub const lnADC_DIVIDER_lnADC_CLOCK_DIV_BY_12: lnADC_DIVIDER = 5;
-pub const lnADC_DIVIDER_lnADC_CLOCK_DIV_BY_16: lnADC_DIVIDER = 7;
-pub type lnADC_DIVIDER = cty::c_uint;
+#[repr(u32)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub enum lnADC_DIVIDER {
+    lnADC_CLOCK_DIV_BY_2 = 0,
+    lnADC_CLOCK_DIV_BY_4 = 1,
+    lnADC_CLOCK_DIV_BY_6 = 2,
+    lnADC_CLOCK_DIV_BY_8 = 3,
+    lnADC_CLOCK_DIV_BY_12 = 5,
+    lnADC_CLOCK_DIV_BY_16 = 7,
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct lnPeripherals {
@@ -2584,20 +2593,29 @@ pub struct lnDMA {
     pub _sourceWidth: cty::c_int,
     pub _targetWidth: cty::c_int,
 }
-pub const lnDMA_DmaInterruptType_DMA_INTERRUPT_HALF: lnDMA_DmaInterruptType = 0;
-pub const lnDMA_DmaInterruptType_DMA_INTERRUPT_FULL: lnDMA_DmaInterruptType = 1;
-pub type lnDMA_DmaInterruptType = cty::c_uint;
+#[repr(u32)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub enum lnDMA_DmaInterruptType {
+    DMA_INTERRUPT_HALF = 0,
+    DMA_INTERRUPT_FULL = 1,
+}
 pub type lnDMA_doneCallback = ::core::option::Option<
     unsafe extern "C" fn(arg1: *mut cty::c_void, arg2: lnDMA_DmaInterruptType),
 >;
-pub const lnDMA_DmaTransferType_DMA_MEMORY_TO_PERIPH: lnDMA_DmaTransferType = 0;
-pub const lnDMA_DmaTransferType_DMA_PERIPH_TO_MEMORY: lnDMA_DmaTransferType = 1;
-pub type lnDMA_DmaTransferType = cty::c_uint;
-pub const lnDMA_DmaPriority_DMA_PRIORITY_LOW: lnDMA_DmaPriority = 0;
-pub const lnDMA_DmaPriority_DMA_PRIORITY_NORMAL: lnDMA_DmaPriority = 1;
-pub const lnDMA_DmaPriority_DMA_PRIORITY_HIGH: lnDMA_DmaPriority = 2;
-pub const lnDMA_DmaPriority_DMA_PRIORITY_ULTRA_HIGH: lnDMA_DmaPriority = 3;
-pub type lnDMA_DmaPriority = cty::c_uint;
+#[repr(u32)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub enum lnDMA_DmaTransferType {
+    DMA_MEMORY_TO_PERIPH = 0,
+    DMA_PERIPH_TO_MEMORY = 1,
+}
+#[repr(u32)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub enum lnDMA_DmaPriority {
+    DMA_PRIORITY_LOW = 0,
+    DMA_PRIORITY_NORMAL = 1,
+    DMA_PRIORITY_HIGH = 2,
+    DMA_PRIORITY_ULTRA_HIGH = 3,
+}
 extern "C" {
     #[link_name = "\u{1}_ZN5lnDMA14attachCallbackEPFvPvNS_16DmaInterruptTypeEES0_"]
     pub fn lnDMA_attachCallback(this: *mut lnDMA, cb: lnDMA_doneCallback, cookie: *mut cty::c_void);
@@ -2799,15 +2817,18 @@ impl lnDMA {
         lnDMA_lnDMA_destructor(self)
     }
 }
-pub const lnADC_CYCLES_LN_ADC_SMPT_1_5: lnADC_CYCLES = 0;
-pub const lnADC_CYCLES_LN_ADC_SMPT_7_5: lnADC_CYCLES = 1;
-pub const lnADC_CYCLES_LN_ADC_SMPT_13_5: lnADC_CYCLES = 2;
-pub const lnADC_CYCLES_LN_ADC_SMPT_28_5: lnADC_CYCLES = 3;
-pub const lnADC_CYCLES_LN_ADC_SMPT_41_5: lnADC_CYCLES = 4;
-pub const lnADC_CYCLES_LN_ADC_SMPT_55_5: lnADC_CYCLES = 5;
-pub const lnADC_CYCLES_LN_ADC_SMPT_71_5: lnADC_CYCLES = 6;
-pub const lnADC_CYCLES_LN_ADC_SMPT_239_5: lnADC_CYCLES = 7;
-pub type lnADC_CYCLES = cty::c_uint;
+#[repr(u32)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub enum lnADC_CYCLES {
+    LN_ADC_SMPT_1_5 = 0,
+    LN_ADC_SMPT_7_5 = 1,
+    LN_ADC_SMPT_13_5 = 2,
+    LN_ADC_SMPT_28_5 = 3,
+    LN_ADC_SMPT_41_5 = 4,
+    LN_ADC_SMPT_55_5 = 5,
+    LN_ADC_SMPT_71_5 = 6,
+    LN_ADC_SMPT_239_5 = 7,
+}
 #[repr(C)]
 pub struct lnBaseAdc__bindgen_vtable(cty::c_void);
 #[repr(C)]
@@ -3181,14 +3202,20 @@ extern "C" {
 pub struct lnCpuID {
     pub _address: u8,
 }
-pub const lnCpuID_LN_VENDOR_LN_MCU_STM32: lnCpuID_LN_VENDOR = 0;
-pub const lnCpuID_LN_VENDOR_LN_MCU_GD32: lnCpuID_LN_VENDOR = 1;
-pub const lnCpuID_LN_VENDOR_LN_MCU_CH32: lnCpuID_LN_VENDOR = 2;
-pub type lnCpuID_LN_VENDOR = cty::c_uint;
-pub const lnCpuID_LN_MCU_LN_MCU_ARM_F3: lnCpuID_LN_MCU = 0;
-pub const lnCpuID_LN_MCU_LN_MCU_ARM_F4: lnCpuID_LN_MCU = 1;
-pub const lnCpuID_LN_MCU_LN_MCU_RISCV: lnCpuID_LN_MCU = 2;
-pub type lnCpuID_LN_MCU = cty::c_uint;
+#[repr(u32)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub enum lnCpuID_LN_VENDOR {
+    LN_MCU_STM32 = 0,
+    LN_MCU_GD32 = 1,
+    LN_MCU_CH32 = 2,
+}
+#[repr(u32)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub enum lnCpuID_LN_MCU {
+    LN_MCU_ARM_F3 = 0,
+    LN_MCU_ARM_F4 = 1,
+    LN_MCU_RISCV = 2,
+}
 extern "C" {
     #[link_name = "\u{1}_ZN7lnCpuID8identifyEv"]
     pub fn lnCpuID_identify();
@@ -3548,13 +3575,19 @@ pub struct lnSerial {
     pub _cb: lnSerial_lnSerialCallback,
     pub _cbCookie: *mut cty::c_void,
 }
-pub const lnSerial_Event_dataAvailable: lnSerial_Event = 0;
-pub type lnSerial_Event = cty::c_uint;
-pub const lnSerial_txState_txTransmittingIdle: lnSerial_txState = 0;
-pub const lnSerial_txState_txTransmittingInterrupt: lnSerial_txState = 1;
-pub const lnSerial_txState_txTransmittingDMA: lnSerial_txState = 2;
-pub const lnSerial_txState_txTransmittingLast: lnSerial_txState = 3;
-pub type lnSerial_txState = cty::c_uint;
+#[repr(u32)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub enum lnSerial_Event {
+    dataAvailable = 0,
+}
+#[repr(u32)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub enum lnSerial_txState {
+    txTransmittingIdle = 0,
+    txTransmittingInterrupt = 1,
+    txTransmittingDMA = 2,
+    txTransmittingLast = 3,
+}
 pub type lnSerial_lnSerialCallback =
     ::core::option::Option<unsafe extern "C" fn(cookie: *mut cty::c_void, event: lnSerial_Event)>;
 extern "C" {
@@ -4252,9 +4285,12 @@ impl lnCycleClock {
     }
 }
 pub type lnTimerIrq = ::core::option::Option<unsafe extern "C" fn(cookie: *mut cty::c_void)>;
-pub const lnTimerMode_lnTimerModePwm0: lnTimerMode = 0;
-pub const lnTimerMode_lnTimerModePwm1: lnTimerMode = 1;
-pub type lnTimerMode = cty::c_uint;
+#[repr(u32)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub enum lnTimerMode {
+    lnTimerModePwm0 = 0,
+    lnTimerModePwm1 = 1,
+}
 #[repr(C)]
 pub struct lnTimer__bindgen_vtable(cty::c_void);
 #[repr(C)]
