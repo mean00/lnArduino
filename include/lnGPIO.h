@@ -19,7 +19,7 @@ enum lnPin
 
 /**
  */
-enum GpioMode
+enum lnGpioMode
 {
     lnFLOATING=0,
     lnINPUT_FLOATING=0,
@@ -33,8 +33,9 @@ enum GpioMode
     lnADC_MODE,
     lnDAC_MODE
 };
+#define GpioMode lnGpioMode
 //typedef int lnPin;
-void lnPinMode(const lnPin pin, const GpioMode mode);
+void lnPinMode(const lnPin pin, const lnGpioMode mode);
 void lnDigitalWrite(const lnPin pin, bool value);
 bool lnDigitalRead(const lnPin pin);
 void lnDigitalToggle(const lnPin pin);

@@ -256,7 +256,7 @@ void lnTwoWire::setSpeed(int newSpeed)
 /**
  */
 #ifdef I2C_USES_INTERRUPT
-bool lnTwoWire::multiWrite(int target, int nbSeqn,int *seqLength, uint8_t **seqData)
+bool lnTwoWire::multiWrite(int target, int nbSeqn,const int *seqLength, const uint8_t **seqData)
 {
     volatile uint32_t stat1,stat0;
     // Send start
@@ -300,7 +300,7 @@ bool lnTwoWire::multiWrite(int target, int nbSeqn,int *seqLength, uint8_t **seqD
  * @param data
  * @return 
  */
-bool lnTwoWire::write(int target, int n, uint8_t *data)
+bool lnTwoWire::write(int target, int n, const uint8_t *data)
 {
     return multiWrite(target,1,&n,&data);
 }
@@ -311,7 +311,7 @@ bool lnTwoWire::write(int target, int n, uint8_t *data)
  * @param data
  * @return 
  */
-bool lnTwoWire::multiRead(int target, int nbSeqn,int *seqLength, uint8_t **seqData)
+bool lnTwoWire::multiRead(int target, int nbSeqn,const int *seqLength,  uint8_t **seqData)
 {
      volatile uint32_t stat1,stat0;
     _dmaRx.beginTransfer(); // we dont actually use dma, but we use the dma mutex to protect against re-entrency
@@ -320,7 +320,7 @@ bool lnTwoWire::multiRead(int target, int nbSeqn,int *seqLength, uint8_t **seqDa
     // Send start
     
     LN_I2C_Registers *adr=_d->adr;
-     lnI2CSession session(target,nbSeqn,seqLength,seqData);
+     lnI2CSession session(target,nbSeqn,seqLength,(const uint8_t **)seqData);
     _session=&session;
 
     stat0=_d->adr->STAT0;
@@ -396,7 +396,7 @@ bool lnTwoWire::initiateTx()
     
     _session->curIndex   =0; // we are starting a new sequence anyway
     int     t=_session->curTransaction;
-    uint8_t *data=_session->transactionData[t];
+    const uint8_t *data=_session->transactionData[t];
     int     size=_session->transactionSize[t];
     
     xAssert(size<=65535);
@@ -423,7 +423,7 @@ bool lnTwoWire::initiateTx()
 bool lnTwoWire::sendNext()
 {    
     int     t=_session->curTransaction;
-    uint8_t *data=_session->transactionData[t];
+    const uint8_t *data=_session->transactionData[t];
     int     size=_session->transactionSize[t];
     
     if(_session->curTransaction>=_session->nbTransaction)
@@ -447,7 +447,7 @@ bool lnTwoWire::sendNext()
 bool lnTwoWire::receiveNext()
 {
      int    t=_session->curTransaction;
-    uint8_t *data=_session->transactionData[t];
+     uint8_t *data=(uint8_t *)_session->transactionData[t];
     int     size=_session->transactionSize[t];
     
     if(_session->curTransaction>=_session->nbTransaction)

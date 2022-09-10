@@ -30,7 +30,7 @@ void lnI2C::setAddress(int address)
      COOKIE->setAddress(address);
 }
 
-bool lnI2C::write(int n, uint8_t *data)
+bool lnI2C::write(int n, const uint8_t *data)
 {
     return COOKIE->write(n,data);
 }
@@ -40,12 +40,12 @@ bool lnI2C::read(int n, uint8_t *data)
     return COOKIE->read(n,data);
 }
 
-bool lnI2C::write(int target, int n, uint8_t *data)
+bool lnI2C::write(int target, int n, const uint8_t *data)
 {
     return COOKIE->write(target,n,data);
 }
 
-bool lnI2C::multiWrite(int target, int nbSeqn,int *seqLength, uint8_t **data)
+bool lnI2C::multiWrite(int target, int nbSeqn,const int *seqLength, const uint8_t **data)
 {
     return COOKIE->multiWrite(target,nbSeqn,seqLength, data);
 }

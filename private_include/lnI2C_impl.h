@@ -13,7 +13,7 @@ struct LN_I2C_DESCRIPTOR;
 class lnI2CSession 
 {
 public:
-    lnI2CSession(int t, int nb, int *sz, uint8_t **dt)
+    lnI2CSession(int t, int nb, const int *sz, const uint8_t **dt)
     {
         target=t;
         nbTransaction=nb;
@@ -29,8 +29,8 @@ public:
     }
     int target;
     int nbTransaction;
-    int *transactionSize;
-    uint8_t **transactionData;
+    const int *transactionSize;
+    const uint8_t **transactionData;
     int     curTransaction;
     int     curIndex;
 };
@@ -52,7 +52,7 @@ public:
             {
                 _targetAddress=address;
             }
-            bool write(int n, uint8_t *data)
+            bool write(int n, const uint8_t *data)
             {
                 return write(_targetAddress,n,data);
             }
@@ -60,10 +60,10 @@ public:
             {
                 return read(_targetAddress,n,data);
             }
-            bool write(int target, int n, uint8_t *data);
-            bool multiWrite(int target, int nbSeqn,int *seqLength, uint8_t **data);
+            bool write(int target, int n, const uint8_t *data);
+            bool multiWrite(int target, int nbSeqn,const int *seqLength, const uint8_t **data);
             bool read(int target,  int n, uint8_t *data);
-            bool multiRead(int target, int nbSeqn,int *seqLength, uint8_t **seqData);
+            bool multiRead(int target, int nbSeqn,const int *seqLength, uint8_t **seqData);
             bool begin(int target=0);
 protected:
             void stopIrq();

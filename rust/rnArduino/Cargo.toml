@@ -12,7 +12,7 @@ panic-reset = "*"
 
 [lib]
 name = "rnarduino"
-path = "src/rnarduino.rs"
+path = "src/lib.rs"
 crate-type = ["rlib"] # Creates static lib
 
 [profile.dev]
