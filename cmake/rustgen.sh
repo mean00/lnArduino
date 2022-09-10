@@ -13,9 +13,9 @@ export ME=`dirname $ME`
 export BINDGEN=/usr/bin/bindgen
 export LN=`realpath $ME/..` 
 
+export PLATFORM_TOOLCHAIN_PATH=`cmake -DHOME=$LN -P $ME/toolchain_env.cmake 2>& 1`
+#export PLATFORM_TOOLCHAIN_PATH=/home/fx/Arduino_stm32/arm-gcc-2021q4/bin
 
-export PLATFORM_TOOLCHAIN_PATH=/home/fx/Arduino_stm32/arm-gcc-2021q4/bin
-#export PLATFORM_TOOLCHAIN_PATH=`cmake -DHOME=$LN -P $ME/toolchain_env.cmake >& 1`
 export PATH=$PLATFORM_TOOLCHAIN_PATH:$PATH
 
 echo "** Processing $1 **"
