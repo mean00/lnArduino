@@ -1039,19 +1039,19 @@ extern "C" {
 }
 extern "C" {
     #[link_name = "\u{1}_Z23lnGetGpioToggleRegisteri"]
-    pub fn lnGetGpioToggleRegister(port: cty::c_int) -> *mut cty::c_ulong;
+    pub fn lnGetGpioToggleRegister(port: cty::c_int) -> *mut cty::c_uint;
 }
 extern "C" {
     #[link_name = "\u{1}_Z26lnGetGpioDirectionRegisteri"]
-    pub fn lnGetGpioDirectionRegister(port: cty::c_int) -> *mut cty::c_ulong;
+    pub fn lnGetGpioDirectionRegister(port: cty::c_int) -> *mut cty::c_uint;
 }
 extern "C" {
     #[link_name = "\u{1}_Z22lnGetGpioValueRegisteri"]
-    pub fn lnGetGpioValueRegister(port: cty::c_int) -> *mut cty::c_ulong;
+    pub fn lnGetGpioValueRegister(port: cty::c_int) -> *mut cty::c_uint;
 }
 extern "C" {
     #[link_name = "\u{1}_Z10lnReadPorti"]
-    pub fn lnReadPort(port: cty::c_int) -> cty::c_ulong;
+    pub fn lnReadPort(port: cty::c_int) -> cty::c_uint;
 }
 extern "C" {
     #[link_name = "\u{1}_Z15lnRemapTimerPini"]
@@ -1060,9 +1060,9 @@ extern "C" {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct lnFastIO {
-    pub _onoff: *mut cty::c_ulong,
-    pub _onbit: cty::c_ulong,
-    pub _offbit: cty::c_ulong,
+    pub _onoff: *mut cty::c_uint,
+    pub _onbit: cty::c_uint,
+    pub _offbit: cty::c_uint,
 }
 extern "C" {
     #[link_name = "\u{1}_ZN8lnFastIOC1E5lnPin"]
@@ -1177,16 +1177,16 @@ extern "C" {
     pub fn vPortExitCritical();
 }
 extern "C" {
-    pub static mut SystemCoreClock: cty::c_ulong;
+    pub static mut SystemCoreClock: cty::c_uint;
 }
 extern "C" {
     pub fn do_assert(a: *const cty::c_char);
 }
 pub type TaskFunction_t = ::core::option::Option<unsafe extern "C" fn(arg1: *mut cty::c_void)>;
-pub type StackType_t = cty::c_ulong;
+pub type StackType_t = cty::c_uint;
 pub type BaseType_t = cty::c_long;
 pub type UBaseType_t = cty::c_ulong;
-pub type TickType_t = cty::c_ulong;
+pub type TickType_t = cty::c_uint;
 extern "C" {
     pub fn vPortSuppressTicksAndSleep(xExpectedIdleTime: TickType_t);
 }
@@ -1278,7 +1278,7 @@ pub struct xSTATIC_TCB {
     pub ucDummy7: [u8; 16usize],
     pub uxDummy10: [UBaseType_t; 2usize],
     pub uxDummy12: [UBaseType_t; 2usize],
-    pub ulDummy18: [cty::c_ulong; 5usize],
+    pub ulDummy18: [cty::c_uint; 5usize],
     pub ucDummy19: [u8; 5usize],
 }
 pub type StaticTask_t = xSTATIC_TCB;
@@ -1404,8 +1404,8 @@ pub type TimeOut_t = xTIME_OUT;
 #[derive(Debug, Copy, Clone)]
 pub struct xMEMORY_REGION {
     pub pvBaseAddress: *mut cty::c_void,
-    pub ulLengthInBytes: cty::c_ulong,
-    pub ulParameters: cty::c_ulong,
+    pub ulLengthInBytes: cty::c_uint,
+    pub ulParameters: cty::c_uint,
 }
 pub type MemoryRegion_t = xMEMORY_REGION;
 #[repr(C)]
@@ -1429,7 +1429,7 @@ pub struct xTASK_STATUS {
     pub eCurrentState: eTaskState,
     pub uxCurrentPriority: UBaseType_t,
     pub uxBasePriority: UBaseType_t,
-    pub ulRunTimeCounter: cty::c_ulong,
+    pub ulRunTimeCounter: cty::c_uint,
     pub pxStackBase: *mut StackType_t,
     pub usStackHighWaterMark: u16,
 }
@@ -1547,7 +1547,7 @@ extern "C" {
     pub fn uxTaskGetSystemState(
         pxTaskStatusArray: *mut TaskStatus_t,
         uxArraySize: UBaseType_t,
-        pulTotalRunTime: *mut cty::c_ulong,
+        pulTotalRunTime: *mut cty::c_uint,
     ) -> UBaseType_t;
 }
 extern "C" {
@@ -1557,33 +1557,33 @@ extern "C" {
     pub fn vTaskGetRunTimeStats(pcWriteBuffer: *mut cty::c_char);
 }
 extern "C" {
-    pub fn ulTaskGetIdleRunTimeCounter() -> cty::c_ulong;
+    pub fn ulTaskGetIdleRunTimeCounter() -> cty::c_uint;
 }
 extern "C" {
     pub fn xTaskGenericNotify(
         xTaskToNotify: TaskHandle_t,
         uxIndexToNotify: UBaseType_t,
-        ulValue: cty::c_ulong,
+        ulValue: cty::c_uint,
         eAction: eNotifyAction,
-        pulPreviousNotificationValue: *mut cty::c_ulong,
+        pulPreviousNotificationValue: *mut cty::c_uint,
     ) -> BaseType_t;
 }
 extern "C" {
     pub fn xTaskGenericNotifyFromISR(
         xTaskToNotify: TaskHandle_t,
         uxIndexToNotify: UBaseType_t,
-        ulValue: cty::c_ulong,
+        ulValue: cty::c_uint,
         eAction: eNotifyAction,
-        pulPreviousNotificationValue: *mut cty::c_ulong,
+        pulPreviousNotificationValue: *mut cty::c_uint,
         pxHigherPriorityTaskWoken: *mut BaseType_t,
     ) -> BaseType_t;
 }
 extern "C" {
     pub fn xTaskGenericNotifyWait(
         uxIndexToWaitOn: UBaseType_t,
-        ulBitsToClearOnEntry: cty::c_ulong,
-        ulBitsToClearOnExit: cty::c_ulong,
-        pulNotificationValue: *mut cty::c_ulong,
+        ulBitsToClearOnEntry: cty::c_uint,
+        ulBitsToClearOnExit: cty::c_uint,
+        pulNotificationValue: *mut cty::c_uint,
         xTicksToWait: TickType_t,
     ) -> BaseType_t;
 }
@@ -1599,7 +1599,7 @@ extern "C" {
         uxIndexToWaitOn: UBaseType_t,
         xClearCountOnExit: BaseType_t,
         xTicksToWait: TickType_t,
-    ) -> cty::c_ulong;
+    ) -> cty::c_uint;
 }
 extern "C" {
     pub fn xTaskGenericNotifyStateClear(
@@ -1611,8 +1611,8 @@ extern "C" {
     pub fn ulTaskGenericNotifyValueClear(
         xTask: TaskHandle_t,
         uxIndexToClear: UBaseType_t,
-        ulBitsToClear: cty::c_ulong,
-    ) -> cty::c_ulong;
+        ulBitsToClear: cty::c_uint,
+    ) -> cty::c_uint;
 }
 extern "C" {
     pub fn vTaskSetTimeOutState(pxTimeOut: *mut TimeOut_t);
@@ -1897,7 +1897,7 @@ pub type TimerHandle_t = *mut tmrTimerControl;
 pub type TimerCallbackFunction_t =
     ::core::option::Option<unsafe extern "C" fn(xTimer: TimerHandle_t)>;
 pub type PendedFunction_t =
-    ::core::option::Option<unsafe extern "C" fn(arg1: *mut cty::c_void, arg2: cty::c_ulong)>;
+    ::core::option::Option<unsafe extern "C" fn(arg1: *mut cty::c_void, arg2: cty::c_uint)>;
 extern "C" {
     pub fn xTimerCreate(
         pcTimerName: *const cty::c_char,
@@ -1923,7 +1923,7 @@ extern "C" {
     pub fn xTimerPendFunctionCallFromISR(
         xFunctionToPend: PendedFunction_t,
         pvParameter1: *mut cty::c_void,
-        ulParameter2: cty::c_ulong,
+        ulParameter2: cty::c_uint,
         pxHigherPriorityTaskWoken: *mut BaseType_t,
     ) -> BaseType_t;
 }
@@ -1931,7 +1931,7 @@ extern "C" {
     pub fn xTimerPendFunctionCall(
         xFunctionToPend: PendedFunction_t,
         pvParameter1: *mut cty::c_void,
-        ulParameter2: cty::c_ulong,
+        ulParameter2: cty::c_uint,
         xTicksToWait: TickType_t,
     ) -> BaseType_t;
 }
@@ -2027,13 +2027,10 @@ extern "C" {
     pub fn vEventGroupDelete(xEventGroup: EventGroupHandle_t);
 }
 extern "C" {
-    pub fn vEventGroupSetBitsCallback(pvEventGroup: *mut cty::c_void, ulBitsToSet: cty::c_ulong);
+    pub fn vEventGroupSetBitsCallback(pvEventGroup: *mut cty::c_void, ulBitsToSet: cty::c_uint);
 }
 extern "C" {
-    pub fn vEventGroupClearBitsCallback(
-        pvEventGroup: *mut cty::c_void,
-        ulBitsToClear: cty::c_ulong,
-    );
+    pub fn vEventGroupClearBitsCallback(pvEventGroup: *mut cty::c_void, ulBitsToClear: cty::c_uint);
 }
 extern "C" {
     pub fn uxEventGroupGetNumber(xEventGroup: *mut cty::c_void) -> UBaseType_t;
@@ -2143,20 +2140,20 @@ pub struct lnEventGroup {
     pub _handle: EventGroupHandle_t,
 }
 extern "C" {
-    #[link_name = "\u{1}_ZN12lnEventGroup9setEventsEm"]
-    pub fn lnEventGroup_setEvents(this: *mut lnEventGroup, events: cty::c_ulong);
+    #[link_name = "\u{1}_ZN12lnEventGroup9setEventsEj"]
+    pub fn lnEventGroup_setEvents(this: *mut lnEventGroup, events: cty::c_uint);
 }
 extern "C" {
-    #[link_name = "\u{1}_ZN12lnEventGroup10waitEventsEmi"]
+    #[link_name = "\u{1}_ZN12lnEventGroup10waitEventsEji"]
     pub fn lnEventGroup_waitEvents(
         this: *mut lnEventGroup,
-        maskint: cty::c_ulong,
+        maskint: cty::c_uint,
         timeout: cty::c_int,
-    ) -> cty::c_ulong;
+    ) -> cty::c_uint;
 }
 extern "C" {
-    #[link_name = "\u{1}_ZN12lnEventGroup10readEventsEm"]
-    pub fn lnEventGroup_readEvents(this: *mut lnEventGroup, maskInt: cty::c_ulong) -> cty::c_ulong;
+    #[link_name = "\u{1}_ZN12lnEventGroup10readEventsEj"]
+    pub fn lnEventGroup_readEvents(this: *mut lnEventGroup, maskInt: cty::c_uint) -> cty::c_uint;
 }
 extern "C" {
     #[link_name = "\u{1}_ZN12lnEventGroupC1Ev"]
@@ -2164,19 +2161,15 @@ extern "C" {
 }
 impl lnEventGroup {
     #[inline]
-    pub unsafe fn setEvents(&mut self, events: cty::c_ulong) {
+    pub unsafe fn setEvents(&mut self, events: cty::c_uint) {
         lnEventGroup_setEvents(self, events)
     }
     #[inline]
-    pub unsafe fn waitEvents(
-        &mut self,
-        maskint: cty::c_ulong,
-        timeout: cty::c_int,
-    ) -> cty::c_ulong {
+    pub unsafe fn waitEvents(&mut self, maskint: cty::c_uint, timeout: cty::c_int) -> cty::c_uint {
         lnEventGroup_waitEvents(self, maskint, timeout)
     }
     #[inline]
-    pub unsafe fn readEvents(&mut self, maskInt: cty::c_ulong) -> cty::c_ulong {
+    pub unsafe fn readEvents(&mut self, maskInt: cty::c_uint) -> cty::c_uint {
         lnEventGroup_readEvents(self, maskInt)
     }
     #[inline]
@@ -2196,8 +2189,8 @@ pub struct lnFastEventGroup__bindgen_vtable(cty::c_void);
 #[derive(Debug)]
 pub struct lnFastEventGroup {
     pub vtable_: *const lnFastEventGroup__bindgen_vtable,
-    pub _value: cty::c_ulong,
-    pub _mask: cty::c_ulong,
+    pub _value: cty::c_uint,
+    pub _mask: cty::c_uint,
     pub _waitingTask: TaskHandle_t,
 }
 extern "C" {
@@ -2205,23 +2198,23 @@ extern "C" {
     pub fn lnFastEventGroup_takeOwnership(this: *mut lnFastEventGroup);
 }
 extern "C" {
-    #[link_name = "\u{1}_ZN16lnFastEventGroup9setEventsEm"]
-    pub fn lnFastEventGroup_setEvents(this: *mut lnFastEventGroup, events: cty::c_ulong);
+    #[link_name = "\u{1}_ZN16lnFastEventGroup9setEventsEj"]
+    pub fn lnFastEventGroup_setEvents(this: *mut lnFastEventGroup, events: cty::c_uint);
 }
 extern "C" {
-    #[link_name = "\u{1}_ZN16lnFastEventGroup10waitEventsEmi"]
+    #[link_name = "\u{1}_ZN16lnFastEventGroup10waitEventsEji"]
     pub fn lnFastEventGroup_waitEvents(
         this: *mut lnFastEventGroup,
-        maskint: cty::c_ulong,
+        maskint: cty::c_uint,
         timeout: cty::c_int,
-    ) -> cty::c_ulong;
+    ) -> cty::c_uint;
 }
 extern "C" {
-    #[link_name = "\u{1}_ZN16lnFastEventGroup10readEventsEm"]
+    #[link_name = "\u{1}_ZN16lnFastEventGroup10readEventsEj"]
     pub fn lnFastEventGroup_readEvents(
         this: *mut lnFastEventGroup,
-        maskInt: cty::c_ulong,
-    ) -> cty::c_ulong;
+        maskInt: cty::c_uint,
+    ) -> cty::c_uint;
 }
 extern "C" {
     #[link_name = "\u{1}_ZN16lnFastEventGroupC1Ev"]
@@ -2233,19 +2226,15 @@ impl lnFastEventGroup {
         lnFastEventGroup_takeOwnership(self)
     }
     #[inline]
-    pub unsafe fn setEvents(&mut self, events: cty::c_ulong) {
+    pub unsafe fn setEvents(&mut self, events: cty::c_uint) {
         lnFastEventGroup_setEvents(self, events)
     }
     #[inline]
-    pub unsafe fn waitEvents(
-        &mut self,
-        maskint: cty::c_ulong,
-        timeout: cty::c_int,
-    ) -> cty::c_ulong {
+    pub unsafe fn waitEvents(&mut self, maskint: cty::c_uint, timeout: cty::c_int) -> cty::c_uint {
         lnFastEventGroup_waitEvents(self, maskint, timeout)
     }
     #[inline]
-    pub unsafe fn readEvents(&mut self, maskInt: cty::c_ulong) -> cty::c_ulong {
+    pub unsafe fn readEvents(&mut self, maskInt: cty::c_uint) -> cty::c_uint {
         lnFastEventGroup_readEvents(self, maskInt)
     }
     #[inline]
@@ -2384,7 +2373,7 @@ extern "C" {
 }
 extern "C" {
     #[link_name = "\u{1}_ZN13lnPeripherals8getClockE11Peripherals"]
-    pub fn lnPeripherals_getClock(periph: Peripherals) -> cty::c_ulong;
+    pub fn lnPeripherals_getClock(periph: Peripherals) -> cty::c_uint;
 }
 extern "C" {
     #[link_name = "\u{1}_ZN13lnPeripherals13setAdcDividerE13lnADC_DIVIDER"]
@@ -2408,7 +2397,7 @@ impl lnPeripherals {
         lnPeripherals_disable(periph)
     }
     #[inline]
-    pub unsafe fn getClock(periph: Peripherals) -> cty::c_ulong {
+    pub unsafe fn getClock(periph: Peripherals) -> cty::c_uint {
         lnPeripherals_getClock(periph)
     }
     #[inline]
@@ -2554,7 +2543,7 @@ extern "C" {
 }
 extern "C" {
     #[link_name = "\u{1}_Z7lnGetUsv"]
-    pub fn lnGetUs() -> cty::c_ulong;
+    pub fn lnGetUs() -> cty::c_uint;
 }
 extern "C" {
     #[link_name = "\u{1}_Z9lnGetUs64v"]
@@ -2570,7 +2559,7 @@ extern "C" {
 }
 extern "C" {
     #[link_name = "\u{1}_Z7lnGetMsv"]
-    pub fn lnGetMs() -> cty::c_ulong;
+    pub fn lnGetMs() -> cty::c_uint;
 }
 extern "C" {
     pub fn free(a: *mut cty::c_void);
@@ -2581,15 +2570,15 @@ extern "C" {
 #[repr(C)]
 #[derive(Debug)]
 pub struct lnDMA {
-    pub _dma: cty::c_ulong,
+    pub _dma: cty::c_uint,
     pub _channelInt: cty::c_int,
     pub _dmaInt: cty::c_int,
     pub _type: lnDMA_DmaTransferType,
     pub _irq: LnIRQ,
     pub _cb: lnDMA_doneCallback,
     pub _cookie: *mut cty::c_void,
-    pub _control: cty::c_ulong,
-    pub _priority: cty::c_ulong,
+    pub _control: cty::c_uint,
+    pub _priority: cty::c_uint,
     pub _sourceWidth: cty::c_int,
     pub _targetWidth: cty::c_int,
 }
@@ -2661,7 +2650,7 @@ extern "C" {
 }
 extern "C" {
     #[link_name = "\u{1}_ZN5lnDMA15getCurrentCountEv"]
-    pub fn lnDMA_getCurrentCount(this: *mut lnDMA) -> cty::c_ulong;
+    pub fn lnDMA_getCurrentCount(this: *mut lnDMA) -> cty::c_uint;
 }
 extern "C" {
     #[link_name = "\u{1}_ZN5lnDMA11endTransferEv"]
@@ -2766,7 +2755,7 @@ impl lnDMA {
         lnDMA_beginTransfer(self)
     }
     #[inline]
-    pub unsafe fn getCurrentCount(&mut self) -> cty::c_ulong {
+    pub unsafe fn getCurrentCount(&mut self) -> cty::c_uint {
         lnDMA_getCurrentCount(self)
     }
     #[inline]
@@ -3411,44 +3400,41 @@ pub struct lnFMC {
     pub _address: u8,
 }
 extern "C" {
-    #[link_name = "\u{1}_ZN5lnFMC5eraseEmi"]
-    pub fn lnFMC_erase(startAddress: cty::c_ulong, sizeInKBytes: cty::c_int) -> bool;
+    #[link_name = "\u{1}_ZN5lnFMC5eraseEji"]
+    pub fn lnFMC_erase(startAddress: cty::c_uint, sizeInKBytes: cty::c_int) -> bool;
 }
 extern "C" {
-    #[link_name = "\u{1}_ZN5lnFMC5writeEmPKhi"]
-    pub fn lnFMC_write(
-        startAddress: cty::c_ulong,
-        data: *const u8,
-        sizeInBytes: cty::c_int,
-    ) -> bool;
+    #[link_name = "\u{1}_ZN5lnFMC5writeEjPKhi"]
+    pub fn lnFMC_write(startAddress: cty::c_uint, data: *const u8, sizeInBytes: cty::c_int)
+        -> bool;
 }
 extern "C" {
-    #[link_name = "\u{1}_ZN5lnFMC8eraseStmEmi"]
-    pub fn lnFMC_eraseStm(startAddress: cty::c_ulong, sizeInKBytes: cty::c_int) -> bool;
+    #[link_name = "\u{1}_ZN5lnFMC8eraseStmEji"]
+    pub fn lnFMC_eraseStm(startAddress: cty::c_uint, sizeInKBytes: cty::c_int) -> bool;
 }
 extern "C" {
-    #[link_name = "\u{1}_ZN5lnFMC9eraseCh32Emi"]
-    pub fn lnFMC_eraseCh32(startAddress: cty::c_ulong, sizeInKBytes: cty::c_int) -> bool;
+    #[link_name = "\u{1}_ZN5lnFMC9eraseCh32Eji"]
+    pub fn lnFMC_eraseCh32(startAddress: cty::c_uint, sizeInKBytes: cty::c_int) -> bool;
 }
 impl lnFMC {
     #[inline]
-    pub unsafe fn erase(startAddress: cty::c_ulong, sizeInKBytes: cty::c_int) -> bool {
+    pub unsafe fn erase(startAddress: cty::c_uint, sizeInKBytes: cty::c_int) -> bool {
         lnFMC_erase(startAddress, sizeInKBytes)
     }
     #[inline]
     pub unsafe fn write(
-        startAddress: cty::c_ulong,
+        startAddress: cty::c_uint,
         data: *const u8,
         sizeInBytes: cty::c_int,
     ) -> bool {
         lnFMC_write(startAddress, data, sizeInBytes)
     }
     #[inline]
-    pub unsafe fn eraseStm(startAddress: cty::c_ulong, sizeInKBytes: cty::c_int) -> bool {
+    pub unsafe fn eraseStm(startAddress: cty::c_uint, sizeInKBytes: cty::c_int) -> bool {
         lnFMC_eraseStm(startAddress, sizeInKBytes)
     }
     #[inline]
-    pub unsafe fn eraseCh32(startAddress: cty::c_ulong, sizeInKBytes: cty::c_int) -> bool {
+    pub unsafe fn eraseCh32(startAddress: cty::c_uint, sizeInKBytes: cty::c_int) -> bool {
         lnFMC_eraseCh32(startAddress, sizeInKBytes)
     }
 }
@@ -3558,7 +3544,7 @@ extern "C" {
 pub struct lnSerial {
     pub _instance: cty::c_int,
     pub _irq: LnIRQ,
-    pub _adr: cty::c_ulong,
+    pub _adr: cty::c_uint,
     pub _txMutex: lnMutex,
     pub _txDone: lnBinarySemaphore,
     pub _cur: *const u8,
@@ -3774,7 +3760,7 @@ pub type spiBitOrder = cty::c_uint;
 #[derive(Debug, Copy, Clone)]
 pub struct lnSPISettings {
     pub pinCS: cty::c_int,
-    pub speed: cty::c_ulong,
+    pub speed: cty::c_uint,
     pub bOrder: spiBitOrder,
     pub dMode: spiDataMode,
 }
@@ -3795,7 +3781,7 @@ pub struct hwlnSPIClass {
     pub _callback: lnSpiCallback,
     pub _callbackCookie: *mut cty::c_void,
     pub _instance: cty::c_int,
-    pub _adr: cty::c_ulong,
+    pub _adr: cty::c_uint,
     pub _irq: LnIRQ,
     pub _inSession: bool,
     pub txDma: lnDMA,
@@ -4220,8 +4206,8 @@ extern "C" {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct lnStopWatch {
-    pub _start: cty::c_ulong,
-    pub _end: cty::c_ulong,
+    pub _start: cty::c_uint,
+    pub _end: cty::c_uint,
 }
 extern "C" {
     #[link_name = "\u{1}_ZN11lnStopWatch7restartEi"]
@@ -4254,7 +4240,7 @@ impl lnStopWatch {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct lnCycleClock {
-    pub _start: cty::c_ulong,
+    pub _start: cty::c_uint,
 }
 extern "C" {
     #[link_name = "\u{1}_ZN12lnCycleClock7restartEv"]
@@ -4262,7 +4248,7 @@ extern "C" {
 }
 extern "C" {
     #[link_name = "\u{1}_ZN12lnCycleClock7elapsedEv"]
-    pub fn lnCycleClock_elapsed(this: *mut lnCycleClock) -> cty::c_ulong;
+    pub fn lnCycleClock_elapsed(this: *mut lnCycleClock) -> cty::c_uint;
 }
 extern "C" {
     #[link_name = "\u{1}_ZN12lnCycleClockC1Ev"]
@@ -4274,7 +4260,7 @@ impl lnCycleClock {
         lnCycleClock_restart(self)
     }
     #[inline]
-    pub unsafe fn elapsed(&mut self) -> cty::c_ulong {
+    pub unsafe fn elapsed(&mut self) -> cty::c_uint {
         lnCycleClock_elapsed(self)
     }
     #[inline]

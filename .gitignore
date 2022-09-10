@@ -23,3 +23,5 @@ demoProject/*/lnArduino
 libraries/tinyUsb/pat*
 rust/rnarduino/target
 rust/rnArduino/target
+*.tmp
+*.orig
