@@ -60,6 +60,21 @@ extern "C"
     {
         return 0;
     }
+    int getpid(void)
+    {
+        do_assert("getpid");
+        return 0;
+    }
+    int kill(int pid, int sig)
+    {
+        do_assert("kill");
+        return 0;
+    }
+    int getppid(void)
+    {
+        do_assert("getppid");
+        return 0;
+    }
     void __cxa_pure_virtual()
     {
           do_assert("__cxa_pure_virtual");
