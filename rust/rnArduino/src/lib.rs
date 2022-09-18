@@ -9,9 +9,13 @@ extern crate alloc;
 use panic_reset as _;
 pub type size_t = cty::c_uint;
 
-mod rnarduino;
-pub mod rnGPIO;
+pub mod rnarduino;
+pub mod rnGpio;
 pub mod rnI2C;
+pub mod rnOsHelper;
+pub mod rnExti;
+pub mod rnFastEventGroup;
+pub mod rnTimingAdc;
 
 pub struct FreeRtosAllocator;
 
