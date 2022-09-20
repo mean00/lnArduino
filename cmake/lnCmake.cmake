@@ -1,5 +1,5 @@
 
-include(lnCmake_${LN_EXT})
+include(lnCmake_${LN_TOOLCHAIN_EXT})
 
 MACRO (LN_APPEND_FLAGS target)
 	GET_SOURCE_FILE_PROPERTY(flags ${target} COMPILE_FLAGS)

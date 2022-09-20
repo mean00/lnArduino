@@ -2,6 +2,7 @@
 MESSAGE(STATUS "Setting up GD32/arm cmake environment")
 IF(NOT DEFINED LN_EXT)
 SET(LN_EXT arm_gd32fx CACHE INTERNAL "")
+SET(LN_TOOLCHAIN_EXT  arm_gd32fx CACHE INTERNAL "")
 include(${CMAKE_CURRENT_LIST_DIR}/../platformConfig.cmake)
 
 IF(NOT PLATFORM_TOOLCHAIN_PATH)
