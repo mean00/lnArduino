@@ -6,6 +6,7 @@ pub use rn::lnI2C as  lnI2C;
 pub use rn::lnGpioMode as rnGpioMode;
 
 type cint = cty::c_int;
+type uint = cty::c_uint;
 
 pub struct rnI2C
 {
@@ -48,28 +49,58 @@ impl rnI2C
     fn write( &mut self, data : &[u8]  ) -> bool
     {
         unsafe {
-                self.ln.write(data.len() as cint, data.as_ptr() as *const u8)
+                self.ln.write(data.len() as uint, data.as_ptr() as *const u8)
             }
     }
     fn writeTo( &mut self, target: u8, data : &[u8]  ) -> bool
     {
         unsafe {
-                self.ln.write1(target as cint, data.len() as cint, data.as_ptr() as *const u8)
+                self.ln.write1(target as cint, data.len() as uint, data.as_ptr() as *const u8)
             }
     }
     fn read( &mut self,  data : &mut [u8]  ) -> bool
     {
         unsafe {
-                self.ln.read( data.len() as cint, data.as_ptr() as *mut u8)
+                self.ln.read( data.len() as uint, data.as_ptr() as *mut u8)
             }
     }
     fn readFrom( &mut self, target: u8, data : &mut [u8]  ) -> bool
     {
         unsafe {
-                self.ln.read1( target as cint, data.len() as cint, data.as_ptr() as *mut u8)
+                self.ln.read1( target as cint, data.len() as uint, data.as_ptr() as *mut u8)
             }
     }
+    ///
+    /// 
+    /// 
+    fn multiWrite(&mut self, tgt: u8,  lengths :  &[cty::c_uint], data :  &[*const u8]) -> bool
+    {
+        let nb=lengths.len();
+        if  nb != data.len()
+        {
+            panic!("Invalid multiwrite : length & data mismatch\n");
+        }
+        if  nb == 0
+        {
+            panic!("I2C  Zero multiwrite \n");
+        }
+        
+        let sequence_lengh : *const cty::c_uint ;
+        sequence_lengh = lengths.as_ptr() as *const cty::c_uint;
+
+        let sequence_data :  *mut *const u8;
+        sequence_data = data.as_ptr() as *mut *const u8;
+        unsafe {
+            return self.ln.multiWrite(
+                tgt as cty::c_int, 
+                nb as cty::c_uint,
+                sequence_lengh,
+                sequence_data
+                );
+        }
+
+    }
+    //   bool multiWrite(int target, int nbSeqn,const int *seqLength, const uint8_t **data);
+
 }
-/*                   
-                    bool multiWrite(int target, int nbSeqn,int *seqLength, uint8_t **data);                    
-*/
+// eof

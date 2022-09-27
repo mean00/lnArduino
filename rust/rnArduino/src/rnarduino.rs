@@ -3435,35 +3435,36 @@ extern "C" {
     pub fn lnI2C_setAddress(this: *mut lnI2C, address: cty::c_int);
 }
 extern "C" {
-    #[link_name = "\u{1}_ZN5lnI2C5writeEiPKh"]
-    pub fn lnI2C_write(this: *mut lnI2C, n: cty::c_int, data: *const u8) -> bool;
+    #[link_name = "\u{1}_ZN5lnI2C5writeEjPKh"]
+    pub fn lnI2C_write(this: *mut lnI2C, n: cty::c_uint, data: *const u8) -> bool;
 }
 extern "C" {
-    #[link_name = "\u{1}_ZN5lnI2C4readEiPh"]
-    pub fn lnI2C_read(this: *mut lnI2C, n: cty::c_int, data: *mut u8) -> bool;
+    #[link_name = "\u{1}_ZN5lnI2C4readEjPh"]
+    pub fn lnI2C_read(this: *mut lnI2C, n: cty::c_uint, data: *mut u8) -> bool;
 }
 extern "C" {
-    #[link_name = "\u{1}_ZN5lnI2C5writeEiiPKh"]
+    #[link_name = "\u{1}_ZN5lnI2C5writeEijPKh"]
     pub fn lnI2C_write1(
         this: *mut lnI2C,
         target: cty::c_int,
-        n: cty::c_int,
+        n: cty::c_uint,
         data: *const u8,
     ) -> bool;
 }
 extern "C" {
-    #[link_name = "\u{1}_ZN5lnI2C10multiWriteEiiPKiPPKh"]
+    #[link_name = "\u{1}_ZN5lnI2C10multiWriteEijPKjPPKh"]
     pub fn lnI2C_multiWrite(
         this: *mut lnI2C,
         target: cty::c_int,
-        nbSeqn: cty::c_int,
-        seqLength: *const cty::c_int,
+        nbSeqn: cty::c_uint,
+        seqLength: *const cty::c_uint,
         data: *mut *const u8,
     ) -> bool;
 }
 extern "C" {
-    #[link_name = "\u{1}_ZN5lnI2C4readEiiPh"]
-    pub fn lnI2C_read1(this: *mut lnI2C, target: cty::c_int, n: cty::c_int, data: *mut u8) -> bool;
+    #[link_name = "\u{1}_ZN5lnI2C4readEijPh"]
+    pub fn lnI2C_read1(this: *mut lnI2C, target: cty::c_int, n: cty::c_uint, data: *mut u8)
+        -> bool;
 }
 extern "C" {
     #[link_name = "\u{1}_ZN5lnI2C5beginEi"]
@@ -3483,29 +3484,29 @@ impl lnI2C {
         lnI2C_setAddress(self, address)
     }
     #[inline]
-    pub unsafe fn write(&mut self, n: cty::c_int, data: *const u8) -> bool {
+    pub unsafe fn write(&mut self, n: cty::c_uint, data: *const u8) -> bool {
         lnI2C_write(self, n, data)
     }
     #[inline]
-    pub unsafe fn read(&mut self, n: cty::c_int, data: *mut u8) -> bool {
+    pub unsafe fn read(&mut self, n: cty::c_uint, data: *mut u8) -> bool {
         lnI2C_read(self, n, data)
     }
     #[inline]
-    pub unsafe fn write1(&mut self, target: cty::c_int, n: cty::c_int, data: *const u8) -> bool {
+    pub unsafe fn write1(&mut self, target: cty::c_int, n: cty::c_uint, data: *const u8) -> bool {
         lnI2C_write1(self, target, n, data)
     }
     #[inline]
     pub unsafe fn multiWrite(
         &mut self,
         target: cty::c_int,
-        nbSeqn: cty::c_int,
-        seqLength: *const cty::c_int,
+        nbSeqn: cty::c_uint,
+        seqLength: *const cty::c_uint,
         data: *mut *const u8,
     ) -> bool {
         lnI2C_multiWrite(self, target, nbSeqn, seqLength, data)
     }
     #[inline]
-    pub unsafe fn read1(&mut self, target: cty::c_int, n: cty::c_int, data: *mut u8) -> bool {
+    pub unsafe fn read1(&mut self, target: cty::c_int, n: cty::c_uint, data: *mut u8) -> bool {
         lnI2C_read1(self, target, n, data)
     }
     #[inline]

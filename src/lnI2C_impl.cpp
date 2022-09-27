@@ -256,7 +256,7 @@ void lnTwoWire::setSpeed(int newSpeed)
 /**
  */
 #ifdef I2C_USES_INTERRUPT
-bool lnTwoWire::multiWrite(int target, int nbSeqn,const int *seqLength, const uint8_t **seqData)
+bool lnTwoWire::multiWrite(int target, uint32_t nbSeqn,const uint32_t *seqLength, const uint8_t **seqData)
 {
     volatile uint32_t stat1,stat0;
     // Send start
@@ -300,7 +300,7 @@ bool lnTwoWire::multiWrite(int target, int nbSeqn,const int *seqLength, const ui
  * @param data
  * @return 
  */
-bool lnTwoWire::write(int target, int n, const uint8_t *data)
+bool lnTwoWire::write(int target, uint32_t n, const uint8_t *data)
 {
     return multiWrite(target,1,&n,&data);
 }
@@ -311,7 +311,7 @@ bool lnTwoWire::write(int target, int n, const uint8_t *data)
  * @param data
  * @return 
  */
-bool lnTwoWire::multiRead(int target, int nbSeqn,const int *seqLength,  uint8_t **seqData)
+bool lnTwoWire::multiRead(int target, uint32_t nbSeqn,const uint32_t *seqLength,  uint8_t **seqData)
 {
      volatile uint32_t stat1,stat0;
     _dmaRx.beginTransfer(); // we dont actually use dma, but we use the dma mutex to protect against re-entrency
@@ -355,7 +355,7 @@ bool lnTwoWire::multiRead(int target, int nbSeqn,const int *seqLength,  uint8_t 
  * @param data
  * @return 
  */
-bool lnTwoWire::read(int target,  int n, uint8_t *data)
+bool lnTwoWire::read(int target,  uint32_t n, uint8_t *data)
 {
     return lnTwoWire::multiRead(  target, 1,&n, &data);
 }

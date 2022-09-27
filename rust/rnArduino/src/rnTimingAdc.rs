@@ -5,7 +5,7 @@ pub use rn::lnPin as  rnPin;
 pub use rn::lnGpioMode as rnGpioMode;
 pub use rn::lnEdge as rnEdge;
 
-use cty::c_int;
+//use cty::c_int;
 
 pub struct rnTimingAdc
 {
