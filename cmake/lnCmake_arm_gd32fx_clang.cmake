@@ -21,6 +21,12 @@ MACRO(GENERATE_GD32_FIRMWARE target)
                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
                    COMMENT "Generating bin file"
     )
+  add_custom_command(TARGET ${target}
+                   POST_BUILD
+                   COMMAND python  ${AF_FOLDER}/script/clang_memory.py $<TARGET_FILE:${target}>.map
+                   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+                   COMMENT "Memory summary"
+    )
 
 ENDMACRO(GENERATE_GD32_FIRMWARE target)
 
