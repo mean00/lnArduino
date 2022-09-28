@@ -92,4 +92,4 @@ with open(args.map_file) as f:
         sums[target] +=  size
 # Print out summary
 for i in range(1,SECTION_MAX):
-        print("%s\t %d" % (section_names[i], sums[i]))
+        print("%s\t %d \t(%d kB)" % (section_names[i], sums[i],(sums[i]+511)/1024))
