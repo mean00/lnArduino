@@ -27,7 +27,7 @@ from __future__ import print_function
 import sys
 import os
 import argparse
-import csv
+
 
 SECTION_NONE = 0
 SECTION_RAM = 1
@@ -90,6 +90,7 @@ with open(args.map_file) as f:
             continue
         #print(section_names[target])
         sums[target] +=  size
+f.close()
 # Print out summary
 for i in range(1,SECTION_MAX):
         print("%s\t %d \t(%d kB)" % (section_names[i], sums[i],(sums[i]+511)/1024))
