@@ -4,7 +4,7 @@ use crate::rnarduino as rn;
 use cty::c_char;
 
 //--
-pub fn rnDelay(to : i32) -> ()
+pub fn rnDelay(to : u32) -> ()
 {
     unsafe {
         rn::lnDelay(to);

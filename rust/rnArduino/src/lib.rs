@@ -9,6 +9,8 @@ extern crate alloc;
 use panic_reset as _;
 pub type size_t = cty::c_uint;
 
+
+
 pub mod rnarduino;
 pub mod rnGpio;
 pub mod rnI2C;
@@ -16,6 +18,14 @@ pub mod rnOsHelper;
 pub mod rnExti;
 pub mod rnFastEventGroup;
 pub mod rnTimingAdc;
+
+pub mod rnArduino;
+
+
+use rnarduino as rn;
+
+
+
 
 pub struct FreeRtosAllocator;
 
@@ -38,3 +48,5 @@ extern "C" {
 extern "C" {
     pub fn vPortFree(pv: *mut cty::c_void);
 }
+
+

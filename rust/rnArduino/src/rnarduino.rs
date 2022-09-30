@@ -2530,12 +2530,12 @@ extern "C" {
     pub fn lnGetUs64() -> u64;
 }
 extern "C" {
-    #[link_name = "\u{1}_Z9lnDelayUsi"]
-    pub fn lnDelayUs(wait: cty::c_int);
+    #[link_name = "\u{1}_Z9lnDelayUsj"]
+    pub fn lnDelayUs(wait: cty::c_uint);
 }
 extern "C" {
-    #[link_name = "\u{1}_Z7lnDelayi"]
-    pub fn lnDelay(wait: cty::c_int);
+    #[link_name = "\u{1}_Z7lnDelayj"]
+    pub fn lnDelay(wait: cty::c_uint);
 }
 extern "C" {
     #[link_name = "\u{1}_Z7lnGetMsv"]
