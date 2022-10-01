@@ -123,7 +123,7 @@ protected:
 };
 #define xAutoMutex lnAutoMutex
 
-void xDelay(int ms);
+void xDelay(uint32_t ms);
 extern "C"
 {void do_assert(const char *a); }
 #define xAssert(a) if(!(a)) {do_assert(#a);}

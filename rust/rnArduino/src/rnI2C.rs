@@ -18,7 +18,7 @@ pub struct rnI2C
  */
 impl rnI2C 
 {
-    fn new(instance : u32, speed: u32) -> rnI2C
+    pub fn new(instance : u32, speed: u32) -> rnI2C
     {
         unsafe {
             let t: rnI2C = rnI2C{
@@ -27,44 +27,44 @@ impl rnI2C
             t
         }
     }
-    fn setSpeed(&mut self, speed: u32)
+    pub fn setSpeed(&mut self, speed: u32)
     {
         unsafe {
         self.ln.setSpeed(speed as cint);
         }
     }
-    fn setAddress(&mut self, address: u8)
+    pub fn setAddress(&mut self, address: u8)
     {
         unsafe {
         self.ln.setAddress(address as cint);
         }
     }
-    fn begin(&mut self, target : u8)            
+    pub fn begin(&mut self, target : u8)            
     {
         unsafe {
             self.ln.begin(target as cint);
             }
     }
     
-    fn write( &mut self, data : &[u8]  ) -> bool
+    pub fn write( &mut self, data : &[u8]  ) -> bool
     {
         unsafe {
                 self.ln.write(data.len() as uint, data.as_ptr() as *const u8)
             }
     }
-    fn writeTo( &mut self, target: u8, data : &[u8]  ) -> bool
+    pub fn writeTo( &mut self, target: u8, data : &[u8]  ) -> bool
     {
         unsafe {
                 self.ln.write1(target as cint, data.len() as uint, data.as_ptr() as *const u8)
             }
     }
-    fn read( &mut self,  data : &mut [u8]  ) -> bool
+    pub fn read( &mut self,  data : &mut [u8]  ) -> bool
     {
         unsafe {
                 self.ln.read( data.len() as uint, data.as_ptr() as *mut u8)
             }
     }
-    fn readFrom( &mut self, target: u8, data : &mut [u8]  ) -> bool
+    pub fn readFrom( &mut self, target: u8, data : &mut [u8]  ) -> bool
     {
         unsafe {
                 self.ln.read1( target as cint, data.len() as uint, data.as_ptr() as *mut u8)
@@ -73,7 +73,7 @@ impl rnI2C
     ///
     /// 
     /// 
-    fn multiWrite(&mut self, tgt: u8,  lengths :  &[cty::c_uint], data :  &[*const u8]) -> bool
+    pub fn multiWrite(&mut self, tgt: u8,  lengths :  &[cty::c_uint], data :  &[*const u8]) -> bool
     {
         let nb=lengths.len();
         if  nb != data.len()

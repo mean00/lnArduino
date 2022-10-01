@@ -19,12 +19,7 @@ pub mod rnExti;
 pub mod rnFastEventGroup;
 pub mod rnTimingAdc;
 
-pub mod rnArduino;
-
-
-use rnarduino as rn;
-
-
+pub mod rn_hal;
 
 
 pub struct FreeRtosAllocator;
