@@ -21,6 +21,8 @@ pub mod rnTimingAdc;
 
 pub mod rn_hal;
 
+#[cfg(feature = "cdc")]
+pub mod rnCDC;
 
 pub struct FreeRtosAllocator;
 

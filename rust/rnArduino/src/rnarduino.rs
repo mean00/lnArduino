@@ -2267,8 +2267,8 @@ pub struct lnAutoMutex {
     pub _tex: *mut lnMutex,
 }
 extern "C" {
-    #[link_name = "\u{1}_Z6xDelayi"]
-    pub fn xDelay(ms: cty::c_int);
+    #[link_name = "\u{1}_Z6xDelayj"]
+    pub fn xDelay(ms: cty::c_uint);
 }
 extern "C" {
     #[link_name = "\u{1}_Z10LoggerInitv"]
@@ -4575,6 +4575,89 @@ impl lnDelayTimer {
 extern "C" {
     #[link_name = "\u{1}_ZN12lnDelayTimerD1Ev"]
     pub fn lnDelayTimer_lnDelayTimer_destructor(this: *mut lnDelayTimer);
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct lnUsbCDC {
+    pub _instance: cty::c_int,
+    pub _eventHandler: lnUsbCDC_lnUsbCDCEventsHandler,
+    pub _eventCookie: *mut cty::c_void,
+}
+#[repr(u32)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub enum lnUsbCDC_lnUsbCDCEvents {
+    CDC_DATA_AVAILABLE = 0,
+    CDC_SESSION_START = 1,
+    CDC_SESSION_END = 2,
+    CDC_SET_SPEED = 3,
+}
+pub type lnUsbCDC_lnUsbCDCEventsHandler = ::core::option::Option<
+    unsafe extern "C" fn(
+        cookie: *mut cty::c_void,
+        interface: cty::c_int,
+        event: lnUsbCDC_lnUsbCDCEvents,
+        payload: cty::c_uint,
+    ),
+>;
+extern "C" {
+    #[link_name = "\u{1}_ZN8lnUsbCDC4readEPhi"]
+    pub fn lnUsbCDC_read(this: *mut lnUsbCDC, buffer: *mut u8, maxSize: cty::c_int) -> cty::c_int;
+}
+extern "C" {
+    #[link_name = "\u{1}_ZN8lnUsbCDC5writeEPKhi"]
+    pub fn lnUsbCDC_write(
+        this: *mut lnUsbCDC,
+        buffer: *const u8,
+        maxSize: cty::c_int,
+    ) -> cty::c_int;
+}
+extern "C" {
+    #[link_name = "\u{1}_ZN8lnUsbCDC5flushEv"]
+    pub fn lnUsbCDC_flush(this: *mut lnUsbCDC);
+}
+extern "C" {
+    #[link_name = "\u{1}_ZN8lnUsbCDC13incomingEventENS_14lnUsbCDCEventsEj"]
+    pub fn lnUsbCDC_incomingEvent(
+        this: *mut lnUsbCDC,
+        ev: lnUsbCDC_lnUsbCDCEvents,
+        payload: cty::c_uint,
+    );
+}
+extern "C" {
+    #[link_name = "\u{1}_ZN8lnUsbCDC15encodingChangedEPKv"]
+    pub fn lnUsbCDC_encodingChanged(this: *mut lnUsbCDC, newEncoding: *const cty::c_void);
+}
+extern "C" {
+    #[link_name = "\u{1}_ZN8lnUsbCDCC1Ei"]
+    pub fn lnUsbCDC_lnUsbCDC(this: *mut lnUsbCDC, instance: cty::c_int);
+}
+impl lnUsbCDC {
+    #[inline]
+    pub unsafe fn read(&mut self, buffer: *mut u8, maxSize: cty::c_int) -> cty::c_int {
+        lnUsbCDC_read(self, buffer, maxSize)
+    }
+    #[inline]
+    pub unsafe fn write(&mut self, buffer: *const u8, maxSize: cty::c_int) -> cty::c_int {
+        lnUsbCDC_write(self, buffer, maxSize)
+    }
+    #[inline]
+    pub unsafe fn flush(&mut self) {
+        lnUsbCDC_flush(self)
+    }
+    #[inline]
+    pub unsafe fn incomingEvent(&mut self, ev: lnUsbCDC_lnUsbCDCEvents, payload: cty::c_uint) {
+        lnUsbCDC_incomingEvent(self, ev, payload)
+    }
+    #[inline]
+    pub unsafe fn encodingChanged(&mut self, newEncoding: *const cty::c_void) {
+        lnUsbCDC_encodingChanged(self, newEncoding)
+    }
+    #[inline]
+    pub unsafe fn new(instance: cty::c_int) -> Self {
+        let mut __bindgen_tmp = ::core::mem::MaybeUninit::uninit();
+        lnUsbCDC_lnUsbCDC(__bindgen_tmp.as_mut_ptr(), instance);
+        __bindgen_tmp.assume_init()
+    }
 }
 unsafe impl Send for lnFastEventGroup {}
 unsafe impl Sync for lnFastEventGroup {}
