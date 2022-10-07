@@ -12,29 +12,31 @@ type uint = cty::c_uint;
 //--
 pub trait rnCDCEventHandler
 {
-    fn  eventHandler( &self, interface: cint ,  event : u32, payload: u32);
+    fn  eventHandler( &self, interface: cint ,  event : rn::lnUsbCDC_lnUsbCDCEvents, payload: u32);
 }
 //--
 pub struct rnCDC
 {
-     ln             : Box<cdc> ,     
+     ln             : Box<cdc> ,   
+     handler        : Option< *const dyn   rnCDCEventHandler>,
 }
 
 /**
  * 
  * 
  */
-impl rnCDC 
+impl rnCDC
 {
     // ctor
-    pub fn new(instance : u32, handler : dyn rnCDCEventHandler) -> rnCDC
+    pub fn new(instance : u32, handler : & 'static dyn rnCDCEventHandler) -> Box<rnCDC>
     {
         unsafe {
-            let t: rnCDC = rnCDC{
-                ln :                Box::new(cdc::new(instance as  cint )),                  
-            };
-            t.ln._eventHandler= rnCDC::bounceBack;
-            t.ln._eventCookie = handler;
+            let mut t  = Box::new(rnCDC{
+                ln :                Box::new(cdc::new(instance as  cint )),
+                handler :           Some(handler),
+            });
+            t.ln._eventHandler= Some(Self::bounceBack);
+            //
             t
         }
     }
@@ -60,10 +62,12 @@ impl rnCDC
             }
     }
 
-    fn bounceBack(ptr : *mut cty::c_void, instance : cint, event: rn::lnUsbCDC_lnUsbCDCEventsHandler , payload : cty::c_uint) -> ()
+    extern "C" fn bounceBack(ptr : *mut cty::c_void, instance : cint, event: rn::lnUsbCDC_lnUsbCDCEvents , payload : cty::c_uint) -> ()
     {
-        // ptr is actually a rnCDCEventHandler in disguise
-        let e = ptr as *rnCDCEventHandler;
-        e.eventHandler(instance,event,payload);
+        unsafe {
+        let e: *mut rnCDC = ptr as *mut rnCDC;        
+        let t = (*e).handler.unwrap();
+            (*t).eventHandler( instance , event , payload );
+        }
     }
 }
