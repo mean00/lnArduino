@@ -29,3 +29,5 @@
 #include "MapleFreeRTOS1000.h"
 #include "MapleFreeRTOS1000_pp.h"
 #include "systemHelper.h"
+
+#include "../libraries/tinyUsb/include/lnUsbCDC.h"

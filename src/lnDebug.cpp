@@ -19,14 +19,21 @@ extern "C" void Logger_C(const char *fmt,...)
   vsnprintf(buffer,127,fmt,va);
 
   buffer[127]=0;
-#ifdef LOGGER_USE_DMA
-  serial0->dmaTransmit(strlen(buffer),(uint8_t *)buffer);
-#else
-  serial0->transmit(strlen(buffer),(uint8_t *)buffer);
-#endif
   va_end(va);
+  Logger_chars(strlen(buffer), buffer);
 }
+/**
 
+*/
+extern "C" void Logger_chars(int n, const char *data)
+{
+  #ifdef LOGGER_USE_DMA
+    serial0->dmaTransmit(n,(uint8_t *)data);
+#else
+    serial0->transmit(n,(uint8_t *)data);
+#endif
+
+}
 
 /**
  *
@@ -43,13 +50,8 @@ void Logger(const char *fmt...)
     vsnprintf(buffer,127,fmt,va);
 
     buffer[127]=0;
-#ifdef LOGGER_USE_DMA
-    serial0->dmaTransmit(strlen(buffer),(uint8_t *)buffer);
-#else
-    serial0->transmit(strlen(buffer),(uint8_t *)buffer);
-#endif
     va_end(va);
-}
+    Logger_chars(strlen(buffer), buffer);}
 /**
  *
  */

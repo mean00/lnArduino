@@ -8,9 +8,12 @@ version = "0.0.0"
 
 [dependencies]
 cty = "0.2.2"
-panic-reset = "*"
+#panic-abort = "*"
 embedded-hal = "1.0.0-alpha.9"
-embedded-hal-bus = { git = "https://github.com/rust-embedded/embedded-hal"}
+#embedded-hal-bus = { git = "https://github.com/rust-embedded/embedded-hal"}
+
+[features]
+cdc = []
 
 [lib]
 name = "rnarduino"
