@@ -2282,6 +2282,12 @@ extern "C" {
     pub fn Logger(fmt: *const cty::c_char, ...);
 }
 extern "C" {
+    pub fn Logger_C(fmt: *const cty::c_char, ...);
+}
+extern "C" {
+    pub fn Logger_chars(n: cty::c_int, data: *const cty::c_char);
+}
+extern "C" {
     #[link_name = "\u{1}_Z17lnInitSystemClockv"]
     pub fn lnInitSystemClock();
 }
