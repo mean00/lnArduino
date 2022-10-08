@@ -475,7 +475,7 @@ int lnSerial::read(int max, uint8_t *to)
 int lnSerial::getReadPointer(uint8_t **to)
 {
     disableInterrupt();
-    if( (_rxHead==_rxTail)) // source empty or target full
+    if( _rxHead==_rxTail) // source empty or target full
     {
         RE_ENABLE_INTERRUPT();
         return 0;

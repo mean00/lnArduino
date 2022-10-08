@@ -92,7 +92,7 @@ bool     lnTimingAdc::setSource( int timer, int channel, int fq,int nbPins, cons
     // set clock divider as needed
     uint32_t adcClock=lnPeripherals::getClock(pADC0); // ADC1 does not support DMA/Timing
     int divider=adcClock/fq; // nb of clock ticks per conversion
-    divider>>8; // divide by 256, max conversion cycles +239.5+12.5 ~ 256
+    divider=divider>>8; // divide by 256, max conversion cycles +239.5+12.5 ~ 256
     
     lnADC_DIVIDER clockDivider=lnADC_CLOCK_DIV_BY_2;
     
