@@ -2,8 +2,9 @@
 #![allow(dead_code)]
 use alloc::boxed::Box;
 
-use crate::rnarduino as rn;
-pub use rn::lnUsbCDC as  cdc;
+use crate::rnarduino as    rn;
+pub use rn::lnUsbCDC as    cdc;
+
 
 type cint = cty::c_int;
 type uint = cty::c_uint;
@@ -17,8 +18,7 @@ pub trait rnCDCEventHandler
 //--
 pub struct rnCDC
 {
-     ln             : Box<cdc> ,   
-     handler        : Option< *const dyn   rnCDCEventHandler>,
+     ln             : Box<cdc> ,         
 }
 
 /**
@@ -33,10 +33,10 @@ impl rnCDC
         unsafe {
             let mut t  = Box::new(rnCDC{
                 ln :                Box::new(cdc::new(instance as  cint )),
-                handler :           Some(handler),
             });
             t.ln._eventHandler= Some(Self::bounceBack);
-            //
+            let   wrapped= Box::new(handler );
+            t.ln._eventCookie= Box::into_raw(wrapped) as *mut cty::c_void;
             t
         }
     }
@@ -61,13 +61,17 @@ impl rnCDC
                 self.ln.flush();
             }
     }
-
+///
+/// 
+/// 
     extern "C" fn bounceBack(ptr : *mut cty::c_void, instance : cint, event: rn::lnUsbCDC_lnUsbCDCEvents , payload : cty::c_uint) -> ()
     {
-        unsafe {
-        let e: *mut rnCDC = ptr as *mut rnCDC;        
-        let t = (*e).handler.unwrap();
-            (*t).eventHandler( instance , event , payload );
+        // cookie is  Box<& 'static dyn rnCDCEventHandler>     
+        type cookie_monster =  Box<& 'static dyn rnCDCEventHandler> ;
+        unsafe {                 
+            let  e : *mut  cookie_monster; 
+            e= ptr as *mut  cookie_monster;
+            (*e).eventHandler(instance, event, payload);
         }
     }
 }
