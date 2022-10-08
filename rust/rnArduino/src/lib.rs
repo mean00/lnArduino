@@ -6,10 +6,10 @@
 
 use core::alloc::{GlobalAlloc, Layout};
 extern crate alloc;
-use panic_reset as _;
+
 pub type size_t = cty::c_uint;
 
-
+use core::panic::PanicInfo;
 
 pub mod rnarduino;
 pub mod rnGpio;
@@ -46,4 +46,16 @@ extern "C" {
     pub fn vPortFree(pv: *mut cty::c_void);
 }
 
+extern "C" {
+    pub fn deadEnd(code: cty::c_int);
+}
 
+#[panic_handler]
+fn panic(_info: &PanicInfo) -> ! {
+    unsafe {
+    deadEnd(55); //: cty::c_int);
+    }
+    loop {
+        
+    }
+}
