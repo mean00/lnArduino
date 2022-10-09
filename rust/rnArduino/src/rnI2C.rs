@@ -100,7 +100,5 @@ impl rnI2C
         }
 
     }
-    //   bool multiWrite(int target, int nbSeqn,const int *seqLength, const uint8_t **data);
-
 }
 // eof
