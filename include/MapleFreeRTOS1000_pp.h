@@ -57,7 +57,7 @@ class lnEventGroup
 public:
                 lnEventGroup();
     virtual     ~lnEventGroup();
-    void        setEvents(uint32_t events);
+    void        setEvents(uint32_t events); // /!\ Cannot be used from interrupt !!!!
     uint32_t    waitEvents(uint32_t maskint, int timeout=0); //  the events are cleared upon return from here ! returns  0 if timeout
     uint32_t    readEvents(uint32_t maskInt); // it is also cleared automatically !
 protected:

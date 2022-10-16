@@ -141,11 +141,10 @@ lnTask::~lnTask()
 {
   xAssert(0);
 }
-#if 0
 /**
  *
  */
-xEventGroup::xEventGroup()
+lnEventGroup::lnEventGroup()
 {
     _handle=xEventGroupCreate();
 
@@ -153,7 +152,7 @@ xEventGroup::xEventGroup()
 /**
  *
  */
-xEventGroup::~xEventGroup()
+lnEventGroup::~lnEventGroup()
 {
 //    xEventGroupDelete(_handle); No delete !
     xAssert(0);
@@ -163,16 +162,19 @@ xEventGroup::~xEventGroup()
  *
  * @param events
  */
-void        xEventGroup::setEvents(uint32_t events)
+void        lnEventGroup::setEvents(uint32_t events)
 {
     if(!underInterrupt)
     {
         xEventGroupSetBits(_handle,events);
     }else
     {
+        xAssert(0);
+        /*
         BaseType_t wakeUp ;
         xEventGroupSetBitsFromISR(_handle,events,&wakeUp);
         portYIELD_FROM_ISR(wakeUp);
+        */
     }
 }
 /**
@@ -181,7 +183,7 @@ void        xEventGroup::setEvents(uint32_t events)
  * @param timeout
  * @return
  */
-uint32_t    xEventGroup::waitEvents(uint32_t maskint, int timeout)
+uint32_t    lnEventGroup::waitEvents(uint32_t maskint, int timeout)
 {
     if(timeout==0)
         timeout=portMAX_DELAY-1;
@@ -201,7 +203,7 @@ uint32_t    xEventGroup::waitEvents(uint32_t maskint, int timeout)
  * @param maskInt
  * @return
  */
-uint32_t    xEventGroup::readEvents(uint32_t maskInt) // it is also cleared automatically !
+uint32_t    lnEventGroup::readEvents(uint32_t maskInt) // it is also cleared automatically !
 {
      EventBits_t ev=xEventGroupGetBits( _handle );
      ev=ev & maskInt;
@@ -212,7 +214,7 @@ uint32_t    xEventGroup::readEvents(uint32_t maskInt) // it is also cleared auto
      return ev;
 
 }
-#endif
+
 //--------------------------------
 /**
  *
