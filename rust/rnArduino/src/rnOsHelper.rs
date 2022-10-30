@@ -10,6 +10,13 @@ pub fn rnDelay(to : u32) -> ()
         rn::lnDelay(to);
     }
 }
+pub fn rnDelayUs(to : u32) -> ()
+{
+    unsafe {
+        rn::lnDelayUs(to);
+    }
+}
+
 
 pub fn  rnLogger( st : &str ) -> ()
 {

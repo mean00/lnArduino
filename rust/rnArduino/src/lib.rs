@@ -18,7 +18,7 @@ pub mod rnOsHelper;
 pub mod rnExti;
 pub mod rnFastEventGroup;
 pub mod rnTimingAdc;
-
+pub mod rnSpi;
 pub mod rn_hal;
 
 #[cfg(feature = "cdc")]
