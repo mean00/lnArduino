@@ -20,10 +20,10 @@ pub enum rnSpiBitOrder
 
 pub struct rnSPISettings 
 {
-    pinCS   : rnPin,        //CS pin associated to the configuration
-    speed   : u32,          //specifies the spi bus maximum clock speed
-    bOrder  : rnSpiBitOrder,  //bit order (MSBFirst or LSBFirst)
-    dMode   : usize,   //one of the data mode
+    pub pinCS   : rnPin,        //CS pin associated to the configuration
+    pub speed   : u32,          //specifies the spi bus maximum clock speed
+    pub bOrder  : rnSpiBitOrder,  //bit order (MSBFirst or LSBFirst)
+    pub dMode   : usize,   //one of the data mode
 }
   
 
@@ -43,7 +43,7 @@ impl rnSPI
     {
         unsafe {
             let t: rnSPI = rnSPI{
-                ln : Box::new(hwlnSPIClass::new(instance as  cint ,  speed as cint)),  
+                ln : Box::new(hwlnSPIClass::new(instance as  cint ,  -1 as cint)),  
                 setting : rnSPISettings{
                     pinCS : rnPin::NoPin,
                     speed : speed,
