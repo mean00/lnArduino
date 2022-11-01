@@ -140,9 +140,21 @@ impl rnSPI
     {
         unsafe {
             self.ln.write161(d.len() as i32, d.as_ptr(),false)
-        }
-        
+        }        
     }
+    pub fn dma_write_data16(&mut self, d: &[u16]) -> bool
+    {
+        unsafe {
+            self.ln.dmaWrite16(d.len() as i32, d.as_ptr())
+        }        
+    }
+    pub fn dma_write_data16_repeat(&mut self, nb: usize, d: u16) -> bool
+    {
+        unsafe {
+            self.ln.dmaWrite16Repeat(nb as i32, d)
+        }        
+    }
+
     pub fn transfer(&mut self, tx : &mut [u8], rx:&mut [u8]) -> bool
     {
         if tx.len() != rx.len()
