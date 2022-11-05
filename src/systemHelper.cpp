@@ -107,7 +107,7 @@ namespace std
 /**
 
 */
-void lnDelayUs(int wait)
+void lnDelayUs(uint32_t wait)
 {
     uint64_t target=lnGetUs()+wait;
     while(1)
@@ -137,10 +137,10 @@ uint32_t lnGetMs()
     return myTick;
 }
 
-void lnDelay(int a);
+void lnDelay(uint32_t a);
 /**
 */
-void xDelay(int wait)
+void xDelay(uint32_t wait)
 {
   lnDelay(wait);
 }

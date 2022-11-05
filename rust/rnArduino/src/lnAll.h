@@ -1,3 +1,8 @@
+#ifdef __ARM_ARCH
+    #undef uint32_t
+    #define _UINT32_T_DECLARED
+    #define uint32_t unsigned int
+#endif
 #include "lnArduino.h"
 
 #include "lnADC.h"
@@ -24,3 +29,5 @@
 #include "MapleFreeRTOS1000.h"
 #include "MapleFreeRTOS1000_pp.h"
 #include "systemHelper.h"
+
+#include "../libraries/tinyUsb/include/lnUsbCDC.h"

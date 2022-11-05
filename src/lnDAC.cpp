@@ -42,8 +42,8 @@ lnPin   lnDAC::pin()
  * @param instance
  */
 lnDAC::lnDAC(int instance): _dma( lnDMA::DMA_MEMORY_TO_PERIPH, 
-                lnDacDesc[_instance].dmaEngine,
-                lnDacDesc[_instance].dmaChannel, 
+                lnDacDesc[instance].dmaEngine,
+                lnDacDesc[instance].dmaChannel, 
                 16,32)
 {
     lnPeripherals::enable((Peripherals)(pDAC+instance));

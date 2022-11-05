@@ -17,11 +17,11 @@ public:
         virtual         ~lnI2C();
                     void setSpeed(int speed);
                     void setAddress(int address);
-                    bool write(int n, uint8_t *data)  ;                 
-                    bool read(int n, uint8_t *data);
-                    bool write(int target, int n, uint8_t *data);
-                    bool multiWrite(int target, int nbSeqn,int *seqLength, uint8_t **data);
-                    bool read(int target,  int n, uint8_t *data);
+                    bool write(uint32_t n, const uint8_t *data)  ;                 
+                    bool read(uint32_t n, uint8_t *data);
+                    bool write(int target, uint32_t n, const uint8_t *data);
+                    bool multiWrite(int target, uint32_t nbSeqn,const uint32_t *seqLength, const uint8_t **data);
+                    bool read(int target,  uint32_t n, uint8_t *data);
                     bool begin(int target=0);       
 protected:
                     void *cookie;
