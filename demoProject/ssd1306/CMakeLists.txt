@@ -9,11 +9,15 @@ add_subdirectory(${AF_FOLDER})
 
 
 include(${AF_FOLDER}/setup.cmake)
-        
-SET( SSD1306 ${AF_FOLDER}/libraries/simplerSSD1306 )
-INCLUDE_DIRECTORIES( ${SSD1306} )
+       
 
-SET(LIBSSD ${SSD1306}/ssd1306_ex_ll.cpp ${SSD1306}/ssd1306_base.cpp ${SSD1306}/ssd1306_ex.cpp ${SSD1306}/ssd1306_i2c_lnGd32vf103.cpp)
+SET( SSD1306 ${AF_FOLDER}/libraries/simplerSSD1306/platforms/lnArduino )
+MESSAGE(STATUS "AF => <${AF_FOLDER}>")
+MESSAGE(STATUS "SS => <${SSD1306}>")
+INCLUDE_DIRECTORIES( ${SSD1306} )
+INCLUDE_DIRECTORIES( ${SSD1306}/../.. )
+add_subdirectory(${SSD1306} )
         
-GENERATE_GD32_FIRMWARE(ssd1306 hello.cpp ${LIBSSD} )      
-        
+GENERATE_GD32_FIRMWARE(demo hello.cpp  )      
+target_link_libraries(demo ssd1306)
+

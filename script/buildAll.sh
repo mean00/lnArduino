@@ -24,7 +24,7 @@ do
     echo "$ARCH:$MCU => $i"
     cd ../demoProject/$i
     rm -f ${SDK}
-    ln -s $PWD/../../../${SDK} .
+    ln -s $PWD/../../ lnArduino
     rm -Rf build${ARCH}_${MCU}
     mkdir build${ARCH}_${MCU}
     cd build${ARCH}_${MCU}
