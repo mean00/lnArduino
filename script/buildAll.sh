@@ -16,7 +16,7 @@ exit 4
 function buildAll()
 {
 echo "** STARTING ARCH ${ARCH}:${MCU}"
-for i in `ls  ../demoProject/ | sort -n| grep -v cmake | grep -v everything`;
+for i in `ls  ../demoProject/ | sort -n| grep -v cmake | grep -v everything | grep -v usb`;
 #for i in adc;
 do
     cd $CUR

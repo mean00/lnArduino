@@ -3,6 +3,7 @@ MESSAGE(STATUS "Setting up GD32 riscv cmake environment")
 IF(NOT DEFINED LN_EXT)
 SET(LN_EXT riscv_gd32fx CACHE INTERNAL "")
 include(${CMAKE_CURRENT_LIST_DIR}/../platformConfig.cmake)
+SET(LN_TOOLCHAIN_EXT  riscv_gd32fx CACHE INTERNAL "")
 
 IF(NOT PLATFORM_TOOLCHAIN_PATH)
         MESSAGE(FATAL_ERROR "PLATFORM_TOOLCHAIN_PATH is not defined in platformConfig.cmake !!")
