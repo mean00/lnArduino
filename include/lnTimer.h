@@ -25,9 +25,10 @@ public:
              lnTimer(int timer,int channel);
              lnTimer(int pin);
     virtual ~lnTimer();
-        // PWM
-        void setPwmMode(int ratio100);
-        void setPwmFrequency(int fqInHz); // This program the timer fq with a tick of 1024, i.e. internal fq is 1024* the given fq
+        // PWM API
+        void setPwmMode(int ratio100);          // The ratio "low", 25 => 25% time low, 75=>75% time low
+        void setPwmFrequency(int fqInHz);       // PMW bas frequency
+        // non PWM API
         void setChannelRatio(int ratio100); // Ratio=100 => 100%, 50 => 50%, 0 => 0%
         //
         void singleShot(int durationMs, bool down=false);
