@@ -11,4 +11,5 @@ include(${AF_FOLDER}/setup.cmake)
         
 GENERATE_GD32_FIRMWARE(simple_pwm simple_pwm.cpp)
 GENERATE_GD32_FIRMWARE(shifting_fq shifting_fq.cpp)
+GENERATE_GD32_FIRMWARE(single_shot single_shot.cpp)
         
