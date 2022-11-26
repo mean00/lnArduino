@@ -10,20 +10,6 @@ void setup()
 {
     pinMode(LED,OUTPUT);    
 }
-int xduration=5;
-/**
- * 
- */
-
-void pulse(lnTimer *t, int duration)
-{
-        Logger("duration=%d\n",duration);
-        lnPinMode(PWM_PIN,lnALTERNATE_PP);   
-        t->singleShot(duration); // off by 2%
-        digitalWrite(PWM_PIN,0);
-        lnPinMode(PWM_PIN,lnOUTPUT);
-    
-}
 
 
 void loop()
