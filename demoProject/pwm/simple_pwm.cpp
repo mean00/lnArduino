@@ -36,11 +36,9 @@ void loop()
     lnTimer timer(PWM_PIN);
     
     Logger("PWM on pin %d\n", PWM_PIN );
-    int ratio=1024;
-    int step=128;
     
     timer.setPwmFrequency(1000);
-    timer.setPwmMode(50); // 25 % duty cycle
+    timer.setPwmMode(50); // 50 % duty cycle
     timer.enable();
     while(1)
     {
