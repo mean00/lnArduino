@@ -95,6 +95,7 @@ public:
         virtual bool timerCallback(bool half)=0; // return true if we continue, zero if we stop
 };
 /**
+ * Careful, the ratio values are between 0 and rollover and rollover depends on fq !
  * 
  * @param pin
  */
