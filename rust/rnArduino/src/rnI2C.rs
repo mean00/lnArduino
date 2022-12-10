@@ -73,6 +73,7 @@ impl rnI2C
     ///
     /// 
     /// 
+    /*
     pub fn multiWrite(&mut self, tgt: u8,  lengths :  &[cty::c_uint], data :  &[*const u8]) -> bool
     {
         let nb=lengths.len();
@@ -90,6 +91,44 @@ impl rnI2C
 
         let sequence_data :  *mut *const u8;
         sequence_data = data.as_ptr() as *mut *const u8;
+        unsafe {
+            return self.ln.multiWrite(
+                tgt as cty::c_int, 
+                nb as cty::c_uint,
+                sequence_lengh,
+                sequence_data
+                );
+        }
+
+    }
+    */
+    pub fn multi_write_to(&mut self, tgt: u8,  lengths :  &[cty::c_uint], data :  &[ &[u8]]) -> bool
+    {
+        let nb=lengths.len();
+        if  nb != data.len()
+        {
+            panic!("Invalid multiwrite : length & data mismatch\n");
+        }
+        if  nb == 0
+        {
+            panic!("I2C  Zero multiwrite \n");
+        }
+        
+        let sequence_lengh : *const cty::c_uint ;
+        sequence_lengh = lengths.as_ptr() as *const cty::c_uint;
+
+        let sequence_data :  *mut *const u8;
+
+        if nb > 3
+        {
+            panic!("Oops");
+        }
+        let mut seqs : [u32;3] = [0,0,0];        
+        for i in  0..nb
+        {
+            seqs[i]=data[i].as_ptr() as u32;
+        }        
+        sequence_data = seqs.as_ptr() as *mut *const u8;
         unsafe {
             return self.ln.multiWrite(
                 tgt as cty::c_int, 
