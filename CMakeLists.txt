@@ -32,5 +32,5 @@ include(./embeddedPrintf.cmake)
 add_subdirectory(src)
 
 IF(LN_ENABLE_RUST)
- #   add_subdirectory(rust)
+    add_subdirectory(rust) # Generate C++->C for easy Rust binding
 ENDIF(LN_ENABLE_RUST)
