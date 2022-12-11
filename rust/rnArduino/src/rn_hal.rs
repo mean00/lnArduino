@@ -17,7 +17,7 @@ use hal::digital::*;
 //---------------------------------
 use crate::rnOsHelper::rnDelay;
 use crate::rnGpio as gpio;
-use crate::rnI2C::rnI2C;
+//use crate::rnI2C::rnI2C;
 //use crate::rnI2C::rnI2C as i2c;
 use crate::rnarduino::lnPin;
 //---------------------------------
@@ -133,7 +133,7 @@ impl DelayUs for rn_hal
         Ok(())
     }
 }
-
+/*
 ///-------------------------------------------------
 ///
 /// ** I2C ***
@@ -221,5 +221,6 @@ impl I2c< SevenBitAddress > for I2C
 
         }
 }
+*/
 /*
 */

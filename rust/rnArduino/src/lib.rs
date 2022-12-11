@@ -3,13 +3,15 @@
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
 #![feature(default_alloc_error_handler)]
-
+#![feature(lang_items)]
 use core::alloc::{GlobalAlloc, Layout};
 extern crate alloc;
 
 pub type size_t = cty::c_uint;
 
 use core::panic::PanicInfo;
+
+mod rn_i2c_c;
 
 pub mod rnarduino;
 pub mod rnGpio;
