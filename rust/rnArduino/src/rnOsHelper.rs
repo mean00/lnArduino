@@ -26,3 +26,18 @@ pub fn  rnLogger( st : &str ) -> ()
         //rn::Logger(st.as_ptr() as *const c_char);
     }
 }
+
+
+pub fn  rnGetTimeMs() -> u32
+{
+    unsafe {
+        return rn::lnGetMs();
+    }
+}
+
+pub fn  rnGetTimeUs() -> u32
+{
+    unsafe {
+        return rn::lnGetUs();
+    }
+}
