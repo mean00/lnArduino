@@ -72,5 +72,33 @@ pub fn pinMode( pin : rnPin, mode: rnGpioMode) -> ()
             rn::lnPinMode(pin,mode);
     }
 }
+
+
+pub fn digital_write( pin: rnPin, value: bool) -> ()
+{
+    unsafe {
+            rn::lnDigitalWrite(pin,value);
+    }
+}
+pub fn digital_toggle( pin: rnPin) -> ()
+{
+    unsafe {
+            rn::lnDigitalToggle(pin);
+    }
+}
+pub fn digital_read( pin: rnPin) -> bool
+{
+    unsafe {
+            rn::lnDigitalRead(pin)
+    }
+}
+
+pub fn pin_mode( pin : rnPin, mode: rnGpioMode) -> ()
+{
+    unsafe {
+            rn::lnPinMode(pin,mode);
+    }
+}
+
 //--
 
