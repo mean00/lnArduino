@@ -5,7 +5,7 @@ use cty::c_char;
 use cty::c_void;
 use crate::rnarduino::UBaseType_t;
 use crate::rnarduino::TaskHandle_t;
-use crate::rnarduino::TaskFunction_t;
+//use crate::rnarduino::TaskFunction_t;
 use alloc::vec::Vec;
 use alloc::boxed::Box;
 

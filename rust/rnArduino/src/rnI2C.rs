@@ -1,6 +1,4 @@
 #![allow(dead_code)]
-use alloc::boxed::Box;
-
 use crate::rnarduino as rn;
 use crate::rn_i2c_c::*;
 
