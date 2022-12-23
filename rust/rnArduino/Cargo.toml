@@ -10,6 +10,8 @@ version = "0.0.0"
 cty = "0.2.2"
 #panic-abort = "*"
 embedded-hal = "1.0.0-alpha.9"
+ufmt = "*"
+heapless = { version = "*", features = ["ufmt-impl"] }
 #embedded-hal-bus = { git = "https://github.com/rust-embedded/embedded-hal"}
 
 [features]

@@ -8,8 +8,9 @@ use crate::rnarduino::TaskHandle_t;
 //use crate::rnarduino::TaskFunction_t;
 use alloc::vec::Vec;
 use alloc::boxed::Box;
-
-
+use heapless::String;
+use ufmt::{   uwrite };
+use ufmt::uDisplay;
 //--
 pub fn rnDelay(to : u32) -> ()
 {
@@ -24,7 +25,15 @@ pub fn rnDelayUs(to : u32) -> ()
     }
 }
 
-
+pub fn rnLogger1<T : uDisplay>(st: &str, v: T)
+{
+    let mut string_buf  : heapless::String<64> = String::new();
+    match uwrite!(&mut string_buf, "{}{}",st,v)    
+    {
+        Ok(_) => rnLogger(&string_buf),
+        Err(_) => {},
+    }
+}
 pub fn  rnLogger( st : &str ) -> ()
 {
     unsafe {
