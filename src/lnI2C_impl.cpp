@@ -337,7 +337,7 @@ bool lnTwoWire::multiRead(int target, uint32_t nbSeqn,const uint32_t *seqLength,
     stat1=_d->adr->STAT1;
     
     startRxIrq();
-    adr->CTL0|=LN_I2C_CTL0_START; // send start       
+    adr->CTL0|=LN_I2C_CTL0_START + LN_I2C_CTL0_ACKEN; // send start, auto ack       
     bool r=_sem.take(100);
     _dmaRx.endTransfer();
     stopIrq();
