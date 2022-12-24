@@ -458,6 +458,12 @@ bool lnTwoWire::receiveNext()
     uint8_t    *data=(uint8_t *)_session->transactionData[t];
     int        size=_session->transactionSize[t];
     
+    // all done ?  
+    if(_session->curTransaction>=_session->nbTransaction)
+    {
+        return false;
+    }
+
     // store current...
     xAssert(_session->curIndex<size);
     xAssert(t<_session->nbTransaction);
@@ -472,12 +478,7 @@ bool lnTwoWire::receiveNext()
     {
         return true;
     }
-    // switch to next transaction ?    
-    if(_session->curTransaction>=_session->nbTransaction)
-    {
-        _session->curIndex=0; // nope, all done
-        return false;
-    }
+    
     _session->curTransaction++;   
     _session->curIndex=0;
     if(_session->curTransaction>=_session->nbTransaction)
