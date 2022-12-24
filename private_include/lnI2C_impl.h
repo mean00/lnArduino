@@ -21,6 +21,8 @@ public:
         transactionData=dt;
         curTransaction=0;
         curIndex=0;
+        total_receive=0;
+        current_receive=0;
         // sanity check
         for(int i=0;i<nb;i++)
         {
@@ -33,6 +35,8 @@ public:
     const uint8_t **transactionData;
     int     curTransaction;
     int     curIndex;
+    int     total_receive;
+    int     current_receive;
 };
 
 

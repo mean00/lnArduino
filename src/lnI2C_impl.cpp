@@ -317,10 +317,17 @@ bool lnTwoWire::multiRead(int target, uint32_t nbSeqn,const uint32_t *seqLength,
     _dmaRx.beginTransfer(); // we dont actually use dma, but we use the dma mutex to protect against re-entrency
                             // ugly, i know
     
+    // compute total bytes to receive..
+    uint32_t total = 0;
+    for( int i=0;i<nbSeqn;i++ )
+        total+=seqLength[i];
+
     // Send start
     
     LN_I2C_Registers *adr=_d->adr;
      lnI2CSession session(target,nbSeqn,seqLength,(const uint8_t **)seqData);
+     session.total_receive = total;
+     session.current_receive = 0;
     _session=&session;
 
     stat0=_d->adr->STAT0;
@@ -330,7 +337,7 @@ bool lnTwoWire::multiRead(int target, uint32_t nbSeqn,const uint32_t *seqLength,
     stat1=_d->adr->STAT1;
     
     startRxIrq();
-    adr->CTL0|=LN_I2C_CTL0_START; // send start    
+    adr->CTL0|=LN_I2C_CTL0_START; // send start       
     bool r=_sem.take(100);
     _dmaRx.endTransfer();
     stopIrq();
@@ -446,24 +453,35 @@ bool lnTwoWire::sendNext()
  */
 bool lnTwoWire::receiveNext()
 {
-     int    t=_session->curTransaction;
-     uint8_t *data=(uint8_t *)_session->transactionData[t];
-    int     size=_session->transactionSize[t];
+    // current transaction
+    int        t=_session->curTransaction;
+    uint8_t    *data=(uint8_t *)_session->transactionData[t];
+    int        size=_session->transactionSize[t];
     
+    // store current...
+    xAssert(_session->curIndex<size);
+    xAssert(t<_session->nbTransaction);
+
+    data[_session->curIndex++]=_d->adr->DATA&0xff;
+    _session->current_receive++;
+    if( _session->current_receive+1 == _session->total_receive)
+    {
+        _d->adr->CTL0|=LN_I2C_CTL0_STOP;  
+    }
+    if(_session->curIndex<size)
+    {
+        return true;
+    }
+    // switch to next transaction ?    
     if(_session->curTransaction>=_session->nbTransaction)
     {
-        _session->curIndex=0; // all done
+        _session->curIndex=0; // nope, all done
         return false;
     }
-    
-    data[_session->curIndex++]=_d->adr->DATA&0xff;
-    if(_session->curIndex>=size) // next transaction ?
-    {
-        _session->curTransaction++;   
-        _session->curIndex=0;
-        if(_session->curTransaction>=_session->nbTransaction)
+    _session->curTransaction++;   
+    _session->curIndex=0;
+    if(_session->curTransaction>=_session->nbTransaction)
             return false;
-    }
     return true;
 }
 /**
