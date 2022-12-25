@@ -1,4 +1,4 @@
- # lnArduino : Arduino style API for GD32 chips
+ # lnArduino : Arduino style API for STM32/GD32/CH32 chips
 
 
 The aim of this project is to offer an Arduino style framework for the Longan Nano board (RISCV) or GD32F1/F3 (ARM) boards.
@@ -8,25 +8,15 @@ The API is 99% the same between the Riscv & Arm versions. Mostly tiny pinout/clo
 
 _What are the differences compared to vanilla Arduino ?_
 * Cmake based build system, use whatever IDE you want.
-* Support ARM and RISCV GD32 MCUs, same API (tested with GD32VF103, GD32F103,GD32F303 and STM32F103).
+* Support ARM and RISCV GD32 MCUs, same API (tested with GD32VF103, GD32F103,GD32F303, CH32F103 and STM32F103).
 * FreeRTOS out of the box, using the RISCV port made by QQxiaoming [1] / or vanilla ARM M3/M4
 * Better peripherals support (DMA, tasks..)
 * Only loosely compatible with Arduino API but easy to port
+* Partial rust binding
 
 A note of warning : This is my take on what i would like to have/use for such a board
 It might not fit your needs.
 
-_What works for the moment :_
- * FreeRTOS
- * Spi transmit (DMA)
- * Serial transmit (DMA)
- * I2C Transmit (DMA) / Receive (Interrupt)
- * GPIO + interrupt
- * PWM support
- * Onboard LCD support (Longan Nano)
- * DAC (DMA) support
- * very basic ADC support / Timer triggered ADC
- * Flash storage
 
 _Demos_
 The demoProject contains simple API demonstration programs.
