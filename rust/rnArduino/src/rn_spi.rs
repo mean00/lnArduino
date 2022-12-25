@@ -46,7 +46,7 @@ impl rnSPI
                 ln : Box::new(hwlnSPIClass::new(instance as  cint ,  -1 as cint)),  
                 setting : rnSPISettings{
                     pinCS : rnPin::NoPin,
-                    speed : speed,
+                    speed,
                     bOrder : rnSpiBitOrder::SPI_LSBFIRST,
                     dMode  : 0,
                 }

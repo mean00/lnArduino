@@ -34,21 +34,20 @@ impl rnTimingAdc
     /// 
     /// 
     /// 
-    pub fn setSource(&mut self, timer : usize, channel: usize, frequency : usize, nb_pins : usize, pins : *const rnPin ) -> bool
+    pub fn set_source(&mut self, timer : usize, channel: usize, frequency : usize, nb_pins : usize, pins : *const rnPin ) -> bool
     {
         unsafe {
-            return self.ln.setSource(
+            self.ln.setSource(
                                     timer      as cty::c_int,    
                                     channel  as cty::c_int , 
                                     frequency  as cty::c_int ,    nb_pins  as cty::c_int , 
-                                    pins);
-        
+                                    pins)        
         }
     }
     ///
     /// 
     ///   
-    pub  fn multiRead(&mut self, nbSamplePerChannel: cty::c_int, output: *mut u16) -> bool 
+    pub  fn multi_read(&mut self, nbSamplePerChannel: cty::c_int, output: *mut u16) -> bool 
     {
         unsafe {
             self.ln.multiRead( nbSamplePerChannel, output)

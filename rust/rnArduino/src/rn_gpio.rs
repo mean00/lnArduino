@@ -16,7 +16,7 @@ impl rnFastIO
 {
     pub fn new( pin : rnPin) -> Self
     {
-        let bit : u32 = (1 as u32) <<( ((pin as u32)& &0x0f) as u32);
+        let bit : u32 = 1_u32 <<( (pin as u32)& 0x0f);
         pinMode(pin,rnGpioMode::lnOUTPUT);
         let r : rnFastIO ;
         unsafe {
@@ -47,13 +47,13 @@ impl rnFastIO
 }
 
 
-pub fn digitalWrite( pin: rnPin, value: bool) -> ()
+pub fn digitalWrite( pin: rnPin, value: bool)
 {
     unsafe {
             rn::lnDigitalWrite(pin,value);
     }
 }
-pub fn digitalToggle( pin: rnPin) -> ()
+pub fn digitalToggle( pin: rnPin)
 {
     unsafe {
             rn::lnDigitalToggle(pin);
@@ -66,7 +66,7 @@ pub fn digitalRead( pin: rnPin) -> bool
     }
 }
 
-pub fn pinMode( pin : rnPin, mode: rnGpioMode) -> ()
+pub fn pinMode( pin : rnPin, mode: rnGpioMode)
 {
     unsafe {
             rn::lnPinMode(pin,mode);
@@ -74,13 +74,13 @@ pub fn pinMode( pin : rnPin, mode: rnGpioMode) -> ()
 }
 
 
-pub fn digital_write( pin: rnPin, value: bool) -> ()
+pub fn digital_write( pin: rnPin, value: bool)
 {
     unsafe {
             rn::lnDigitalWrite(pin,value);
     }
 }
-pub fn digital_toggle( pin: rnPin) -> ()
+pub fn digital_toggle( pin: rnPin)
 {
     unsafe {
             rn::lnDigitalToggle(pin);
@@ -93,7 +93,7 @@ pub fn digital_read( pin: rnPin) -> bool
     }
 }
 
-pub fn pin_mode( pin : rnPin, mode: rnGpioMode) -> ()
+pub fn pin_mode( pin : rnPin, mode: rnGpioMode)
 {
     unsafe {
             rn::lnPinMode(pin,mode);

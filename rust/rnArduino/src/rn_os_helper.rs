@@ -1,40 +1,35 @@
 #![allow(dead_code)]
 
 use crate::rnarduino as rn;
-use cty::c_char;
-use cty::c_void;
-use crate::rnarduino::UBaseType_t;
-use crate::rnarduino::TaskHandle_t;
-//use crate::rnarduino::TaskFunction_t;
+use cty::{c_char,c_void};
+use crate::rnarduino::{UBaseType_t,TaskHandle_t};
 use alloc::vec::Vec;
 use alloc::boxed::Box;
 use heapless::String;
-use ufmt::{   uwrite };
-use ufmt::uDisplay;
+use ufmt::{   uwrite,uDisplay };
 //--
-pub fn rnDelay(to : u32) -> ()
+pub fn delay_ms(to : u32)
 {
     unsafe {
         rn::lnDelay(to);
     }
 }
-pub fn rnDelayUs(to : u32) -> ()
+pub fn delay_us(to : u32)
 {
     unsafe {
         rn::lnDelayUs(to);
     }
 }
 
-pub fn rnLogger1<T : uDisplay>(st: &str, v: T)
+pub fn log1<T : uDisplay>(st: &str, v: T)
 {
     let mut string_buf  : heapless::String<64> = String::new();
-    match uwrite!(&mut string_buf, "{}{}",st,v)    
+    if uwrite!(&mut string_buf, "{}{}",st,v).is_ok()
     {
-        Ok(_) => rnLogger(&string_buf),
-        Err(_) => {},
+        log(&string_buf);
     }
 }
-pub fn  rnLogger( st : &str ) -> ()
+pub fn  log( st : &str )
 {
     unsafe {
         rn::Logger_chars(st.len() as i32, st.as_ptr() as *const c_char);
@@ -44,17 +39,17 @@ pub fn  rnLogger( st : &str ) -> ()
 }
 
 
-pub fn  rnGetTimeMs() -> u32
+pub fn  get_time_ms() -> u32
 {
     unsafe {
-        return rn::lnGetMs();
+        rn::lnGetMs()
     }
 }
 
-pub fn  rnGetTimeUs() -> u32
+pub fn  get_time_us() -> u32
 {
     unsafe {
-        return rn::lnGetUs();
+         rn::lnGetUs()
     }
 }
 
@@ -79,12 +74,12 @@ extern "C" fn trampoline( p : *mut cty::c_void)
 
 }
 
-pub fn rnCreateTask(function_entry : &'static rnTaskEntry, name: &str, priority : usize, taskSize : u32, param : *mut c_void )
+pub fn rn_create_task(function_entry : &'static rnTaskEntry, name: &str, priority : usize, taskSize : u32, param : *mut c_void )
 {
     let task_param : TrampolineStruct = TrampolineStruct
     {
         entry : function_entry,
-        param : param
+        param,
     };    
     let param_box = Box::new(task_param);
     let name_as_vec :  Vec<char> = name.chars().collect();
