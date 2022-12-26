@@ -8,7 +8,7 @@ pub use rn::lnEdge as rnEdge;
 ///
 ///
 ///
-pub fn attachInterrupt(
+pub fn attach_interrupt(
         pin: rn::lnPin,
         edge: rn::lnEdge,
         cb: rn::lnExtiCallback,
@@ -21,7 +21,7 @@ pub fn attachInterrupt(
 ///
 ///
 ///
-pub fn detachInterrupt(pin: rnPin) -> ()
+pub fn detach_interrupt(pin: rnPin)
 {
     unsafe {
         rn::lnExtiDetachInterrupt(pin);
@@ -30,7 +30,7 @@ pub fn detachInterrupt(pin: rnPin) -> ()
 ///
 ///
 ///
-pub fn enableInterrupt(pin: rnPin) -> ()
+pub fn enable_interrupt(pin: rnPin)
 {
   unsafe {
         rn::lnExtiEnableInterrupt(pin);
@@ -39,7 +39,7 @@ pub fn enableInterrupt(pin: rnPin) -> ()
 ///
 ///
 ///
-pub fn disableInterrupt(pin: rnPin) -> ()
+pub fn disable_interrupt(pin: rnPin)
 {
   unsafe {
         rn::lnExtiDisableInterrupt(pin);

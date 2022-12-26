@@ -11,8 +11,6 @@ pub struct rnI2C
 {
      ln : *mut ln_i2c_c,
 }
-
-
 /**
  * 
  * 
@@ -29,13 +27,13 @@ impl rnI2C
         }
     }
    
-    pub fn setSpeed(&mut self, speed: u32)
+    pub fn set_speed(&mut self, speed: u32)
     {
         unsafe {
             lni2c_setSpeed(self.ln, speed as cint);
         }
     }
-    pub fn setAddress(&mut self, address: u8)
+    pub fn set_address(&mut self, address: u8)
     {
         unsafe {
             lni2c_setAddress(self.ln, address as cint);
@@ -85,10 +83,7 @@ impl rnI2C
             panic!("I2C  Zero multiwrite \n");
         }
         
-        let sequence_lengh : *const cty::c_uint ;
-        sequence_lengh = lengths.as_ptr() as *const cty::c_uint;
-
-        let sequence_data :  *mut *const u8;
+        
 
         if nb > 3
         {
@@ -99,14 +94,15 @@ impl rnI2C
         {
             seqs[i]=data[i].as_ptr() as u32;
         }        
-        sequence_data = seqs.as_ptr() as *mut *const u8;
+        let sequence_data :  *mut *const u8 = seqs.as_ptr() as *mut *const u8;
+        let sequence_lengh : *const cty::c_uint  = lengths.as_ptr() as *const cty::c_uint;
         unsafe {
-            return lni2c_multi_write_to( self.ln,
+             lni2c_multi_write_to( self.ln,
                 tgt as cty::c_int, 
                 nb as cty::c_uint,
                 sequence_lengh,
                 sequence_data
-                );
+                )
         }
 
     }

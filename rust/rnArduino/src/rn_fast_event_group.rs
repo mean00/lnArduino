@@ -7,7 +7,12 @@ pub struct rnFastEventGroup
 {
      ln : Box<rn::lnFastEventGroup> ,
 }
-
+impl Default for rnFastEventGroup 
+{
+       fn default() -> Self {
+            Self::new()
+         }
+}
 impl rnFastEventGroup
 {
     pub fn new() -> Self
@@ -19,10 +24,12 @@ impl rnFastEventGroup
             t
         }
     }
+   
+        
     ///
     /// 
     /// 
-    pub fn takeOwnership(&mut self) -> ()
+    pub fn take_ownership(&mut self)
     {
         unsafe {
             self.ln.takeOwnership();
@@ -31,7 +38,7 @@ impl rnFastEventGroup
     ///
     /// 
     /// 
-    pub fn setEvents(&mut self, event : u32) -> ()
+    pub fn set_events(&mut self, event : u32)
     {
         unsafe {
             self.ln.setEvents(event);
@@ -40,19 +47,19 @@ impl rnFastEventGroup
     ///
     /// 
     /// 
-    pub fn waitEvents(&mut self, maskint : u32, timeout : i32) -> u32
+    pub fn wait_events(&mut self, maskint : u32, timeout : i32) -> u32
     {
         unsafe {
-            self.ln.waitEvents(maskint,timeout) as u32
+            self.ln.waitEvents(maskint,timeout)
         }
     } 
     ///
     /// 
     /// 
-    pub fn readEvents(&mut self, maskint : u32) -> u32
+    pub fn read_events(&mut self, maskint : u32) -> u32
     {
         unsafe {
-            self.ln.readEvents(maskint) as u32
+            self.ln.readEvents(maskint)
         }
     } 
 }
