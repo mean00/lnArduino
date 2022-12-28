@@ -34,7 +34,6 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "portmacro.h"
-
 /* Standard includes. */
 #include "string.h"
 

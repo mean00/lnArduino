@@ -33,6 +33,12 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+// FX
+#include "ch32v30x.h"
+#include "core_riscv.h"
+// /FX
+
+
 
 /*-----------------------------------------------------------
  * Port specific definitions.
