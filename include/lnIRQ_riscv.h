@@ -6,6 +6,13 @@
 #include "lnArduino.h"
 #include "lnPeripherals.h"
 
+#if LN_MCU == LN_MCU_CH32V3x
+    #define LN_INTERRUPT_TYPE  __attribute__((used)) ;
+    #define LN_FAST_INTERRUPT_TYPE __attribute__((used)) __attribute__((interrupt("WCH-Interrupt-fast"))
+#else
+    #define LN_INTERRUPT_TYPE  __attribute__((used)) __attribute__ ((interrupt ("IRQ")));
+#endif
+
 enum LnIRQ
 {
 LN_IRQ_NONE=0,
@@ -69,7 +76,24 @@ LN_IRQ_CAN1_RX0            ,     /*!< CAN1 RX0 interrupt                        
 LN_IRQ_CAN1_RX1            ,     /*!< CAN1 RX1 interrupt                                       */
 LN_IRQ_CAN1_EWMC           ,     /*!< CAN1 EWMC interrupt                                      */
 LN_IRQ_USBFS               ,     /*!< USBFS global interrupt                                   */
-LN_IRQ_LAST=LN_IRQ_USBFS
+
+// CH32V3 specific 
+ LN_IRQ_USBHS,
+ LN_IRQ_USBHS_WKUP,
+ LN_IRQ_OTG_FS, 
+ LN_IRQ_USB_HP,
+ LN_IRQ_USB_LP,
+ LN_IRQ_RNG,
+ LN_IRQ_FSMC,
+ LN_IRQ_SDIO, 
+ LN_IRQ_DMA1_Channel5       ,   /*!< DMA1 channel0 global interrupt                           */
+ LN_IRQ_DMA1_Channel6       ,   /*!< DMA1 channel1 global interrupt                           */
+ LN_IRQ_DMA1_Channel7       ,   /*!< DMA1 channel2 global interrupt                           */
+ LN_IRQ_DMA1_Channel8       ,   /*!< DMA1 channel3 global interrupt                           */
+ LN_IRQ_DMA1_Channel9       ,   /*!< DMA1 channel3 global interrupt                           */
+ LN_IRQ_DMA1_Channel10      ,   /*!< DMA1 channel3 global interrupt                           */
+ LN_IRQ_DMA1_Channel11      ,   /*!< DMA1 channel3 global interrupt                           */
+ LN_IRQ_LAST
 };
 
 extern uint32_t underInterrupt;

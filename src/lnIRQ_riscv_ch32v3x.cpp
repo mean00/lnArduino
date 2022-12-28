@@ -11,11 +11,35 @@
  * 
  */
 
-#define ECLIC_CTLBIT 4      // We have the 4 higher bits
-#define ECLIC_CTLBIT_SHIFT (8-ECLIC_CTLBIT) // # number of low bits
-#define ECLIC_CTLBIT_LOW   ((1<<(ECLIC_CTLBIT_SHIFT))-1)
-#define ECLIC_NB_SOURCES 87
- 
+struct CH32V3_INTERRUPT
+{
+    uint32_t ISR[4];                // 0x00 Interrupt Enable Status Register
+    uint32_t dummy0[4];             // 0x10
+    uint32_t IPR[4];                // 0x20 Interrupt Pending Status Register  
+    uint32_t dummy1[4];             // 0x30
+    uint32_t ITHRESHOLD;            // 0x40 Interrupt priority Threshold configuration register
+    uint32_t dummy2;
+    uint32_t CFGR      ;            // 0x48 Interrupt Configuration Register
+    uint32_t GISR      ;            // 0x4C Global Status Register
+    uint32_t VTFIDR    ;            // 0x50 VTF Interrupt ID configuration Register
+    uint32_t dummy3[3]; 
+    uint32_t VTFADDR[4]    ;        // 0x60 VTD Interrupt Address Register
+    uint32_t dummy4[(0x100-0x70)/4]; 
+    uint32_t IENR[4]    ;           // 0x100 Interrupt Enable Set Register
+    uint32_t dummy5[(0x180-0x110)/4];
+    uint32_t IRER[4]    ;           // 0x180 Interrupt Enable Reset Register
+    uint32_t dummy6[(0x200-0x190)/4];
+    uint32_t IPSR[4]    ;           // 0x200 Interrupt Pending Set Register
+    uint32_t dummy7[(0x280-0x210)/4];
+    uint32_t IPRR[4]    ;           // 0x280 Interrupt Pending Reset Register
+    uint32_t dummy8[(0x300-0x290)/4];
+    uint32_t IACTR[4]    ;          // 0x280 Interrupt Activation Register
+    uint32_t dummy9[(0x400-0x310)/4];
+    uint32_t IPRIOIR[64];          // 0x400 Priority(0..63)
+};
+
+CH32V3_INTERRUPT *pfic = (CH32V3_INTERRUPT *)LN_PFIC_ADR;
+
 uint32_t underInterrupt=0;
 
 // Attribute [LEVEL1:LEVEL0][SHV] : 
@@ -30,54 +54,13 @@ uint32_t underInterrupt=0;
 
 void lnIrqSysInit()
 {
-    // start from a clean state
-    *eclicCfg=0;
-    *eclicMth=0;
-        
-    // Check the compilation value are the same as the runtime value
-    xAssert((*eclicInfo &0xfff)==ECLIC_NB_SOURCES);
-    xAssert(((*eclicInfo >>21)&0xf)==ECLIC_CTLBIT);
-    
-      // See bumblebee Core Architecture Manual
-    *eclicCfg=4<<1; // nlbits =4
-    
-    for(int i=0;i<ECLIC_NB_SOURCES;i++)
-    {
-        eclicIrqs[i].ie=0;  // default : disabled
-        eclicIrqs[i].ip=0x0; 
-    }
-     
-    
-    
-    // Switch to ECLIC mode
-    // If the 6 lower bits= 3 => eclic mode
-    uint32_t tmp1,tmp2;
-    
-    asm volatile (
-                  "li  %0,0x3f\n" // https://stackoverflow.com/questions/64547741/how-is-risc-v-neg-instruction-imeplemented
-                  "not %1,%0\n"
-                  "csrr %0, mtvec\n" 
-                  "and  %0,%0,%1\n" 
-                  "ori  %0,%0,3\n"
-                  "csrw mtvec, %0\n"     
-            :: "r"(tmp1),"r"(tmp2)
-    ); 
-  
-    // Now reconfigure with real value
-    for(int i=0;i<ECLIC_NB_SOURCES;i++)
-    {
-        lnSetInterruptLevelDirect(i,1,false);
-        
-    }
-    // Preconfigure timer & syscall
-    // these 2 are in vector mode, lowest prio
-    lnSetInterruptLevelDirect(3,0,true);
-    lnSetInterruptLevelDirect(7,0,true);
+   
     return;
 }
 
 void _enableDisable(bool enableDisable, const LnIRQ &irq)
 {
+    /*
     const _irqDesc *i=_irqs+(int)irq;
     xAssert(i->interrpt==irq)
     
@@ -88,6 +71,7 @@ void _enableDisable(bool enableDisable, const LnIRQ &irq)
     else
         iclic->ie&=~1;
     LN_FENCE();
+    */
 }
 /**
  * 
@@ -95,9 +79,10 @@ void _enableDisable(bool enableDisable, const LnIRQ &irq)
  */
 extern "C" void lnEnableInterruptDirect(int irq)
 {   
-    LN_ECLIC_irq *iclic=eclicIrqs+irq;
+   /* LN_ECLIC_irq *iclic=eclicIrqs+irq;
     iclic->ie|=1;
     LN_FENCE();
+    */
 }
 /**
  * 
@@ -105,9 +90,11 @@ extern "C" void lnEnableInterruptDirect(int irq)
  */
 extern "C" void lnDisableInterruptDirect(int irq)
 {   
+    /*
     LN_ECLIC_irq *iclic=eclicIrqs+irq;
     iclic->ie&=~1;
     LN_FENCE();
+    */
 }
 
 /**
@@ -120,7 +107,7 @@ void lnEnableInterrupt(const LnIRQ &irq)
 }
 void lnIrqSetPriority(const LnIRQ &irq, int prio )
 {    
-    lnSetInterruptLevelDirect(irq,1+prio,false);
+  //  lnSetInterruptLevelDirect(irq,1+prio,false);
 }
 /**
  * 
@@ -128,6 +115,7 @@ void lnIrqSetPriority(const LnIRQ &irq, int prio )
  */
 void lnSetInterruptLevelDirect(int irq, int prio, bool vectored)
 {
+    /*
     LN_ECLIC_irq *iclic=eclicIrqs+irq;
     bool attr=0;
     if(vectored) attr|=1;
@@ -138,6 +126,7 @@ void lnSetInterruptLevelDirect(int irq, int prio, bool vectored)
     // nlbits=4 => level = 4 bits, priority=0 bits
     iclic->control=(prio<<ECLIC_CTLBIT_SHIFT)+ECLIC_CTLBIT_LOW;    
     LN_FENCE();
+    */
 }
 /**
  * 
@@ -150,12 +139,14 @@ void lnDisableInterrupt(const LnIRQ &irq)
 
 void lnWriteMthDirect(int mth)
 {
-    *eclicMth=mth;
+   /* *eclicMth=mth;
     LN_FENCE();
+    */
 }
 int  lnReadMthDirect()
 {
-    return *eclicMth;
+    //return *eclicMth;
+    return 0;
 }
 
 #define DMA_IRQ(d,c) extern "C" void DMA##d##_Channel##c##_IRQHandler(void) { dmaIrqHandler(d,c);}

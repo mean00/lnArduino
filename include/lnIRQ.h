@@ -5,7 +5,7 @@
 #pragma once
 #include "lnArduino.h"
 
-#define LN_INTERRUPT_TYPE  __attribute__((used)) __attribute__ ((interrupt ("IRQ")));
+
 
 #if LN_ARCH == LN_ARCH_RISCV
     #include "lnIRQ_riscv.h"

@@ -83,7 +83,7 @@ IF(NOT DEFINED LN_EXT)
     ENDIF(LN_SPEC)
     SET(GD32_SPECS  "--specs=${LN_SPEC}.specs" CACHE INTERNAL "" FORCE)
     #
-    SET(GD32_SPECS_C_FLAGS  "${GD32_SPECS_SPECS}  ${PLATFORM_C_FLAGS} -DLN_ARCH=LN_ARCH_RISCV -Werror=return-type  -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -fno-common ${GD32_BOARD_FLAG} -I${AF_FOLDER}/riscv_ch32v3x/")
+    SET(GD32_SPECS_C_FLAGS  "${GD32_SPECS_SPECS}  ${PLATFORM_C_FLAGS} -DLN_MCU=LN_MCU_CH32V3x -DLN_ARCH=LN_ARCH_RISCV -Werror=return-type  -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -fno-common ${GD32_BOARD_FLAG} -I${AF_FOLDER}/riscv_ch32v3x/")
     SET(CMAKE_C_FLAGS "${GD32_SPECS_C_FLAGS}" CACHE INTERNAL "")
     SET(CMAKE_CXX_FLAGS "${GD32_SPECS_C_FLAGS}  -fno-rtti -fno-exceptions -fno-threadsafe-statics" CACHE INTERNAL "") 
     #
