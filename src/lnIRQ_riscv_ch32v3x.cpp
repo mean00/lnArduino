@@ -6,7 +6,7 @@
 #include "lnArduino.h"
 #include "lnRCU.h"
 #include "lnIRQ.h"
-#include "lnIRQ_riscv_priv.h"
+#include "lnIRQ_riscv_priv_ch32v3x.h"
 /**
  * 
  */
