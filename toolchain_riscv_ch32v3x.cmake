@@ -35,7 +35,7 @@ IF(NOT DEFINED LN_EXT)
     set(CMAKE_C_COMPILER_WORKS      TRUE)
     set(CMAKE_CXX_COMPILER_WORKS    TRUE)
     #
-    SET(GD32_BOARD_FLAG    ""  ) 
+    SET(GD32_BOARD_FLAG    ""  CACHE INTERNAL "") 
     SET(GD32_BOARD       ch32v3x CACHE INTERNAL "")
 
     IF(NOT DEFINED LN_MCU_SPEED)
@@ -84,16 +84,16 @@ IF(NOT DEFINED LN_EXT)
     SET(GD32_SPECS  "--specs=${LN_SPEC}.specs" CACHE INTERNAL "" FORCE)
     #
     SET(GD32_SPECS_C_FLAGS  "${GD32_SPECS_SPECS}  ${PLATFORM_C_FLAGS} -DLN_ARCH=LN_ARCH_RISCV -Werror=return-type  -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -fno-common ${GD32_BOARD_FLAG} -I${AF_FOLDER}/riscv_ch32v3x/")
-    SET(CMAKE_C_FLAGS "${GD32_SPECS_C_FLAGS}")
-    SET(CMAKE_CXX_FLAGS "${GD32_SPECS_C_FLAGS}  -fno-rtti -fno-exceptions -fno-threadsafe-statics" ) 
+    SET(CMAKE_C_FLAGS "${GD32_SPECS_C_FLAGS}" CACHE INTERNAL "")
+    SET(CMAKE_CXX_FLAGS "${GD32_SPECS_C_FLAGS}  -fno-rtti -fno-exceptions -fno-threadsafe-statics" CACHE INTERNAL "") 
     #
     SET(GD32_SPECS_LD_FLAGS "-nostdlib ${GD32_SPECS_SPECS}  -Wl,--traditional-format -Wl,--warn-common")
     SET(GD32_SPECS_LD_LIBS "-lm -lc -lgcc")
 
     #
-    set(CMAKE_CXX_LINK_EXECUTABLE    "<CMAKE_CXX_COMPILER>   <CMAKE_CXX_LINK_FLAGS>  <LINK_FLAGS> -lgcc -Xlinker -print-memory-usage   -Wl,--start-group  <OBJECTS> <LINK_LIBRARIES> -Wl,--end-group  -Wl,-Map,<TARGET>.map   -o <TARGET> ${GD32_LD_FLAGS} ${GD32_LD_LIBS}")
-    SET(CMAKE_EXECUTABLE_SUFFIX_C .elf)
-    SET(CMAKE_EXECUTABLE_SUFFIX_CXX .elf)
+    set(CMAKE_CXX_LINK_EXECUTABLE    "<CMAKE_CXX_COMPILER>   <CMAKE_CXX_LINK_FLAGS>  <LINK_FLAGS> -lgcc -Xlinker -print-memory-usage   -Wl,--start-group  <OBJECTS> <LINK_LIBRARIES> -Wl,--end-group  -Wl,-Map,<TARGET>.map   -o <TARGET> ${GD32_LD_FLAGS} ${GD32_LD_LIBS}"  CACHE INTERNAL "")
+    SET(CMAKE_EXECUTABLE_SUFFIX_C .elf CACHE INTERNAL "")
+    SET(CMAKE_EXECUTABLE_SUFFIX_CXX .elf CACHE INTERNAL "")
 
     include_directories(${ARDUINO_GD32_FREERTOS}/legacy/boards/${GD32_BOARD}/)
 

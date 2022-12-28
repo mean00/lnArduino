@@ -9,9 +9,9 @@
 *******************************************************************************/
 
 	.section	.init,"ax",@progbits
-	.global	_start
+	.global	_start2
 	.align	1
-_start:
+_start2:
 	j	handle_reset
 	.word 0x00000013
 	.word 0x00000013
@@ -30,7 +30,7 @@ _start:
     .align  1
 _vector_base:
     .option norvc;
-    .word   _start
+    .word   _start2
     .word   0
     .word   NMI_Handler                /* NMI */
     .word   HardFault_Handler          /* Hard Fault */
@@ -341,11 +341,11 @@ handle_reset:
 	la gp, __global_pointer$
 .option	pop 
 1:
-	la sp, _eusrstack 
+	la sp, _sp 
 2:
 	/* Load data section from flash to RAM */
 	la a0, _data_lma
-	la a1, _data_vma
+	la a1, _data
 	la a2, _edata
 	bgeu a1, a2, 2f
 1:
@@ -356,8 +356,8 @@ handle_reset:
 	bltu a1, a2, 1b
 2:
 	/* Clear bss section */
-	la a0, _sbss
-	la a1, _ebss
+	la a0, __bss_start
+	la a1, _end
 	bgeu a0, a1, 2f
 1:
 	sw zero, (a0)
@@ -379,7 +379,7 @@ handle_reset:
     ori t0, t0, 3           
 	csrw mtvec, t0
 
-    jal  SystemInit
+    #jal  SystemInit
 	la t0, main
 	csrw mepc, t0
 	mret
