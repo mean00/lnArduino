@@ -52,27 +52,34 @@ uint32_t underInterrupt=0;
 //              1 vectored
 //
 #define X(y) (uint32_t )y
+
 void unsupported()
 {
-    deadEnd(88);
+    deadEnd(11);
 }
+extern "C" void SysTick_Handler();
+extern "C" void Ecall_M_Mode_Handler();
+extern "C" void Ecall_U_Mode_Handler();
+extern "C" void SW_Handler();
+
 static const uint32_t vecTable[]  __attribute__((aligned(32)))=
 {
-    X(unsupported), //.word   0
-    X(unsupported), //.word   NMI_Handler                /* NMI */
-    X(unsupported), //.word   HardFault_Handler          /* Hard Fault */
-    X(unsupported), //.word   0
-    X(unsupported), //.word   Ecall_M_Mode_Handler       /* Ecall M Mode */
-    X(unsupported), //.word   0
-    X(unsupported), //.word   0
-    X(unsupported), //.word   Ecall_U_Mode_Handler       /* Ecall U Mode */
-    X(unsupported), //.word   Break_Point_Handler        /* Break Point */
-    X(unsupported), //.word   0
-    X(unsupported), //.word   0
-    X(unsupported), //.word   SysTick_Handler            /* SysTick */
-    X(unsupported), //.word   0
-    X(unsupported), //.word   SW_Handler                 /* SW */
-    X(unsupported), //.word   0    
+    X(unsupported),  //0 .word   RESET
+    X(unsupported),  //1 .word   0
+    X(unsupported), //2 .word   NMI_Handler                /* NMI */
+    X(unsupported), //3 .word   HardFault_Handler          /* Hard Fault */
+    X(unsupported), //4 .word   0
+    X(unsupported), //5 .word   Ecall_M_Mode_Handler       /* Ecall M Mode */
+    X(unsupported), //6 .word   0
+    X(unsupported), //7 .word   0
+    X(unsupported), //8 .word   Ecall_U_Mode_Handler       /* Ecall U Mode */
+    X(unsupported), //9 .word   Break_Point_Handler        /* Break Point */
+    X(unsupported), //10 .word   0
+    X(unsupported), //11 .word   0
+    X(SysTick_Handler), //12 .word   SysTick_Handler            /* SysTick */
+    X(unsupported), //13 .word   0
+    X(SW_Handler), //14 .word   SW_Handler                 /* SW */
+    X(unsupported), //15 .word   0    
     X(unsupported), //.word   WWDG_IRQHandler            /* Window Watchdog */
     X(unsupported), //.word   PVD_IRQHandler             /* PVD through EXTI Line detect */
     X(unsupported), //.word   TAMPER_IRQHandler          /* TAMPER */
