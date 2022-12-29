@@ -13,7 +13,8 @@ extern LN_SCB_Registers *aSCB;
 enum MCU_IDENTIFICATION
 {
     MCU_NONE,
-    MCU_GD32VF103_128K
+    MCU_CH32V307_128K,
+
 };
 static MCU_IDENTIFICATION _chipId;
 /**
@@ -24,10 +25,10 @@ void lnCpuID::identify()
     
     if(_flashSize) return; // already done
     
-    _chipId=MCU_GD32VF103_128K;
+    _chipId=MCU_CH32V307_128K;
     _ramSize=32;
     _flashSize=64;
-    _vendor=lnCpuID::LN_MCU_GD32;
+    _vendor=lnCpuID::LN_MCU_CH32;
 }
 /**
  * 
@@ -81,7 +82,7 @@ int lnCpuID::ramSize()
  {
      switch(_chipId)
      {
-            case MCU_GD32VF103_128K: return "GD32VF103/128kB"; break;
+            case MCU_CH32V307_128K: return "CH32V307/128kB"; break;
             default:break;
      }
      xAssert(0);
