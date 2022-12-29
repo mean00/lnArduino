@@ -95,9 +95,14 @@ LN_IRQ_USBFS               ,     /*!< USBFS global interrupt                    
  LN_IRQ_DMA1_Channel11      ,   /*!< DMA1 channel3 global interrupt                           */
  LN_IRQ_LAST
 };
+#if LN_MCU == LN_MCU_CH32V3x
+    extern bool xPortIsInsideInterrupt();
+    #define underInterrupt xPortIsInsideInterrupt()
+#else // GD32
+    extern uint32_t underInterrupt;
+    void lnSetInterruptLevelDirect(int intr, int prio, bool vectored);
+#endif
 
-extern uint32_t underInterrupt;
-void lnSetInterruptLevelDirect(int intr, int prio, bool vectored);
 
 
 #define LN_SYSTEM_LED PA2

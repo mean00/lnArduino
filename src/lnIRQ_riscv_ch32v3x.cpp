@@ -42,7 +42,6 @@ typedef volatile CH32V3_INTERRUPTx CH32V3_INTERRUPT;
 
 CH32V3_INTERRUPT *pfic = (CH32V3_INTERRUPT *)LN_PFIC_ADR;
 
-uint32_t underInterrupt=0;
 
 // Attribute [LEVEL1:LEVEL0][SHV] : 
 //      LEVEL: 
@@ -220,6 +219,15 @@ void lnIrqSysInit()
                 );
     return;
 }
+/**
+
+*/
+bool xPortIsInsideInterrupt()
+{
+    uint32_t gisr = pfic -> GISR;    
+    return (gisr>>8) & 1; // under interrupt
+}
+
 /**
 
 
