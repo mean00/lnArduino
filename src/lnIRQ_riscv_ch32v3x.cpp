@@ -33,7 +33,7 @@ struct CH32V3_INTERRUPTx
     uint32_t dummy7[(0x280-0x210)/4];
     uint32_t IPRR[4]    ;           // 0x280 Interrupt Pending Reset Register
     uint32_t dummy8[(0x300-0x290)/4];
-    uint32_t IACTR[4]    ;          // 0x280 Interrupt Activation Register
+    uint32_t IACTR[4]    ;          // 0x300 Interrupt Activation Register
     uint32_t dummy9[(0x400-0x310)/4];
     uint32_t IPRIOIR[64];          // 0x400 Priority(0..63)
 };
@@ -266,33 +266,6 @@ void lnIrqSetPriority(const LnIRQ &irq, int prio )
 }
 /**
  * 
- * @param irq
- */
-void lnSetInterruptLevelDirect(int irq, int prio, bool vectored)
-{
-    /*
-    int irq_num = _irqDesc[irq];
-
-_irqDesc
-{
-    LnIRQ       interrpt;
-    int         irqNb;
-
-    
-    LN_ECLIC_irq *iclic=eclicIrqs+irq;
-    bool attr=0;
-    if(vectored) attr|=1;
-    // Assume level interrupt (?)
-    iclic->attr=attr;
-    // control
-    //  4 bits then 1 1 1 1
-    // nlbits=4 => level = 4 bits, priority=0 bits
-    iclic->control=(prio<<ECLIC_CTLBIT_SHIFT)+ECLIC_CTLBIT_LOW;    
-    LN_FENCE();
-    */
-}
-/**
- * 
  * @param per
  */
 void lnDisableInterrupt(const LnIRQ &irq)
@@ -300,17 +273,6 @@ void lnDisableInterrupt(const LnIRQ &irq)
      _enableDisable(false,irq);
 }
 
-void lnWriteMthDirect(int mth)
-{
-   /* *eclicMth=mth;
-    LN_FENCE();
-    */
-}
-int  lnReadMthDirect()
-{
-    //return *eclicMth;
-    return 0;
-}
 
 #define DMA_IRQ(d,c) extern "C" void DMA##d##_Channel##c##_IRQHandler(void) { dmaIrqHandler(d,c);}
 /**
@@ -355,6 +317,7 @@ extern "C" void deadEnd(int code)
     while(1)
     {
         // blink red light...
+        asm volatile("nop");
         
     }
 }        
