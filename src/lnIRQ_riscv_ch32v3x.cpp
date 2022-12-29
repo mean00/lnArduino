@@ -11,7 +11,7 @@
  * 
  */
 
-struct CH32V3_INTERRUPT
+struct CH32V3_INTERRUPTx
 {
     uint32_t ISR[4];                // 0x00 Interrupt Enable Status Register
     uint32_t dummy0[4];             // 0x10
@@ -37,6 +37,8 @@ struct CH32V3_INTERRUPT
     uint32_t dummy9[(0x400-0x310)/4];
     uint32_t IPRIOIR[64];          // 0x400 Priority(0..63)
 };
+
+typedef volatile CH32V3_INTERRUPTx CH32V3_INTERRUPT;
 
 CH32V3_INTERRUPT *pfic = (CH32V3_INTERRUPT *)LN_PFIC_ADR;
 
@@ -218,44 +220,22 @@ void lnIrqSysInit()
                 );
     return;
 }
+/**
 
+
+*/
 void _enableDisable(bool enableDisable, const LnIRQ &irq)
 {
-    /*
-    const _irqDesc *i=_irqs+(int)irq;
-    xAssert(i->interrpt==irq)
-    
-    
-    LN_ECLIC_irq *iclic=eclicIrqs+i->irqNb;
+    int irq_num = _irqs[irq].irqNb;
     if(enableDisable)
-        iclic->ie|=1;
+    {
+        pfic->IENR[irq_num >> 5] = 1<< (irq_num & 0x1f);
+    }
     else
-        iclic->ie&=~1;
-    LN_FENCE();
-    */
-}
-/**
- * 
- * @param irq
- */
-extern "C" void lnEnableInterruptDirect(int irq)
-{   
-   /* LN_ECLIC_irq *iclic=eclicIrqs+irq;
-    iclic->ie|=1;
-    LN_FENCE();
-    */
-}
-/**
- * 
- * @param irq
- */
-extern "C" void lnDisableInterruptDirect(int irq)
-{   
-    /*
-    LN_ECLIC_irq *iclic=eclicIrqs+irq;
-    iclic->ie&=~1;
-    LN_FENCE();
-    */
+    {
+        pfic->IRER[irq_num >> 5] = 1<< (irq_num & 0x1f);
+    }
+    // fence ?
 }
 
 /**
@@ -277,6 +257,14 @@ void lnIrqSetPriority(const LnIRQ &irq, int prio )
 void lnSetInterruptLevelDirect(int irq, int prio, bool vectored)
 {
     /*
+    int irq_num = _irqDesc[irq];
+
+_irqDesc
+{
+    LnIRQ       interrpt;
+    int         irqNb;
+
+    
     LN_ECLIC_irq *iclic=eclicIrqs+irq;
     bool attr=0;
     if(vectored) attr|=1;
