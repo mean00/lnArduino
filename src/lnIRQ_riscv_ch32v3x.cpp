@@ -51,10 +51,141 @@ uint32_t underInterrupt=0;
 //              0 non vectored
 //              1 vectored
 //
+#define X(y) (uint32_t )y
+void unsupported()
+{
+    deadEnd(88);
+}
+static const uint32_t vecTable[]  __attribute__((aligned(32)))=
+{
+    X(unsupported), //.word   0
+    X(unsupported), //.word   NMI_Handler                /* NMI */
+    X(unsupported), //.word   HardFault_Handler          /* Hard Fault */
+    X(unsupported), //.word   0
+    X(unsupported), //.word   Ecall_M_Mode_Handler       /* Ecall M Mode */
+    X(unsupported), //.word   0
+    X(unsupported), //.word   0
+    X(unsupported), //.word   Ecall_U_Mode_Handler       /* Ecall U Mode */
+    X(unsupported), //.word   Break_Point_Handler        /* Break Point */
+    X(unsupported), //.word   0
+    X(unsupported), //.word   0
+    X(unsupported), //.word   SysTick_Handler            /* SysTick */
+    X(unsupported), //.word   0
+    X(unsupported), //.word   SW_Handler                 /* SW */
+    X(unsupported), //.word   0    
+    X(unsupported), //.word   WWDG_IRQHandler            /* Window Watchdog */
+    X(unsupported), //.word   PVD_IRQHandler             /* PVD through EXTI Line detect */
+    X(unsupported), //.word   TAMPER_IRQHandler          /* TAMPER */
+    X(unsupported), //.word   RTC_IRQHandler             /* RTC */
+    X(unsupported), //.word   FLASH_IRQHandler           /* Flash */
+    X(unsupported), //.word   RCC_IRQHandler             /* RCC */
+    X(unsupported), //.word   EXTI0_IRQHandler           /* EXTI Line 0 */
+    X(unsupported), //.word   EXTI1_IRQHandler           /* EXTI Line 1 */
+    X(unsupported), //.word   EXTI2_IRQHandler           /* EXTI Line 2 */
+    X(unsupported), //.word   EXTI3_IRQHandler           /* EXTI Line 3 */
+    X(unsupported), //.word   EXTI4_IRQHandler           /* EXTI Line 4 */
+    X(unsupported), //.word   DMA1_Channel1_IRQHandler   /* DMA1 Channel 1 */
+    X(unsupported), //.word   DMA1_Channel2_IRQHandler   /* DMA1 Channel 2 */
+    X(unsupported), //.word   DMA1_Channel3_IRQHandler   /* DMA1 Channel 3 */
+    X(unsupported), //.word   DMA1_Channel4_IRQHandler   /* DMA1 Channel 4 */
+    X(unsupported), //.word   DMA1_Channel5_IRQHandler   /* DMA1 Channel 5 */
+    X(unsupported), //.word   DMA1_Channel6_IRQHandler   /* DMA1 Channel 6 */
+    X(unsupported), //.word   DMA1_Channel7_IRQHandler   /* DMA1 Channel 7 */
+    X(unsupported), //.word   ADC1_2_IRQHandler          /* ADC1_2 */
+    X(unsupported), //.word   USB_HP_CAN1_TX_IRQHandler  /* USB HP and CAN1 TX */
+    X(unsupported), //.word   USB_LP_CAN1_RX0_IRQHandler /* USB LP and CAN1RX0 */
+    X(unsupported), //.word   CAN1_RX1_IRQHandler        /* CAN1 RX1 */
+    X(unsupported), //.word   CAN1_SCE_IRQHandler        /* CAN1 SCE */
+    X(unsupported), //.word   EXTI9_5_IRQHandler         /* EXTI Line 9..5 */
+    X(unsupported), //.word   TIM1_BRK_IRQHandler        /* TIM1 Break */
+    X(unsupported), //.word   TIM1_UP_IRQHandler         /* TIM1 Update */
+    X(unsupported), //.word   TIM1_TRG_COM_IRQHandler    /* TIM1 Trigger and Commutation */
+    X(unsupported), //.word   TIM1_CC_IRQHandler         /* TIM1 Capture Compare */
+    X(unsupported), //.word   TIM2_IRQHandler            /* TIM2 */
+    X(unsupported), //.word   TIM3_IRQHandler            /* TIM3 */
+    X(unsupported), //.word   TIM4_IRQHandler            /* TIM4 */
+    X(unsupported), //.word   I2C1_EV_IRQHandler         /* I2C1 Event */
+    X(unsupported), //.word   I2C1_ER_IRQHandler         /* I2C1 Error */
+    X(unsupported), //.word   I2C2_EV_IRQHandler         /* I2C2 Event */
+    X(unsupported), //.word   I2C2_ER_IRQHandler         /* I2C2 Error */
+    X(unsupported), //.word   SPI1_IRQHandler            /* SPI1 */
+    X(unsupported), //.word   SPI2_IRQHandler            /* SPI2 */
+    X(unsupported), //.word   USART1_IRQHandler          /* USART1 */
+    X(unsupported), //.word   USART2_IRQHandler          /* USART2 */
+    X(unsupported), //.word   USART3_IRQHandler          /* USART3 */
+    X(unsupported), //.word   EXTI15_10_IRQHandler       /* EXTI Line 15..10 */
+    X(unsupported), //.word   RTCAlarm_IRQHandler        /* RTC Alarm through EXTI Line */
+    X(unsupported), //.word   USBWakeUp_IRQHandler       /* USB Wakeup from suspend */
+    X(unsupported), //.word   TIM8_BRK_IRQHandler        /* TIM8 Break */
+    X(unsupported), //.word   TIM8_UP_IRQHandler         /* TIM8 Update */
+    X(unsupported), //.word   TIM8_TRG_COM_IRQHandler    /* TIM8 Trigger and Commutation */
+    X(unsupported), //.word   TIM8_CC_IRQHandler         /* TIM8 Capture Compare */
+    X(unsupported), //.word   RNG_IRQHandler             /* RNG */
+    X(unsupported), //.word   FSMC_IRQHandler            /* FSMC */
+    X(unsupported), //.word   SDIO_IRQHandler            /* SDIO */
+    X(unsupported), //.word   TIM5_IRQHandler            /* TIM5 */
+    X(unsupported), //.word   SPI3_IRQHandler            /* SPI3 */
+    X(unsupported), //.word   UART4_IRQHandler           /* UART4 */
+    X(unsupported), //.word   UART5_IRQHandler           /* UART5 */
+    X(unsupported), //.word   TIM6_IRQHandler            /* TIM6 */
+    X(unsupported), //.word   TIM7_IRQHandler            /* TIM7 */
+    X(unsupported), //.word   DMA2_Channel1_IRQHandler   /* DMA2 Channel 1 */
+    X(unsupported), //.word   DMA2_Channel2_IRQHandler   /* DMA2 Channel 2 */
+    X(unsupported), //.word   DMA2_Channel3_IRQHandler   /* DMA2 Channel 3 */
+    X(unsupported), //.word   DMA2_Channel4_IRQHandler   /* DMA2 Channel 4 */
+    X(unsupported), //.word   DMA2_Channel5_IRQHandler   /* DMA2 Channel 5 */
+    X(unsupported), //.word   ETH_IRQHandler             /* ETH */
+    X(unsupported), //.word   ETH_WKUP_IRQHandler        /* ETH WakeUp */
+    X(unsupported), //.word   CAN2_TX_IRQHandler         /* CAN2 TX */
+    X(unsupported), //.word   CAN2_RX0_IRQHandler        /* CAN2 RX0 */
+    X(unsupported), //.word   CAN2_RX1_IRQHandler        /* CAN2 RX1 */
+    X(unsupported), //.word   CAN2_SCE_IRQHandler        /* CAN2 SCE */
+    X(unsupported), //.word   OTG_FS_IRQHandler          /* OTGFS */
+    X(unsupported), //.word   USBHSWakeup_IRQHandler     /* USBHS Wakeup */
+    X(unsupported), //.word   USBHS_IRQHandler           /* USBHS */
+    X(unsupported), //.word   DVP_IRQHandler             /* DVP */
+    X(unsupported), //.word   UART6_IRQHandler           /* UART6 */
+    X(unsupported), //.word   UART7_IRQHandler           /* UART7 */
+    X(unsupported), //.word   UART8_IRQHandler           /* UART8 */
+    X(unsupported), //.word   TIM9_BRK_IRQHandler        /* TIM9 Break */
+    X(unsupported), //.word   TIM9_UP_IRQHandler         /* TIM9 Update */
+    X(unsupported), //.word   TIM9_TRG_COM_IRQHandler    /* TIM9 Trigger and Commutation */
+    X(unsupported), //.word   TIM9_CC_IRQHandler         /* TIM9 Capture Compare */
+    X(unsupported), //.word   TIM10_BRK_IRQHandler       /* TIM10 Break */
+    X(unsupported), //.word   TIM10_UP_IRQHandler        /* TIM10 Update */
+    X(unsupported), //.word   TIM10_TRG_COM_IRQHandler   /* TIM10 Trigger and Commutation */
+    X(unsupported), //.word   TIM10_CC_IRQHandler        /* TIM10 Capture Compare */
+    X(unsupported), //.word   DMA2_Channel6_IRQHandler   /* DMA2 Channel 6 */
+    X(unsupported), //.word   DMA2_Channel7_IRQHandler   /* DMA2 Channel 7 */
+    X(unsupported), //.word   DMA2_Channel8_IRQHandler   /* DMA2 Channel 8 */
+    X(unsupported), //.word   DMA2_Channel9_IRQHandler   /* DMA2 Channel 9 */
+    X(unsupported), //.word   DMA2_Channel10_IRQHandler  /* DMA2 Channel 10 */
+    X(unsupported), //.word   DMA2_Channel11_IRQHandler  /* DMA2 Channel 11 */
+ 
+};
 
 void lnIrqSysInit()
 {
-   
+    // relocate vector table
+
+ 	asm volatile(   
+                    /* Enable nested and hardware stack */
+                    "li t0, 0x1f\n"
+                    "csrw 0x804, t0\n" // INTSYSCR
+                    /* Enable floating point and interrupt */
+                    "li t0, 0x7800\n"
+                    "csrs mstatus, t0\n"
+                    /* Relocate vector table */
+                    "la t0, vec\n"
+                    "lw t0, 0(t0)\n"
+                    "ori t0, t0, 3\n" //        <= [1] [0] 1: Absolute address 0: vectored    
+	                "csrw mtvec, t0 \n" //
+                    
+                    "ret \n" //
+                    ".align 4\n"
+                    "vec : .dword %0"
+                  :: "i"(vecTable)
+                );
     return;
 }
 
