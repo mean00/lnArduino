@@ -57,10 +57,33 @@ void unsupported()
 {
     deadEnd(11);
 }
-extern "C" void SysTick_Handler();
-extern "C" void Ecall_M_Mode_Handler();
-extern "C" void Ecall_U_Mode_Handler();
-extern "C" void SW_Handler();
+extern "C"
+{
+void SysTick_Handler();
+void Ecall_M_Mode_Handler();
+void Ecall_U_Mode_Handler();
+void SW_Handler();
+void USART0_IRQHandler();
+void DMA0_Channel0_IRQHandler();
+void DMA0_Channel1_IRQHandler();
+void DMA0_Channel2_IRQHandler();
+void DMA0_Channel3_IRQHandler();
+void DMA0_Channel4_IRQHandler();
+void DMA0_Channel5_IRQHandler();
+void DMA0_Channel6_IRQHandler();
+void DMA0_Channel7_IRQHandler();
+
+void DMA1_Channel0_IRQHandler();
+void DMA1_Channel1_IRQHandler();
+void DMA1_Channel2_IRQHandler();
+void DMA1_Channel3_IRQHandler();
+void DMA1_Channel4_IRQHandler();
+void DMA1_Channel5_IRQHandler();
+void DMA1_Channel6_IRQHandler();
+void DMA1_Channel7_IRQHandler();
+
+
+}
 
 static const uint32_t vecTable[]  __attribute__((aligned(32)))=
 {
@@ -91,13 +114,13 @@ static const uint32_t vecTable[]  __attribute__((aligned(32)))=
     X(unsupported), //.word   EXTI2_IRQHandler           /* EXTI Line 2 */
     X(unsupported), //.word   EXTI3_IRQHandler           /* EXTI Line 3 */
     X(unsupported), //.word   EXTI4_IRQHandler           /* EXTI Line 4 */
-    X(unsupported), //.word   DMA1_Channel1_IRQHandler   /* DMA1 Channel 1 */
-    X(unsupported), //.word   DMA1_Channel2_IRQHandler   /* DMA1 Channel 2 */
-    X(unsupported), //.word   DMA1_Channel3_IRQHandler   /* DMA1 Channel 3 */
-    X(unsupported), //.word   DMA1_Channel4_IRQHandler   /* DMA1 Channel 4 */
-    X(unsupported), //.word   DMA1_Channel5_IRQHandler   /* DMA1 Channel 5 */
-    X(unsupported), //.word   DMA1_Channel6_IRQHandler   /* DMA1 Channel 6 */
-    X(unsupported), //.word   DMA1_Channel7_IRQHandler   /* DMA1 Channel 7 */
+    X(DMA0_Channel0_IRQHandler), //.word   DMA1_Channel1_IRQHandler   /* DMA1 Channel 1 */
+    X(DMA0_Channel1_IRQHandler), //.word   DMA1_Channel2_IRQHandler   /* DMA1 Channel 2 */
+    X(DMA0_Channel2_IRQHandler), //.word   DMA1_Channel3_IRQHandler   /* DMA1 Channel 3 */
+    X(DMA0_Channel3_IRQHandler), //.word   DMA1_Channel4_IRQHandler   /* DMA1 Channel 4 */
+    X(DMA0_Channel4_IRQHandler), //.word   DMA1_Channel5_IRQHandler   /* DMA1 Channel 5 */
+    X(DMA0_Channel5_IRQHandler), //.word   DMA1_Channel6_IRQHandler   /* DMA1 Channel 6 */
+    X(DMA0_Channel6_IRQHandler), //.word   DMA1_Channel7_IRQHandler   /* DMA1 Channel 7 */
     X(unsupported), //.word   ADC1_2_IRQHandler          /* ADC1_2 */
     X(unsupported), //.word   USB_HP_CAN1_TX_IRQHandler  /* USB HP and CAN1 TX */
     X(unsupported), //.word   USB_LP_CAN1_RX0_IRQHandler /* USB LP and CAN1RX0 */
@@ -117,7 +140,7 @@ static const uint32_t vecTable[]  __attribute__((aligned(32)))=
     X(unsupported), //.word   I2C2_ER_IRQHandler         /* I2C2 Error */
     X(unsupported), //.word   SPI1_IRQHandler            /* SPI1 */
     X(unsupported), //.word   SPI2_IRQHandler            /* SPI2 */
-    X(unsupported), //.word   USART1_IRQHandler          /* USART1 */
+    X(USART0_IRQHandler), //.word   USART1_IRQHandler          /* USART1 */
     X(unsupported), //.word   USART2_IRQHandler          /* USART2 */
     X(unsupported), //.word   USART3_IRQHandler          /* USART3 */
     X(unsupported), //.word   EXTI15_10_IRQHandler       /* EXTI Line 15..10 */
@@ -136,11 +159,11 @@ static const uint32_t vecTable[]  __attribute__((aligned(32)))=
     X(unsupported), //.word   UART5_IRQHandler           /* UART5 */
     X(unsupported), //.word   TIM6_IRQHandler            /* TIM6 */
     X(unsupported), //.word   TIM7_IRQHandler            /* TIM7 */
-    X(unsupported), //.word   DMA2_Channel1_IRQHandler   /* DMA2 Channel 1 */
-    X(unsupported), //.word   DMA2_Channel2_IRQHandler   /* DMA2 Channel 2 */
-    X(unsupported), //.word   DMA2_Channel3_IRQHandler   /* DMA2 Channel 3 */
-    X(unsupported), //.word   DMA2_Channel4_IRQHandler   /* DMA2 Channel 4 */
-    X(unsupported), //.word   DMA2_Channel5_IRQHandler   /* DMA2 Channel 5 */
+    X(DMA1_Channel0_IRQHandler), //.word   DMA2_Channel1_IRQHandler   /* DMA2 Channel 1 */
+    X(DMA1_Channel1_IRQHandler), //.word   DMA2_Channel2_IRQHandler   /* DMA2 Channel 2 */
+    X(DMA1_Channel2_IRQHandler), //.word   DMA2_Channel3_IRQHandler   /* DMA2 Channel 3 */
+    X(DMA1_Channel3_IRQHandler), //.word   DMA2_Channel4_IRQHandler   /* DMA2 Channel 4 */
+    X(DMA1_Channel4_IRQHandler), //.word   DMA2_Channel5_IRQHandler   /* DMA2 Channel 5 */
     X(unsupported), //.word   ETH_IRQHandler             /* ETH */
     X(unsupported), //.word   ETH_WKUP_IRQHandler        /* ETH WakeUp */
     X(unsupported), //.word   CAN2_TX_IRQHandler         /* CAN2 TX */
@@ -162,8 +185,8 @@ static const uint32_t vecTable[]  __attribute__((aligned(32)))=
     X(unsupported), //.word   TIM10_UP_IRQHandler        /* TIM10 Update */
     X(unsupported), //.word   TIM10_TRG_COM_IRQHandler   /* TIM10 Trigger and Commutation */
     X(unsupported), //.word   TIM10_CC_IRQHandler        /* TIM10 Capture Compare */
-    X(unsupported), //.word   DMA2_Channel6_IRQHandler   /* DMA2 Channel 6 */
-    X(unsupported), //.word   DMA2_Channel7_IRQHandler   /* DMA2 Channel 7 */
+    X(DMA1_Channel5_IRQHandler), //.word   DMA2_Channel6_IRQHandler   /* DMA2 Channel 6 */
+    X(DMA1_Channel6_IRQHandler), //.word   DMA2_Channel7_IRQHandler   /* DMA2 Channel 7 */
     X(unsupported), //.word   DMA2_Channel8_IRQHandler   /* DMA2 Channel 8 */
     X(unsupported), //.word   DMA2_Channel9_IRQHandler   /* DMA2 Channel 9 */
     X(unsupported), //.word   DMA2_Channel10_IRQHandler  /* DMA2 Channel 10 */
