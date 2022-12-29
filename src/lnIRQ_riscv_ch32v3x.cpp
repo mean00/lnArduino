@@ -108,7 +108,7 @@ static const uint32_t vecTable[]  __attribute__((aligned(32)))=
     X(unsupported), //.word   PVD_IRQHandler             /* PVD through EXTI Line detect */
     X(unsupported), //.word   TAMPER_IRQHandler          /* TAMPER */
     X(unsupported), //.word   RTC_IRQHandler             /* RTC */
-    X(unsupported), //.word   FLASH_IRQHandler           /* Flash */
+    X(unsupported), //20 .word   FLASH_IRQHandler           /* Flash */
     X(unsupported), //.word   RCC_IRQHandler             /* RCC */
     X(unsupported), //.word   EXTI0_IRQHandler           /* EXTI Line 0 */
     X(unsupported), //.word   EXTI1_IRQHandler           /* EXTI Line 1 */
@@ -118,7 +118,7 @@ static const uint32_t vecTable[]  __attribute__((aligned(32)))=
     X(DMA0_Channel0_IRQHandler), //.word   DMA1_Channel1_IRQHandler   /* DMA1 Channel 1 */
     X(DMA0_Channel1_IRQHandler), //.word   DMA1_Channel2_IRQHandler   /* DMA1 Channel 2 */
     X(DMA0_Channel2_IRQHandler), //.word   DMA1_Channel3_IRQHandler   /* DMA1 Channel 3 */
-    X(DMA0_Channel3_IRQHandler), //.word   DMA1_Channel4_IRQHandler   /* DMA1 Channel 4 */
+    X(DMA0_Channel3_IRQHandler), // 30 .word   DMA1_Channel4_IRQHandler   /* DMA1 Channel 4 */
     X(DMA0_Channel4_IRQHandler), //.word   DMA1_Channel5_IRQHandler   /* DMA1 Channel 5 */
     X(DMA0_Channel5_IRQHandler), //.word   DMA1_Channel6_IRQHandler   /* DMA1 Channel 6 */
     X(DMA0_Channel6_IRQHandler), //.word   DMA1_Channel7_IRQHandler   /* DMA1 Channel 7 */
@@ -128,7 +128,7 @@ static const uint32_t vecTable[]  __attribute__((aligned(32)))=
     X(unsupported), //.word   CAN1_RX1_IRQHandler        /* CAN1 RX1 */
     X(unsupported), //.word   CAN1_SCE_IRQHandler        /* CAN1 SCE */
     X(unsupported), //.word   EXTI9_5_IRQHandler         /* EXTI Line 9..5 */
-    X(unsupported), //.word   TIM1_BRK_IRQHandler        /* TIM1 Break */
+    X(unsupported), //40 .word   TIM1_BRK_IRQHandler        /* TIM1 Break */
     X(unsupported), //.word   TIM1_UP_IRQHandler         /* TIM1 Update */
     X(unsupported), //.word   TIM1_TRG_COM_IRQHandler    /* TIM1 Trigger and Commutation */
     X(unsupported), //.word   TIM1_CC_IRQHandler         /* TIM1 Capture Compare */
@@ -237,7 +237,7 @@ void _enableDisable(bool enableDisable, const LnIRQ &irq)
     int irq_num = _irqs[irq].irqNb;
     if(enableDisable)
     {
-        pfic->IENR[irq_num >> 5] = 1<< (irq_num & 0x1f);
+        pfic->IENR[irq_num >> 5] = 1<< (irq_num & 0x1f); // 32 bits per register
     }
     else
     {
@@ -256,7 +256,13 @@ void lnEnableInterrupt(const LnIRQ &irq)
 }
 void lnIrqSetPriority(const LnIRQ &irq, int prio )
 {    
-  //  lnSetInterruptLevelDirect(irq,1+prio,false);
+    int irq_num = _irqs[irq].irqNb;
+    int s=(irq_num & 3)*8;
+    int r=irq_num >> 4;
+    uint32_t b = pfic->IPRIOIR[r];
+    b&=~(0xff<<s);
+    b|=(prio<<4) << s;
+    pfic->IPRIOIR[r]=b;
 }
 /**
  * 
