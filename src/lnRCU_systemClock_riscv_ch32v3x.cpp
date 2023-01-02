@@ -83,12 +83,12 @@ static void waitCfg0Bit(int mask)
  */
 
 static const int Multipliers[]={
-    0,0,0,1,     // 0 1 2 3
-    2,3,4,5,     // 4 5 6 7
-    6,7,8,9,     // 8 9 10 11
+    0,1,1,1,    // 0 1 2 3
+    2,3,4,5,    // 4 5 6 7
+    6,7,8,9,    // 8 9 10 11
     // the ones below dont work on stm32 !
-    10,11,12,12, // 12 13 14 15
-    14,16,17,18 // 16 17 18 19
+    10,11,12,14,// 12 13 14 15
+    15,         // 16 17 18 19
 };
 /**
  *
@@ -113,10 +113,7 @@ void setPll(int inputClock, int multiplier, int predivider, bool external)
     // Set PLL multiplier
     c0&=~((0xf)<<18);
     c0|=((pllMultiplier)&0x0f)<<18; // PLL Multiplier, ignore MSB
-    if(pllMultiplier&0x10)
-        c0|= 1<<27;
-    else
-        c0&=~(1<<27);
+
     if(external)
         c0 |=LN_RCU_CFG0_PLLSEL;
     else
