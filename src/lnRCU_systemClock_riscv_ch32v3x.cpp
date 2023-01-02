@@ -42,6 +42,7 @@ uint32_t lnPeripherals::getClock(const Peripherals periph)
                     return _rcuClockApb1;break;                    
     }
 }
+
 /**
  * \brief wait for the "stabilized" bit to be set
  * @param bit
@@ -53,100 +54,150 @@ static void waitControlBit(int mask)
     {
         __asm__("nop");
     }
-    
+
 }
 
 static void waitCfg0Bit(int mask)
 {
-    
+
     while(!(arcu->CFG0 & mask))
     {
         __asm__("nop");
     }
-    
+
 }
+
+
 #define CLOCK_XTAL_VALUE        8 // 8mhz quartz
 #define CLOCK_TARGET_SYSCLOCK   (LN_MCU_SPEED/(1000*1000))  // 108 Mhz
-#define CLOCK_TARGET_PREDIV   2
+#define CLOCK_TARGET_PREDIV     1
 
 //{CTL = 0x38683, CFG0 = 0x400, CIR = 0x0, APB2RSTR = 0x0, APB1RSTR = 0x0, AHBENR = 0x14, APB2ENR = 0x0, APB1ENR = 0x0, BDCR = 0x18, CSR = 0x1c000000}
 //{CTL = 0x38683, CFG0 = 0x1d0400, CIR = 0x0, APB2RSTR = 0x0, APB1RSTR = 0x0, AHBENR = 0x14, APB2ENR = 0x0, APB1ENR = 0x0, BDCR = 0x18, CSR = 0x1c000000}
 //{CTL = 0x3038683, CFG0 = 0x1d0400, CIR = 0x0, APB2RSTR = 0x0, APB1RSTR = 0x0, AHBENR = 0x14, APB2ENR = 0x0, APB1ENR = 0x0, BDCR = 0x18, CSR = 0x1c000000}
 
 /**
- * 
+ *
  * @param multiplier
  * @param predivider
  */
-static void setPll(int multiplier, int predivider)
+
+static const int Multipliers[]={
+    0,0,0,1,     // 0 1 2 3
+    2,3,4,5,     // 4 5 6 7
+    6,7,8,9,     // 8 9 10 11
+    // the ones below dont work on stm32 !
+    10,11,12,12, // 12 13 14 15
+    14,16,17,18 // 16 17 18 19
+};
+/**
+ *
+ * @param multiplier
+ * @param predivider
+ * @param external
+ */
+void setPll(int inputClock, int multiplier, int predivider, bool external)
 {
     volatile uint32_t *control=&(arcu->CTL);
     volatile uint32_t *cfg0=&(arcu->CFG0);
     volatile uint32_t *cfg1=&(arcu->CFG1);
-    
+
     uint32_t c0=*cfg0;
-    
-    int pllMultiplier=multiplier;
-    
-    SystemCoreClock=(CLOCK_XTAL_VALUE*multiplier*1000000)/predivider;
+    *cfg1=0;
+    int pllMultiplier=Multipliers[multiplier];
+
+    SystemCoreClock=(inputClock*multiplier*1000000)/predivider;
     _rcuClockApb1=SystemCoreClock/2;
     _rcuClockApb2=SystemCoreClock;
 
-    
     // Set PLL multiplier
-    pllMultiplier--;
     c0&=~((0xf)<<18);
-    c0&=~((0x1)<<29);
-    c0|=(pllMultiplier&0x0f)<<18; // PLL Multiplier, ignore MSB
-    c0|=(((pllMultiplier&0x10))>>4)<<29;
+    c0|=((pllMultiplier)&0x0f)<<18; // PLL Multiplier, ignore MSB
+    if(pllMultiplier&0x10)
+        c0|= 1<<27;
+    else
+        c0&=~(1<<27);
+    if(external)
+        c0 |=LN_RCU_CFG0_PLLSEL;
+    else
+        c0 &=~LN_RCU_CFG0_PLLSEL;
     *cfg0=c0;
-    
-         
-    // Set PLL1 & PLL2
-    uint32_t c1=0;            
-    c1&=~LN_RCU_CFG1_PRED_CLOCKSEL; // 0-> XTAL is source for PREDV0
-    c1|=LN_RCU_CFG1_PREDV0_DIV(1); // divide by 2
-    c1|=LN_RCU_CFG1_PREDV1_DIV(1); // divide by 2
-#warning do we use PLL1 / PLL2 ? Maybe I2S    
-    c1|=LN_RCU_CFG1_PLL1_MUL(15);  // multipy by 20, 
-    c1|=LN_RCU_CFG1_PLL2_MUL(15);  // multipy by 20
-    *cfg1=c1;
-                
-    // enable pll1 & pll2, wait for stabilization
-    *control |= LN_RCU_CTL_PLL1EN;
-    waitControlBit(LN_RCU_CTL_PLL1STB);
-    *control |= LN_RCU_CTL_PLL2EN;
-    waitControlBit(LN_RCU_CTL_PLL2STB);    
+
+    // start PLL...
+    *control|=LN_RCU_CTL_PLLEN;
+    waitControlBit(LN_RCU_CTL_PLLSTB); // Wait Xtal stable
 }
 
 //
+#define LN_CLOCK_IRC8  0
+#define LN_CLOCK_XTAL  16
+#define LN_CLOCK_PLL   24
+static void enableDisableClock(int clock, bool enabled)
+{
+    int setBit=1<<clock;
+    int statusBit=1<<(clock+1);
+    if(enabled)
+    {
+        arcu->CTL|=setBit;
+        waitControlBit(statusBit);
+    }else
+    {
+        arcu->CTL&=~setBit;
+    }
+
+}
+/**
+ *
+ */
 void lnInitSystemClock()
 {
     lnCpuID::identify();
 
+    //________________________
+    // Reset everything...
+    //________________________
+    // Enable IRC8 just in case
+    enableDisableClock(LN_CLOCK_IRC8,true);
+    // Switch SYS clock to IRC8
+    uint32_t sysClock=arcu->CFG0;
+    sysClock&=~LN_RCU_CFG0_SYSCLOCK_MASK; //  0 is IRC8
+    arcu->CFG0=sysClock;
+    while(1)
+    {
+        if(!(arcu->CFG0&(LN_RCU_CFG0_SYSCLOCK_MASK<<2))) break;
+    }
+    // Ok now we can disable PLL and Xtal
+    enableDisableClock(LN_CLOCK_XTAL,false);
+    enableDisableClock(LN_CLOCK_PLL,false);
+
+    //________________________
+    //
+    //________________________
+
     volatile uint32_t *control=&(arcu->CTL);
     volatile uint32_t *cfg0=&(arcu->CFG0);
-    
-    {
-        *control=LN_RCU_CTL_IRC8MEN;     // Enable internal 8 Mhz oscillator
-        *cfg0=0;         // select 8Mhz as source for sysclock
-        *control=LN_RCU_CTL_IRC8MEN;     // Enable internal 8 Mhz oscillator
-        arcu->INT=0;    // No interrupt
-        arcu->CFG1=0;   // PLL pre divider not set
-    }
+
+    int inputClock;
+    bool useExternalClock;
+
+#ifndef LN_USE_INTERNAL_CLOCK
     {
         // start crystal...
         *control|=LN_RCU_CTL_HXTALEN;
         waitControlBit(LN_RCU_CTL_HXTASTB); // Wait Xtal stable
+        inputClock=CLOCK_XTAL_VALUE;
+        useExternalClock=true;
     }
-    {
-        // Set HXTAL as source for PLL <<
-        *cfg0=LN_RCU_CFG0_PLLSEL;
-        setPll(CLOCK_TARGET_SYSCLOCK*CLOCK_TARGET_PREDIV/(CLOCK_XTAL_VALUE),CLOCK_TARGET_PREDIV); // 8*27/2=108 Mhz
-    }
+#else
+        inputClock=8/2; // HSI is divided by 2
+        useExternalClock=false;
+#endif
+
+    int multiplier=CLOCK_TARGET_SYSCLOCK/inputClock;
+    setPll(inputClock,multiplier,CLOCK_TARGET_PREDIV,useExternalClock); // 8*9/1=72 Mhz
+
     // Setup AHB...
     // AHB is Xtal:1, divider value=0
-    
     // APB2=AHB/1
     uint32_t a=*cfg0;
     a&=~((0xf)<<4); // AHB PRESCALER CLEAR
@@ -158,18 +209,27 @@ void lnInitSystemClock()
     a&=~(7<<8);
     a|=4<<8;        // APB1 is AHB/2
     *cfg0=a;
-    
-    // Enable PLL and wait for it to be stable
-    *control|=LN_RCU_CTL_PLLEN;
-    waitControlBit(LN_RCU_CTL_PLLSTB);
-    
-    // then switch to PLL as clock source
-    uint32_t src=*cfg0;
-    src&=~(LN_RCU_CFG0_SYSCLOCK_MASK); // clear source
-    src|=LN_RCU_CFG0_SYSCLOCK_PLL; // set PLL as source
-    *cfg0=src;
-    
-    waitCfg0Bit(LN_RCU_CFG0_PLL_USED);
-    
-}
-// EOF
+
+
+    // it it is a STM32 chip, increase flash wait state
+    // GD has ram, so  0 wait state is fine
+    if(lnCpuID::vendor()!=lnCpuID::LN_MCU_GD32)
+    {
+        int ws=0;
+        if(CLOCK_TARGET_SYSCLOCK>48) ws=2;
+        else if(CLOCK_TARGET_SYSCLOCK>24) ws=1;
+
+        *(uint32_t *)0x40022000=0x30+ws; // enable prefetch
+    }
+
+    // now switch system clock to pll
+    a&=~(LN_RCU_CFG0_SYSCLOCK_MASK);
+    a|=LN_RCU_CFG0_SYSCLOCK_PLL;
+    *cfg0=a;
+
+    // In debug mode, halt everthing we can
+    volatile uint32_t *debug=(volatile uint32_t *)0xE0042000U;
+    // stop timer 0..3 i2c0 i2c1  timer 4..7 timer 8..13
+    //jtagId=debug[0];
+    //debug[1]=(0xf<<10)+(1<<15)+(0x1f<<16)+(0x3f<<25);
+}// EOF

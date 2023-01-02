@@ -65,23 +65,23 @@ void Ecall_M_Mode_Handler();
 void Ecall_U_Mode_Handler();
 void SW_Handler();
 void USART0_IRQHandler();
-void DMA0_Channel0_IRQHandler();
-void DMA0_Channel1_IRQHandler();
-void DMA0_Channel2_IRQHandler();
-void DMA0_Channel3_IRQHandler();
-void DMA0_Channel4_IRQHandler();
-void DMA0_Channel5_IRQHandler();
-void DMA0_Channel6_IRQHandler();
-void DMA0_Channel7_IRQHandler();
+void DMA0_Channel0_IRQHandler() LN_INTERRUPT_TYPE;
+void DMA0_Channel1_IRQHandler() LN_INTERRUPT_TYPE;
+void DMA0_Channel2_IRQHandler() LN_INTERRUPT_TYPE;
+void DMA0_Channel3_IRQHandler() LN_INTERRUPT_TYPE;
+void DMA0_Channel4_IRQHandler() LN_INTERRUPT_TYPE;
+void DMA0_Channel5_IRQHandler() LN_INTERRUPT_TYPE;
+void DMA0_Channel6_IRQHandler() LN_INTERRUPT_TYPE;
+void DMA0_Channel7_IRQHandler() LN_INTERRUPT_TYPE;
 
-void DMA1_Channel0_IRQHandler();
-void DMA1_Channel1_IRQHandler();
-void DMA1_Channel2_IRQHandler();
-void DMA1_Channel3_IRQHandler();
-void DMA1_Channel4_IRQHandler();
-void DMA1_Channel5_IRQHandler();
-void DMA1_Channel6_IRQHandler();
-void DMA1_Channel7_IRQHandler();
+void DMA1_Channel0_IRQHandler() LN_INTERRUPT_TYPE;
+void DMA1_Channel1_IRQHandler() LN_INTERRUPT_TYPE;
+void DMA1_Channel2_IRQHandler() LN_INTERRUPT_TYPE;
+void DMA1_Channel3_IRQHandler() LN_INTERRUPT_TYPE;
+void DMA1_Channel4_IRQHandler() LN_INTERRUPT_TYPE;
+void DMA1_Channel5_IRQHandler() LN_INTERRUPT_TYPE;
+void DMA1_Channel6_IRQHandler() LN_INTERRUPT_TYPE;
+void DMA1_Channel7_IRQHandler() LN_INTERRUPT_TYPE;
 
 
 }
