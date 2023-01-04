@@ -86,6 +86,18 @@ void DMA1_Channel7_IRQHandler() LN_INTERRUPT_TYPE;
 
 }
 
+#ifdef LN_ENABLE_I2C
+ void i2cIrqHandler(int instance, bool error);
+#else
+  #define i2cIrqHandler(...) deadEnd(1)
+#endif
+
+#define I2C_IRQ(d) extern "C"{ void I2C##d##_EV_IRQHandler(void) LN_INTERRUPT_TYPE ; void I2C##d##_EV_IRQHandler(void) { i2cIrqHandler(d,false);}} \
+                 extern "C"{ void I2C##d##_ERR_IRQHandler(void)LN_INTERRUPT_TYPE;  void I2C##d##_ERR_IRQHandler(void) { i2cIrqHandler(d,true);} }
+
+I2C_IRQ(0)
+I2C_IRQ(1)
+
 static const uint32_t vecTable[]  __attribute__((aligned(32)))=
 {
     X(unsupported),  //0 .word   RESET
@@ -135,10 +147,10 @@ static const uint32_t vecTable[]  __attribute__((aligned(32)))=
     X(unsupported), //.word   TIM2_IRQHandler            /* TIM2 */
     X(unsupported), //.word   TIM3_IRQHandler            /* TIM3 */
     X(unsupported), //.word   TIM4_IRQHandler            /* TIM4 */
-    X(unsupported), //.word   I2C1_EV_IRQHandler         /* I2C1 Event */
-    X(unsupported), //.word   I2C1_ER_IRQHandler         /* I2C1 Error */
-    X(unsupported), //.word   I2C2_EV_IRQHandler         /* I2C2 Event */
-    X(unsupported), //.word   I2C2_ER_IRQHandler         /* I2C2 Error */
+    X(I2C0_EV_IRQHandler), //.word   I2C1_EV_IRQHandler         /* I2C1 Event */
+    X(I2C0_ERR_IRQHandler), //.word   I2C1_ER_IRQHandler         /* I2C1 Error */
+    X(I2C1_EV_IRQHandler), //.word   I2C2_EV_IRQHandler         /* I2C2 Event */
+    X(I2C1_ERR_IRQHandler), //.word   I2C2_ER_IRQHandler         /* I2C2 Error */
     X(unsupported), //.word   SPI1_IRQHandler            /* SPI1 */
     X(unsupported), //.word   SPI2_IRQHandler            /* SPI2 */
     X(USART0_IRQHandler), //.word   USART1_IRQHandler          /* USART1 */
@@ -296,18 +308,6 @@ DMA_IRQ(1,4)
 DMA_IRQ(1,5)
 DMA_IRQ(1,6)
 
-
-#ifdef LN_ENABLE_I2C
- void i2cIrqHandler(int instance, bool error);
-#else
-  #define i2cIrqHandler(...) deadEnd(1)
-#endif
-
-#define I2C_IRQ(d) extern "C"{ void I2C##d##_EV_IRQHandler(void) LN_INTERRUPT_TYPE ; void I2C##d##_EV_IRQHandler(void) { i2cIrqHandler(d,false);}} \
-                 extern "C"{ void I2C##d##_ERR_IRQHandler(void)LN_INTERRUPT_TYPE;  void I2C##d##_ERR_IRQHandler(void) { i2cIrqHandler(d,true);} }
-
-I2C_IRQ(0)
-I2C_IRQ(1)
 
 
 extern "C" void deadEnd(int code)
