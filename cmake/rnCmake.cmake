@@ -1,5 +1,9 @@
 If(NOT Rust_CARGO_TARGET)
-    SET(Rust_CARGO_TARGET "thumbv7m-none-eabi" CACHE INTERNAL "")
+    IF(LN_ARCH STREQUAL "RISCV") 
+        SET(Rust_CARGO_TARGET "riscv32imac-unknown-none-elf" CACHE INTERNAL "")
+    ELSE()
+        SET(Rust_CARGO_TARGET "thumbv7m-none-eabi" CACHE INTERNAL "")
+    ENDIF()
 ENDIF(NOT Rust_CARGO_TARGET)
 # Lookup Corrosion
 IF(NOT CORROSION_FOUND)
