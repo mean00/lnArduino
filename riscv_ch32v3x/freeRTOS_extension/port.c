@@ -230,7 +230,8 @@ void vPortEndScheduler( void )
 	for( ;; );
 }
 /*-----------------------------------------------------------*/
-void SysTick_Handler(void) __attribute__((interrupt("WCH-Interrupt-fast")));
+//void SysTick_Handler(void) __attribute__((interrupt("WCH-Interrupt-fast")));
+void SysTick_Handler(void) __attribute__((used)) __attribute__((naked));
 void SysTick_Handler( void )
 {
     GET_INT_SP();
@@ -242,6 +243,7 @@ void SysTick_Handler( void )
     }
     portENABLE_INTERRUPTS();
     FREE_INT_SP();
+    __asm__("mret");
 }
 
 /*-----------------------------------------------------------*/
