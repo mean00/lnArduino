@@ -125,5 +125,5 @@ protected:
 
 void xDelay(uint32_t ms);
 extern "C"
-{void do_assert(const char *a); }
+{void __attribute__((noreturn)) do_assert(const char *a); }
 #define xAssert(a) if(!(a)) {do_assert(#a);}
