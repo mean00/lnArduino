@@ -35,7 +35,7 @@ extern "C" {
 #endif
 // FX
 #include "ch32v30x.h"
-#include "core_riscv.h"
+// FX #include "core_riscv.h"
 // /FX
 
 
