@@ -54,7 +54,7 @@ CH32V3_INTERRUPT *pfic = (CH32V3_INTERRUPT *)LN_PFIC_ADR;
 //
 #define X(y) (uint32_t )y
 
-void unsupported()
+void  __attribute__ ((noinline)) unsupported()
 {
     deadEnd(11);
 }
@@ -310,7 +310,7 @@ DMA_IRQ(1,6)
 
 
 
-extern "C" void deadEnd(int code)
+extern "C" void __attribute__ ((noinline))  deadEnd(int code)
 {
     // No interrrupt
     ENTER_CRITICAL();
