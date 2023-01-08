@@ -21,7 +21,7 @@ struct CH32V3_INTERRUPTx
     uint32_t dummy2;
     uint32_t CFGR      ;            // 0x48 Interrupt Configuration Register
     uint32_t GISR      ;            // 0x4C Global Status Register
-    uint32_t VTFIDR    ;            // 0x50 VTF Interrupt ID configuration Register
+    uint8_t  VTFIDR[4]    ;            // 0x50 VTF Interrupt ID configuration Register vector to assign to that fast vector
     uint32_t dummy3[3]; 
     uint32_t VTFADDR[4]    ;        // 0x60 VTD Interrupt Address Register
     uint32_t dummy4[(0x100-0x70)/4]; 
