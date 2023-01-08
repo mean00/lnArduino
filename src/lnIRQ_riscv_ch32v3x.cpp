@@ -58,6 +58,14 @@ void  __attribute__ ((noinline)) unsupported()
 {
     deadEnd(11);
 }
+
+void  __attribute__ ((noinline)) HardFault()
+{
+    deadEnd(12);
+}
+
+
+
 extern "C"
 {
 void SysTick_Handler();
@@ -103,7 +111,7 @@ static const uint32_t vecTable[]  __attribute__((aligned(32)))=
     X(unsupported),  //0 .word   RESET
     X(unsupported),  //1 .word   0
     X(unsupported), //2 .word   NMI_Handler                /* NMI */
-    X(unsupported), //3 .word   HardFault_Handler          /* Hard Fault */
+    X(HardFault), //3 .word   HardFault_Handler          /* Hard Fault */
     X(unsupported), //4 .word   0
     X(unsupported), //5 .word   Ecall_M_Mode_Handler       /* Ecall M Mode */
     X(unsupported), //6 .word   0
@@ -257,7 +265,22 @@ void _enableDisable(bool enableDisable, const LnIRQ &irq)
     }
     // fence ?
 }
-
+// API used by the freeRTOS port
+extern "C"
+{
+void NVIC_SetPendingIRQ(IRQn_Type IRQn)
+{
+  pfic->IPSR[((uint32_t)(IRQn) >> 5)] = (1 << ((uint32_t)(IRQn) & 0x1F));
+}
+void NVIC_EnableIRQ(IRQn_Type IRQn)
+{
+  pfic->IENR[((uint32_t)(IRQn) >> 5)] = (1 << ((uint32_t)(IRQn) & 0x1F));
+}
+void NVIC_SetPriority(IRQn_Type IRQn, uint8_t priority)
+{
+  pfic->IPRIOIR[(uint32_t)(IRQn)] = priority;
+}
+}
 /**
  * 
  * @param per
