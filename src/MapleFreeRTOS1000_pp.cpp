@@ -14,10 +14,13 @@
 extern "C"
 {
 extern void deadEnd(int code);
-void do_assert(const char *a)
+void __attribute__((noinline))  __attribute__((noreturn))  do_assert(const char *a)
 {
     deadEnd(0xA000);
-
+    while(1)
+        {
+            asm("nop");
+        }
 }
 #define xAssert(a) if(!(a)) {do_assert(#a);}
 /**
