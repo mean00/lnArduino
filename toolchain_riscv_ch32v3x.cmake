@@ -82,21 +82,23 @@ IF(NOT DEFINED LN_EXT)
         SET(LN_SPEC "nano" CACHE INTERNAL "" FORCE)
     ENDIF(LN_SPEC)
     SET(GD32_SPECS  "--specs=${LN_SPEC}.specs" CACHE INTERNAL "" FORCE)
+    MESSAGE(STATUS "CH32V3x C++ specs   ${LN_SPEC} (${GD32_SPECS})")
     #
     #SET(MCPU " -march=rv32imac -mabi=ilp32 -msmall-data-limit=8 -msave-restore " CACHE INTERNAL "" FORCE)
+    SET(GD32_DEBUG_FLAGS "-g3 ${LN_LTO}  -O1 " CACHE INTERNAL "")
     
     #
-    SET(GD32_SPECS_C_FLAGS  "${GD32_SPECS_SPECS}  ${MCPU} ${PLATFORM_C_FLAGS} -DLN_MCU=LN_MCU_CH32V3x -DLN_ARCH=LN_ARCH_RISCV -Werror=return-type  -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -fno-common ${GD32_BOARD_FLAG} -I${AF_FOLDER}/riscv_ch32v3x/" CACHE INTERNAL "")
+    SET(GD32_SPECS_C_FLAGS  "${GD32_SPECS}  ${MCPU} ${GD32_DEBUG_FLAGS} ${PLATFORM_C_FLAGS} -DLN_MCU=LN_MCU_CH32V3x -DLN_ARCH=LN_ARCH_RISCV -Werror=return-type  -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -fno-common ${GD32_BOARD_FLAG} -I${AF_FOLDER}/riscv_ch32v3x/" CACHE INTERNAL "")
     SET(CMAKE_C_FLAGS "${GD32_SPECS_C_FLAGS}" CACHE INTERNAL "")
     SET(CMAKE_AS_FLAGS "${PLATFORM_C_FLAGS} ${CMAKE_AS_FLAGS}" CACHE INTERNAL "")
     SET(CMAKE_ASM_FLAGS "${PLATFORM_C_FLAGS} ${CMAKE_ASM_FLAGS}" CACHE INTERNAL "")
     SET(CMAKE_CXX_FLAGS "${GD32_SPECS_C_FLAGS}  -fno-rtti -fno-exceptions -fno-threadsafe-statics" CACHE INTERNAL "") 
     #
-    SET(GD32_SPECS_LD_FLAGS "-nostdlib ${GD32_SPECS_SPECS}  -Wl,--traditional-format -Wl,--warn-common" CACHE INTERNAL "")
+    SET(GD32_SPECS_LD_FLAGS "-nostdlib ${GD32_SPECS}  -Wl,--traditional-format -Wl,--warn-common" CACHE INTERNAL "")
     SET(GD32_SPECS_LD_LIBS "-lm -lc -lgcc")
     SET(GD32_LD_FLAGS ${PLATFORM_C_FLAGS} CACHE INTERNAL "")
     #
-    set(CMAKE_CXX_LINK_EXECUTABLE    "<CMAKE_CXX_COMPILER>   <CMAKE_CXX_LINK_FLAGS>  <LINK_FLAGS> -lgcc -Xlinker -print-memory-usage   -Wl,--start-group  <OBJECTS> <LINK_LIBRARIES> -Wl,--end-group  -Wl,-Map,<TARGET>.map   -o <TARGET> ${GD32_LD_FLAGS} ${GD32_LD_LIBS}"  CACHE INTERNAL "")
+    set(CMAKE_CXX_LINK_EXECUTABLE    "<CMAKE_CXX_COMPILER>   <CMAKE_CXX_LINK_FLAGS>  <LINK_FLAGS> -lgcc -Xlinker -print-memory-usage   -Wl,--start-group  <OBJECTS> <LINK_LIBRARIES> -Wl,--end-group  -Wl,-Map,<TARGET>.map   -o <TARGET> ${GD32_SPECS_LD_FLAGS} ${GD32_LD_FLAGS} ${GD32_LD_LIBS} ${GD32_DEBUG_FLAGS}"  CACHE INTERNAL "")
     SET(CMAKE_EXECUTABLE_SUFFIX_C .elf CACHE INTERNAL "")
     SET(CMAKE_EXECUTABLE_SUFFIX_CXX .elf CACHE INTERNAL "")
 
@@ -104,7 +106,6 @@ IF(NOT DEFINED LN_EXT)
 
     # Sees optimizaton >=2 are causing issues (???)
 
-    ADD_DEFINITIONS("-g3  -Os ")
     #ADD_DEFINITIONS("-O0 ")
 
 
