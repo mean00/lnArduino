@@ -113,7 +113,7 @@ at the top of this file. */
 .extern xISRStackTop
 /*-----------------------------------------------------------*/
 .align 8
-.func
+
 SW_Handler:
 	addi sp, sp, -portCONTEXT_SIZE
 	store_x x1, 1 * portWORD_SIZE( sp )
@@ -207,11 +207,11 @@ processed_source:
 	addi sp, sp, portCONTEXT_SIZE
 
 	mret
-	.endfunc
+	
 /*-----------------------------------------------------------*/
 
 .align 8
-.func
+
 xPortStartFirstTask:
 
 /* if it is an assembly entry code, the SP offset value is determined by the assembly code,
@@ -266,7 +266,7 @@ beginning of the interrupt function */
 
 	addi	sp, sp, portCONTEXT_SIZE
 	ret
-	.endfunc
+	
 /*-----------------------------------------------------------*/
 
 /*
@@ -332,7 +332,7 @@ beginning of the interrupt function */
  * pxCode
  */
 .align 8
-.func
+
 pxPortInitialiseStack:
 
 	csrr t0, mstatus					/* Obtain current mstatus value. */
@@ -358,6 +358,6 @@ chip_specific_stack_frame:				/* First add any chip specific registers to the st
 	addi a0, a0, -portWORD_SIZE
 	store_x a1, 0(a0)					/* mret value (pxCode parameter) onto the stack. */
 	ret
-	.endfunc
+	
 
 
