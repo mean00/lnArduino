@@ -3,7 +3,7 @@ MESSAGE(STATUS "Setting up CH32V3x riscv cmake environment")
 IF(NOT DEFINED LN_EXT)
     SET(LN_EXT riscv_ch32v3x            CACHE INTERNAL "")
     include(${CMAKE_CURRENT_LIST_DIR}/../platformConfig.cmake)
-    SET(LN_TOOLCHAIN_EXT  riscv_ch32v3x CACHE INTERNAL "")
+    SET(LN_TOOLCHAIN_EXT  riscv_ch32v3x_clang CACHE INTERNAL "")
 
     IF(NOT PLATFORM_TOOLCHAIN_PATH)
         MESSAGE(FATAL_ERROR "PLATFORM_TOOLCHAIN_PATH is not defined in platformConfig.cmake !!")
@@ -88,20 +88,20 @@ IF(NOT DEFINED LN_EXT)
     ENDIF(LN_SPEC)
     SET(GD32_SPECS  "--specs=${LN_SPEC}.specs"      CACHE INTERNAL "" FORCE)
     #   
-    
+    SET(GD32_DEBUG_FLAGS "-g3 ${LN_LTO} -Oz" CACHE INTERNAL "") 
     #
-    SET(GD32_SPECS_C_FLAGS  "${GD32_SPECS_SPECS} --sysroot ${PLATFORM_CLANG_SYSROOT}  ${MCPU} ${PLATFORM_C_FLAGS} -DLN_MCU=LN_MCU_CH32V3x -DLN_ARCH=LN_ARCH_RISCV -Werror=return-type  -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -fno-common ${GD32_BOARD_FLAG} -I${AF_FOLDER}/riscv_ch32v3x/" CACHE INTERNAL "")
+    SET(GD32_SPECS_C_FLAGS  "${GD32_SPECS_SPECS} ${GD32_DEBUG_FLAGS} --sysroot ${PLATFORM_CLANG_SYSROOT}  ${MCPU} ${PLATFORM_C_FLAGS} -DLN_MCU=LN_MCU_CH32V3x -DLN_ARCH=LN_ARCH_RISCV -Werror=return-type  -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -fno-common ${GD32_BOARD_FLAG} -I${AF_FOLDER}/riscv_ch32v3x/" CACHE INTERNAL "")
     SET(CMAKE_C_FLAGS "${GD32_SPECS_C_FLAGS}"                                                       CACHE INTERNAL "")
     SET(CMAKE_ASM_FLAGS "${GD32_SPECS_C_FLAGS}"                                                       CACHE INTERNAL "")
     SET(CMAKE_CXX_FLAGS "${GD32_SPECS_C_FLAGS}  -fno-rtti -fno-exceptions -fno-threadsafe-statics"  CACHE INTERNAL "") 
     #
-    SET(CLANG_LINKER_OPT "-L${PLATFORM_CLANG_PATH}/../lib/gcc/riscv64-unknown-elf/12.2.0/ -L${PLATFORM_CLANG_SYSROOT}/lib/rv32imac/ilp32 "                          CACHE INTERNAL "")  
+    SET(CLANG_LINKER_OPT "")
     #
-    SET(GD32_SPECS_LD_FLAGS "-nostdlib ${GD32_SPECS_SPECS}  -Wl,--traditional-format -Wl,--warn-common" CACHE INTERNAL "")
-    SET(GD32_SPECS_LD_LIBS "-lm  -lc ${CLANG_LINKER_OPT}"                                               CACHE INTERNAL "")
+    SET(GD32_SPECS_LD_FLAGS "-fuse-ld=lld  -nostdlib ${GD32_SPECS_SPECS}   -Wl,--warn-common" CACHE INTERNAL "")
+    SET(GD32_SPECS_LD_LIBS "-lm  -lc ${CLANG_LINKER_OPT} -L${PLATFORM_CLANG_PATH}/../lib/clang-runtimes/riscv32-none-eabi/riscv32/lib/"                                               CACHE INTERNAL "")
     
     #
-    set(CMAKE_CXX_LINK_EXECUTABLE    "<CMAKE_CXX_COMPILER>   <CMAKE_CXX_LINK_FLAGS>  ${PLATFORM_C_FLAGS} <LINK_FLAGS>   -Wl,--start-group  <OBJECTS> <LINK_LIBRARIES> -Wl,--end-group  -Wl,-Map,<TARGET>.map   -o <TARGET> ${GD32_LD_FLAGS} ${GD32_LD_LIBS} ${GD32_SPECS_LD_LIBS}"  CACHE INTERNAL "")
+    set(CMAKE_CXX_LINK_EXECUTABLE    "<CMAKE_CXX_COMPILER>   <CMAKE_CXX_LINK_FLAGS>  ${PLATFORM_C_FLAGS} <LINK_FLAGS>   -Wl,--start-group  <OBJECTS> <LINK_LIBRARIES> -Wl,--end-group  -Wl,-Map,<TARGET>.map   -o <TARGET> ${GD32_LD_FLAGS} ${GD32_LD_LIBS} ${GD32_SPECS_LD_LIBS} ${GD32_SPECS_LD_FLAGS}   -lclang_rt.builtins ${LN_LTO}"  CACHE INTERNAL "")
     SET(CMAKE_EXECUTABLE_SUFFIX_C .elf                                                                  CACHE INTERNAL "")
     SET(CMAKE_EXECUTABLE_SUFFIX_CXX .elf                                                                CACHE INTERNAL "")
 
@@ -109,7 +109,6 @@ IF(NOT DEFINED LN_EXT)
 
     # Sees optimizaton >=2 are causing issues (???)
 
-    ADD_DEFINITIONS("-g3  -Os ")
     #ADD_DEFINITIONS("-O0 ")
 
 
