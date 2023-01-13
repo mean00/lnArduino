@@ -25,3 +25,4 @@ rust/rnarduino/target
 rust/rnArduino/target
 *.tmp
 *.orig
+*attic*
