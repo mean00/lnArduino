@@ -226,16 +226,11 @@ void lnIrqSysInit()
                     /* Enable floating point and interrupt */
                     "li t0, 0x7800\n"
                     "csrs mstatus, t0\n"
-                    /* Relocate vector table */
-                    "la t0, vec\n"
-                    "lw t0, 0(t0)\n"
+                    /* Relocate vector table */                    
+                    "mv t0, %0 \n"
                     "ori t0, t0, 3\n" //        <= [1] [0] 1: Absolute address 0: vectored    
-	                "csrw mtvec, t0 \n" //
-                    
-                    "ret \n" //
-                    ".align 4\n"
-                    "vec : .dword %0"
-                  :: "i"(vecTable)
+	                "csrw mtvec, t0 \n" //                    
+                  :: "r"(vecTable)
                 );
     return;
 }
