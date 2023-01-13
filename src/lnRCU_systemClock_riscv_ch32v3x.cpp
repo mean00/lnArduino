@@ -210,13 +210,20 @@ void lnInitSystemClock()
 
     // it it is a STM32 chip, increase flash wait state
     // GD has ram, so  0 wait state is fine
-    if(lnCpuID::vendor()!=lnCpuID::LN_MCU_GD32)
+    switch(lnCpuID::vendor())
     {
-        int ws=0;
-        if(CLOCK_TARGET_SYSCLOCK>48) ws=2;
-        else if(CLOCK_TARGET_SYSCLOCK>24) ws=1;
+        case lnCpuID::LN_MCU_STM32:  
+         {
+            int ws=0;
+            if(CLOCK_TARGET_SYSCLOCK>48) ws=2;
+            else if(CLOCK_TARGET_SYSCLOCK>24) ws=1;
 
-        *(uint32_t *)0x40022000=0x30+ws; // enable prefetch
+            *(uint32_t *)0x40022000=0x30+ws; // enable prefetch
+            }
+            break;   
+        default:            
+        case lnCpuID::LN_MCU_CH32:        
+        case lnCpuID::LN_MCU_GD32:           
     }
 
     // now switch system clock to pll
