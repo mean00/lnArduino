@@ -217,6 +217,25 @@ static const uint32_t vecTable[]  __attribute__((aligned(32)))=
     X(unsupported), //.word   DMA2_Channel11_IRQHandler  /* DMA2 Channel 11 */
  
 };
+
+// API used by the freeRTOS port
+extern "C"
+{
+void NVIC_trigger_sw_irq()
+{
+  const uint32_t sw_irq=14;
+  pfic->IPSR[sw_irq >> 5] = 1 << (sw_irq & 0x1F);
+}
+void NVIC_EnableIRQ(IRQn_Type IRQn)
+{
+  pfic->IENR[((uint32_t)(IRQn) >> 5)] = (1 << ((uint32_t)(IRQn) & 0x1F));
+}
+void NVIC_SetPriority(IRQn_Type IRQn, uint8_t priority)
+{
+  pfic->IPRIOIR[(uint32_t)(IRQn)] = priority;
+}
+}
+
 /**
 
 */
@@ -246,6 +265,10 @@ void lnIrqSysInit()
                   :: "r"(vecTable)
                 );
     PromoteIrqToFast(LN_IRQ_SYSTICK, 1);
+    
+    NVIC_SetPriority(Software_IRQn,0xf0);    
+    NVIC_SetPriority(SysTicK_IRQn,0xf0);
+
     return;
 }
 /**
@@ -298,22 +321,7 @@ void _enableDisable(bool enableDisable, const LnIRQ &irq)
 }
 /**
 */
-// API used by the freeRTOS port
-extern "C"
-{
-void NVIC_SetPendingIRQ(IRQn_Type IRQn)
-{
-  pfic->IPSR[((uint32_t)(IRQn) >> 5)] = (1 << ((uint32_t)(IRQn) & 0x1F));
-}
-void NVIC_EnableIRQ(IRQn_Type IRQn)
-{
-  pfic->IENR[((uint32_t)(IRQn) >> 5)] = (1 << ((uint32_t)(IRQn) & 0x1F));
-}
-void NVIC_SetPriority(IRQn_Type IRQn, uint8_t priority)
-{
-  pfic->IPRIOIR[(uint32_t)(IRQn)] = priority;
-}
-}
+
 
 /**
 
@@ -327,11 +335,9 @@ void PromoteIrqToFast(const LnIRQ &irq, int no)
      no--; // between 0 and 3 now
      int irq_num = lookupIrq(irq);
      uint32_t adr=vecTable[irq_num];
-
      fastInterrupt[no]=irq;
      pfic->VTFIDR[no]=irq_num;
      pfic->VTFADDR[no]=adr; // disabled by default, bit0 =0
-     
 }
 
 

@@ -42,9 +42,7 @@ typedef struct
 }SysTick_Type;
 #define SysTick         ((SysTick_Type *) 0xE000F000)
 
-extern void NVIC_SetPendingIRQ(IRQn_Type);
 extern void NVIC_EnableIRQ(IRQn_Type IRQn);
-extern void NVIC_SetPriority(IRQn_Type IRQn, uint8_t priority);
 
 #ifdef __cplusplus
 }

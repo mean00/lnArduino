@@ -98,7 +98,8 @@ not need to be guarded with a critical section. */
 
 /* Scheduler utilities. */
 extern void vTaskSwitchContext( void );
-#define portYIELD()   NVIC_SetPendingIRQ(Software_IRQn)
+extern void NVIC_trigger_sw_irq();
+#define portYIELD()   NVIC_trigger_sw_irq();
 #define portEND_SWITCHING_ISR( xSwitchRequired ) do { if( xSwitchRequired ) portYIELD(); } while( 0 )
 #define portYIELD_FROM_ISR( x ) portEND_SWITCHING_ISR( x )
 /*-----------------------------------------------------------*/

@@ -152,11 +152,6 @@ task stack, not the ISR stack). */
 /* just for wch's systick,don't have mtime */
 void vPortSetupTimerInterrupt( void )
 {
-    /* set software is lowest priority */
-    NVIC_SetPriority(Software_IRQn,0xf0);
-    /* set systick is lowest priority */
-    NVIC_SetPriority(SysTicK_IRQn,0xf0);
-
     SysTick->CTLR= 0;
     SysTick->SR  = 0;
     SysTick->CNT = 0;
@@ -198,24 +193,11 @@ extern void xPortStartFirstTask( void );
 	configure whichever clock is to be used to generate the tick interrupt. */
 	vPortSetupTimerInterrupt();
 
-	#if( ( configMTIME_BASE_ADDRESS != 0 ) && ( configMTIMECMP_BASE_ADDRESS != 0 ) )
-	{
-		/* Enable mtime and external interrupts.  1<<7 for timer interrupt, 1<<11
-		for external interrupt.  _RB_ What happens here when mtime is not present as
-		with pulpino? */
-	    NVIC_EnableIRQ(SysTicK_IRQn);
-	    NVIC_EnableIRQ(Software_IRQn);
-	}
-	#else
-	{
-		/* Enable external interrupts,global interrupt is enabled at first task start. */
-	    NVIC_EnableIRQ(SysTicK_IRQn);
-	    NVIC_EnableIRQ(Software_IRQn);
-	}
-	#endif /* ( configMTIME_BASE_ADDRESS != 0 ) && ( configMTIMECMP_BASE_ADDRESS != 0 ) */
+	NVIC_EnableIRQ(SysTicK_IRQn);
+	NVIC_EnableIRQ(Software_IRQn);
 
     /* Initialise the critical nesting count ready for the first task. */
-    uxCriticalNesting = 0;
+	uxCriticalNesting = 0;
 	xPortStartFirstTask();
 
 	/* Should not get here as after calling xPortStartFirstTask() only tasks
