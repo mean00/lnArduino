@@ -10,7 +10,7 @@
 /**
  * 
  */
-
+void PromoteIrqToFast(const LnIRQ &irq, int no);
 struct CH32V3_INTERRUPTx
 {
     uint32_t ISR[4];                // 0x00 Interrupt Enable Status Register
@@ -245,6 +245,7 @@ void lnIrqSysInit()
 	                "csrw mtvec, t0 \n" //                    
                   :: "r"(vecTable)
                 );
+    PromoteIrqToFast(LN_IRQ_SYSTICK, 1);
     return;
 }
 /**
@@ -313,6 +314,27 @@ void NVIC_SetPriority(IRQn_Type IRQn, uint8_t priority)
   pfic->IPRIOIR[(uint32_t)(IRQn)] = priority;
 }
 }
+
+/**
+
+*/
+void PromoteIrqToFast(const LnIRQ &irq, int no)
+{
+    if(no<1 || no > 4)
+    {
+        xAssert(0);
+    }
+     no--; // between 0 and 3 now
+     int irq_num = lookupIrq(irq);
+     uint32_t adr=vecTable[irq_num];
+
+     fastInterrupt[no]=irq;
+     pfic->VTFIDR[no]=irq_num;
+     pfic->VTFADDR[no]=adr; // disabled by default, bit0 =0
+     
+}
+
+
 /**
  * 
  * @param per
