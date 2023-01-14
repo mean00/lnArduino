@@ -106,6 +106,9 @@ void DMA1_Channel7_IRQHandler() LN_INTERRUPT_TYPE;
 I2C_IRQ(0)
 I2C_IRQ(1)
 
+#define FAST_UNUSED   0xFF00
+uint16_t fastInterrupt[4]={FAST_UNUSED, FAST_UNUSED, FAST_UNUSED, FAST_UNUSED};
+
 static const uint32_t vecTable[]  __attribute__((aligned(32)))=
 {
     X(unsupported),  //0 .word   RESET
@@ -214,9 +217,19 @@ static const uint32_t vecTable[]  __attribute__((aligned(32)))=
     X(unsupported), //.word   DMA2_Channel11_IRQHandler  /* DMA2 Channel 11 */
  
 };
+/**
 
+*/
 void lnIrqSysInit()
 {
+   // Disable fast
+    for(int i=0;i<4;i++)
+    {
+        pfic->VTFIDR[i]=0;
+        pfic->VTFADDR[i]=0;
+        fastInterrupt[i]=FAST_UNUSED;
+    }
+
     // relocate vector table
 
  	asm volatile(   
@@ -243,13 +256,26 @@ bool xPortIsInsideInterrupt()
     return (gisr>>8) & 1; // under interrupt
 }
 
+
+
 /**
-
-
 */
-void _enableDisable(bool enableDisable, const LnIRQ &irq)
+static int lookupIrq(int irq)
 {
-    int irq_num = _irqs[irq].irqNb;
+    if(_irqs[irq].interrpt==irq) return _irqs[irq].irqNb;
+    // deep search
+    int n=sizeof(_irqs)/sizeof(_irqDesc);
+    for(int i=0;i<n;i++)
+    {
+          if(_irqs[i].interrpt==irq) return _irqs[i].irqNb;
+    }
+    xAssert(0);
+    return 0;
+}
+/**
+*/
+void _enableDisable_direct(bool enableDisable, const int &irq_num)
+{    
     if(enableDisable)
     {
         pfic->IENR[irq_num >> 5] = 1<< (irq_num & 0x1f); // 32 bits per register
@@ -260,6 +286,17 @@ void _enableDisable(bool enableDisable, const LnIRQ &irq)
     }
     // fence ?
 }
+/**
+
+
+*/
+void _enableDisable(bool enableDisable, const LnIRQ &irq)
+{
+    int irq_num = lookupIrq(irq); //_irqs[irq].irqNb;
+    _enableDisable_direct(enableDisable,irq_num);
+}
+/**
+*/
 // API used by the freeRTOS port
 extern "C"
 {
@@ -286,7 +323,7 @@ void lnEnableInterrupt(const LnIRQ &irq)
 }
 void lnIrqSetPriority(const LnIRQ &irq, int prio )
 {    
-    int irq_num = _irqs[irq].irqNb;
+    int irq_num = lookupIrq(irq); //_irqs[irq].irqNb;
     int s=(irq_num & 3)*8;
     int r=irq_num >> 4;
     uint32_t b = pfic->IPRIOIR[r];
