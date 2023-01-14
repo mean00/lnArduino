@@ -223,7 +223,8 @@ void lnInitSystemClock()
             break;   
         default:            
         case lnCpuID::LN_MCU_CH32:        
-        case lnCpuID::LN_MCU_GD32:           
+        case lnCpuID::LN_MCU_GD32:
+            break;
     }
 
     // now switch system clock to pll
