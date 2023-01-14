@@ -9,14 +9,14 @@
 *******************************************************************************/
 
 	.section	.init,"ax",@progbits
-	.global	_start2    
+	.global	_start	    
 	.align	1
-_start2:
+_start:
 	j	handle_reset
     .align  1
 _vector_base:
     .option norvc;
-    .word   _start2
+    .word   _start
    
 
 	.section	.text.handle_reset,"ax",@progbits	
