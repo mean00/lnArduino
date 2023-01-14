@@ -1,9 +1,9 @@
 SET(FOS ${ARDUINO_GD32_FREERTOS}/FreeRTOS)
 include( ${ARDUINO_GD32_FREERTOS}/freeRTOS_port_${LN_EXT}.cmake)
 
-FOREACH(common croutine.c  event_groups.c  list.c  queue.c  stream_buffer.c  tasks.c  timers.c)
+FOREACH(common   event_groups.c  list.c  queue.c  stream_buffer.c  tasks.c  timers.c)
     LIST(APPEND CMN ${FOS}/${common})
-ENDFOREACH(common croutine.c  event_groups.c  list.c  queue.c  stream_buffer.c  tasks.c  timers.c)
+ENDFOREACH(common   event_groups.c  list.c  queue.c  stream_buffer.c  tasks.c  timers.c)
 
 ADD_DEFINITIONS("-DLN_FREERTOS_HEAP_SIZE=(${LN_MCU_RAM_SIZE}-${LN_MCU_STATIC_RAM}-1)")
 
