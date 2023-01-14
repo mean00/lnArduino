@@ -90,7 +90,8 @@ static const _irqDesc _irqs[]=
     {LN_IRQ_DMA1_Channel9       , XXX(86)},     /*!< DMA1 channel3 global interrupt                           */
     {LN_IRQ_DMA1_Channel10      , XXX(87)},     /*!< DMA1 channel3 global interrupt                           */
     {LN_IRQ_DMA1_Channel11      , XXX(88)},     /*!< DMA1 channel3 global interrupt                           */
-    
+    {LN_IRQ_SYSTICK             , 12},          /*!< Direct PFIC systick interrupt                           */
+    {LN_IRQ_SW                  , 14},          /*!< Direct PFIC SW interrupt                           */
 };
 
 extern "C" void lnWriteMthDirect(int val);
