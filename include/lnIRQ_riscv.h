@@ -101,11 +101,13 @@ LN_IRQ_USBFS               ,     /*!< USBFS global interrupt                    
 #if LN_MCU == LN_MCU_CH32V3x
     extern bool xPortIsInsideInterrupt();
     #define underInterrupt xPortIsInsideInterrupt()
+    #define LN_SYSTEM_LED PA15
 #else // GD32
     extern uint32_t underInterrupt;
     void lnSetInterruptLevelDirect(int intr, int prio, bool vectored);
+    #define LN_SYSTEM_LED PC13
 #endif
 
 
 
-#define LN_SYSTEM_LED PA2
+
