@@ -264,7 +264,7 @@ void lnIrqSysInit()
 	                "csrw mtvec, t0 \n" //                    
                   :: "r"(vecTable)
                 );
-    PromoteIrqToFast(LN_IRQ_SYSTICK, 1);
+    //PromoteIrqToFast(LN_IRQ_SYSTICK, 1);
     
     NVIC_SetPriority(Software_IRQn,0xf0);    
     NVIC_SetPriority(SysTicK_IRQn,0xf0);

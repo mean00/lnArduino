@@ -20,7 +20,7 @@
  * where the heap should live).
  */
 MEMORY
-{
+{ 
   ram (rwx) :       ORIGIN = 0x20000000, LENGTH = @LN_MCU_RAM_SIZE@K
   bootloader (rx):  ORIGIN = 0x00000000, LENGTH = @LN_BOOTLOADER_SIZE@K
   rom (rx)  :       ORIGIN = 0x00000000+@LN_BOOTLOADER_SIZE@K, LENGTH = @LN_MCU_FLASH_SIZE@K-@LN_MCU_EEPROM_SIZE@K-@LN_BOOTLOADER_SIZE@K
@@ -129,54 +129,41 @@ SECTIONS
         KEEP (*(SORT(.dtors.*)))
         KEEP (*crtend.o(.dtors))
       } > REGION_TEXT
-
-	.copy_data_flash  :
-	{
-		. = ALIGN(4);
-		PROVIDE( _data_lma = .); /* mark copy section start in flash */
-	} > rom AT> rom
-
-	.copy_data_ram   :
-	{
-		. = ALIGN(4);
-		PROVIDE( _data= .); /* mark copy section start in ram */
-	} > ram AT> rom
-
-
-    /*
-     * Ro image to be copied from flash to ram
-     */
-        .data :
-          {
-      	    LONG(0)
-            . = ALIGN(8);
-
-            *(.rdata)
-   	    *(.data .data.*)
-    	    . = ALIGN(8);
-    	    PROVIDE( __global_pointer$ = . + 0x800); 
-    	    *(.sdata .sdata.*)
+      .rodata_section : 
+      {
     	    . = ALIGN(8);
     	    *(.srodata.cst16)
     	    *(.srodata.cst8)
     	    *(.srodata.cst4)
     	    *(.srodata.cst2)
     	    *(.srodata .srodata.*)
-            *(.got.plt) *(.got)
+      } > REGION_TEXT
+ 
+      .copy_data_flash  :
+      {
+            . = ALIGN(4);
+            PROVIDE( _data_lma = .); /* mark copy section start in flash */
+      } > rom 
+    /*
+     * Ro image to be copied from flash to ram
+     */
+        .data :
+          {
+            . = ALIGN(4);
+            PROVIDE( _data= .); /* mark copy section start in ram */            
+      	    LONG(0)
             . = ALIGN(8);
+            *(.rdata)
+   	    *(.data .data.*)
+    	    . = ALIGN(8);
+    	    PROVIDE( __global_pointer$ = . + 0x800); 
+    	    *(.sdata .sdata.*)
+           *(.got.plt) *(.got)
+            . = ALIGN(8);
+              __data_end__ = .;
+            PROVIDE( _edata= .); /* mark copy section start in ram */
+            PROVIDE( edata= .); /* mark copy section start in ram */
           } > REGION_DATA AT> REGION_RODATA
-
-	.end_copy_ram   :
-	{
-		. = ALIGN(4);
-                __data_end__ = .;
-		PROVIDE( _edata= .); /* mark copy section start in ram */
-		PROVIDE( edata= .); /* mark copy section start in ram */
-	} > ram AT> ram
-
-
-	
-
     	/*
     .eeprom eeprom_begin :
       {
@@ -236,6 +223,5 @@ SECTIONS
     .debug_funcnames 0 (NOLOAD) : { *(.debug_funcnames) }
     .debug_typenames 0 (NOLOAD) : { *(.debug_typenames) }
     .debug_varnames  0 (NOLOAD) : { *(.debug_varnames) }
-
 }
 
