@@ -254,13 +254,6 @@ void lnIrqSysInit()
         pfic->IPRIOIR[i]=prio32;
     }
 
-#define CH32_SYSCR_HWSTKEN          (1<<0) // Hardware stack enabled
-#define CH32_SYSCR_INESTEN          (1<<1) // Interrupt nesting enabled
-#define CH32_SYSCR_MPTCFG_2NESTED   (1<<2) // 
-#define CH32_SYSCR_MPTCFG_8NESTED   (3<<2) // 
-#define CH32_SYSCR_HWSTKOVEN        (1<<4) // Continue after hw stack overflow
-#define CH32_SYSCR_GIHWSTKNEN       (1<<5) // Temporarily disable interrupts & hw stack
-
     // allow fast path for these 2 interrupts
     PromoteIrqToFast(LN_IRQ_SYSTICK, 1);
     PromoteIrqToFast(LN_IRQ_SW, 2);
