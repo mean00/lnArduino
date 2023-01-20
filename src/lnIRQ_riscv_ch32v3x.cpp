@@ -1,6 +1,9 @@
 /*
  *  (C) 2022/2023 MEAN00 fixounet@free.fr
  *  See license file
+ *  PFIC is configured with 2 nested level, 1 bit for preemption
+ *  That means interrupt priority between 0..7 ignoring preemption
+ *
  */
 
 #include "lnArduino.h"
@@ -41,7 +44,7 @@ struct CH32V3_INTERRUPTx
 typedef volatile CH32V3_INTERRUPTx CH32V3_INTERRUPT;
 
 CH32V3_INTERRUPT *pfic = (CH32V3_INTERRUPT *)LN_PFIC_ADR;
-
+void _enableDisable_direct(bool enableDisable, const int &irq_num);
 
 // Attribute [LEVEL1:LEVEL0][SHV] : 
 //      LEVEL: 
@@ -228,14 +231,9 @@ void NVIC_trigger_sw_irq()
 }
 void NVIC_EnableIRQ(IRQn_Type IRQn)
 {
-  pfic->IENR[((uint32_t)(IRQn) >> 5)] = (1 << ((uint32_t)(IRQn) & 0x1F));
-}
-void NVIC_SetPriority(IRQn_Type IRQn, uint8_t priority)
-{
-  pfic->IPRIOIR[(uint32_t)(IRQn)] = priority;
+    _enableDisable_direct(true, IRQn);    
 }
 }
-
 /**
 
 */
@@ -248,27 +246,42 @@ void lnIrqSysInit()
         pfic->VTFADDR[i]=0;
         fastInterrupt[i]=FAST_UNUSED;
     }
+    // Set all priorities to DEFAULT_PRIO (assuming 2 nested levels)
+    #define DEFAULT_PRIO 5
+    uint32_t prio32 = (DEFAULT_PRIO<<4) | (DEFAULT_PRIO<<(4+8)) | (DEFAULT_PRIO<<(4+16)) | (DEFAULT_PRIO<<(4+24));
+    for(int i=0;i<64;i++)
+    {
+        pfic->IPRIOIR[i]=prio32;
+    }
+
+#define CH32_SYSCR_HWSTKEN          (1<<0) // Hardware stack enabled
+#define CH32_SYSCR_INESTEN          (1<<1) // Interrupt nesting enabled
+#define CH32_SYSCR_MPTCFG_2NESTED   (1<<2) // 
+#define CH32_SYSCR_MPTCFG_8NESTED   (3<<2) // 
+#define CH32_SYSCR_HWSTKOVEN        (1<<4) // Continue after hw stack overflow
+#define CH32_SYSCR_GIHWSTKNEN       (1<<5) // Temporarily disable interrupts & hw stack
+
+    // allow fast path for these 2 interrupts
+    PromoteIrqToFast(LN_IRQ_SYSTICK, 1);
+    PromoteIrqToFast(LN_IRQ_SW, 2);
+    // Set these two to higher number = lower priority
+    lnIrqSetPriority(LN_IRQ_SYSTICK,6);
+    lnIrqSetPriority(LN_IRQ_SW,7);    
 
     // relocate vector table
-
- 	asm volatile(   
-                    /* Enable nested and hardware stack */
-                    "li t0, 0x1f\n"
-                    "csrw 0x804, t0\n" // INTSYSCR
-                    /* Enable floating point and interrupt */
+    // Initialise WCH enhance interrutp controller, 
+    uint32_t syscr=(0*CH32_SYSCR_HWSTKEN) | CH32_SYSCR_INESTEN | CH32_SYSCR_MPTCFG_2NESTED | CH32_SYSCR_HWSTKOVEN  ;
+ 	asm volatile(                       
+                    "mv t0, %1\n"
+                    "csrw 0x804, t0\n"   // INTSYSCR                    
                     "li t0, 0x7800\n"
-                    "csrs mstatus, t0\n"
-                    /* Relocate vector table */                    
+                    "csrs mstatus, t0\n" // Enable floating point and interrupt 
                     "mv t0, %0 \n"
-                    "ori t0, t0, 3\n" //        <= [1] [0] 1: Absolute address 0: vectored    
-	                "csrw mtvec, t0 \n" //                    
-                  :: "r"(vecTable)
+                    "ori t0, t0, 3\n"    //      Use vectored mode + relocate vector table
+                    "csrw mtvec, t0 \n"  //                    
+                  :: "r"(vecTable),"r"(syscr)
                 );
-    //PromoteIrqToFast(LN_IRQ_SYSTICK, 1);
-    
-    NVIC_SetPriority(Software_IRQn,0xf0);    
-    NVIC_SetPriority(SysTicK_IRQn,0xf0);
-
+   
     return;
 }
 /**
@@ -279,8 +292,6 @@ bool xPortIsInsideInterrupt()
     uint32_t gisr = pfic -> GISR;    
     return (gisr>>8) & 1; // under interrupt
 }
-
-
 
 /**
 */
@@ -332,12 +343,12 @@ void PromoteIrqToFast(const LnIRQ &irq, int no)
     {
         xAssert(0);
     }
-     no--; // between 0 and 3 now
-     int irq_num = lookupIrq(irq);
-     uint32_t adr=vecTable[irq_num];
-     fastInterrupt[no]=irq;
-     pfic->VTFIDR[no]=irq_num;
-     pfic->VTFADDR[no]=adr; // disabled by default, bit0 =0
+    no--; // between 0 and 3 now
+    int irq_num = lookupIrq(irq);
+    uint32_t adr=vecTable[irq_num];
+    fastInterrupt[no]=irq;
+    pfic->VTFIDR[no]=irq_num;
+    pfic->VTFADDR[no]=adr | 1; // fast path enabled by default, bit0
 }
 
 
@@ -349,15 +360,27 @@ void lnEnableInterrupt(const LnIRQ &irq)
 {   
     _enableDisable(true,irq);   
 }
-void lnIrqSetPriority(const LnIRQ &irq, int prio )
-{    
-    int irq_num = lookupIrq(irq); //_irqs[irq].irqNb;
+
+
+/**
+    Set priority between 0 and 15
+*/
+void lnIrqSetPriority_direct(const int &irq_num, int prio )
+{
     int s=(irq_num & 3)*8;
-    int r=irq_num >> 4;
+    int r=irq_num >> 2;
     uint32_t b = pfic->IPRIOIR[r];
     b&=~(0xff<<s);
     b|=(prio<<4) << s;
     pfic->IPRIOIR[r]=b;
+}
+/**
+
+*/
+void lnIrqSetPriority(const LnIRQ &irq, int prio )
+{    
+    int irq_num = lookupIrq(irq); //_irqs[irq].irqNb;
+    lnIrqSetPriority_direct(irq_num,prio);
 }
 /**
  * 
