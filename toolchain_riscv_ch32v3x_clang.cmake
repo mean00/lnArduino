@@ -99,6 +99,7 @@ IF(NOT DEFINED LN_EXT)
     #
     SET(GD32_SPECS_LD_FLAGS "-fuse-ld=lld  ${LN_LTO} -nostdlib ${GD32_SPECS_SPECS}   -Wl,--warn-common" CACHE INTERNAL "")
     SET(GD32_SPECS_LD_LIBS "-lm  -lc ${CLANG_LINKER_OPT} -L${PLATFORM_CLANG_PATH}/../lib/clang-runtimes/riscv32-none-eabi/riscv32/lib/"                                               CACHE INTERNAL "")
+    SET(GD32_LD_LIBS "-lm -lc -Wl,--gc-sections -Wl,--gdb-index " CACHE INTERNAL "")
     
     #
     set(CMAKE_CXX_LINK_EXECUTABLE    "<CMAKE_CXX_COMPILER>   <CMAKE_CXX_LINK_FLAGS>  ${PLATFORM_CLANG_C_FLAGS} <LINK_FLAGS>   -Wl,--start-group  <OBJECTS> <LINK_LIBRARIES> -Wl,--end-group  -Wl,-Map,<TARGET>.map   -o <TARGET> ${GD32_LD_FLAGS} ${GD32_LD_LIBS} ${GD32_SPECS_LD_LIBS} ${GD32_SPECS_LD_FLAGS}   -lclang_rt.builtins "  CACHE INTERNAL "")

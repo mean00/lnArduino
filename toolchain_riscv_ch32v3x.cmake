@@ -85,7 +85,7 @@ IF(NOT DEFINED LN_EXT)
     MESSAGE(STATUS "CH32V3x C++ specs   ${LN_SPEC} (${GD32_SPECS})")
     #
     #SET(MCPU " -march=rv32imac -mabi=ilp32 -msmall-data-limit=8 -msave-restore " CACHE INTERNAL "" FORCE)
-    SET(GD32_DEBUG_FLAGS "-g3 ${LN_LTO}  -O1 " CACHE INTERNAL "")
+    SET(GD32_DEBUG_FLAGS "-g3 -O1 " CACHE INTERNAL "")
     
     #
     SET(GD32_SPECS_C_FLAGS  "${GD32_SPECS}  ${MCPU} ${GD32_DEBUG_FLAGS} ${PLATFORM_C_FLAGS} -DLN_MCU=LN_MCU_CH32V3x -DLN_ARCH=LN_ARCH_RISCV -Werror=return-type  -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -fno-common ${GD32_BOARD_FLAG} -I${AF_FOLDER}/riscv_ch32v3x/" CACHE INTERNAL "")
@@ -96,11 +96,11 @@ IF(NOT DEFINED LN_EXT)
     #
     SET(GD32_SPECS_LD_FLAGS "-nostdlib ${GD32_SPECS}  -Wl,--traditional-format -Wl,--warn-common" CACHE INTERNAL "")
     SET(GD32_SPECS_LD_LIBS "-lm -lc -lgcc")
-    SET(GD32_LD_LIBS "-lm -lc -Wl,--gc-sections -Wl,--gdb-index " CACHE INTERNAL "")
+    SET(GD32_LD_LIBS "-lm -lc -Wl,--gc-sections " CACHE INTERNAL "")
     
     SET(GD32_LD_FLAGS ${PLATFORM_C_FLAGS} CACHE INTERNAL "")
     #
-    set(CMAKE_CXX_LINK_EXECUTABLE    "<CMAKE_CXX_COMPILER>   <CMAKE_CXX_LINK_FLAGS>  <LINK_FLAGS> -lgcc -Xlinker -print-memory-usage   -Wl,--start-group  <OBJECTS> <LINK_LIBRARIES> -Wl,--end-group  -Wl,-Map,<TARGET>.map   -o <TARGET> ${GD32_SPECS_LD_FLAGS} ${GD32_LD_FLAGS} ${GD32_SPECS_LD_LIBS} ${GD32_LD_LIBS} ${GD32_DEBUG_FLAGS}"  CACHE INTERNAL "")
+    set(CMAKE_CXX_LINK_EXECUTABLE    "<CMAKE_CXX_COMPILER>   <CMAKE_CXX_LINK_FLAGS>  <LINK_FLAGS> ${LN_LTO} -lgcc -Xlinker -print-memory-usage   -Wl,--start-group  <OBJECTS> <LINK_LIBRARIES> -Wl,--end-group  -Wl,-Map,<TARGET>.map   -o <TARGET> ${GD32_SPECS_LD_FLAGS} ${GD32_LD_FLAGS} ${GD32_SPECS_LD_LIBS} ${GD32_LD_LIBS} ${GD32_DEBUG_FLAGS}"  CACHE INTERNAL "")
     SET(CMAKE_EXECUTABLE_SUFFIX_C .elf CACHE INTERNAL "")
     SET(CMAKE_EXECUTABLE_SUFFIX_CXX .elf CACHE INTERNAL "")
 
@@ -117,5 +117,6 @@ IF(NOT DEFINED LN_EXT)
     MESSAGE(STATUS "MCU Flash Size   ${LN_MCU_FLASH_SIZE}")
     MESSAGE(STATUS "MCU Ram Size     ${LN_MCU_RAM_SIZE}")
     MESSAGE(STATUS "MCU Static RAM   ${LN_MCU_STATIC_RAM}")
+    MESSAGE(STATUS "LTO Flags        ${LN_LTO}")
 
 ENDIF(NOT DEFINED LN_EXT)
