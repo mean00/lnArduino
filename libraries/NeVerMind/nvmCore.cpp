@@ -91,7 +91,6 @@ bool lnNvm::sanityCheck()
         int roundup=(entry.size+1)&0xfe;
         if(LN_NVM_ALLONES==entry.id) // last entry reached
         {
-            run=false;
             valid=true;
             break;
         }
@@ -416,7 +415,6 @@ bool lnNvm::garbageCollection()
         if(LN_NVM_ALLONES==entry.id)
         {
             VERBOSE("End of scan at offset %x  \n",offset);
-            run=false;
             break;
         }
         if(entry.size>LN_NVM_MAX_PAYLOAD)
