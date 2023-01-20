@@ -88,6 +88,9 @@ void attachInterrupt(uint8_t interruptNum, void (*userFunc)(void), int mode)
         case CHANGE:  oedge=LN_EDGE_BOTH;break;
         case FALLING: oedge=LN_EDGE_FALLING;break;
         case RISING:  oedge=LN_EDGE_RISING;break;
+        default:
+                        xAssert(0);
+                        break;
     }
     lnExtiAttachInterrupt((lnPin)interruptNum, oedge, extiInternalCb, (void *)userFunc);
 }
