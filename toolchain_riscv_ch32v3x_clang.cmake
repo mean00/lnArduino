@@ -1,5 +1,6 @@
 #=============================================================================#
 MESSAGE(STATUS "Setting up CH32V3x riscv cmake environment")
+OPTION(USE_SCAN_BUILD "Disable custom CC") 
 IF(NOT DEFINED LN_EXT)
     SET(LN_EXT riscv_ch32v3x            CACHE INTERNAL "")
     include(${CMAKE_CURRENT_LIST_DIR}/../platformConfig.cmake)
@@ -67,14 +68,16 @@ IF(NOT DEFINED LN_EXT)
     SET(LN_MCU_SPEED ${LN_MCU_SPEED}                CACHE INTERNAL "" FORCE)
 
     #
-
-    set(CMAKE_C_COMPILER    ${PLATFORM_CLANG_PATH}/clang${PLATFORM_CLANG_VERSION}${TOOLCHAIN_SUFFIX}    CACHE PATH "" FORCE)
-    set(CMAKE_ASM_COMPILER  ${PLATFORM_CLANG_PATH}/clang${PLATFORM_CLANG_VERSION}${TOOLCHAIN_SUFFIX}    CACHE PATH "" FORCE)
-    set(CMAKE_CXX_COMPILER  ${PLATFORM_CLANG_PATH}/clang++${PLATFORM_CLANG_VERSION}${TOOLCHAIN_SUFFIX}  CACHE PATH "" FORCE)
+    IF(USE_SCAN_BUILD) 
+    ELSE(USE_SCAN_BUILD) 
+        set(CMAKE_C_COMPILER    ${PLATFORM_CLANG_PATH}/clang${PLATFORM_CLANG_VERSION}${TOOLCHAIN_SUFFIX}    CACHE PATH "" FORCE)
+        set(CMAKE_ASM_COMPILER  ${PLATFORM_CLANG_PATH}/clang${PLATFORM_CLANG_VERSION}${TOOLCHAIN_SUFFIX}    CACHE PATH "" FORCE)
+        set(CMAKE_CXX_COMPILER  ${PLATFORM_CLANG_PATH}/clang++${PLATFORM_CLANG_VERSION}${TOOLCHAIN_SUFFIX}  CACHE PATH "" FORCE)
+    ENDIF(USE_SCAN_BUILD)
     set(CMAKE_SIZE          ${PLATFORM_CLANG_PATH}/llvm-size${TOOLCHAIN_SUFFIX}                         CACHE PATH "" FORCE)
     set(CMAKE_OBJCOPY       ${PLATFORM_CLANG_PATH}/llvm-objcopy${TOOLCHAIN_SUFFIX}                      CACHE PATH "" FORCE)
     # 
-    set(CMAKE_LINKER  ${CMAKE_CXX_COMPILER}                                                             CACHE PATH "" FORCE)
+    #set(CMAKE_LINKER  ${CMAKE_CXX_COMPILER}                                                             CACHE PATH "" FORCE)
     
     # dont try to create a shared lib, it will not work
     SET(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY                                                    CACHE INTERNAL "")
