@@ -133,7 +133,6 @@ extern "C" void vApplicationTickHook()
  */
 uint32_t lnGetMs()
 {
-    uint32_t v=myTick;
     return myTick;
 }
 

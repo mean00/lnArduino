@@ -59,3 +59,5 @@ extern "C"
 
 extern "C" void free(void *a) _NOTHROW;
 extern "C" void *malloc(size_t size)  _NOTHROW __attribute_malloc__;
+
+extern volatile uint32_t lnScratchRegister; // used to prevent optimisation

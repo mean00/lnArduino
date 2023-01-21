@@ -6,7 +6,12 @@
 #include "lnIRQ.h"
 #include "lnPeripheral_priv.h"
 
-//typedef volatile LN_ECLIC_irqx LN_ECLIC_irq;
+#define CH32_SYSCR_HWSTKEN          (1<<0) // Hardware stack enabled
+#define CH32_SYSCR_INESTEN          (1<<1) // Interrupt nesting enabled
+#define CH32_SYSCR_MPTCFG_2NESTED   (1<<2) // 
+#define CH32_SYSCR_MPTCFG_8NESTED   (3<<2) // 
+#define CH32_SYSCR_HWSTKOVEN        (1<<4) // Continue after hw stack overflow
+#define CH32_SYSCR_GIHWSTKNEN       (1<<5) // Temporarily disable interrupts & hw stack
 
         
 // Bit description        
@@ -93,6 +98,3 @@ static const _irqDesc _irqs[]=
     {LN_IRQ_SYSTICK             , 12},          /*!< Direct PFIC systick interrupt                           */
     {LN_IRQ_SW                  , 14},          /*!< Direct PFIC SW interrupt                           */
 };
-
-extern "C" void lnWriteMthDirect(int val);
-extern "C" int  lnReadMthDirect();

@@ -11,14 +11,13 @@
 	.section	.init,"ax",@progbits
 	.global	_start	    
 	.align	1
+	.extern main
 _start:
 	j	handle_reset
-    .align  1
+	.align  1
 _vector_base:
-    .option norvc;
-    .word   _start
-   
-
+	.option norvc;
+	.word   _start
 	.section	.text.handle_reset,"ax",@progbits	
 	.align	1
 handle_reset:
@@ -50,25 +49,9 @@ handle_reset:
 	addi a0, a0, 4
 	bltu a0, a1, 1b
 2:
-    li t0, 0x1f
-    csrw 0xbc0, t0
-
-    /* Enable nested and hardware stack */
-	//li t0, 0x1f
-	//csrw 0x804, t0 // INTSYSCR
-
-    /* Enable floating point and interrupt */
-   	//li t0, 0x7800
-   	//csrs mstatus, t0
-
- 	//la t0, _vector_base
-    //ori t0, t0, 3        <= [1] [0] 1: Absolute address 0: vectored    
-	//csrw mtvec, t0
-
-    // jal  SystemInit
-	//la t0, main
-	//csrw mepc, t0
-    jal main
+	li t0, 0x1f
+	csrw 0xbc0, t0
+	J main
 	mret
 
 

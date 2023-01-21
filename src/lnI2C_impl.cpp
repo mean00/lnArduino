@@ -105,8 +105,8 @@ void lnTwoWire::startIrq()
     
     setInterruptMode(true,false,false); // event, no dma, no tx empty
     
-    uint32_t stat0=_d->adr->STAT0;
-    uint32_t stat1=_d->adr->STAT1;
+    lnScratchRegister = _d->adr->STAT0;
+    lnScratchRegister = _d->adr->STAT1;
     
     _dmaTx.attachCallback(dmaTxDone_,this);    
     
@@ -124,8 +124,8 @@ void lnTwoWire::startRxIrq()
     
     setInterruptMode(true,false,false); // event, no dma, no tx empty
     
-    uint32_t stat0=_d->adr->STAT0;
-    uint32_t stat1=_d->adr->STAT1;
+    lnScratchRegister = _d->adr->STAT0;
+    lnScratchRegister = _d->adr->STAT1;
     
     lnEnableInterrupt(_d->_irqErr);
     lnEnableInterrupt(_d->_irqEv);
@@ -406,7 +406,7 @@ void lnTwoWire::dmaTxDone()
     {
         SET_STATE(I2C_TX_STOP);      
         setInterruptMode(true,false,false); // event, no dma, no tx        
-        volatile uint32_t r=_d->adr->STAT0+_d->adr->STAT1;
+        lnScratchRegister = _d->adr->STAT0+_d->adr->STAT1;
     }
     // done !    
 }

@@ -133,7 +133,7 @@ bool hwlnSPIClass::finishAsyncDma()
 bool hwlnSPIClass::waitForAsyncDmaDone()
 {
     LN_SPI_Registers *d=(LN_SPI_Registers *)_adr;
-    bool r;
+    bool r=true;
     if(false==_done.take(60*1000)) // 100 ms should be plenty enough!
     {
         r=false;

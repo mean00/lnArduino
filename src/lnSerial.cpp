@@ -136,7 +136,7 @@ void lnSerial::purgeRx()
   volatile uint32_t stat=d->STAT;
   while(stat & (LN_USART_STAT_RBNE))
   {
-    uint8_t c=d->DATA;
+    lnScratchRegister=d->DATA;
     stat=d->STAT;
   }
    RE_ENABLE_INTERRUPT();
@@ -338,7 +338,7 @@ void lnSerial::_interrupt(void)
     else
     if(stat & (LN_USART_STAT_NERR+LN_USART_STAT_PERR+LN_USART_STAT_FERR+LN_USART_STAT_ORERR)) // Error
     {
-        volatile uint32_t clear=d->DATA;
+        lnScratchRegister=d->DATA;
     }
 }
 
@@ -384,7 +384,7 @@ void lnSerial::txInterruptHandler(void)
 {
   LN_USART_Registers *d=(LN_USART_Registers *)_adr;
   volatile int stat=d->STAT;
-  volatile int ctl0=d->CTL0;
+  lnScratchRegister=d->CTL0;
   switch(_txState)
   {
       case txTransmittingInterrupt:

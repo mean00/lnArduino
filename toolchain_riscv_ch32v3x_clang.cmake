@@ -1,5 +1,6 @@
 #=============================================================================#
 MESSAGE(STATUS "Setting up CH32V3x riscv cmake environment")
+OPTION(USE_SCAN_BUILD "Disable custom CC") 
 IF(NOT DEFINED LN_EXT)
     SET(LN_EXT riscv_ch32v3x            CACHE INTERNAL "")
     include(${CMAKE_CURRENT_LIST_DIR}/../platformConfig.cmake)
@@ -67,14 +68,16 @@ IF(NOT DEFINED LN_EXT)
     SET(LN_MCU_SPEED ${LN_MCU_SPEED}                CACHE INTERNAL "" FORCE)
 
     #
-
-    set(CMAKE_C_COMPILER    ${PLATFORM_CLANG_PATH}/clang${PLATFORM_CLANG_VERSION}${TOOLCHAIN_SUFFIX}    CACHE PATH "" FORCE)
-    set(CMAKE_ASM_COMPILER  ${PLATFORM_CLANG_PATH}/clang${PLATFORM_CLANG_VERSION}${TOOLCHAIN_SUFFIX}    CACHE PATH "" FORCE)
-    set(CMAKE_CXX_COMPILER  ${PLATFORM_CLANG_PATH}/clang++${PLATFORM_CLANG_VERSION}${TOOLCHAIN_SUFFIX}  CACHE PATH "" FORCE)
+    IF(USE_SCAN_BUILD) 
+    ELSE(USE_SCAN_BUILD) 
+        set(CMAKE_C_COMPILER    ${PLATFORM_CLANG_PATH}/clang${PLATFORM_CLANG_VERSION}${TOOLCHAIN_SUFFIX}    CACHE PATH "" FORCE)
+        set(CMAKE_ASM_COMPILER  ${PLATFORM_CLANG_PATH}/clang${PLATFORM_CLANG_VERSION}${TOOLCHAIN_SUFFIX}    CACHE PATH "" FORCE)
+        set(CMAKE_CXX_COMPILER  ${PLATFORM_CLANG_PATH}/clang++${PLATFORM_CLANG_VERSION}${TOOLCHAIN_SUFFIX}  CACHE PATH "" FORCE)
+    ENDIF(USE_SCAN_BUILD)
     set(CMAKE_SIZE          ${PLATFORM_CLANG_PATH}/llvm-size${TOOLCHAIN_SUFFIX}                         CACHE PATH "" FORCE)
     set(CMAKE_OBJCOPY       ${PLATFORM_CLANG_PATH}/llvm-objcopy${TOOLCHAIN_SUFFIX}                      CACHE PATH "" FORCE)
     # 
-    set(CMAKE_LINKER  ${CMAKE_CXX_COMPILER}                                                             CACHE PATH "" FORCE)
+    #set(CMAKE_LINKER  ${CMAKE_CXX_COMPILER}                                                             CACHE PATH "" FORCE)
     
     # dont try to create a shared lib, it will not work
     SET(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY                                                    CACHE INTERNAL "")
@@ -99,6 +102,7 @@ IF(NOT DEFINED LN_EXT)
     #
     SET(GD32_SPECS_LD_FLAGS "-fuse-ld=lld  ${LN_LTO} -nostdlib ${GD32_SPECS_SPECS}   -Wl,--warn-common" CACHE INTERNAL "")
     SET(GD32_SPECS_LD_LIBS "-lm  -lc ${CLANG_LINKER_OPT} -L${PLATFORM_CLANG_PATH}/../lib/clang-runtimes/riscv32-none-eabi/riscv32/lib/"                                               CACHE INTERNAL "")
+    SET(GD32_LD_LIBS "-lm -lc -Wl,--gc-sections -Wl,--gdb-index " CACHE INTERNAL "")
     
     #
     set(CMAKE_CXX_LINK_EXECUTABLE    "<CMAKE_CXX_COMPILER>   <CMAKE_CXX_LINK_FLAGS>  ${PLATFORM_CLANG_C_FLAGS} <LINK_FLAGS>   -Wl,--start-group  <OBJECTS> <LINK_LIBRARIES> -Wl,--end-group  -Wl,-Map,<TARGET>.map   -o <TARGET> ${GD32_LD_FLAGS} ${GD32_LD_LIBS} ${GD32_SPECS_LD_LIBS} ${GD32_SPECS_LD_FLAGS}   -lclang_rt.builtins "  CACHE INTERNAL "")
