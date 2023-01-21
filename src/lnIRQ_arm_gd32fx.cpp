@@ -67,8 +67,8 @@ void unsupportedInterrupt2()
  * */
 void lnSoftSystemReset()
 {
-    uint32_t aircr=aSCB->AIRCR;
-    aircr= AIRCR_KEY+(1<<0); // VECTRESET
+    lnScratchRegister = aSCB->AIRCR;
+    uint32_t aircr= AIRCR_KEY+(1<<0); // VECTRESET
     aSCB->VTOR=0; // boot to bootloader, not the app
     aSCB->AIRCR= aircr;
     while(1)
@@ -82,8 +82,8 @@ void lnSoftSystemReset()
  */
 void lnHardSystemReset()
 {
-    uint32_t aircr=aSCB->AIRCR;
-    aircr= AIRCR_KEY+(1<<2); // SYSREQRESET
+    lnScratchRegister = aSCB->AIRCR;
+    uint32_t aircr= AIRCR_KEY+(1<<2); // SYSREQRESET
     aSCB->VTOR=0; // boot to bootloader, not the app
     aSCB->AIRCR= aircr;
     while(1)

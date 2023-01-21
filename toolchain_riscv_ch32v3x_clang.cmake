@@ -1,6 +1,5 @@
 #=============================================================================#
 MESSAGE(STATUS "Setting up CH32V3x riscv cmake environment")
-OPTION(USE_SCAN_BUILD "Disable custom CC") 
 IF(NOT DEFINED LN_EXT)
     SET(LN_EXT riscv_ch32v3x            CACHE INTERNAL "")
     include(${CMAKE_CURRENT_LIST_DIR}/../platformConfig.cmake)
