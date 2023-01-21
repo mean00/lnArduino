@@ -113,7 +113,7 @@ void lnTimer::setTickFrequency(int fqInHz)
         divider=divider/2;
     }
    
-    uint32_t ctl0=t->CTL0;    
+    lnScratchRegister=t->CTL0;    
     if(!divider) divider=1;
     t->PSC=divider-1;
 }

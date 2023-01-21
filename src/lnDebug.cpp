@@ -9,6 +9,7 @@
 #define LOGGER_USE_DMA 1
 
 extern lnSerial *serial0=NULL;
+volatile uint32_t lnScratchRegister;
 
 extern "C" void Logger_C(const char *fmt,...)
 {

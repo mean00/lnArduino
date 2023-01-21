@@ -99,7 +99,6 @@ bool lnNvm::sanityCheck()
         {
           // First one is inconsistent, drop here
             if(!processed) return false;
-            run=false;
             break;
         }
         if(entry.size>LN_NVM_MAX_PAYLOAD)

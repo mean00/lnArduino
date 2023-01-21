@@ -19,11 +19,9 @@
  */
 lnSimpleADC::lnSimpleADC(int instance, lnPin pin)  : lnBaseAdc(instance)
 {
-    LN_ADC_Registers *adc=lnAdcDesc[_instance].registers;
     _pin=pin;
     setPin(pin);   
-    setup();
-    
+    setup();   
 }
 /**
  * 
