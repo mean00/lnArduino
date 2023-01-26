@@ -93,6 +93,9 @@ void DMA1_Channel4_IRQHandler() LN_INTERRUPT_TYPE;
 void DMA1_Channel5_IRQHandler() LN_INTERRUPT_TYPE;
 void DMA1_Channel6_IRQHandler() LN_INTERRUPT_TYPE;
 void DMA1_Channel7_IRQHandler() LN_INTERRUPT_TYPE;
+extern void USB_TX_IRQHandler()     LN_INTERRUPT_TYPE;
+extern void USB_RX_IRQHandler()     LN_INTERRUPT_TYPE;
+extern void USB_WAKEUP_IRQHandler() LN_INTERRUPT_TYPE;
 
 
 }
@@ -149,8 +152,8 @@ static const uint32_t vecTable[]  __attribute__((aligned(32)))=
     X(DMA0_Channel5_IRQHandler), //.word   DMA1_Channel6_IRQHandler   /* DMA1 Channel 6 */
     X(DMA0_Channel6_IRQHandler), //.word   DMA1_Channel7_IRQHandler   /* DMA1 Channel 7 */
     X(unsupported), //.word   ADC1_2_IRQHandler          /* ADC1_2 */
-    X(unsupported), //.word   USB_HP_CAN1_TX_IRQHandler  /* USB HP and CAN1 TX */
-    X(unsupported), //.word   USB_LP_CAN1_RX0_IRQHandler /* USB LP and CAN1RX0 */
+    X(USB_TX_IRQHandler), //.word   USB_HP_CAN1_TX_IRQHandler  /* USB HP and CAN1 TX */
+    X(USB_RX_IRQHandler), //.word   USB_LP_CAN1_RX0_IRQHandler /* USB LP and CAN1RX0 */
     X(unsupported), //.word   CAN1_RX1_IRQHandler        /* CAN1 RX1 */
     X(unsupported), //.word   CAN1_SCE_IRQHandler        /* CAN1 SCE */
     X(unsupported), //.word   EXTI9_5_IRQHandler         /* EXTI Line 9..5 */
@@ -172,7 +175,7 @@ static const uint32_t vecTable[]  __attribute__((aligned(32)))=
     X(unsupported), //.word   USART3_IRQHandler          /* USART3 */
     X(unsupported), //.word   EXTI15_10_IRQHandler       /* EXTI Line 15..10 */
     X(unsupported), //.word   RTCAlarm_IRQHandler        /* RTC Alarm through EXTI Line */
-    X(unsupported), //.word   USBWakeUp_IRQHandler       /* USB Wakeup from suspend */
+    X(USB_WAKEUP_IRQHandler), //.word   USBWakeUp_IRQHandler       /* USB Wakeup from suspend */
     X(unsupported), //.word   TIM8_BRK_IRQHandler        /* TIM8 Break */
     X(unsupported), //.word   TIM8_UP_IRQHandler         /* TIM8 Update */
     X(unsupported), //.word   TIM8_TRG_COM_IRQHandler    /* TIM8 Trigger and Commutation */
@@ -420,5 +423,18 @@ extern "C" void __attribute__ ((noinline))  deadEnd(int code)
         
     }
 }        
+
+void  __attribute__((weak))  USB_WAKEUP_IRQHandler()
+{
+  xAssert(0);
+}
+void  __attribute__((weak)) USB_TX_IRQHandler()
+{
+    xAssert(0);
+}
+void  __attribute__((weak)) USB_RX_IRQHandler()
+{
+    xAssert(0);
+}
 // EOF
 

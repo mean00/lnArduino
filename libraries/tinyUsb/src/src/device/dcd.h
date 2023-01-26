@@ -177,7 +177,7 @@ extern void dcd_event_handler(dcd_event_t const * event, bool in_isr);
 // helper to send bus signal event
 TU_ATTR_ALWAYS_INLINE static inline void dcd_event_bus_signal (uint8_t rhport, dcd_eventid_t eid, bool in_isr)
 {
-  dcd_event_t event = { .rhport = rhport, .event_id = eid };
+  dcd_event_t event = { .rhport = rhport, .event_id = (uint8_t )eid }; // MEANX
   dcd_event_handler(&event, in_isr);
 }
 

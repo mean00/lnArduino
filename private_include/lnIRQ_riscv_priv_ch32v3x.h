@@ -43,8 +43,8 @@ static const _irqDesc _irqs[]=
     {LN_IRQ_DMA0_Channel5       , XXX(16)},     /*!< DMA0 channel5 interrupt                                  */
     {LN_IRQ_DMA0_Channel6       , XXX(17)},     /*!< DMA0 channel6 interrupt                                  */
     {LN_IRQ_ADC0_1              , XXX(18)},     /*!< ADC0 and ADC1 interrupt                                  */
-    {LN_IRQ_USB_HP              , XXX(19)},     /*!< CAN0 TX interrupts                                       */
-    {LN_IRQ_USB_LP              , XXX(20)},     /*!< CAN0 RX0 interrupts                                      */
+    {LN_IRQ_USB_HP_CAN_TX       , XXX(19)},     /*!< CAN0 TX interrupts                                       */
+    {LN_IRQ_USB_LP_CAN_RX0      , XXX(20)},     /*!< CAN0 RX0 interrupts                                      */
     {LN_IRQ_CAN0_RX1            , XXX(21)},     /*!< CAN0 RX1 interrupts                                      */
     {LN_IRQ_CAN0_EWMC           , XXX(22)},     /*!< CAN0 EWMC interrupts                                     */
     {LN_IRQ_EXTI5_9             , XXX(23)},     /*!< EXTI[9:5] interrupts                                     */

@@ -27,6 +27,25 @@ ELSE()
     SET(LN_USB_DFU_RUNTIME 0 CACHE INTERNAL "")
 ENDIF()
 
+
+
+IF( ${LN_MCU} STREQUAL "CH32V3x") 
+    SET(CH32V3x_FOLDER ${CMAKE_CURRENT_SOURCE_DIR}/src/src/portable/wch/ch32v307/)
+    SET(DRIVERS ${CH32V3x_FOLDER}/dcd_usbhs.c)
+    SET( LN_OPT_TUSB_MCU OPT_MCU_CH32V307)
+    INCLUDE_DIRECTORIES( ${CH32V3x_FOLDER}  )
+    SET(LN_OPT_MODE  OPT_MODE_HIGH_SPEED)      
+    ADD_DEFINITIONS("-DCFG_TUD_MAX_SPEED=OPT_MODE_HIGH_SPEED")
+ELSE()
+    SET(DRIVERS             ${LNSRC}/lnTinyUsbImpl.cpp            ${LNSRC}/lnUsbStack.cpp        )
+    SET( LN_OPT_TUSB_MCU OPT_MCU_STM32F1)
+    SET(LN_OPT_MODE  OPT_MODE_FULL_SPEED)  
+ENDIF()
+
+
+
+
+
 configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/tusb_config.h.in ${CMAKE_BINARY_DIR}/tusb_config.h @ONLY)
 
 IF( LN_USB_NB_CDC GREATER 0 )
@@ -43,13 +62,14 @@ IF(FALSE)
     ADD_DEFINITIONS("-DCFG_TUSB_DEBUG=3")
     ADD_DEFINITIONS("-DCFG_TUSB_DEBUG_PRINTF=Logger_C")
 ENDIF()
+
+
 SET(SRCS  ${CLASS_FILES} 
           ${TUSB}/tusb.c
           ${TUSB}/device/usbd_control.c
           ${TUSB}/device/usbd.c
           ${TUSB}/common/tusb_fifo.c
-          ${LNSRC}/lnTinyUsbImpl.cpp
-          ${LNSRC}/lnUsbStack.cpp
+          ${DRIVERS}
           )
 add_library(tinyUsb STATIC ${SRCS})
 target_include_directories(tinyUsb PRIVATE ${CMAKE_BINARY_DIR})

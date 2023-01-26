@@ -36,8 +36,8 @@ LN_IRQ_DMA0_Channel4       ,     /*!< DMA0 channel4 interrupt                   
 LN_IRQ_DMA0_Channel5       ,     /*!< DMA0 channel5 interrupt                                  */
 LN_IRQ_DMA0_Channel6       ,     /*!< 30 DMA0 channel6 interrupt                                  */
 LN_IRQ_ADC0_1              ,     /*!< 31 ADC0 and ADC1 interrupt                                  */
-LN_IRQ_CAN0_TX             ,     /*!< CAN0 TX interrupts                                       */
-LN_IRQ_CAN0_RX0            ,     /*!< CAN0 RX0 interrupts                                      */
+LN_IRQ_USB_HP_CAN_TX       ,     /*!< CAN0 TX interrupts                                       */
+LN_IRQ_USB_LP_CAN_RX0      ,     /*!< CAN0 RX0 interrupts                                      */
 LN_IRQ_CAN0_RX1            ,     /*!< CAN0 RX1 interrupts                                      */
 LN_IRQ_CAN0_EWMC           ,     /*!< CAN0 EWMC interrupts                                     */
 LN_IRQ_EXTI5_9             ,     /*!< EXTI[9:5] interrupts                                     */
@@ -95,8 +95,10 @@ LN_IRQ_USBFS               ,     /*!< USBFS global interrupt                    
  LN_IRQ_DMA1_Channel10      ,   /*!< DMA1 channel3 global interrupt                           */
  LN_IRQ_DMA1_Channel11      ,   /*!< DMA1 channel3 global interrupt                           */
  LN_IRQ_SYSTICK,
- LN_IRQ_SW,
+ LN_IRQ_SW, 
+ LN_IRQ_USBWAKEUP = LN_IRQ_USBFS_WKUP, 
  LN_IRQ_LAST
+
 };
 #if LN_MCU == LN_MCU_CH32V3x
     extern bool xPortIsInsideInterrupt();

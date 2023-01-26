@@ -30,8 +30,12 @@
 #include "device/dcd.h"
 
 #include "ch32_usbhs_reg.h"
-#include "core_riscv.h"
+// MEANX  #include "core_riscv.h"
+// We dont want to include the whole wch SDK, just pick what we need
+#include "ch32_extra.h"
+extern void NVIC_DisableIRQ(int irq);
 
+ // /MEANX
 // Max number of bi-directional endpoints including EP0
 #define EP_MAX 16
 
@@ -106,7 +110,10 @@ void dcd_init(uint8_t rhport) {
     USBHSD->DEV_AD = 0;
     USBHSD->CONTROL |= USBHS_DEV_PU_EN;
 }
-
+// MEANX  Only interrupt used here
+// USBHS_IRQn->85
+// /MEANX
+#define USBHS_IRQn 85
 void dcd_int_enable(uint8_t rhport) {
     (void)rhport;
 
