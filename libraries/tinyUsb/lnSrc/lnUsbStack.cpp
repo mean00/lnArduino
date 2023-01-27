@@ -61,11 +61,6 @@ class tusbEventHandler : public lnUsbEventHandler
 
 static const tusbEventHandler myEventHandler;
 
-void dcd_remote_wakeup(uint8_t rhport)
-{
-    (void)rhport;
-    _usbDevice->wakeUpHost();
-}
 
 /**
 
@@ -148,27 +143,7 @@ void    lnUsbStack::task()
     }
     vTaskDelete(NULL);
 }
-//----
 
-void dcd_int_disable(uint8_t rhport)
-{
-    _usbDevice->irqEnabled(false);
-}
-void dcd_int_enable(uint8_t rhport)
-{
-    _usbDevice->irqEnabled(true);
-}
-
-void dcd_init(uint8_t rhport)
-{
-  // Send a reset
-  _usbDevice->hwReset();
-}
-
-void dcd_edpt_close_all(uint8_t rhport)
-{
-    (void)rhport;
-}
 
 // Invoked when usb bus is suspended
 // remote_wakeup_en : if host allow us  to perform remote wakeup

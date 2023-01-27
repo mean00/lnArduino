@@ -96,8 +96,7 @@ void DMA1_Channel7_IRQHandler() LN_INTERRUPT_TYPE;
 extern void USB_TX_IRQHandler()     LN_INTERRUPT_TYPE;
 extern void USB_RX_IRQHandler()     LN_INTERRUPT_TYPE;
 extern void USB_WAKEUP_IRQHandler() LN_INTERRUPT_TYPE;
-
-
+extern "C" void USBHS_IRQHandler() LN_INTERRUPT_TYPE;
 }
 
 #ifdef LN_ENABLE_I2C
@@ -202,7 +201,7 @@ static const uint32_t vecTable[]  __attribute__((aligned(32)))=
     X(unsupported), //.word   CAN2_SCE_IRQHandler        /* CAN2 SCE */
     X(unsupported), //.word   OTG_FS_IRQHandler          /* OTGFS */
     X(unsupported), //.word   USBHSWakeup_IRQHandler     /* USBHS Wakeup */
-    X(unsupported), //.word   USBHS_IRQHandler           /* USBHS */
+    X(USBHS_IRQHandler), //.word   USBHS_IRQHandler           /* USBHS */
     X(unsupported), //.word   DVP_IRQHandler             /* DVP */
     X(unsupported), //.word   UART6_IRQHandler           /* UART6 */
     X(unsupported), //.word   UART7_IRQHandler           /* UART7 */

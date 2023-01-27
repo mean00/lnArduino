@@ -7,19 +7,19 @@
 
 struct LN_RCUx
 {
-    uint32_t CTL;       // CR
-    uint32_t CFG0;      // CFGR
-    uint32_t INT;       // CIR
-    uint32_t APB2RST;   // APB2RSTR
-    uint32_t APB1RST;   // APB1RSTR
-    uint32_t AHBEN;     // AHBENR
-    uint32_t APB2EN;    // APB2ENR
-    uint32_t APB1EN;    // APB1ENR
-    uint32_t BDCTL;     // BDCR
-    uint32_t RSTCLK;    // CSR
-    uint32_t AHBRST;    // AHBRSTR
-    uint32_t CFG1;      // CFGR2
-    uint32_t DSV;       // N/A
+    uint32_t CTL;       // 00 CR
+    uint32_t CFG0;      // 04 CFGR
+    uint32_t INT;       // 08 CIR
+    uint32_t APB2RST;   // 0c APB2RSTR
+    uint32_t APB1RST;   // 10 APB1RSTR
+    uint32_t AHBEN;     // 14 AHBENR
+    uint32_t APB2EN;    // 18 APB2ENR
+    uint32_t APB1EN;    // 1c APB1ENR
+    uint32_t BDCTL;     // 20 BDCR
+    uint32_t RSTCLK;    // 24 CSR
+    uint32_t AHBRST;    // 28 AHBRSTR
+    uint32_t CFG1;      // 2c CFGR2
+    uint32_t DSV;       // 30 N/A
 };
 typedef volatile LN_RCUx LN_RCU;    
 
@@ -83,6 +83,9 @@ typedef volatile LN_RCUx LN_RCU;
 #define LN_RCU_AHB_FMCSPEN     (1<<4)
 #define LN_RCU_AHB_CRCEN       (1<<6)
 #define LN_RCU_AHB_EXMCEN      (1<<8)
+#define LN_RCU_AHB_RNGEN_CH32V3x     (1<<9)
+#define LN_RCU_AHB_SDIOEN_CH32V3x    (1<<10)
+#define LN_RCU_AHB_USBHSEN_CH32V3x   (1<<11)
 #define LN_RCU_AHB_USBFSEN     (1<<12)
 
 // AHB RESET

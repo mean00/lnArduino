@@ -394,5 +394,8 @@ void dcd_int_handler(uint8_t rhport) {
         USBHSD->INT_FG = USBHS_SUSPEND_FLAG; /* Clear flag */
     }
 }
-
+void USBHS_IRQHandler()
+{
+    dcd_int_handler(0);
+}
 #endif

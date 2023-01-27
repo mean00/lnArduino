@@ -64,9 +64,7 @@ static const RCU_Peripheral _peripherals[]=
             // PERIP        AHB/APB         APB         BIT
     {        pDMA0,          8,          LN_RCU_AHB_DMA0EN},
     {        pDMA1,          8,          LN_RCU_AHB_DMA1EN},
-    //
-
-    //
+    {        pUSBHS_CH32v3x, 8,          LN_RCU_AHB_USBHSEN_CH32V3x},
 };
 
 // 1 : Reset
@@ -159,7 +157,6 @@ void lnPeripherals::enableUsb48Mhz()
   // careful, the usb clock must be off !
   int scaler=(2*lnPeripherals::getClock(pSYSCLOCK))/48000000;
   int x=0;
-
   switch(scaler)
   {
       case 3: x=0;break; // 3/2=1.5
@@ -180,6 +177,27 @@ void lnPeripherals::enableUsb48Mhz()
   cfg0&=LN_RCU_CFG0_USBPSC_MASK;
   cfg0|=LN_RCU_CFG0_USBPSC(x);
   arcu->CFG0=cfg0;
+}
+/**
+    This is the USB HS clock for CH32V3x chip
+*/
+void lnPeripherals::enableUsbHS48Mhz_ch32v3x()
+{
+#if 0
+  RCC_USBCLK48MConfig(RCC_USBCLK48MCLKSource_USBPHY);
+  RCC_USBHSPLLCLKConfig(RCC_HSBHSPLLCLKSource_HSE);
+  RCC_USBHSConfig(RCC_USBPLL_Div2);
+  RCC_USBHSPLLCKREFCLKConfig(RCC_USBHSPLLCKREFCLK_4M);
+  RCC_USBHSPHYPLLALIVEcmd(ENABLE);
+#endif
+  uint32_t cfg1=arcu->CFG1;
+  cfg1&=0xffffff; 
+  cfg1|=1<<27; // src = HSE
+  cfg1=(1<<24); // div = 2
+  cfg1=(1<<28); // Ref= 4Mhz
+  cfg1=(1<<31); // Src=USB PHY
+  cfg1=(1<<30); // USB PHY PLL ALive
+  arcu->CFG1=cfg1;
 }
 /**
  *

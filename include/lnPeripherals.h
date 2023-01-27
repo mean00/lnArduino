@@ -41,8 +41,10 @@ enum Peripherals
             pAF,
             pDMA0,
             pDMA1,
+            // CH32V3
+            pUSBHS_CH32v3x,
 
-            
+            //--
             
             pAPB1=100,
             pAPB2,

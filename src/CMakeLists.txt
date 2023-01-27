@@ -52,7 +52,12 @@ ENDIF()
 #
 #
 IF(LN_ENABLE_USBD)
-  ADD_LIBRARY(gd32_usb_usbd STATIC  lnUSBD.cpp)                                    
+  IF("${LN_MCU}" STREQUAL "CH32V3x")
+    SET(IMPL lnUSBD_ch32v3x.cpp)    
+  ELSE()    
+    SET(IMPL lnUSBD.cpp)
+  ENDIF()
+  ADD_LIBRARY(gd32_usb_usbd STATIC  ${IMPL})                                    
   SET(TUSB ${CMAKE_CURRENT_SOURCE_DIR}/../libraries/tinyUsb/src)
   target_include_directories( gd32_usb_usbd  PRIVATE ${TUSB}/common ${TUSB} ${TUSB}/..)
 ENDIF(LN_ENABLE_USBD)
