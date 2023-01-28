@@ -10,8 +10,7 @@ void lnRunTimeInit()
 
 void lnRunTimeInitPostPeripherals()
 {
-    lnExtiJtagNoResetOnly();
+   // We use fake SWD, no jtag stuff lnExtiJtagNoResetOnly();
 }
- const unsigned short int *_ctype_b;
 // EOF
 
