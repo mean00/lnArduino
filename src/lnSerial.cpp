@@ -507,4 +507,7 @@ IRQHANDLER(0)
 IRQHANDLER(1)
 IRQHANDLER(2)
 IRQHANDLER(3)
+
+ const unsigned short int *_ctype_b;
+
 // EOF
