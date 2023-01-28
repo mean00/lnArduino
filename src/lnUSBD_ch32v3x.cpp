@@ -102,7 +102,7 @@ void      lnUsbDevice::hwReset()
     7. Configure endpoint 0 and prepare to receive SETUP packet.
     #endif
 
-#if 1
+#if 0
     // Force host reset by asserting D+ low for 10 ms
     lnDigitalWrite(USB_DPLUS,0);
     lnPinMode(USB_DPLUS, lnOUTPUT); // D+
