@@ -321,7 +321,6 @@ static void receive_packet(xfer_ctl_t *xfer, uint16_t xfer_size) {
     // indicative of the end of a transfer (at least for ctl, bulk, int).
     xfer->short_packet = (xfer_size < xfer->max_size);
 }
-
 void dcd_int_handler(uint8_t rhport) {
     (void)rhport;
 
@@ -394,8 +393,5 @@ void dcd_int_handler(uint8_t rhport) {
         USBHSD->INT_FG = USBHS_SUSPEND_FLAG; /* Clear flag */
     }
 }
-void USBHS_IRQHandler()
-{
-    dcd_int_handler(0);
-}
+
 #endif
