@@ -37,8 +37,15 @@ class tusbEventHandler : public lnUsbEventHandler
         switch (ev)
         {
             case UsbReset:
+                          {
+                            tusb_speed_t speed=TUSB_SPEED_FULL;
+                            #ifdef LN_USB_SPEED
+                              speed=LN_USB_SPEED;
+                            #endif
                             dcd_handle_bus_reset();
-                            dcd_event_bus_reset(0, TUSB_SPEED_FULL, true);
+
+                            dcd_event_bus_reset(0, speed , true); 
+                          }
                             break;
             case UsbResume:
                             dcd_event_bus_signal(0, DCD_EVENT_RESUME, true);
