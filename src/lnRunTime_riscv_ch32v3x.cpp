@@ -12,6 +12,6 @@ void lnRunTimeInitPostPeripherals()
 {
     lnExtiJtagNoResetOnly();
 }
-
+ const unsigned short int *_ctype_b;
 // EOF
 
