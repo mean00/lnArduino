@@ -86,6 +86,7 @@ typedef volatile LN_RCUx LN_RCU;
 #define LN_RCU_AHB_RNGEN_CH32V3x     (1<<9)
 #define LN_RCU_AHB_SDIOEN_CH32V3x    (1<<10)
 #define LN_RCU_AHB_USBHSEN_CH32V3x   (1<<11)
+#define LN_RCU_AHB_USBFSEN_OTG_CH32V3x   (1<<12)
 #define LN_RCU_AHB_USBFSEN     (1<<12)
 
 // AHB RESET

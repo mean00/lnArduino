@@ -65,6 +65,7 @@ static const RCU_Peripheral _peripherals[]=
     {        pDMA0,          8,          LN_RCU_AHB_DMA0EN},
     {        pDMA1,          8,          LN_RCU_AHB_DMA1EN},
     {        pUSBHS_CH32v3x, 8,          LN_RCU_AHB_USBHSEN_CH32V3x},
+    {        pUSBFS_OTG_CH32v3x, 8,      LN_RCU_AHB_USBFSEN_OTG_CH32V3x},
 };
 
 // 1 : Reset
