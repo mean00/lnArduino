@@ -194,10 +194,10 @@ void lnPeripherals::enableUsbHS48Mhz_ch32v3x()
   uint32_t cfg1=arcu->CFG1;
   cfg1&=0xffffff; 
   cfg1|=1<<27; // src = HSE
-  cfg1=(1<<24); // div = 2
-  cfg1=(1<<28); // Ref= 4Mhz
-  cfg1=(1<<31); // Src=USB PHY
-  cfg1=(1<<30); // USB PHY PLL ALive
+  cfg1|=(1<<24); // div = 2
+  cfg1|=(1<<28); // Ref= 4Mhz
+  cfg1|=(1<<31); // Src=USB PHY
+  cfg1|=(1<<30); // USB PHY PLL ALive
   arcu->CFG1=cfg1;
 }
 /**
