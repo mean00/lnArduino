@@ -50,15 +50,15 @@ bool lnUsbDevice::power(bool onoff)
 {    
     if (onoff)
     {
-        lnPeripherals::enable(Peripherals::pUSBFS_OTG_CH32v3x);
-        lnPeripherals::reset(Peripherals::pUSBFS_OTG_CH32v3x);
+        //lnPeripherals::enable(Peripherals::pUSBFS_OTG_CH32v3x);
+        //lnPeripherals::reset(Peripherals::pUSBFS_OTG_CH32v3x);
         
         lnPeripherals::enable(Peripherals::pUSBHS_CH32v3x);
         lnPeripherals::reset(Peripherals::pUSBHS_CH32v3x);
     }
     else
     {        
-        lnPeripherals::disable(Peripherals::pUSBFS_OTG_CH32v3x);
+        //lnPeripherals::disable(Peripherals::pUSBFS_OTG_CH32v3x);
         lnPeripherals::disable(Peripherals::pUSBHS_CH32v3x);
     }
     return true;
