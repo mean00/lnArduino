@@ -31,6 +31,9 @@ void cdcEventHandler(void *cookie, int interface,lnUsbCDC::lnUsbCDCEvents event,
 
     switch (event)
     {
+      case lnUsbCDC::CDC_SET_SPEED:
+            Logger("CDC SET SPEED\n");
+            break;
       case lnUsbCDC::CDC_DATA_AVAILABLE:
         {
           int n=cdc->read(buffer,32);
