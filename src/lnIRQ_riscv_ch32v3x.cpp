@@ -436,12 +436,9 @@ void  __attribute__((weak)) USB_RX_IRQHandler()
     xAssert(0);
 }
 
-static int usbInterruptCount=0;
-extern "C" void dcd_int_handler(int port);
-void USBHS_IRQHandler()
+void  __attribute__((weak))  USBHS_IRQHandler()
 {
-    usbInterruptCount++;
-    dcd_int_handler(0);
+    xAssert(0);
 }
 
 // EOF

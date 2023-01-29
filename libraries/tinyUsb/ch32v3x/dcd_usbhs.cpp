@@ -443,3 +443,13 @@ void dcd_int_handler(uint8_t rhport) {
         return;
     }
 }
+
+
+extern "C" void dcd_int_handler(int port);
+void USBHS_IRQHandler()
+{
+    dcd_int_handler(0);
+}
+
+
+
