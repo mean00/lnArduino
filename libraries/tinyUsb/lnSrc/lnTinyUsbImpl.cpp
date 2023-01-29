@@ -373,4 +373,12 @@ void dcd_edpt_clear_stall(uint8_t rhport, uint8_t ep_addr)
         _usbInstance->setEpStatus(ep_addr, false, LN_USBD_EPxCS_RX_STA_NAK);
     }
 }
+void dcd_sof_enable(uint8_t rhport, bool en)
+{
+  (void) rhport;
+  (void) en;
+
+  // TODO implement later
+}
+
 // EOF
