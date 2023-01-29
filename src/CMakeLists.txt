@@ -1,5 +1,9 @@
 include(../setup.cmake)
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/../private_include)
+IF("${LN_MCU}" STREQUAL "CH32V3x")
+    SET(EXTRA_OVERLAY lnRCU_ch32v3x.cpp)
+ ENDIF()
+
 SET(OVERLAY_SRCS       MapleFreeRTOS1000_pp.cpp systemAlloc.cpp lnDebug.cpp lnSerial.cpp lnGPIO.cpp                      
                        lnDma.cpp 
                        lnSystemInit.cpp lnRCU.cpp 
@@ -22,6 +26,7 @@ SET(OVERLAY_SRCS       MapleFreeRTOS1000_pp.cpp systemAlloc.cpp lnDebug.cpp lnSe
                        lnADC_timing.cpp
                        lnFMC.cpp
                        lnFreeRTOSDebug.cpp                       
+                       ${EXTRA_OVERLAY}
                        ../legacy/boards/${GD32_BOARD}/lnPinMapping.cpp
                     )
 
