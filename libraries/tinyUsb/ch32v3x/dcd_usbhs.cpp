@@ -113,7 +113,7 @@ void dcd_init(uint8_t rhport) {
 
     USBHSD->CONTROL = 0;
     USBHSD->CONTROL = RB_UC_RESET;
-
+    USBHSD->INT_FG = 0xff; // clear all pending interrupts
     USBHSD->CONTROL = USBHS_DMA_EN | USBHS_INT_BUSY_EN | SPEED_BITS;
 
     USBHSD->INT_EN = 0;
