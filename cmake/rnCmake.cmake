@@ -1,6 +1,11 @@
 If(NOT Rust_CARGO_TARGET)
     IF(LN_ARCH STREQUAL "RISCV") 
-        SET(Rust_CARGO_TARGET "riscv32imac-unknown-none-elf" CACHE INTERNAL "")
+        IF(USE_HW_FPU)
+                SET(Rust_CARGO_TARGET "${AF_FOLDER}/riscv_ch32v3x/riscv32imacf-unknown-none-elf.json" CACHE INTERNAL "")
+                SET(LN_RUST_BUILD_FLAGS FLAGS -Z build-std=core,alloc CACHE INTERNAL "")
+        ELSE()
+                SET(Rust_CARGO_TARGET "riscv32imac-unknown-none-elf" CACHE INTERNAL "")
+        ENDIF()
     ELSE()
         IF( "${LN_MCU}" STREQUAL "M4")
             SET(Rust_CARGO_TARGET "thumbv7em-none-eabihf" CACHE INTERNAL "")
@@ -11,18 +16,6 @@ If(NOT Rust_CARGO_TARGET)
 ENDIF(NOT Rust_CARGO_TARGET)
 # Lookup Corrosion
 IF(NOT CORROSION_FOUND)
-        #SET(CORROSION_FOUND True CACHE INTERNAL "")
-    find_file (CORRODED CorrosionConfig.cmake
-                        /usr/lib64/cmake/Corrosion
-                        /usr/lib/cmake/Corrosion
-                        /usr/local/lib64/cmake/Corrosion
-                        /usr/local/lib/cmake/Corrosion )
-    if(${CORRODED} STREQUAL "CORRODED-NOTFOUND" )
-        MESSAGE(STATUS "Corrosion not found !")
-    else()
-        MESSAGE(STATUS "Corrosion : ${CORRODED}")
-        get_filename_component(CORRODED ${CORRODED} DIRECTORY)
-        SET(Corrosion_DIR "${CORRODED}")
-    endif()
-    find_package(Corrosion REQUIRED)
+        SET(CORROSION_FOUND True CACHE INTERNAL "")
+        ADD_SUBDIRECTORY(${AF_FOLDER}/rust/corrosion corrosion)
 ENDIF(NOT CORROSION_FOUND)
