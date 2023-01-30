@@ -1,9 +1,6 @@
 [submodule "FreeRTOS"]
 	path = FreeRTOS
 	url = https://github.com/FreeRTOS/FreeRTOS-Kernel.git
-[submodule "libraries/simplerST7735"]
-	path = libraries/simplerST7735
-	url = https://github.com/mean00/simplerST7735.git
 [submodule "libraries/simplerSSD1306"]
 	path = libraries/simplerSSD1306
 	url = https://github.com/mean00/simpler_SSD1306.git
