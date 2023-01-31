@@ -2,7 +2,7 @@
 MESSAGE(STATUS "Setting up CH32V3x riscv cmake environment")
 IF(NOT DEFINED LN_EXT)
     SET(LN_EXT riscv_ch32v3x CACHE INTERNAL "")
-    include(${CMAKE_CURRENT_LIST_DIR}/../platformConfig.cmake)
+    include(${CMAKE_CURRENT_LIST_DIR}/../../platformConfig.cmake)
     SET(LN_TOOLCHAIN_EXT  riscv_ch32v3x CACHE INTERNAL "")
 
     IF(NOT PLATFORM_TOOLCHAIN_PATH)

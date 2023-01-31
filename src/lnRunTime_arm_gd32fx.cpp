@@ -23,4 +23,5 @@ void lnRunTimeInitPostPeripherals()
     // Init
     lnExtiSWDOnly();
 }
+
 // EOF
