@@ -92,28 +92,25 @@ IF(NOT DEFINED LN_EXT)
     #   
     SET(GD32_DEBUG_FLAGS "-g3 ${LN_LTO} -Oz" CACHE INTERNAL "") 
     #
-    SET(GD32_SPECS_C_FLAGS  "${GD32_SPECS_SPECS} ${GD32_DEBUG_FLAGS}  --sysroot ${PLATFORM_CLANG_SYSROOT}  ${MCPU} ${PLATFORM_CLANG_C_FLAGS} -DLN_MCU=LN_MCU_CH32V3x -DLN_ARCH=LN_ARCH_RISCV -Werror=return-type  -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -fno-common ${GD32_BOARD_FLAG} -I${AF_FOLDER}/riscv_ch32v3x/" CACHE INTERNAL "")
-    SET(CMAKE_C_FLAGS "${GD32_SPECS_C_FLAGS}"                                                       CACHE INTERNAL "")
-    SET(CMAKE_ASM_FLAGS "${GD32_SPECS_C_FLAGS}"                                                       CACHE INTERNAL "")
-    SET(CMAKE_CXX_FLAGS "${GD32_SPECS_C_FLAGS}  -fno-rtti -fno-exceptions -fno-threadsafe-statics"  CACHE INTERNAL "") 
+    # -gdwarf-2
+    SET(GD32_MCU_C_FLAGS "${MCPU} ${PLATFORM_CLANG_C_FLAGS} -DLN_MCU=LN_MCU_CH32V3x -DLN_ARCH=LN_ARCH_RISCV -I${AF_FOLDER}/riscv_ch32v3x/  --sysroot ${PLATFORM_CLANG_SYSROOT}" CACHE INTERNAL "")
+    SET(GD32_C_FLAGS    "${GD32_SPECS_SPECS}      ${GD32_DEBUG_FLAGS}   ${GD32_MCU_C_FLAGS}  -Werror=return-type  -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -fno-common ${GD32_BOARD_FLAG} " CACHE INTERNAL "")
+    SET(CMAKE_C_FLAGS   "${GD32_C_FLAGS}"                                                       CACHE INTERNAL "")
+    SET(CMAKE_ASM_FLAGS "${GD32_C_FLAGS}"                                                       CACHE INTERNAL "")
+    SET(CMAKE_CXX_FLAGS "${GD32_C_FLAGS}  -fno-rtti -fno-exceptions -fno-threadsafe-statics"    CACHE INTERNAL "") 
     #
     SET(CLANG_LINKER_OPT "" CACHE INTERNAL "")
     #
-    SET(GD32_SPECS_LD_FLAGS "-fuse-ld=lld  ${LN_LTO} -nostdlib ${GD32_SPECS_SPECS} --sysroot ${PLATFORM_CLANG_SYSROOT}  -Wl,--warn-common" CACHE INTERNAL "")
-    SET(GD32_SPECS_LD_LIBS "-lm  -lc ${CLANG_LINKER_OPT} "                                               CACHE INTERNAL "")
-    SET(GD32_LD_LIBS "-lm -lc -Wl,--gc-sections -Wl,--gdb-index " CACHE INTERNAL "")
-    
+    SET(GD32_LD_FLAGS "-fuse-ld=lld  ${LN_LTO} -nostdlib ${GD32_SPECS_SPECS} --sysroot ${PLATFORM_CLANG_SYSROOT}  -Wl,--warn-common" CACHE INTERNAL "")
+    SET(GD32_LIBS "-lm  -lc ${CLANG_LINKER_OPT} -Wl,--gc-sections -Wl,--gdb-index -lclang_rt.builtins    " CACHE INTERNAL "")    
     #
-    set(CMAKE_CXX_LINK_EXECUTABLE    "<CMAKE_CXX_COMPILER>  ${PLATFORM_CLANG_EXTRA_LD_ARG} <CMAKE_CXX_LINK_FLAGS>  ${PLATFORM_CLANG_C_FLAGS} <LINK_FLAGS>   -Wl,--start-group  <OBJECTS> <LINK_LIBRARIES> -Wl,--end-group  -Wl,-Map,<TARGET>.map   -o <TARGET> ${GD32_LD_FLAGS} ${GD32_LD_LIBS} ${GD32_SPECS_LD_LIBS} ${GD32_SPECS_LD_FLAGS}   -lclang_rt.builtins "  CACHE INTERNAL "")
-    SET(CMAKE_EXECUTABLE_SUFFIX_C .elf                                                                  CACHE INTERNAL "")
-    SET(CMAKE_EXECUTABLE_SUFFIX_CXX .elf                                                                CACHE INTERNAL "")
+    set(CMAKE_CXX_LINK_EXECUTABLE    "<CMAKE_CXX_COMPILER>  ${PLATFORM_CLANG_EXTRA_LD_ARG} <CMAKE_CXX_LINK_FLAGS>  ${PLATFORM_CLANG_C_FLAGS} <LINK_FLAGS>   -Wl,--start-group  <OBJECTS> <LINK_LIBRARIES> -Wl,--end-group  -Wl,-Map,<TARGET>.map   -o <TARGET> ${GD32_LD_FLAGS}  ${GD32_LIBS} ${GD32_LD_FLAGS}   "  CACHE INTERNAL "")
+    SET(CMAKE_EXECUTABLE_SUFFIX_C   .elf                          CACHE INTERNAL "")
+    SET(CMAKE_EXECUTABLE_SUFFIX_CXX .elf                           CACHE INTERNAL "")
 
     include_directories(${ARDUINO_GD32_FREERTOS}/legacy/boards/${GD32_BOARD}/)
 
     # Sees optimizaton >=2 are causing issues (???)
-
-    #ADD_DEFINITIONS("-O0 ")
-
 
     MESSAGE(STATUS "MCU Architecture ${LN_ARCH}")
     MESSAGE(STATUS "MCU Type         ${LN_MCU}")
