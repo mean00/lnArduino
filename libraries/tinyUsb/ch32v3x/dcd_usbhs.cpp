@@ -445,7 +445,7 @@ void dcd_int_handler(uint8_t rhport) {
 }
 
 
-extern "C" void dcd_int_handler(int port);
+extern "C" void dcd_int_handler(uint8_t port);
 void USBHS_IRQHandler()
 {
     dcd_int_handler(0);
