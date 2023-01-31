@@ -61,10 +61,10 @@ def build_all(arch, mcu):
 
 print("-- Build all --")
 grab_demo_folders()
+build_all("ARM","M3")
+build_all("ARM","M4")
 build_all("RISCV","CH32V3x")
-#build_all("ARM","M3")
-#build_all("ARM","M4")
-# OBsolete build_all("RISCV","VF103")
+# Obsolete build_all("RISCV","VF103")
 print("-- Failures --")
 for i in failures:
     print("\t"+i)
