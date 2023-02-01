@@ -16,10 +16,13 @@ If(NOT Rust_CARGO_TARGET)
         ENDIF()        
     ENDIF()
     
-    ADD_SUBDIRECTORY(${AF_FOLDER}/rust/corrosion corrosion)
-
-    MACRO(RUST_ADD tgt MANIFEST)
-            corrosion_import_crate(MANIFEST_PATH ${MANIFEST} FLAGS "${LN_RUST_BUILD_FLAGS}")
-            corrosion_add_target_rustflags(${tgt} "${LN_LTO_RUST_FLAGS}")
-    ENDMACRO(RUST_ADD MANIFEST)    
+    
 ENDIF(NOT Rust_CARGO_TARGET)
+#
+ADD_SUBDIRECTORY(${AF_FOLDER}/rust/corrosion corrosion)
+#
+#
+MACRO(RUST_ADD tgt MANIFEST)
+    corrosion_import_crate(MANIFEST_PATH ${MANIFEST} FLAGS "${LN_RUST_BUILD_FLAGS}")
+    corrosion_add_target_rustflags(${tgt} "${LN_LTO_RUST_FLAGS}")
+ENDMACRO(RUST_ADD MANIFEST)    
