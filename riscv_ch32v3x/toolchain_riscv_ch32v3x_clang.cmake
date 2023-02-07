@@ -74,6 +74,8 @@ IF(NOT DEFINED LN_EXT)
         set(CMAKE_CXX_COMPILER  ${PLATFORM_CLANG_PATH}/clang++${PLATFORM_CLANG_VERSION}${TOOLCHAIN_SUFFIX}  CACHE PATH "" FORCE)
     ENDIF(USE_SCAN_BUILD)
     set(CMAKE_SIZE          ${PLATFORM_CLANG_PATH}/llvm-size${TOOLCHAIN_SUFFIX}                         CACHE PATH "" FORCE)
+    set(CMAKE_AR            ${PLATFORM_CLANG_PATH}/llvm-ar${TOOLCHAIN_SUFFIX}                           CACHE PATH "" FORCE)
+    set(CMAKE_RANLIB        ${PLATFORM_CLANG_PATH}/llvm-ranlib${TOOLCHAIN_SUFFIX}                           CACHE PATH "" FORCE)
     set(CMAKE_OBJCOPY       ${PLATFORM_CLANG_PATH}/llvm-objcopy${TOOLCHAIN_SUFFIX}                      CACHE PATH "" FORCE)
     # 
     #set(CMAKE_LINKER  ${CMAKE_CXX_COMPILER}                                                             CACHE PATH "" FORCE)
