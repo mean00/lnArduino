@@ -19,6 +19,7 @@ public:
           int read(uint8_t *buffer, int maxSize);
           int write(const uint8_t *buffer, int maxSize);
           void flush();
+          void clear_input_buffers();
           void setEventHandler(lnUsbCDCEventsHandler *h, void *cookie)
           {
               _eventHandler=h;

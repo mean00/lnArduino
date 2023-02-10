@@ -68,6 +68,14 @@ void lnUsbCDC::flush()
 {
   tud_cdc_n_write_flush(_instance);
 }
+/**
+
+*/
+void lnUsbCDC::clear_input_buffers()
+{
+  tud_cdc_n_read_flush(_instance);
+}
+
 //---- hooks ---
 #define PREMABLE(itf) lnUsbCDC *me=_cdc_instances[itf]; xAssert(me);
 #define FORWARD_EVENT(ifg,event) PREMABLE(itf);  me->incomingEvent(event);
