@@ -1,15 +1,28 @@
 
 include(lnCmake_${LN_TOOLCHAIN_EXT})
+#______________________________________
 
 MACRO (LN_APPEND_FLAGS target)
-	GET_SOURCE_FILE_PROPERTY(flags ${target} COMPILE_FLAGS)
-	IF(flags  MATCHES "NOTFOUND")
-			SET(flags "")
-	ENDIF()
-  SET(flags "${flags} ${ARGN}")
-	SET_SOURCE_FILES_PROPERTIES(${target} PROPERTIES COMPILE_FLAGS "${flags}")   
+    SET_PROPERTY(   
+                    SOURCE ${target}
+                    PROPERTY COMPILE_FLAGS ${ARGN}
+                    APPEND
+            ) 
+    GET_SOURCE_FILE_PROPERTY(flags ${target} COMPILE_FLAGS)
 ENDMACRO (LN_APPEND_FLAGS)
-
+#______________________________________
+# This does not seem to work
+#MACRO (LN_APPEND_IDIR target)
+#GET_SOURCE_FILE_PROPERTY(flags ${target} INCLUDE_DIRECTORIES)
+#MESSAGE(STATUS "aax ${target}=> ${flags} www")
+#SET_PROPERTY(   
+#SOURCE ${target}
+#PROPERTY INCLUDE_DIRECTORIES ${ARGN}
+#APPEND
+#) 
+#GET_SOURCE_FILE_PROPERTY(flags ${target} INCLUDE_DIRECTORIES)
+#MESSAGE(STATUS "aat ${target}=>${flags} www")
+#ENDMACRO (LN_APPEND_IDIR)
 
 
 MACRO(USE_LIBRARY lib)
