@@ -2,76 +2,133 @@
 #![allow(dead_code)]
 use alloc::boxed::Box;
 
-use crate::rnarduino as rn;
-pub use rn::lnUsbCDC as    cdc;
 
-
-type cint = cty::c_int;
-type uint = cty::c_uint;
-
-
-//--
-pub trait rnCDCEventHandler
+use crate::rn_cdc_c::lncdc_c as cdc_c;
+use crate::rn_cdc_c::{lncdc_create,lncdc_delete,lncdc_read,lncdc_write, lncdc_flush, lncdc_clear_input_buffers,lncdc_set_event_handler};
+//use crate::rn_os_helper::log;
+use cty::{c_void,c_int};
+//
+trait cdc_event_handler
 {
-    fn  eventHandler( &self, interface: cint ,  event : rn::lnUsbCDC_lnUsbCDCEvents, payload: u32);
+    fn  handler(  &mut self, _interface : usize, _event : cdc_events ,  _payload : u32)
+    {        
+        panic!("oops");
+    }
 }
+
 //--
 pub struct rnCDC
 {
-     ln             : Box<cdc> ,         
+     cdc             : *mut cdc_c,  
+     handler         : Option< &'static mut dyn cdc_event_handler>,       
+}
+//
+pub enum cdc_events
+{
+    DATA_AVAILABLE=0,
+    SESSION_START=1,
+    SESSION_END=2,
+    SET_SPEED=3
+}
+impl cdc_events
+{
+    pub fn from_u32( ix : u32) -> Self
+    {
+        return match ix {
+            0 => cdc_events::DATA_AVAILABLE,
+            1 => cdc_events::SESSION_START,
+            2 => cdc_events::SESSION_END,
+            3 => cdc_events::SET_SPEED,
+            _ => panic!("EVENTCDC"),
+        };
+    }
 }
 
 /**
  * 
  * 
  */
+impl Drop for rnCDC
+{
+    fn drop(&mut self) {
+        unsafe {
+            lncdc_delete(self.cdc);
+        }
+    }
+}
 impl rnCDC
 {
     // ctor
-    pub fn new(instance : u32, handler : & 'static dyn rnCDCEventHandler) -> Box<rnCDC>
+    pub fn new(instance : u32, handler : & 'static mut dyn cdc_event_handler) -> Box<rnCDC>
     {
         unsafe {
-            let mut t  = Box::new(rnCDC{
-                ln :                Box::new(cdc::new(instance as  cint )),
-            });
-            t.ln._eventHandler= Some(Self::bounceBack);
-            let   wrapped= Box::new(handler );
-            t.ln._eventCookie= Box::into_raw(wrapped) as *mut cty::c_void;
-            t
-        }
+        let r = Box::new(
+            rnCDC {
+                cdc :  lncdc_create(instance),
+                handler : Some(handler),
+            }
+        );
+        let r_ptr = &*r as *const rnCDC;
+        lncdc_set_event_handler(r.cdc,Some(Self::bounceBack),r_ptr as *const c_void);
+        r
+        }        
+       
     }
-    // returns byte received
+    // returns byte received, can be zero, this is non blocking
     pub fn read( &mut self,data : &mut [u8]) -> i32
     {
         unsafe{
-        return self.ln.read(data.as_ptr() as *mut u8 ,data.len() as  cty::c_int) as i32;
+            return lncdc_read(self.cdc, data.as_ptr() as *mut u8 ,data.len() as  cty::c_int) as i32;
         }
     }
-    // returns byte received
-    pub fn write( &mut self , data : &[u8]) -> i32
+    // returns byte written
+    pub fn write( &mut self,data : &mut [u8]) -> i32
     {
-        unsafe{
-            return self.ln.write(data.as_ptr()  ,data.len() as  cty::c_int) as i32;
-            }
+         unsafe{
+             return lncdc_write(self.cdc, data.as_ptr() as *const u8 ,data.len() as  cty::c_int) as i32;
+        }
     }
-    // flush
+
+    // flush pending writes
     pub fn flush( &mut self )
     {
         unsafe{
-                self.ln.flush();
+            lncdc_flush(self.cdc);
             }
     }
-///
-/// 
-/// 
-    extern "C" fn bounceBack(ptr : *mut cty::c_void, instance : cint, event: rn::lnUsbCDC_lnUsbCDCEvents , payload : cty::c_uint) -> ()
+    // flush input buffers
+    pub fn clear_input_buffers(&mut self)
     {
-        // cookie is  Box<& 'static dyn rnCDCEventHandler>     
-        type cookie_monster =  Box<& 'static dyn rnCDCEventHandler> ;
-        unsafe {                 
-            let  e : *mut  cookie_monster; 
-            e= ptr as *mut  cookie_monster;
-            (*e).eventHandler(instance, event, payload);
+        unsafe {
+            lncdc_clear_input_buffers(self.cdc);
         }
+    }
+    fn invoke_callback( &mut self, instance : usize, event : cdc_events, payload: u32)
+    {
+        match &mut self.handler
+            {
+                Some(x) => x.handler(instance, event,payload),
+                None    => panic!("no cdc handler"),
+            }
+    }
+    extern "C" fn bounceBack(ptr : *mut cty::c_void, instance : cty::c_int, event: c_int , payload : cty::c_uint) -> ()
+    {          
+        type cookie_monster <'a>=  Box<&'a rnCDC> ;
+        unsafe {  
+        let  mut e = ptr as *mut  cookie_monster;
+        let  mut rf =&mut *e;
+        //(*e).invoke_callback( instance as usize,  cdc_events::from_u32(event as u32),payload as u32);
+        //*rf.invoke_callback( instance as usize,  cdc_events::from_u32(event as u32),payload as u32);
+            /*
+        match rf
+        {
+            Some(mut x) => match x.handler
+                        {
+                            Some(mut y) => y.handler(instance as usize, cdc_events::from_u32(event as u32) , payload as u32),
+                            None    => panic!("no cdc2"),
+                        },
+            None    => panic!("no CDC handler"),
+        }*/
+      }
     }
 }
