@@ -45,7 +45,9 @@
         .thumb_func
 
         .globl __start__
+        .globl __trap
         .type __start__, %function
+        .type __trap, %function
 __start__:
         .fnstart
         ldr r1,=__msp_init-4
@@ -55,3 +57,7 @@ __start__:
         .pool
         .cantunwind
         .fnend
+        .code 16
+__trap:
+	bkpt #1
+	b __trap        
