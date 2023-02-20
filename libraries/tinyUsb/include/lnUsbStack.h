@@ -15,10 +15,10 @@ class lnUsbStack
   public:
     enum lnUsbStackEvents
     {
-        USB_CONNECT,
-        USB_DISCONNECT,
-        USB_SUSPEND,
-        USB_RESUME
+        USB_CONNECT=0,
+        USB_DISCONNECT=1,
+        USB_SUSPEND=2,
+        USB_RESUME=3
     };
 
     typedef void lnUsbStackEventHandler(void *cookie, const lnUsbStackEvents event);
