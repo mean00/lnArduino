@@ -1,8 +1,12 @@
 #!/bin/bash
 #
-export out=../src/rn_i2c_c.rs
-# rustified_enum
-bash ../../../cmake/rustgen.sh  lnI2C_c.h   ${out}
-export out=../src/rn_cdc_c.rs
-bash ../../../cmake/rustgen.sh  lnCDC_c.h   ${out}
+gen()
+{
+bash ../../../cmake/rustgen.sh  ${1}   ${2}
+}
+
+
+gen lnI2C_c.h ../src/rn_i2c_c.rs
+gen lnCDC_c.h ../src/rn_cdc_c.rs
+gen lnUSB_c.h ../src/rn_usb_c.rs
 

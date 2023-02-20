@@ -1,7 +1,7 @@
 
 #![allow(dead_code)]
 use alloc::boxed::Box;
-
+use crate::rnarduino as rn;
 
 use crate::rn_cdc_c::lncdc_c as cdc_c;
 use crate::rn_cdc_c::{lncdc_create,lncdc_delete,lncdc_read,lncdc_write, lncdc_flush, lncdc_clear_input_buffers,lncdc_set_event_handler};
@@ -35,10 +35,10 @@ impl cdc_events
     pub fn from_u32( ix : u32) -> Self
     {
         return match ix {
-            0 => cdc_events::DATA_AVAILABLE,
-            1 => cdc_events::SESSION_START,
-            2 => cdc_events::SESSION_END,
-            3 => cdc_events::SET_SPEED,
+           0 /*rn::lnUsbCDC_lnUsbCDCEvents::CDC_DATA_AVAILABLE*/ => cdc_events::DATA_AVAILABLE,
+           1 /*rn::lnUsbCDC_lnUsbCDCEvents::CDC_SESSION_START*/  => cdc_events::SESSION_END,
+           2 /*rn::lnUsbCDC_lnUsbCDCEvents::CDC_SESSION_END*/    => cdc_events::SESSION_END,
+           3 /*rn::lnUsbCDC_lnUsbCDCEvents::CDC_SET_SPEED*/      => cdc_events::SET_SPEED,
             _ => panic!("EVENTCDC"),
         };
     }
@@ -111,15 +111,22 @@ impl rnCDC
                 None    => panic!("no cdc handler"),
             }
     }
+    /*
+    *
+    */
     extern "C" fn bounceBack(ptr : *mut cty::c_void, instance : cty::c_int, event: c_int , payload : cty::c_uint) -> ()
     {          
-        type cookie_monster <'a>=  Box<&'a rnCDC> ;
+        //type cookie_monster <'a>=  Box<&'a rnCDC> ;
+        type cookie_monster =   rnCDC;
         unsafe {  
-        let  mut e = ptr as *mut  cookie_monster;
-        let  mut rf =&mut *e;
+        let  e : *mut cookie_monster = ptr as *mut  cookie_monster;
+        //let  rf :& mut rnCDC =  &mut **e ;
+
+        let a = &mut *e;
+            //let r: () = a;
+        a.invoke_callback( instance as usize,  cdc_events::from_u32(event as u32),payload as u32);
+           /* 
         //(*e).invoke_callback( instance as usize,  cdc_events::from_u32(event as u32),payload as u32);
-        //*rf.invoke_callback( instance as usize,  cdc_events::from_u32(event as u32),payload as u32);
-            /*
         match rf
         {
             Some(mut x) => match x.handler

@@ -27,6 +27,10 @@ pub mod rn_hal_gpio;
 pub mod rn_usb_cdc;
 #[cfg(feature = "cdc")]
 pub mod rn_cdc_c;
+#[cfg(feature = "cdc")]
+pub mod rn_usb_c;
+#[cfg(feature = "cdc")]
+pub mod rn_usb;
 
 pub struct FreeRtosAllocator;
 
