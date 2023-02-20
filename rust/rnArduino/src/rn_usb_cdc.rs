@@ -8,7 +8,7 @@ use crate::rn_cdc_c::{lncdc_create,lncdc_delete,lncdc_read,lncdc_write, lncdc_fl
 //use crate::rn_os_helper::log;
 use cty::{c_void,c_int};
 //
-trait cdc_event_handler
+pub trait cdc_event_handler
 {
     fn  handler(  &mut self, _interface : usize, _event : cdc_events ,  _payload : u32)
     {        
@@ -17,10 +17,10 @@ trait cdc_event_handler
 }
 
 //--
-pub struct rnCDC
+pub struct rnCDC  <'a>
 {
      cdc             : *mut cdc_c,  
-     handler         : Option< &'static mut dyn cdc_event_handler>,       
+     handler         : Option< &'a mut dyn cdc_event_handler>,       
 }
 //
 pub enum cdc_events
@@ -48,6 +48,7 @@ impl cdc_events
  * 
  * 
  */
+/*
 impl Drop for rnCDC
 {
     fn drop(&mut self) {
@@ -55,11 +56,11 @@ impl Drop for rnCDC
             lncdc_delete(self.cdc);
         }
     }
-}
-impl rnCDC
+}*/
+impl  <'a> rnCDC  <'a>
 {
     // ctor
-    pub fn new(instance : u32, handler : & 'static mut dyn cdc_event_handler) -> Box<rnCDC>
+    pub fn new(instance : u32, handler : & 'a mut dyn cdc_event_handler) -> Box<rnCDC>
     {
         unsafe {
         let r = Box::new(
@@ -117,7 +118,7 @@ impl rnCDC
     extern "C" fn bounceBack(ptr : *mut cty::c_void, instance : cty::c_int, event: c_int , payload : cty::c_uint) -> ()
     {          
         //type cookie_monster <'a>=  Box<&'a rnCDC> ;
-        type cookie_monster =   rnCDC;
+        type cookie_monster <'a> =   rnCDC  <'a>;
         unsafe {  
         let  e : *mut cookie_monster = ptr as *mut  cookie_monster;
         //let  rf :& mut rnCDC =  &mut **e ;

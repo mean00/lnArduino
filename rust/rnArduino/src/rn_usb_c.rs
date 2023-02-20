@@ -99,16 +99,6 @@ pub type int_fast32_t = cty::c_int;
 pub type uint_fast32_t = cty::c_uint;
 pub type int_fast64_t = cty::c_longlong;
 pub type uint_fast64_t = cty::c_ulonglong;
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct tusb_desc_device_t {
-    _unused: [u8; 0],
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct tusb_desc_device_qualifier_t {
-    _unused: [u8; 0],
-}
 pub type lnUsbStackEventHandler =
     ::core::option::Option<unsafe extern "C" fn(cookie: *mut cty::c_void, event: cty::c_int)>;
 #[repr(C)]
@@ -133,14 +123,8 @@ extern "C" {
     );
 }
 extern "C" {
-    #[link_name = "\u{1}_Z22lnusb_setConfigurationP7lnusb_cPKhS2_PK18tusb_desc_device_tPK28tusb_desc_device_qualifier_t"]
-    pub fn lnusb_setConfiguration(
-        inst: *mut lnusb_c,
-        hsConfiguration: *const u8,
-        fsConfiguration: *const u8,
-        desc: *const tusb_desc_device_t,
-        qual: *const tusb_desc_device_qualifier_t,
-    );
+    #[link_name = "\u{1}_Z22lnusb_setConfigurationP7lnusb_c"]
+    pub fn lnusb_setConfiguration(inst: *mut lnusb_c);
 }
 extern "C" {
     #[link_name = "\u{1}_Z21lnusb_setEventHandlerP7lnusb_cPKvPFvPviE"]

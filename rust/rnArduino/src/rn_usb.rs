@@ -17,7 +17,7 @@ pub enum usb_events
     RESUME=3
 }
 //
-trait usb_event_handler
+pub trait usb_event_handler
 {
     fn  handler(  &mut self,  _event : usb_events )
     {        
@@ -26,12 +26,13 @@ trait usb_event_handler
 }
 
 //--
-pub struct rnUSB
+pub struct rnUSB   <'a>
 {
      usb             : *mut usb_c,  
-     handler         : Option< &'static mut dyn usb_event_handler>,       
+     handler         : Option< &'a mut dyn usb_event_handler>,       
 }
-
+/*
+ */
 impl usb_events
 {
     pub fn from_u32( ix : u32) -> Self
@@ -50,18 +51,21 @@ impl usb_events
  * 
  * 
  */
-impl Drop for rnUSB
+/*
+impl Drop for rnUSB 
 {
     fn drop(&mut self) {
         unsafe {
             lnusb_delete(self.usb);
         }
     }
-}
-impl rnUSB
+}*/
+/*
+ */
+impl <'a> rnUSB <'a>
 {
     // ctor
-    pub fn new(instance : u32, handler : & 'static mut dyn usb_event_handler) -> Box<rnUSB>
+    pub fn new(instance : u32, handler : & 'a mut dyn usb_event_handler) -> Box<rnUSB>
     {
         unsafe {
         let r = Box::new(
@@ -75,6 +79,30 @@ impl rnUSB
         r
         }        
        
+    }
+    //
+    pub fn  set_configuration(&mut self)
+    {
+            //,  const tusb_desc_device_t *desc, const tusb_desc_device_qualifier_t *qual);
+            unsafe {
+                lnusb_setConfiguration(self.usb);
+            }
+    }
+
+    //
+    pub fn start(&mut self)
+    {
+        unsafe {
+        lnusb_start(self.usb);
+        }
+    }
+
+    //
+    pub fn stop(&mut self)
+    {
+        unsafe {
+        lnusb_stop(self.usb);
+        }
     }
 
     //
@@ -90,27 +118,12 @@ impl rnUSB
     *
     */
     extern "C" fn bounceBack(ptr : *mut cty::c_void,  event: c_int) -> ()
-    {          
-        //type cookie_monster <'a>=  Box<&'a rnCDC> ;
-        type cookie_monster =   rnUSB;
+    {                  
+        type cookie_monster<'a> =   rnUSB<'a>;
         unsafe {  
         let  e : *mut cookie_monster = ptr as *mut  cookie_monster;
-        //let  rf :& mut rnCDC =  &mut **e ;
-
         let a = &mut *e;
-            //let r: () = a;
-        a.invoke_callback(   usb_events::from_u32(event as u32));
-           /* 
-        //(*e).invoke_callback( instance as usize,  cdc_events::from_u32(event as u32),payload as u32);
-        match rf
-        {
-            Some(mut x) => match x.handler
-                        {
-                            Some(mut y) => y.handler(instance as usize, cdc_events::from_u32(event as u32) , payload as u32),
-                            None    => panic!("no cdc2"),
-                        },
-            None    => panic!("no CDC handler"),
-        }*/
+        a.invoke_callback(   usb_events::from_u32(event as u32));         
       }
     }
 }

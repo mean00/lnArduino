@@ -1,15 +1,15 @@
 
 #include "lnArduino.h"
-#include "lnUsbStack.h"
-#include "lnUsbCDC.h"
-
+#include "include/lnUsbStack.h"
+#include "include/lnUsbCDC.h"
+#include "lnCDC_c.h"
 #define WRAPME(x) ((lnUsbCDC *)x)
 /*
 
 */
 lncdc_c *   lncdc_create(uint32_t instance)
 {
-    return new lnUsbCDC((int)instance);
+    return (lncdc_c *)(new lnUsbCDC((int)instance));
 }
 /*
 
@@ -59,7 +59,7 @@ void        lncdc_clear_input_buffers(lncdc_c *instance)
 
 void        lncdc_set_event_handler(lncdc_c *instance, cdc_event_handler *handler, void *cookie)
 {
-      return WRAPME(instance)->set_event_handler(handler,cookie);
+      return WRAPME(instance)->setEventHandler(( lnUsbCDC::lnUsbCDCEventsHandler *)handler,cookie);
 }
 /*
 
