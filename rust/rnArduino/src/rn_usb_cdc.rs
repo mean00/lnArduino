@@ -1,7 +1,7 @@
 
 #![allow(dead_code)]
 use alloc::boxed::Box;
-use crate::rnarduino as rn;
+
 
 use crate::rn_cdc_c::lncdc_c as cdc_c;
 use crate::rn_cdc_c::{lncdc_create,lncdc_delete,lncdc_read,lncdc_write, lncdc_flush, lncdc_clear_input_buffers,lncdc_set_event_handler};
@@ -48,15 +48,14 @@ impl cdc_events
  * 
  * 
  */
-/*
-impl Drop for rnCDC
+impl <'a> Drop for rnCDC <'a>
 {
     fn drop(&mut self) {
         unsafe {
             lncdc_delete(self.cdc);
         }
     }
-}*/
+}
 impl  <'a> rnCDC  <'a>
 {
     // ctor
@@ -70,7 +69,7 @@ impl  <'a> rnCDC  <'a>
             }
         );
         let r_ptr = &*r as *const rnCDC;
-        lncdc_set_event_handler(r.cdc,Some(Self::bounceBack),r_ptr as *const c_void);
+        lncdc_set_event_handler(r.cdc,Some(Self::bounceBack),r_ptr as *mut c_void);
         r
         }        
        

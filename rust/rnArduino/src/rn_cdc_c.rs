@@ -102,7 +102,7 @@ pub type uint_fast64_t = cty::c_ulonglong;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct lncdc_c {
-    pub _address: u8,
+    pub dummy: *mut cty::c_void,
 }
 pub type cdc_event_handler = ::core::option::Option<
     unsafe extern "C" fn(
@@ -113,34 +113,27 @@ pub type cdc_event_handler = ::core::option::Option<
     ),
 >;
 extern "C" {
-    #[link_name = "\u{1}_Z12lncdc_createj"]
     pub fn lncdc_create(instance: cty::c_uint) -> *mut lncdc_c;
 }
 extern "C" {
-    #[link_name = "\u{1}_Z12lncdc_deleteP7lncdc_c"]
     pub fn lncdc_delete(arg1: *mut lncdc_c);
 }
 extern "C" {
-    #[link_name = "\u{1}_Z10lncdc_readP7lncdc_cPhi"]
     pub fn lncdc_read(arg1: *mut lncdc_c, buffer: *mut u8, maxSize: cty::c_int) -> cty::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}_Z11lncdc_writeP7lncdc_cPKhi"]
     pub fn lncdc_write(arg1: *mut lncdc_c, buffer: *const u8, maxSize: cty::c_int) -> cty::c_int;
 }
 extern "C" {
-    #[link_name = "\u{1}_Z11lncdc_flushP7lncdc_c"]
     pub fn lncdc_flush(arg1: *mut lncdc_c);
 }
 extern "C" {
-    #[link_name = "\u{1}_Z25lncdc_clear_input_buffersP7lncdc_c"]
     pub fn lncdc_clear_input_buffers(arg1: *mut lncdc_c);
 }
 extern "C" {
-    #[link_name = "\u{1}_Z23lncdc_set_event_handlerP7lncdc_cPFvPviijEPKv"]
     pub fn lncdc_set_event_handler(
         arg1: *mut lncdc_c,
         h: cdc_event_handler,
-        cookie: *const cty::c_void,
+        cookie: *mut cty::c_void,
     );
 }

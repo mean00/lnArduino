@@ -1,9 +1,11 @@
 #pragma once
 #include "stdint.h"
-struct ln_i2c_c  // opaque
-{
 
+struct  ln_i2c_c  // opaque
+{
+    void *dummy;
 };
+
 
 
 ln_i2c_c *lni2c_create(int instance, int speed);
@@ -16,4 +18,5 @@ bool    lni2c_write_to(ln_i2c_c *ptr,int target, uint32_t n, const uint8_t *data
 bool    lni2c_multi_write_to(ln_i2c_c *ptr,int target, uint32_t nbSeqn,const uint32_t *seqLength, const uint8_t **data);
 bool    lni2c_read_from(ln_i2c_c *ptr,int target,  uint32_t n, uint8_t *data);
 bool    lni2c_begin(ln_i2c_c *ptr,int target);
+
 // EOF

@@ -1,7 +1,6 @@
 
 #![allow(dead_code)]
 use alloc::boxed::Box;
-use crate::rnarduino as rn;
 
 use crate::rn_usb_c::lnusb_c as usb_c;
 use crate::rn_usb_c::{lnusb_create,lnusb_delete,lnusb_start,lnusb_stop,lnusb_setConfiguration, lnusb_setEventHandler};
@@ -51,15 +50,15 @@ impl usb_events
  * 
  * 
  */
-/*
-impl Drop for rnUSB 
+
+impl <'a> Drop for rnUSB  <'a>
 {
     fn drop(&mut self) {
         unsafe {
             lnusb_delete(self.usb);
         }
     }
-}*/
+}
 /*
  */
 impl <'a> rnUSB <'a>

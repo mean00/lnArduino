@@ -104,18 +104,15 @@ pub type lnUsbStackEventHandler =
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct lnusb_c {
-    pub _address: u8,
+    pub dummy: *mut cty::c_void,
 }
 extern "C" {
-    #[link_name = "\u{1}_Z12lnusb_createj"]
     pub fn lnusb_create(instance: cty::c_uint) -> *mut lnusb_c;
 }
 extern "C" {
-    #[link_name = "\u{1}_Z12lnusb_deleteP7lnusb_c"]
     pub fn lnusb_delete(arg1: *mut lnusb_c);
 }
 extern "C" {
-    #[link_name = "\u{1}_Z10lnusb_initP7lnusb_ciPPKc"]
     pub fn lnusb_init(
         inst: *mut lnusb_c,
         nbDescriptorLine: cty::c_int,
@@ -123,11 +120,9 @@ extern "C" {
     );
 }
 extern "C" {
-    #[link_name = "\u{1}_Z22lnusb_setConfigurationP7lnusb_c"]
     pub fn lnusb_setConfiguration(inst: *mut lnusb_c);
 }
 extern "C" {
-    #[link_name = "\u{1}_Z21lnusb_setEventHandlerP7lnusb_cPKvPFvPviE"]
     pub fn lnusb_setEventHandler(
         inst: *mut lnusb_c,
         cookie: *const cty::c_void,
@@ -135,10 +130,8 @@ extern "C" {
     );
 }
 extern "C" {
-    #[link_name = "\u{1}_Z11lnusb_startP7lnusb_c"]
     pub fn lnusb_start(inst: *mut lnusb_c);
 }
 extern "C" {
-    #[link_name = "\u{1}_Z10lnusb_stopP7lnusb_c"]
     pub fn lnusb_stop(inst: *mut lnusb_c);
 }
