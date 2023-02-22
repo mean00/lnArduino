@@ -16,19 +16,34 @@ pub enum usb_events
     RESUME=3
 }
 //
+impl usb_events
+{
+    pub fn to_str(&self) -> &'static str
+    {
+        return match self
+        {
+            usb_events::CONNECT     =>  "CONNECT",
+            usb_events::DISCONNECT  =>  "DISCONNECT",
+            usb_events::SUSPEND     =>  "SUSPEND",
+            usb_events::RESUME      =>  "RESUME",
+        }
+    }
+}
+//
 pub trait usb_event_handler
 {
-    fn  handler(  &mut self,  _event : usb_events )
+    fn  handler(  &self,  _event : usb_events )
     {        
         panic!("oops");
     }
+  
 }
 
 //--
 pub struct rnUSB   <'a>
 {
      usb             : *mut usb_c,  
-     handler         : Option< &'a mut dyn usb_event_handler>,       
+     handler         : Option< &'a dyn usb_event_handler>,       
 }
 /*
  */
@@ -64,7 +79,7 @@ impl <'a> Drop for rnUSB  <'a>
 impl <'a> rnUSB <'a>
 {
     // ctor
-    pub fn new(instance : u32, handler : & 'a mut dyn usb_event_handler) -> Box<rnUSB>
+    pub fn new(instance : u32, handler : & 'a  dyn usb_event_handler) -> Box<rnUSB>
     {
         unsafe {
         let r = Box::new(

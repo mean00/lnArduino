@@ -11,6 +11,7 @@ pub type size_t = cty::c_uint;
 use core::panic::PanicInfo;
 // C api -> bindgen
 mod rn_i2c_c;
+mod rn_fast_event_c;
 pub mod rnarduino;
 // internal API
 pub mod rn_gpio;

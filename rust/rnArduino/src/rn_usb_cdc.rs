@@ -10,7 +10,7 @@ use cty::{c_void,c_int};
 //
 pub trait cdc_event_handler
 {
-    fn  handler(  &mut self, _interface : usize, _event : cdc_events ,  _payload : u32)
+    fn  handler(  &self, _interface : usize, _event : cdc_events ,  _payload : u32)
     {        
         panic!("oops");
     }
@@ -20,7 +20,7 @@ pub trait cdc_event_handler
 pub struct rnCDC  <'a>
 {
      cdc             : *mut cdc_c,  
-     handler         : Option< &'a mut dyn cdc_event_handler>,       
+     handler         : Option< &'a dyn cdc_event_handler>,       
 }
 //
 pub enum cdc_events
@@ -36,11 +36,21 @@ impl cdc_events
     {
         return match ix {
            0 /*rn::lnUsbCDC_lnUsbCDCEvents::CDC_DATA_AVAILABLE*/ => cdc_events::DATA_AVAILABLE,
-           1 /*rn::lnUsbCDC_lnUsbCDCEvents::CDC_SESSION_START*/  => cdc_events::SESSION_END,
+           1 /*rn::lnUsbCDC_lnUsbCDCEvents::CDC_SESSION_START*/  => cdc_events::SESSION_START,
            2 /*rn::lnUsbCDC_lnUsbCDCEvents::CDC_SESSION_END*/    => cdc_events::SESSION_END,
            3 /*rn::lnUsbCDC_lnUsbCDCEvents::CDC_SET_SPEED*/      => cdc_events::SET_SPEED,
             _ => panic!("EVENTCDC"),
         };
+    }
+    pub fn to_str(&self) -> &'static str
+    {
+        return match self
+        {
+            cdc_events::DATA_AVAILABLE  =>  "DATA_AVL",
+            cdc_events::SESSION_END     =>  "END",
+            cdc_events::SESSION_START   =>  "START",
+            cdc_events::SET_SPEED       =>  "SPEED",
+        }
     }
 }
 
@@ -59,7 +69,7 @@ impl <'a> Drop for rnCDC <'a>
 impl  <'a> rnCDC  <'a>
 {
     // ctor
-    pub fn new(instance : u32, handler : & 'a mut dyn cdc_event_handler) -> Box<rnCDC>
+    pub fn new(instance : u32, handler : & 'a dyn cdc_event_handler) -> Box<rnCDC>
     {
         unsafe {
         let r = Box::new(

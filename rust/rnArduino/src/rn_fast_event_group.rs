@@ -2,10 +2,13 @@
 
 use alloc::boxed::Box;
 use crate::rnarduino as rn;
+use crate::rn_fast_event_c::{lnfast_event_group_c,  lnfast_event_group_create,  lnfast_event_group_delete,
+                            lnfast_event_group_wait_events,  lnfast_event_group_read_events,
+                            lnfast_event_group_takeOwnership,  lnfast_event_group_set_events};
 
 pub struct rnFastEventGroup
 {
-     ln : Box<rn::lnFastEventGroup> ,
+     ln : *const lnfast_event_group_c ,
 }
 impl Default for rnFastEventGroup 
 {
@@ -19,7 +22,7 @@ impl rnFastEventGroup
     {
         unsafe {
             let t: rnFastEventGroup = rnFastEventGroup{
-                ln : Box::new(rn::lnFastEventGroup::new()),
+                ln : lnfast_event_group_create(),
             };
             t
         }
@@ -32,34 +35,34 @@ impl rnFastEventGroup
     pub fn take_ownership(&mut self)
     {
         unsafe {
-            self.ln.takeOwnership();
+            lnfast_event_group_takeOwnership(self.ln);
         }
     }
     ///
     /// 
     /// 
-    pub fn set_events(&mut self, event : u32)
+    pub fn set_events(&self, event : u32)
     {
         unsafe {
-            self.ln.setEvents(event);
+            lnfast_event_group_set_events(self.ln,event);
         }
     }
     ///
     /// 
     /// 
-    pub fn wait_events(&mut self, maskint : u32, timeout : i32) -> u32
+    pub fn wait_events(&self, maskint : u32, timeout : i32) -> u32
     {
         unsafe {
-            self.ln.waitEvents(maskint,timeout)
+            return lnfast_event_group_wait_events(self.ln, maskint, timeout);
         }
     } 
     ///
     /// 
     /// 
-    pub fn read_events(&mut self, maskint : u32) -> u32
+    pub fn read_events(&self, msk : u32) -> u32
     {
         unsafe {
-            self.ln.readEvents(maskint)
+            return lnfast_event_group_read_events(self.ln, msk);
         }
     } 
 }

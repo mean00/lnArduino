@@ -102,7 +102,7 @@ pub type uint_fast64_t = cty::c_ulonglong;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct ln_i2c_c {
-    pub _address: u8,
+    pub dummy: *mut cty::c_void,
 }
 extern "C" {
     #[link_name = "\u{1}_Z12lni2c_createii"]
