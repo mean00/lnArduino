@@ -10,4 +10,6 @@ IF(LN_ENABLE_USBD)
             )
 ENDIF()
 
-add_library(lnarduino_c_bindings STATIC ${C}/lnI2C_c.cpp ${USB} )
+add_library(lnarduino_c_bindings STATIC ${C}/lnI2C_c.cpp 
+                                        ${C}/lnFast_EventGroup_c.cpp
+                                        ${USB} )
