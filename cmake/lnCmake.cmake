@@ -3,11 +3,7 @@ include(lnCmake_${LN_TOOLCHAIN_EXT})
 #______________________________________
 
 MACRO (LN_APPEND_FLAGS target)
-    SET_PROPERTY(   
-                    SOURCE ${target}
-                    PROPERTY COMPILE_FLAGS ${ARGN}
-                    APPEND
-            ) 
+    SET_PROPERTY(   SOURCE ${target} APPEND_STRING PROPERTY COMPILE_OPTIONS ${ARGN}) 
     GET_SOURCE_FILE_PROPERTY(flags ${target} COMPILE_FLAGS)
 ENDMACRO (LN_APPEND_FLAGS)
 #______________________________________
