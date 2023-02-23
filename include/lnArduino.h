@@ -57,7 +57,11 @@ extern "C"
 #define LN_ALIGN(x) __attribute__ ((aligned(x)))
 #define LN_USED __attribute__((used))
 
-extern "C" void free(void *a) _NOTHROW;
-extern "C" void *malloc(size_t size)  _NOTHROW __attribute_malloc__;
+#ifndef LN_LINUX
+    extern "C" void free(void *a) _NOTHROW;
+    extern "C" void *malloc(size_t size)  _NOTHROW __attribute_malloc__;
+#else
+    #include "stdlib.h"    
+#endif //LN_LINUX
 
 extern volatile uint32_t lnScratchRegister; // used to prevent optimisation
