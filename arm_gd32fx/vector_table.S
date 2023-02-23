@@ -39,5 +39,8 @@ __stm32_vector_table:
     .long   __trap
     .long   __trap
 	.long   __trap
+	.long   __trap
+	.word   0x1234
+	.word   0x5678
 	.size	__stm32_vector_table, . - __stm32_vector_table
 
