@@ -34,7 +34,7 @@ cat $1 >> $TMP
 \rm -f rnArduino.rs.tmp
 $BINDGEN      --use-core --no-doc-comments \
      --no-layout-tests      $TMP \
-    --ctypes-prefix cty \
+    --ctypes-prefix core::ffi \
     --rustified-enum "ln.*" \
     -o $2.tmp \
     -- -x c   -DLN_ARCH=LN_ARCH_ARM \
