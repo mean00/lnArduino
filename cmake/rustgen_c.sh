@@ -10,7 +10,8 @@ output=$2
 ME=$0
 export ME=`realpath $ME`
 export ME=`dirname $ME`
-export BINDGEN=/usr/bin/bindgen
+#export BINDGEN=/usr/bin/bindgen
+export BINDGEN=~/.cargo/bin/bindgen
 export LN=`realpath $ME/..` 
 
 export PLATFORM_TOOLCHAIN_PATH=`cmake -DHOME=$LN -P $ME/toolchain_env.cmake 2>& 1`
@@ -35,6 +36,7 @@ cat $1 >> $TMP
 $BINDGEN      --use-core --no-doc-comments \
      --no-layout-tests      $TMP \
     --ctypes-prefix core::ffi \
+     \
     --rustified-enum "ln.*" \
     -o $2.tmp \
     -- -x c   -DLN_ARCH=LN_ARCH_ARM \
