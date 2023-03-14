@@ -66,7 +66,10 @@ int write(uint8_t *buffer, int maxSize);
 */
 void lnUsbCDC::flush()
 {
-  tud_cdc_n_write_flush(_instance);
+  while(  tud_cdc_n_write_flush(_instance) != 0)
+  {
+    
+  }
 }
 /**
 
