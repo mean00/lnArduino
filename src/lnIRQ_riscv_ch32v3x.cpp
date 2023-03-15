@@ -440,6 +440,8 @@ void  __attribute__((weak))  USBHS_IRQHandler()
 {
     xAssert(0);
 }
-
+void lnSoftSystemReset()
+{
+}
 // EOF
 
