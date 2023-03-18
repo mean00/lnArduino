@@ -158,21 +158,51 @@ void lnPeripherals::enableUsb48Mhz()
   // careful, the usb clock must be off !
   int scaler=(2*lnPeripherals::getClock(pSYSCLOCK))/48000000;
   int x=0;
-  switch(scaler)
+   switch(lnCpuID::vendor())
   {
-      case 3: x=0;break; // 3/2=1.5
-      case 2: x=1;break; // 2/2=1
-      case 5: x=2;break; // 5/2=2.5
-      case 4: x=3;break; // 4/2=2
-      default:
-        xAssert(0); // invalid sys clock
-        break;
-  }
+            case lnCpuID::LN_MCU_STM32:
+              // STM32F1 chip only supports div by 1 and div by 1.5, i.e. x=0 or 1
+              switch(scaler)
+                {
+                    case 3: x=0;break; // 3/2=1.5
+                    case 2: x=1;break; // 2/2=1
+                    default:
+                                     xAssert(0); // invalid sys clock
+                        break;
+                }
+                break;
+            case lnCpuID::LN_MCU_CH32: // For riscv chip CH32V303/.. FIXME
+            {
+              switch(scaler)
+                {
+                    case 2: x=0;break; // 48 Mhz
+                    case 4: x=1;break; // 96 Mhz
+                    case 6: x=2;break; // 144 Mhz
+                    default:
+                                     xAssert(0); // invalid sys clock
+                        break;
+                }
+                // enable internal pullup/down
+                volatile uint32_t *exten=(volatile uint32_t *)0x40023800;
+                volatile uint32_t reg=*exten;
+                reg |= 2;
+                *exten=reg;
+            }
+                break;
+          // only GD32 has more dividers
+            case lnCpuID::LN_MCU_GD32:
+              switch(scaler)
+                {
+                    case 3: x=0;break; // 3/2=1.5
+                    case 2: x=1;break; // 2/2=1
+                    case 5: x=2;break; // 5/2=2.5
+                    case 4: x=3;break; // 4/2=2
+                    default:
+                                     xAssert(0); // invalid sys clock
+                        break;
+                }
+                break;
 
-  if(lnCpuID::vendor()!=lnCpuID::LN_MCU_GD32)
-  {
-    if(x>1) xAssert(0); // STM32F1 chip only supports div by 1 and div by 1.5, i.e. x=0 or 1
-                        // only GD32 has more dividers
   }
   uint32_t cfg0=arcu->CFG0;
   cfg0&=LN_RCU_CFG0_USBPSC_MASK;

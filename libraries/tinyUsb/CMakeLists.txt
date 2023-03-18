@@ -29,7 +29,7 @@ ENDIF()
 
 
 
-IF( ${LN_MCU} STREQUAL "CH32V3x") 
+IF( USE_CH32v3x_USB_HS ) # ${LN_MCU} STREQUAL "CH32V3x") 
     SET(CH32V3x_FOLDER      ${CMAKE_CURRENT_SOURCE_DIR}/ch32v3x/)
     SET(DRIVERS             ${CH32V3x_FOLDER}/dcd_usbhs.cpp       ${LNSRC}/lnUsbStack.cpp  ${LNSRC}/lnUsbStubs.cpp)
     SET(LN_OPT_TUSB_MCU     OPT_MCU_CH32V307)

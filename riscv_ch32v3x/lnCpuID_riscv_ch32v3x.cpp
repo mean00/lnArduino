@@ -1,14 +1,13 @@
 #include "Arduino.h"
 #include "MapleFreeRTOS1000_pp.h"
 #include "lnCpuID.h"
-#include "lnSCB_arm_priv.h"
 
 
 static lnCpuID::LN_MCU    _mcu;
 static lnCpuID::LN_VENDOR _vendor;
 static int      _flashSize=0;
 static int      _ramSize=0;
-extern LN_SCB_Registers *aSCB;
+
 
 enum MCU_IDENTIFICATION
 {

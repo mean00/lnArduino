@@ -61,7 +61,7 @@ ENDIF()
 #
 #
 IF(LN_ENABLE_USBD)
-  IF("${LN_MCU}" STREQUAL "CH32V3x")
+  IF(USE_CH32v3x_USB_HS) #IF("${LN_MCU}" STREQUAL "CH32V3x")
     SET(IMPL ../riscv_ch32v3x/lnUSBD_ch32v3x.cpp)    
   ELSE()    
     SET(IMPL lnUSBD.cpp)
