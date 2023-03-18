@@ -4,16 +4,20 @@ IF("${LN_MCU}" STREQUAL "CH32V3x")
     SET(EXTRA_OVERLAY lnRCU_ch32v3x.cpp)
  ENDIF()
 
-SET(OVERLAY_SRCS       MapleFreeRTOS1000_pp.cpp systemAlloc.cpp lnDebug.cpp lnSerial.cpp lnGPIO.cpp                      
+ SET(TARGET_SPECIFIC_SOURCES
+                       ../${LN_EXT}/lnRCU_systemClock_${LN_EXT}.cpp 
+                       ../${LN_EXT}/lnIRQ_${LN_EXT}.cpp 
+                       ../${LN_EXT}/lnRunTime_${LN_EXT}.cpp
+                       ../${LN_EXT}/lnSystemTimer_${LN_EXT}.cpp 
+                       ../${LN_EXT}/lnCpuID_${LN_EXT}.cpp 
+                       )
+
+SET(OVERLAY_SRCS       
+                       ${TARGET_SPECIFIC_SOURCES}
+                       MapleFreeRTOS1000_pp.cpp systemAlloc.cpp lnDebug.cpp lnSerial.cpp lnGPIO.cpp                      
                        lnDma.cpp 
                        lnSystemInit.cpp lnRCU.cpp 
-                       lnRCU_systemClock_${LN_EXT}.cpp 
-                       lnIRQ_${LN_EXT}.cpp 
-                       lnRunTime_${LN_EXT}.cpp
-                       
-                       lnSystemTimer_${LN_EXT}.cpp 
-                       lnCpuID_${LN_EXT}.cpp 
-                       lnDAC.cpp lnExti.cpp
+                       lnExti.cpp
                        lnBasicTimer.cpp
                        lnBasicDelayTimer.cpp
                        lnDelayTimer.cpp
