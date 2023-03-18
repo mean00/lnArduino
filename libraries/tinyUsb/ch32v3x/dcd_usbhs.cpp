@@ -446,10 +446,13 @@ void dcd_int_handler(uint8_t rhport) {
 
 
 extern "C" void dcd_int_handler(uint8_t port);
+extern "C" 
+{
+void USBHS_IRQHandler() LN_INTERRUPT_TYPE;
 void USBHS_IRQHandler()
 {
     dcd_int_handler(0);
 }
-
+}
 
 

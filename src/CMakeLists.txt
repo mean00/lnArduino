@@ -1,7 +1,7 @@
 include(../setup.cmake)
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/../private_include)
 IF("${LN_MCU}" STREQUAL "CH32V3x")
-    SET(EXTRA_OVERLAY lnRCU_ch32v3x.cpp)
+    SET(EXTRA_OVERLAY ../riscv_ch32v3x/lnRCU_ch32v3x.cpp)
  ENDIF()
 
  SET(TARGET_SPECIFIC_SOURCES
@@ -62,7 +62,7 @@ ENDIF()
 #
 IF(LN_ENABLE_USBD)
   IF("${LN_MCU}" STREQUAL "CH32V3x")
-    SET(IMPL lnUSBD_ch32v3x.cpp)    
+    SET(IMPL ../riscv_ch32v3x/lnUSBD_ch32v3x.cpp)    
   ELSE()    
     SET(IMPL lnUSBD.cpp)
   ENDIF()
