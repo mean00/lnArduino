@@ -17,7 +17,8 @@ OPTION(LN_ENABLE_SPI  "Enable SPI support" ON)
 
 OPTION(LN_ENABLE_RUST "Enable rust support" OFF)
 
-OPTION(USE_CH32v3x_USB_HS "Use the USB HS interface (CH32V307 only)" FALSE)
+OPTION(USE_CH32v3x_USB_HS  "Use the USB HS interface (CH32V307 only)" FALSE)
+OPTION(USE_CH32v3x_USB_OTG "Use the USB OTG interface (CH32V30x only)" FALSE)
 
 
 IF(LN_BOOTLOADER_SIZE)

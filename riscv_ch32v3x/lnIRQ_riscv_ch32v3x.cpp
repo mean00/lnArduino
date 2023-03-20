@@ -95,6 +95,7 @@ void DMA1_Channel6_IRQHandler() LN_INTERRUPT_TYPE;
 void DMA1_Channel7_IRQHandler() LN_INTERRUPT_TYPE;
 void USBHSWakeup_IRQHandler()   LN_INTERRUPT_TYPE;
 void USBHS_IRQHandler()         LN_INTERRUPT_TYPE;
+void OTG_FS_IRQHandler()         LN_INTERRUPT_TYPE;
 }
 //extern void USB_TX_IRQHandler()     LN_INTERRUPT_TYPE;
 //extern void USB_RX_IRQHandler()     LN_INTERRUPT_TYPE;
@@ -199,7 +200,7 @@ static const uint32_t vecTable[]  __attribute__((aligned(32)))=
     X(unsupported), //.word   CAN2_RX0_IRQHandler        /* CAN2 RX0 */
     X(unsupported), //.word   CAN2_RX1_IRQHandler        /* CAN2 RX1 */
     X(unsupported), //.word   CAN2_SCE_IRQHandler        /* CAN2 SCE */
-    X(unsupported), //.word   OTG_FS_IRQHandler          /* OTGFS */
+    X(OTG_FS_IRQHandler), //.word   OTG_FS_IRQHandler          /* OTGFS */
     X(unsupported), //.word   USBHSWakeup_IRQHandler     /* USBHS Wakeup */
     X(USBHS_IRQHandler), //.word   USBHS_IRQHandler           /* USBHS */
     X(unsupported), //.word   DVP_IRQHandler             /* DVP */
