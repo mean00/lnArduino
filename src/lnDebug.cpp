@@ -28,7 +28,9 @@ extern "C" void Logger_C(const char *fmt,...)
 */
 extern "C" void Logger_chars(int n, const char *data)
 {
-  #ifdef LOGGER_USE_DMA
+  if(!n)
+    return; // 0 sized dma does not work...
+#ifdef LOGGER_USE_DMA
     serial0->dmaTransmit(n,(uint8_t *)data);
 #else
     serial0->transmit(n,(uint8_t *)data);
