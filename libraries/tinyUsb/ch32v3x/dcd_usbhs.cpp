@@ -310,7 +310,7 @@ bool dcd_edpt_xfer(uint8_t rhport, uint8_t ep_addr, uint8_t *buffer, uint16_t to
                 USBHSD->UEP_TX_DMA[epnum-1] = (uint32_t)buffer;
                 USBHSD->ENDP_CONFIG |= (USBHS_EP0_T_EN << epnum);
                 lenSet(epnum,  short_packet_size);
-                rxControl(epnum,USBHS_EP_T_RES_MASK ,USBHS_EP_T_RES_ACK);
+                txControl(epnum,USBHS_EP_T_RES_MASK ,USBHS_EP_T_RES_ACK);
             }
         }
     } else { /* TUSB_DIR_OUT */
