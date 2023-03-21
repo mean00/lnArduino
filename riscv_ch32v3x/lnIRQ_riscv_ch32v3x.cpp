@@ -71,11 +71,11 @@ void  __attribute__ ((noinline)) HardFault()
 
 extern "C"
 {
-void SysTick_Handler();
-void Ecall_M_Mode_Handler();
-void Ecall_U_Mode_Handler();
-void SW_Handler();
-void USART0_IRQHandler();
+void SysTick_Handler() LN_INTERRUPT_TYPE;
+void Ecall_M_Mode_Handler() LN_INTERRUPT_TYPE;
+void Ecall_U_Mode_Handler() LN_INTERRUPT_TYPE;
+void SW_Handler() LN_INTERRUPT_TYPE;
+void USART0_IRQHandler() LN_INTERRUPT_TYPE;
 void DMA0_Channel0_IRQHandler() LN_INTERRUPT_TYPE;
 void DMA0_Channel1_IRQHandler() LN_INTERRUPT_TYPE;
 void DMA0_Channel2_IRQHandler() LN_INTERRUPT_TYPE;
@@ -388,7 +388,10 @@ void lnDisableInterrupt(const LnIRQ &irq)
 }
 
 
-#define DMA_IRQ(d,c) extern "C" void DMA##d##_Channel##c##_IRQHandler(void) { dmaIrqHandler(d,c);}
+#define DMA_IRQ(d,c) \
+            extern "C" void DMA##d##_Channel##c##_IRQHandler(void) LN_INTERRUPT_TYPE; \
+            extern "C" void DMA##d##_Channel##c##_IRQHandler(void) { dmaIrqHandler(d,c);}
+
 /**
  * 
  * @param dma
@@ -436,8 +439,12 @@ void  __attribute__((weak)) USB_RX_IRQHandler()
 {
     xAssert(0);
 }
-
 void  __attribute__((weak))  USBHS_IRQHandler()
+{
+    xAssert(0);
+}
+
+void  __attribute__((weak))  OTG_FS_IRQHandler()
 {
     xAssert(0);
 }
