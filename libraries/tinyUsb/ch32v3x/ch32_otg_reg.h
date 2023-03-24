@@ -23,8 +23,9 @@ typedef struct
     uint8_t INT_ST;      // 07
 
     uint16_t RX_LEN;     // 08
-    uint8_t  mod[4];      // 0C 41 23 56 7_
-    uint32_t dma[8];   //0x10
+    uint16_t padder2;    // 0A
+    uint8_t  mod[4];     // 0C 41 23 56 7_
+    uint32_t dma[8];     //0x10
     endpoints ep[8];    //0x30
 
     uint32_t padder;     // 50
