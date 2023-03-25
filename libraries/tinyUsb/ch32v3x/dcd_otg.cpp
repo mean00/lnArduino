@@ -108,7 +108,7 @@ void dcd_init(uint8_t rhport) {
     xDelay(1);
     USBOTGD->DEV_ADDRESS = 0;
     USBOTGD->CTRL = 0;
-    USBOTGD->INT_EN = USBOTG_INT_EN_BUS_RESET_IE + USBOTG_INT_EN_TRANSFER_IE; // + USBOTG_INT_NAK_IE;
+    USBOTGD->INT_EN = USBOTG_INT_EN_BUS_RESET_IE + USBOTG_INT_EN_TRANSFER_IE + USBOTG_INT_EN_SUSPEND_IE; // + USBOTG_INT_NAK_IE;
     USBOTGD->CTRL = USBOTG_CTRL_PULLUP_ENABLE+ USBOTG_CTRL_DMA_ENABLE + USBOTG_CTRL_INT_BUSY;
 
 
@@ -120,6 +120,11 @@ void dcd_init(uint8_t rhport) {
 
 }
 
+void dcd_set_address(uint8_t rhport, uint8_t dev_addr) 
+{
+    // Response with zlp status
+    dcd_edpt_xfer(rhport, 0x80, NULL, 0);
+}
 
 
 /**
@@ -261,6 +266,23 @@ void dcd_int_reset()
 
     dcd_event_bus_reset(0, TUSB_SPEED_FULL, true);
 }
+
+extern "C" void dcd_edpt0_status_complete(uint8_t rhport, tusb_control_request_t const *request) {
+    (void)rhport;
+
+    if (request->bmRequestType_bit.recipient == TUSB_REQ_RCPT_DEVICE &&
+        request->bmRequestType_bit.type == TUSB_REQ_TYPE_STANDARD &&
+        request->bRequest == TUSB_REQ_SET_ADDRESS) 
+    {
+        USBOTGD->DEV_ADDRESS = (uint8_t)request->wValue;
+    }
+
+    txSet(0, USBOTG_EP_RES_NACK);
+    rxSet(0, USBOTG_EP_RES_ACK);
+
+}
+
+
 /**
     It's ep_out so it's a read
 */
@@ -388,6 +410,11 @@ void dcd_int_handler(uint8_t rhport)
             USBOTGD->INT_FG = USBOTG_INT_FG_TRANSFER_COMPLETE;
             return;      
                     
+    }
+    if(fg & USBOTG_INT_FG_SUSPEND)
+    {
+        USBOTGD->INT_FG = USBOTG_INT_FG_SUSPEND;
+        return;      
     }
     xAssert(0);
 }

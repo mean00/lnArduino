@@ -85,13 +85,6 @@ void dcd_edpt_close_all(uint8_t rhport) {
 }
 /**
 */
-void dcd_set_address(uint8_t rhport, uint8_t dev_addr) {
-    (void)dev_addr;
-
-    USBOTGD->DEV_ADDRESS = dev_addr;
-    // Response with zlp status
-    dcd_edpt_xfer(rhport, 0x80, NULL, 0);
-}
 /**
 */
 void dcd_remote_wakeup(uint8_t rhport)
