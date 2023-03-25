@@ -66,4 +66,21 @@ typedef volatile LN_USB_OTG_DEVICEx LN_USB_OTG_DEVICE;
 #define USBOTG_INT_ST_TOKEN_PID_MASK        (0x30)
 #define USBOTG_INT_ST_TOG_OK                (1<<6)
 
+#define USBOTG_EP_RES_MASK                  (3<<0)
+#define USBOTG_EP_RES_ACK                   (0<<0)
+#define USBOTG_EP_RES_NACK                  (2<<0)
+#define USBOTG_EP_RES_STALL                 (3<<0)
+#define USBOTG_EP_RES_NAK                   USBOTG_EP_RES_NACK
+
+#define USBOTG_EP_RES_AUTOTOG               (1<<3)
+#define USBOTG_EP_RES_TOG1                  (1<<2)
+#define USBOTG_EP_RES_TOG0                  (0<<2)
+
+
+// 00: OUT, 01:SOF, 10:IN, 11:SETUP
+#define PID_OUT   0
+#define PID_SOF   1
+#define PID_IN    2
+#define PID_SETUP 3
+
 

@@ -108,7 +108,7 @@
 #define USBHS_EP_T_LEN_MASK (0x7FF)
 
 //UEPn_TX_CTRL
-#define USBHS_EP_T_RES_MASK  (3 << 0)
+#define USBHS_EP_T_RES_MASK  ( (3 << 0))
 #define USBHS_EP_T_RES_ACK   (0 << 0)
 #define USBHS_EP_T_RES_NYET  (1 << 0)
 #define USBHS_EP_T_RES_NAK   (2 << 0)
@@ -123,7 +123,7 @@
 #define USBHS_EP_T_AUTOTOG (1 << 5)
 
 //UEPn_RX_CTRL
-#define USBHS_EP_R_RES_MASK  (3 << 0)
+#define USBHS_EP_R_RES_MASK ( (3 << 0))
 #define USBHS_EP_R_RES_ACK   (0 << 0)
 #define USBHS_EP_R_RES_NYET  (1 << 0)
 #define USBHS_EP_R_RES_NAK   (2 << 0)

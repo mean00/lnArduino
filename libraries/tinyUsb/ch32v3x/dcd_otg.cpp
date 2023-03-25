@@ -28,7 +28,6 @@ https://github.com/openwch/ch32v20x/blob/main/EVT/EXAM/USB/USBFS/DEVICE/CH372Dev
 #include "tusb_option.h"
 #include "device/dcd.h"
 #include "ch32_otg_reg.h"
-#include "ch32_usbhs_reg.h"
 #include "ch32_extra.h"
 #undef USBHSD
 #define CHECK_ALIGNED(x) { if(((uint32_t)x) &3) xAssert(0);}
@@ -46,11 +45,11 @@ static void setEndpointMode(int endpoint, bool mod, bool enable_tx, bool enable_
 
 #if TUD_OPT_HIGH_SPEED
     #define MAXIMUM_PACKET_LEN  512
-    #define SPEED_BITS          USBHS_HIGH_SPEED;
+    #define SPEED_BITS          USBOTG_HIGH_SPEED;
     #define REPORTED_SPEED      TUSB_SPEED_HIGH
 #else
     #define MAXIMUM_PACKET_LEN  64
-    #define SPEED_BITS          USBHS_FULL_SPEED
+    #define SPEED_BITS          USBOTG_FULL_SPEED
     #define REPORTED_SPEED      TUSB_SPEED_FULL
 #endif   
 
@@ -113,8 +112,8 @@ void dcd_init(uint8_t rhport) {
     USBOTGD->CTRL = USBOTG_CTRL_PULLUP_ENABLE+ USBOTG_CTRL_DMA_ENABLE + USBOTG_CTRL_INT_BUSY;
 
 
-    txSet(0, USBHS_EP_T_RES_NAK);
-    rxSet(0, USBHS_EP_R_RES_ACK);
+    txSet(0, USBOTG_EP_RES_NACK);
+    rxSet(0, USBOTG_EP_RES_ACK);
 
     USBOTGD->INT_FG = 0xff; // clear interrupt (again)
     USBOTGD->DEVICE_CTRL = USBOTG_DEVICE_CTRL_ENABLE;
@@ -139,10 +138,10 @@ bool dcd_edpt_open(uint8_t rhport, tusb_desc_endpoint_t const *desc_edpt) {
     if (epnum != 0) 
     {
         if (tu_edpt_dir(desc_edpt->bEndpointAddress) == TUSB_DIR_OUT) {
-            rxSet(epnum, USBHS_EP_R_AUTOTOG | USBHS_EP_R_RES_ACK);
+            rxSet(epnum, USBOTG_EP_RES_AUTOTOG | USBOTG_EP_RES_ACK);
         } else {            
             txLenSet(epnum, 0);
-            txSet(epnum, USBHS_EP_T_AUTOTOG | USBHS_EP_T_RES_NAK | USBHS_EP_T_TOG_0);
+            txSet(epnum, USBOTG_EP_RES_AUTOTOG | USBOTG_EP_RES_NACK | USBOTG_EP_RES_TOG0);
         }
     }
     return true;
@@ -166,7 +165,7 @@ bool dcd_edpt_xfer_ep_in( xfer_ctl_t *xfer, uint8_t epnum, uint16_t total_bytes)
             txLenSet(0, short_packet_size);
             memcpy( getBufferAddress(0,1), xfer->buffer, short_packet_size );            
         }
-        txSet(0, USBHS_EP_T_RES_ACK | (ep0_tx_tog ? USBHS_EP_T_TOG_1 : USBHS_EP_T_TOG_0));
+        txSet(0, USBOTG_EP_RES_ACK | (ep0_tx_tog ? USBOTG_EP_RES_TOG1 : USBOTG_EP_RES_TOG0));
         return true;
     }
     // Other EP
@@ -181,7 +180,7 @@ bool dcd_edpt_xfer_ep_in( xfer_ctl_t *xfer, uint8_t epnum, uint16_t total_bytes)
         // copy to Tx dma
         memcpy( getBufferAddress(epnum,1), xfer->buffer, short_packet_size );        
     }
-    txControl(epnum,USBHS_EP_T_RES_MASK ,USBHS_EP_T_RES_ACK); // go!
+    txControl(epnum,USBOTG_EP_RES_MASK ,USBOTG_EP_RES_ACK); // go!
     return true;
 }
 /*
@@ -197,13 +196,13 @@ bool dcd_edpt_xfer_ep_out( xfer_ctl_t *xfer, uint8_t epnum, uint16_t total_bytes
             xAssert(total_bytes<=xfer->max_size);
         }        
         if(ep0_rx_tog)
-                rxSet(0,USBHS_EP_R_RES_ACK | USBHS_EP_R_TOG_1);
+                rxSet(0,USBOTG_EP_RES_ACK | USBOTG_EP_RES_TOG1);
         else
-                rxSet(0,USBHS_EP_R_RES_ACK | USBHS_EP_R_TOG_0);
+                rxSet(0,USBOTG_EP_RES_ACK | USBOTG_EP_RES_TOG0);
         return true;
     }
     // other op
-    rxControl(epnum,USBHS_EP_R_RES_MASK ,USBHS_EP_R_RES_ACK);
+    rxControl(epnum,USBOTG_EP_RES_MASK ,USBOTG_EP_RES_ACK);
     return true;
 }
            
@@ -244,17 +243,17 @@ void dcd_int_reset()
     USBOTGD->INT_EN &= ~USBOTG_INT_EN_BUS_RESET_IE;
     XFER_CTL_BASE(0,0)->max_size = 64;
     XFER_CTL_BASE(0,1)->max_size = 64;
-    USBOTGD->DEV_ADDRESS = 0;
-    rxSet(0, USBHS_EP_R_RES_NAK );
-    txSet(0, USBHS_EP_R_RES_NAK );
+  //  USBOTGD->DEV_ADDRESS = 0;
+    rxSet(0, USBOTG_EP_RES_NACK );
+    txSet(0, USBOTG_EP_RES_NACK );
     txLenSet(0,0);
 
     // init ep to a safe value
     USBOTGD->dma[0] = (uint32_t )getBufferAddress(0,false);
     for(int ep = 1; ep< EP_MAX;ep++)
     {
-        rxSet(ep, USBHS_EP_R_RES_NAK | USBHS_EP_R_AUTOTOG );
-        txSet(ep, USBHS_EP_T_RES_NAK | USBHS_EP_T_AUTOTOG );
+        rxSet(ep, USBOTG_EP_RES_NACK | USBOTG_EP_RES_AUTOTOG );
+        txSet(ep, USBOTG_EP_RES_NACK | USBOTG_EP_RES_AUTOTOG );
         USBOTGD->dma[ep] = (uint32_t )getBufferAddress(ep,false);
     }
     ep0_tx_tog = true;
@@ -271,13 +270,13 @@ void dcd_int_out(int end_num)
     int endp = end_num;
     if(end_num==0)
     {
-        rxSet(0,  USBHS_EP_R_RES_NAK);
+        rxSet(0,  USBOTG_EP_RES_NACK);
         xfer_ctl_t *xfer = XFER_CTL_BASE(0, false);
         xfer->xfered_so_far += rx_len;
         dcd_event_xfer_complete(0, endp, xfer->xfered_so_far, XFER_RESULT_SUCCESS, true);
         if(rx_len==0) // zlp
         {            
-            rxSet(0,  USBHS_EP_R_RES_ACK);
+            rxSet(0,  USBOTG_EP_RES_ACK);
             ep0_tx_tog = 1;
             ep0_rx_tog = 1;
         }else
@@ -292,11 +291,11 @@ void dcd_int_out(int end_num)
         xfer->xfered_so_far += rx_len;
         if ( rx_len < xfer->max_size ||  xfer->xfered_so_far==xfer->total_len)
         {
-            rxControl(end_num, USBHS_EP_R_RES_MASK, USBHS_EP_R_RES_NAK );
+            rxControl(end_num, USBOTG_EP_RES_MASK, USBOTG_EP_RES_NACK );
             dcd_event_xfer_complete(0, endp, xfer->xfered_so_far, XFER_RESULT_SUCCESS, true);
         }else
         {
-            rxControl(end_num,USBHS_EP_R_RES_MASK ,USBHS_EP_R_RES_ACK);
+            rxControl(end_num,USBOTG_EP_RES_MASK ,USBOTG_EP_RES_ACK);
         }
     }
 }
@@ -315,10 +314,13 @@ void dcd_int_in(int end_num)
         if(left>0)
         {
             xAssert(0);
+        }else
+        {
+            ep0_tx_tog=1;
         }
-        ep0_tx_tog^=1;
+        
         dcd_event_xfer_complete(0, endp  , xfer->xfered_so_far, XFER_RESULT_SUCCESS, true);
-        txControl(0, USBHS_EP_T_RES_MASK, USBHS_EP_T_RES_NAK); //
+        txControl(0, USBOTG_EP_RES_MASK, USBOTG_EP_RES_NACK); //
     }else
     {
         
@@ -332,10 +334,10 @@ void dcd_int_in(int end_num)
             memcpy( getBufferAddress(end_num, true), xfer->buffer+xfer->xfered_so_far, left);
             xfer->current_transfer = left;
             txLenSet(end_num, left);
-            txControl(end_num, USBHS_EP_T_RES_MASK, USBHS_EP_T_RES_ACK);
+            txControl(end_num, USBOTG_EP_RES_MASK, USBOTG_EP_RES_ACK);
         }else
         {
-            txControl(end_num, USBHS_EP_T_RES_MASK, USBHS_EP_T_RES_NAK);
+            txControl(end_num, USBOTG_EP_RES_MASK, USBOTG_EP_RES_NACK);
             dcd_event_xfer_complete(0, endp , xfer->xfered_so_far, XFER_RESULT_SUCCESS, true);
         }
         

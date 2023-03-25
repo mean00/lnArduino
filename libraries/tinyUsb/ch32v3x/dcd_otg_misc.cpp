@@ -35,7 +35,9 @@ uint8_t *getBufferAddress(int x, bool is_in)
 {
     xAssert(x<8);
     uint8_t *s = xfer_status.buffer[x];
-    return s+is_in*64;
+    if(x)                   // shared TX/RX buffer for EP0
+        return s+is_in*64;
+    return s;
 }
 /**
 */
@@ -88,7 +90,7 @@ void dcd_set_address(uint8_t rhport, uint8_t dev_addr) {
 
     USBOTGD->DEV_ADDRESS = dev_addr;
     // Response with zlp status
-    //dcd_edpt_xfer(rhport, 0x80, NULL, 0);
+    dcd_edpt_xfer(rhport, 0x80, NULL, 0);
 }
 /**
 */
