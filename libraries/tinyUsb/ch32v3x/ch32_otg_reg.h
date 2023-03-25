@@ -51,16 +51,24 @@ typedef volatile LN_USB_OTG_DEVICEx LN_USB_OTG_DEVICE;
 
 
 #define USBOTG_INT_EN_BUS_RESET_IE          (1<<0)
-#define USBOTG_INT_TRANSFER_IE              (1<<1)
-#define USBOTG_INT_NAK_IE                   (1<<6)
+#define USBOTG_INT_EN_TRANSFER_IE           (1<<1)
+#define USBOTG_INT_EN_SUSPEND_IE            (1<<2)
+#define USBOTG_INT_EN_NAK_IE                (1<<6)
+#define USBOTG_INT_EN_SOF_IE                (1<<7)
 
-#define USBOTG_MIST_DEV_ATTACHED            (1<<0)
+// #define USBOTG_MIST_DEV_ATTACHED            (1<<0) host mode
+// #define USBOTG_MIST_DM_LEVEL_STATUS         (1<<1) host mode
+#define USBOTG_MIST_SUSPEND_STATUS          (1<<2)
 #define USBOTG_MIST_BUS_RESET_STATUS        (1<<3)
 #define USBOTG_MIST_RX_NOT_EMPTY_STATUS     (1<<4)
 #define USBOTG_MIST_RX_NOT_BUSY_STATUS      (1<<5)
-
+// 6 &7 -> host mode
 #define USBOTG_INT_FG_BUS_RESET             (1<<0)
 #define USBOTG_INT_FG_TRANSFER_COMPLETE     (1<<1)
+#define USBOTG_INT_FG_SUSPEND               (1<<2)
+#define USBOTG_INT_FG_TOG_OK                (1<<6)
+#define USBOTG_INT_FG_NAK                   (1<<7)
+
 
 #define USBOTG_INT_ST_CURRENT_ENDP_MASK     (0xf)
 #define USBOTG_INT_ST_TOKEN_PID_MASK        (0x30)

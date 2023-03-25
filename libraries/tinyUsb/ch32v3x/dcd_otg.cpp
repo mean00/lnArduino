@@ -85,8 +85,8 @@ void dcd_init(uint8_t rhport) {
     (void)rhport;
 
     // enable clock
-     lnPeripherals::enable(pUSBFS_OTG_CH32v3x);
-     // 
+    lnPeripherals::enable(pUSBFS_OTG_CH32v3x);
+    // 
     Logger("OTG FS driver\n");
     xDelay(1);
     USBOTGD->DEVICE_CTRL = 0;
@@ -108,7 +108,7 @@ void dcd_init(uint8_t rhport) {
     xDelay(1);
     USBOTGD->DEV_ADDRESS = 0;
     USBOTGD->CTRL = 0;
-    USBOTGD->INT_EN = USBOTG_INT_EN_BUS_RESET_IE + USBOTG_INT_TRANSFER_IE; // + USBOTG_INT_NAK_IE;
+    USBOTGD->INT_EN = USBOTG_INT_EN_BUS_RESET_IE + USBOTG_INT_EN_TRANSFER_IE; // + USBOTG_INT_NAK_IE;
     USBOTGD->CTRL = USBOTG_CTRL_PULLUP_ENABLE+ USBOTG_CTRL_DMA_ENABLE + USBOTG_CTRL_INT_BUSY;
 
 
@@ -317,8 +317,7 @@ void dcd_int_in(int end_num)
         }else
         {
             ep0_tx_tog=1;
-        }
-        
+        }        
         dcd_event_xfer_complete(0, endp  , xfer->xfered_so_far, XFER_RESULT_SUCCESS, true);
         txControl(0, USBOTG_EP_RES_MASK, USBOTG_EP_RES_NACK); //
     }else
@@ -370,35 +369,25 @@ void dcd_int_handler(uint8_t rhport)
             switch(token_type)
             {
                 case PID_SOF:
-                    USBOTGD->INT_FG = USBOTG_INT_FG_TRANSFER_COMPLETE;
-                    return;      
                     break;
                 case PID_OUT : // it's a read 
-                {
                     dcd_int_out(end_num);
-                    USBOTGD->INT_FG = USBOTG_INT_FG_TRANSFER_COMPLETE;
-                    return;
-                }
                     break;
                 case PID_IN : // IN, it's a write
-                {
                     dcd_int_in(end_num);
-                    USBOTGD->INT_FG = USBOTG_INT_FG_TRANSFER_COMPLETE;
-                    return;
-                }
                     break;
                 case PID_SETUP : // SETUP
-                {
                     ep0_tx_tog = 1;
+                    ep0_rx_tog = 1;
                     dcd_event_setup_received(0, getBufferAddress(0,false), true);     
-                    USBOTGD->INT_FG = USBOTG_INT_FG_TRANSFER_COMPLETE;
-                    return;
-                }
                     break;
                 default:
                     xAssert(0);
                     break;
             }
+            USBOTGD->INT_FG = USBOTG_INT_FG_TRANSFER_COMPLETE;
+            return;      
+                    
     }
     xAssert(0);
 }
