@@ -155,13 +155,13 @@ bool dcd_edpt_open(uint8_t rhport, tusb_desc_endpoint_t const *desc_edpt) {
 /*
      ep_in => it's a write actually from the device point of view
 */
-bool dcd_edpt_xfer_ep_in( xfer_ctl_t *xfer, uint8_t epnum, uint16_t total_bytes) 
+bool dcd_edpt_xfer_ep_in( xfer_ctl_t *xfer, uint8_t epnum) 
 {
-    Logger("Prepare for IN with %d bytes on EP %d\n",total_bytes, epnum);
-    int short_packet_size = xmin(total_bytes, xfer->max_size);
+    Logger("Prepare for IN with %d bytes on EP %d\n",xfer->total_len, epnum);
+    int short_packet_size = xmin(xfer->total_len, xfer->max_size);
     if(!epnum) // ep0
     {
-        if(!total_bytes) // ep0 zlp
+        if(!xfer->total_len) // ep0 zlp
         {            
             txLenSet(0, 0);
         }else
@@ -171,10 +171,15 @@ bool dcd_edpt_xfer_ep_in( xfer_ctl_t *xfer, uint8_t epnum, uint16_t total_bytes)
             memcpy( getBufferAddress(0,1), xfer->buffer, short_packet_size );            
         }
         txSet(0, USBOTG_EP_RES_ACK | (ep0_tx_tog ? USBOTG_EP_RES_TOG1 : USBOTG_EP_RES_TOG0));
+       /*/ if(short_packet_size == xfer->max_size)
+        {
+            ep0_tx_tog ^= 1;
+        }
+        */
         return true;
     }
     // Other EP
-    if(!total_bytes) // epx zlp
+    if(!xfer->total_len) // epx zlp
     {
         xfer->current_transfer = 0;
         txLenSet(epnum, 0);                
@@ -191,14 +196,14 @@ bool dcd_edpt_xfer_ep_in( xfer_ctl_t *xfer, uint8_t epnum, uint16_t total_bytes)
 /*
      ep_out => it's a read actually from the device point of view
 */
-bool dcd_edpt_xfer_ep_out( xfer_ctl_t *xfer, uint8_t epnum, uint16_t total_bytes) 
+bool dcd_edpt_xfer_ep_out( xfer_ctl_t *xfer, uint8_t epnum) 
 {
-    Logger("Prepare for OUT with %d bytes on EP %d\n",total_bytes, epnum);
+    Logger("Prepare for OUT with %d bytes on EP %d\n",xfer->total_len, epnum);
     if (!epnum) // ep0
     {
-        if(total_bytes)
+        if(xfer->total_len)
         {           
-            xAssert(total_bytes<=xfer->max_size);
+            xAssert(xfer->total_len<=xfer->max_size);
         }        
         if(ep0_rx_tog)
                 rxSet(0,USBOTG_EP_RES_ACK | USBOTG_EP_RES_TOG1);
@@ -233,11 +238,11 @@ bool dcd_edpt_xfer(uint8_t rhport, uint8_t ep_addr, uint8_t *buffer, uint16_t to
     
     if(dir) // ep_in
     {
-        return dcd_edpt_xfer_ep_in(xfer, epnum,  total_bytes );
+        return dcd_edpt_xfer_ep_in(xfer, epnum );
     }
     else 
     {
-        return dcd_edpt_xfer_ep_out(xfer, epnum,  total_bytes );
+        return dcd_edpt_xfer_ep_out(xfer, epnum );
     }
 }
 //
