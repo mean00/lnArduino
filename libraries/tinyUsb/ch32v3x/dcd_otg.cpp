@@ -297,13 +297,13 @@ void dcd_int_out(int end_num)
     int endp = end_num;
     if(end_num==0)
     {
-        rxSet(0,  USBOTG_EP_RES_NACK);
+        rxSet(0,  USBOTG_EP_RES_NACK + ep0_rx_tog * USBOTG_EP_RES_TOG1);
         xfer_ctl_t *xfer = XFER_CTL_BASE(0, false);
         xfer->xfered_so_far += rx_len;
         dcd_event_xfer_complete(0, endp, xfer->xfered_so_far, XFER_RESULT_SUCCESS, true);
         if(rx_len==0) // zlp
         {            
-            rxSet(0,  USBOTG_EP_RES_ACK);
+            rxSet(0,  USBOTG_EP_RES_ACK + + ep0_rx_tog * USBOTG_EP_RES_TOG1);
             ep0_tx_tog = 1;
             ep0_rx_tog = 1;
         }else
@@ -335,18 +335,13 @@ void dcd_int_in(int end_num)
     xfer_ctl_t *xfer = XFER_CTL_BASE(end_num, 1);                    
     if(end_num==0)
     {  // assume one transfer is enough (?)
-        xfer->xfered_so_far+=xfer->current_transfer;
-        xfer->current_transfer = 0;
+        xfer->xfered_so_far+=xfer->current_transfer;        
         int left = xfer->total_len-xfer->xfered_so_far;
-        if(left>0)
-        {
-            xAssert(0);
-        }else
-        {
-            ep0_tx_tog=1;
-        }        
+        ep0_tx_tog ^=1;
+        xfer->current_transfer = 0;
         dcd_event_xfer_complete(0, endp  , xfer->xfered_so_far, XFER_RESULT_SUCCESS, true);
-        txControl(0, USBOTG_EP_RES_MASK, USBOTG_EP_RES_NACK); //
+
+        txSet(0,  USBOTG_EP_RES_NACK + ep0_tx_tog * USBOTG_EP_RES_TOG1); //
     }else
     {
         
