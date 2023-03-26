@@ -40,14 +40,21 @@ uint8_t *getBufferAddress(int x, bool is_in)
     return s;
 }
 /**
+0 not used
+   1 4
+   2 3
+   5 6
+   7
 */
 void setEndpointMode(int endpoint, bool mod, bool enable_tx, bool enable_rx)
 {
+//                          0         1   2   3  4  5 6  7    
 const uint8_t  offset[8] ={ 0,        0,  1 , 1, 0, 2,2, 3};
 const uint8_t  up[8]     ={ 0,        1,  0,  1, 0, 0,1, 0};
 
     if(!endpoint) return;
-    uint8_t value = USBOTGD->mod[offset[endpoint]];
+    volatile uint8_t *adr = &(USBOTGD->mod[offset[endpoint]]);
+    uint8_t value = *adr;
     if(up[endpoint])
     {
         value&=0xF0;
@@ -57,7 +64,7 @@ const uint8_t  up[8]     ={ 0,        1,  0,  1, 0, 0,1, 0};
         value&=0x0F;
         value|= ( mod + enable_tx*4+enable_rx*8) ;
     }
-    USBOTGD->mod[offset[endpoint]]=value;
+    *adr=value;
 }
 /**
 */

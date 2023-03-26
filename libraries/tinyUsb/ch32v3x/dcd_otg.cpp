@@ -39,7 +39,6 @@ volatile uint8_t ep0_rx_tog = 0x01;
 
 int nbTxComplete=0;
 static uint8_t *getBufferAddress(int x, bool dir);
-static void setEndpointMode(int endpoint, bool mod, bool enable_tx, bool enable_rx);
 // Max number of bi-directional endpoints including EP0
 #define EP_MAX 8
 
@@ -91,10 +90,6 @@ void dcd_init(uint8_t rhport) {
     xDelay(1);
     USBOTGD->DEVICE_CTRL = 0;
     
-    for(int i=1;i<EP_MAX;i++) // ep0 is not configurable
-    {
-        setEndpointMode(i,false, true, true);        
-    }
 
     for(int i=0;i<EP_MAX;i++)
     {
@@ -268,6 +263,16 @@ void dcd_int_reset()
     }
     ep0_tx_tog = true;
     ep0_rx_tog = true;
+    /*
+    for(int i=1;i<EP_MAX;i++) // ep0 is not configurable
+    {
+        setEndpointMode(i,false, true, true);        
+    }
+    */
+    USBOTGD->mod[0]=0xcc;
+    USBOTGD->mod[1]=0xcc;
+    USBOTGD->mod[2]=0xcc;
+    USBOTGD->mod[3]=0xc;
 
     dcd_event_bus_reset(0, TUSB_SPEED_FULL, true);
 }
@@ -310,21 +315,21 @@ void dcd_int_out(int end_num)
         {
             ep0_rx_tog ^= 1;
         }
+        return;
+    }        
+    xfer_ctl_t *xfer = XFER_CTL_BASE(end_num,false);
+    // copy from DMA area to final buffer
+    memcpy( xfer->buffer+ xfer->xfered_so_far, getBufferAddress(end_num, false), rx_len);
+    xfer->xfered_so_far += rx_len;
+    if ( rx_len < xfer->max_size ||  xfer->xfered_so_far==xfer->total_len)
+    {
+        rxControl(end_num, USBOTG_EP_RES_MASK, USBOTG_EP_RES_NACK );
+        dcd_event_xfer_complete(0, endp, xfer->xfered_so_far, XFER_RESULT_SUCCESS, true);
     }else
-    {        
-        xfer_ctl_t *xfer = XFER_CTL_BASE(end_num,false);
-        // copy from DMA area to final buffer
-        memcpy( xfer->buffer+ xfer->xfered_so_far, getBufferAddress(end_num, false), rx_len);
-        xfer->xfered_so_far += rx_len;
-        if ( rx_len < xfer->max_size ||  xfer->xfered_so_far==xfer->total_len)
-        {
-            rxControl(end_num, USBOTG_EP_RES_MASK, USBOTG_EP_RES_NACK );
-            dcd_event_xfer_complete(0, endp, xfer->xfered_so_far, XFER_RESULT_SUCCESS, true);
-        }else
-        {
-            rxControl(end_num,USBOTG_EP_RES_MASK ,USBOTG_EP_RES_ACK);
-        }
+    {
+        rxControl(end_num,USBOTG_EP_RES_MASK ,USBOTG_EP_RES_ACK);
     }
+    
 }
 //
 // ep_in, it's a write
@@ -342,27 +347,26 @@ void dcd_int_in(int end_num)
         dcd_event_xfer_complete(0, endp  , xfer->xfered_so_far, XFER_RESULT_SUCCESS, true);
 
         txSet(0,  USBOTG_EP_RES_NACK + ep0_tx_tog * USBOTG_EP_RES_TOG1); //
+        return;
+    }   
+    // finish or queue the next one ?
+    xfer->xfered_so_far+=xfer->current_transfer;
+    xfer->current_transfer = 0;
+    int left = xfer->total_len-xfer->xfered_so_far;
+    if(left>0)
+    {
+        left = xmin(left,xfer->max_size);
+        memcpy( getBufferAddress(end_num, true), xfer->buffer+xfer->xfered_so_far, left);
+        xfer->current_transfer = left;
+        txLenSet(end_num, left);
+        txControl(end_num, USBOTG_EP_RES_MASK, USBOTG_EP_RES_ACK);
     }else
     {
-        
-        // finish or queue the next one ?
-        xfer->xfered_so_far+=xfer->current_transfer;
-        xfer->current_transfer = 0;
-        int left = xfer->total_len-xfer->xfered_so_far;
-        if(left>0)
-        {
-            left = xmin(left,xfer->max_size);
-            memcpy( getBufferAddress(end_num, true), xfer->buffer+xfer->xfered_so_far, left);
-            xfer->current_transfer = left;
-            txLenSet(end_num, left);
-            txControl(end_num, USBOTG_EP_RES_MASK, USBOTG_EP_RES_ACK);
-        }else
-        {
-            txControl(end_num, USBOTG_EP_RES_MASK, USBOTG_EP_RES_NACK);
-            dcd_event_xfer_complete(0, endp , xfer->xfered_so_far, XFER_RESULT_SUCCESS, true);
-        }
-        
+        txControl(end_num, USBOTG_EP_RES_MASK, USBOTG_EP_RES_NACK);
+        dcd_event_xfer_complete(0, endp , xfer->xfered_so_far, XFER_RESULT_SUCCESS, true);
     }
+        
+    
 }
 /**
 */
