@@ -23,8 +23,9 @@ typedef struct
     uint8_t INT_ST;      // 07
 
     uint16_t RX_LEN;     // 08
-    uint8_t  mod[4];      // 0C 41 23 56 7_
-    uint32_t dma[8];   //0x10
+    uint16_t padder2;    // 0A
+    uint8_t  mod[4];     // 0C 41 23 56 7_
+    uint32_t dma[8];     //0x10
     endpoints ep[8];    //0x30
 
     uint32_t padder;     // 50
@@ -50,19 +51,44 @@ typedef volatile LN_USB_OTG_DEVICEx LN_USB_OTG_DEVICE;
 
 
 #define USBOTG_INT_EN_BUS_RESET_IE          (1<<0)
-#define USBOTG_INT_TRANSFER_IE              (1<<1)
-#define USBOTG_INT_NAK_IE                   (1<<6)
+#define USBOTG_INT_EN_TRANSFER_IE           (1<<1)
+#define USBOTG_INT_EN_SUSPEND_IE            (1<<2)
+#define USBOTG_INT_EN_NAK_IE                (1<<6)
+#define USBOTG_INT_EN_SOF_IE                (1<<7)
 
-#define USBOTG_MIST_DEV_ATTACHED            (1<<0)
+// #define USBOTG_MIST_DEV_ATTACHED            (1<<0) host mode
+// #define USBOTG_MIST_DM_LEVEL_STATUS         (1<<1) host mode
+#define USBOTG_MIST_SUSPEND_STATUS          (1<<2)
 #define USBOTG_MIST_BUS_RESET_STATUS        (1<<3)
 #define USBOTG_MIST_RX_NOT_EMPTY_STATUS     (1<<4)
 #define USBOTG_MIST_RX_NOT_BUSY_STATUS      (1<<5)
-
+// 6 &7 -> host mode
 #define USBOTG_INT_FG_BUS_RESET             (1<<0)
 #define USBOTG_INT_FG_TRANSFER_COMPLETE     (1<<1)
+#define USBOTG_INT_FG_SUSPEND               (1<<2)
+#define USBOTG_INT_FG_TOG_OK                (1<<6)
+#define USBOTG_INT_FG_NAK                   (1<<7)
+
 
 #define USBOTG_INT_ST_CURRENT_ENDP_MASK     (0xf)
 #define USBOTG_INT_ST_TOKEN_PID_MASK        (0x30)
 #define USBOTG_INT_ST_TOG_OK                (1<<6)
+
+#define USBOTG_EP_RES_MASK                  (3<<0)
+#define USBOTG_EP_RES_ACK                   (0<<0)
+#define USBOTG_EP_RES_NACK                  (2<<0)
+#define USBOTG_EP_RES_STALL                 (3<<0)
+#define USBOTG_EP_RES_NAK                   USBOTG_EP_RES_NACK
+
+#define USBOTG_EP_RES_AUTOTOG               (1<<3)
+#define USBOTG_EP_RES_TOG1                  (1<<2)
+#define USBOTG_EP_RES_TOG0                  (0<<2)
+
+
+// 00: OUT, 01:SOF, 10:IN, 11:SETUP
+#define PID_OUT   0
+#define PID_SOF   1
+#define PID_IN    2
+#define PID_SETUP 3
 
 
