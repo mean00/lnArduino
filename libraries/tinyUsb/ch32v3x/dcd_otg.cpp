@@ -34,6 +34,12 @@ https://github.com/openwch/ch32v20x/blob/main/EVT/EXAM/USB/USBFS/DEVICE/CH372Dev
 LN_USB_OTG_DEVICE *USBOTGD =    (LN_USB_OTG_DEVICE *) USBOTG_BASE;
 
 
+#if 0
+    #define LDEBUG Logger
+#else
+    #define LDEBUG(...)     {}
+#endif
+
 volatile uint8_t ep0_tx_tog = 0x01;
 volatile uint8_t ep0_rx_tog = 0x01;
 
@@ -86,7 +92,7 @@ void dcd_init(uint8_t rhport) {
     // enable clock
     lnPeripherals::enable(pUSBFS_OTG_CH32v3x);
     // 
-    Logger("OTG FS driver\n");
+    LDEBUG("OTG FS driver\n");
     xDelay(1);
     USBOTGD->DEVICE_CTRL = 0;
     
@@ -95,6 +101,8 @@ void dcd_init(uint8_t rhport) {
     {
         USBOTGD->dma[i]= (uint32_t )getBufferAddress(i,false);
     }
+    XFER_CTL_BASE(0,0)->max_size = 64;
+    XFER_CTL_BASE(0,1)->max_size = 64;
 
     USBOTGD->INT_FG = 0xFF;
     USBOTGD->INT_FG = 0xFF; // clear pending interrupts
@@ -152,7 +160,7 @@ bool dcd_edpt_open(uint8_t rhport, tusb_desc_endpoint_t const *desc_edpt) {
 */
 bool dcd_edpt_xfer_ep_in( xfer_ctl_t *xfer, uint8_t epnum) 
 {
-    Logger("Prepare for IN with %d bytes on EP %d\n",xfer->total_len, epnum);
+    LDEBUG("Prepare for IN with %d bytes on EP %d\n",xfer->total_len, epnum);
     int short_packet_size = xmin(xfer->total_len, xfer->max_size);
     if(!epnum) // ep0
     {
@@ -193,12 +201,15 @@ bool dcd_edpt_xfer_ep_in( xfer_ctl_t *xfer, uint8_t epnum)
 */
 bool dcd_edpt_xfer_ep_out( xfer_ctl_t *xfer, uint8_t epnum) 
 {
-    Logger("Prepare for OUT with %d bytes on EP %d\n",xfer->total_len, epnum);
+    LDEBUG("Prepare for OUT with %d bytes on EP %d\n",xfer->total_len, epnum);
     if (!epnum) // ep0
     {
         if(xfer->total_len)
         {           
-            xAssert(xfer->total_len<=xfer->max_size);
+            if(xfer->total_len>xfer->max_size)
+            {
+                xAssert(0);
+            }
         }        
         if(ep0_rx_tog)
                 rxSet(0,USBOTG_EP_RES_ACK | USBOTG_EP_RES_TOG1);
