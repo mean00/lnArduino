@@ -34,29 +34,28 @@ https://github.com/openwch/ch32v20x/blob/main/EVT/EXAM/USB/USBFS/DEVICE/CH372Dev
 LN_USB_OTG_DEVICE *USBOTGD =    (LN_USB_OTG_DEVICE *) USBOTG_BASE;
 
 
-#if 0
+#if 1
     #define LDEBUG Logger
 #else
     #define LDEBUG(...)     {}
 #endif
 
 volatile uint8_t ep0_tx_tog = 0x01;
-volatile uint8_t ep0_rx_tog = 0x01;
+volatile uint8_t ep0_rx_tog = 0x01; 
+int sept=0;
+int tog_ko_out=0; /*-*/
+int tog_ko_in=0;
+int not_ready = 0;
+
+
 
 int nbTxComplete=0;
 static uint8_t *getBufferAddress(int x, bool dir);
 // Max number of bi-directional endpoints including EP0
 #define EP_MAX 8
-
-#if TUD_OPT_HIGH_SPEED
-    #define MAXIMUM_PACKET_LEN  512
-    #define SPEED_BITS          USBOTG_HIGH_SPEED;
-    #define REPORTED_SPEED      TUSB_SPEED_HIGH
-#else
-    #define MAXIMUM_PACKET_LEN  64
-    #define SPEED_BITS          USBOTG_FULL_SPEED
-    #define REPORTED_SPEED      TUSB_SPEED_FULL
-#endif   
+#define MAXIMUM_PACKET_LEN  64
+#define SPEED_BITS          USBOTG_FULL_SPEED
+#define REPORTED_SPEED      TUSB_SPEED_FULL
 
 // Max number of bi-directional endpoints including EP0
 
@@ -211,10 +210,7 @@ bool dcd_edpt_xfer_ep_out( xfer_ctl_t *xfer, uint8_t epnum)
                 xAssert(0);
             }
         }        
-        if(ep0_rx_tog)
-                rxSet(0,USBOTG_EP_RES_ACK | USBOTG_EP_RES_TOG1);
-        else
-                rxSet(0,USBOTG_EP_RES_ACK | USBOTG_EP_RES_TOG0);
+        rxSet(0,USBOTG_EP_RES_ACK | ep0_rx_tog*USBOTG_EP_RES_TOG1);
         return true;
     }
     // other op
@@ -298,8 +294,8 @@ extern "C" void dcd_edpt0_status_complete(uint8_t rhport, tusb_control_request_t
         USBOTGD->DEV_ADDRESS = (uint8_t)request->wValue;
     }
 
-    txSet(0, USBOTG_EP_RES_NACK);
-    rxSet(0, USBOTG_EP_RES_ACK);
+    //txSet(0, USBOTG_EP_RES_NACK);
+    //rxSet(0, USBOTG_EP_RES_ACK);
 
 }
 
@@ -324,6 +320,10 @@ void dcd_int_out(int end_num)
             ep0_rx_tog = 1;
         }else
         {
+            if(xfer->buffer==NULL)
+            {
+                not_ready++;
+            }
             ep0_rx_tog ^= 1;
         }
         return;
@@ -408,10 +408,22 @@ void dcd_int_handler(uint8_t rhport)
                 case PID_SOF:
                     break;
                 case PID_OUT : // it's a read 
-                    dcd_int_out(end_num);
+                    if(st & USBOTG_INT_ST_TOG_OK)
+                    {
+                        dcd_int_out(end_num);
+                    }else
+                    {
+                        tog_ko_out++;
+                    }
                     break;
                 case PID_IN : // IN, it's a write
-                    dcd_int_in(end_num);
+                    if(st & USBOTG_INT_ST_TOG_OK)
+                    {
+                        dcd_int_in(end_num);
+                    }else
+                    {
+                        tog_ko_in++;
+                    }
                     break;
                 case PID_SETUP : // SETUP
                     ep0_tx_tog = 1;
