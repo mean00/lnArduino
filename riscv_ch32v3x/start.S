@@ -11,7 +11,7 @@
 	.section	.init,"ax",@progbits
 	.global	_start	    
 	.align	1
-	.extern main
+	.extern start_c
 _start:
 	j	handle_reset
 	.align  1
@@ -51,7 +51,7 @@ handle_reset:
 2:
 	li t0, 0x1f
 	csrw 0xbc0, t0
-	J main
+	J start_c
 	mret
 
 

@@ -451,5 +451,14 @@ void  __attribute__((weak))  OTG_FS_IRQHandler()
 void lnSoftSystemReset()
 {
 }
+extern "C" int main();
+extern "C" void __libc_init_array(void);
+extern "C" void   __attribute__((noreturn))  start_c()
+{
+    __libc_init_array(); // call ctor before jumping in the code
+    main();
+    xAssert(0);  
+}
+
 // EOF
 
