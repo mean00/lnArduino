@@ -77,6 +77,7 @@ typedef volatile LN_USB_OTG_DEVICEx LN_USB_OTG_DEVICE;
 #define USBOTG_EP_RES_MASK                  (3<<0)
 #define USBOTG_EP_RES_ACK                   (0<<0)
 #define USBOTG_EP_RES_NACK                  (2<<0)
+#define USBOTG_EP_RES_NYET                  (1<<0)
 #define USBOTG_EP_RES_STALL                 (3<<0)
 #define USBOTG_EP_RES_NAK                   USBOTG_EP_RES_NACK
 

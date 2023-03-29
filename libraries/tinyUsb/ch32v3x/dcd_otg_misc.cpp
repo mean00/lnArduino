@@ -46,22 +46,23 @@ uint8_t *getBufferAddress(int x, bool is_in)
    5 6
    7
 */
-void setEndpointMode(int endpoint, bool mod, bool enable_tx, bool enable_rx)
-{
 //                          0         1   2   3  4  5 6  7    
 const uint8_t  offset[8] ={ 0,        0,  1 , 1, 0, 2,2, 3};
 const uint8_t  up[8]     ={ 0,        1,  0,  1, 0, 0,1, 0};
+
+void setEndpointMode(int endpoint, bool mod, bool enable_tx, bool enable_rx)
+{
 
     if(!endpoint) return;
     volatile uint8_t *adr = &(USBOTGD->mod[offset[endpoint]]);
     uint8_t value = *adr;
     if(up[endpoint])
     {
-        value&=0xF0;
-        value|=  ( mod + enable_tx*4+enable_rx*8) <<4;
+        value&=0x0F;
+        value|=  ( mod + enable_tx*4+enable_rx*8)<<4;
     }else
     {
-        value&=0x0F;
+        value&=0xF0;
         value|= ( mod + enable_tx*4+enable_rx*8) ;
     }
     *adr=value;
@@ -97,6 +98,7 @@ void dcd_edpt_close_all(uint8_t rhport) {
 void dcd_remote_wakeup(uint8_t rhport)
 {
   (void) rhport;
+  xAssert(0);
 }
 
 
@@ -112,13 +114,13 @@ int usbd_ep_close(const uint8_t ep) {
 void dcd_edpt_stall(uint8_t rhport, uint8_t ep_addr) {
     (void)rhport;
 
-   
+   xAssert(0);
 }
 /**
 */
 void dcd_edpt_clear_stall(uint8_t rhport, uint8_t ep_addr) {
     (void)rhport;
-
+    xAssert(0);
    
 }
 

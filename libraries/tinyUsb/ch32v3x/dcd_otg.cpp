@@ -142,13 +142,18 @@ bool dcd_edpt_open(uint8_t rhport, tusb_desc_endpoint_t const *desc_edpt) {
     xfer_ctl_t *xfer = XFER_CTL_BASE(epnum, dir);
     xfer->max_size = tu_edpt_packet_size(desc_edpt);
 
-    if (epnum != 0) 
+    if (epnum != 0) // ep0 is set automatically
     {
-        if (tu_edpt_dir(desc_edpt->bEndpointAddress) == TUSB_DIR_OUT) {
-            rxSet(epnum, USBOTG_EP_RES_AUTOTOG | USBOTG_EP_RES_ACK);
-        } else {            
+        if(desc_edpt->bEndpointAddress & TUSB_DIR_IN_MASK ) // IN ?
+        {
+            setEndpointMode(epnum,false, true,false);
             txLenSet(epnum, 0);
             txSet(epnum, USBOTG_EP_RES_AUTOTOG | USBOTG_EP_RES_NACK );
+        }
+        else
+        {
+            setEndpointMode(epnum,false, false,true);
+            rxSet(epnum, USBOTG_EP_RES_AUTOTOG | USBOTG_EP_RES_NACK); // ready to receive
         }
     }
     return true;
@@ -225,7 +230,7 @@ bool dcd_edpt_xfer(uint8_t rhport, uint8_t ep_addr, uint8_t *buffer, uint16_t to
     xfer_ctl_t *xfer = XFER_CTL_BASE(epnum, dir);
     if(xfer->active)
     {
-        xAssert(0);
+        //xAssert(0);
     }
     xfer->active=true;
     xfer->buffer = buffer;    
@@ -258,27 +263,22 @@ void dcd_int_reset()
     txSet(0, USBOTG_EP_RES_NACK );
     txLenSet(0,0);
 
+    for(int i=1;i<EP_MAX;i++) // ep0 is not configurable
+    {
+        setEndpointMode(i,false, false, false);        
+    }
+
     // init ep to a safe value
     USBOTGD->dma[0] = (uint32_t )getBufferAddress(0,false);
     for(int ep = 1; ep< EP_MAX;ep++)
     {
-        rxSet(ep, USBOTG_EP_RES_NACK | USBOTG_EP_RES_AUTOTOG );
-        txSet(ep, USBOTG_EP_RES_NACK | USBOTG_EP_RES_AUTOTOG );
-        USBOTGD->dma[ep] = (uint32_t )getBufferAddress(ep,false);        
+        USBOTGD->dma[ep] = (uint32_t )getBufferAddress(ep,false); 
+        rxSet(ep, USBOTG_EP_RES_NYET | USBOTG_EP_RES_AUTOTOG );
+        txSet(ep, USBOTG_EP_RES_NYET | USBOTG_EP_RES_AUTOTOG );               
     }
     ep0_tx_tog = true;
     ep0_rx_tog = true;
-    /*
-    for(int i=1;i<EP_MAX;i++) // ep0 is not configurable
-    {
-        setEndpointMode(i,false, true, true);        
-    }
-    */
-    USBOTGD->mod[0]=0xcc;
-    USBOTGD->mod[1]=0xcc;
-    USBOTGD->mod[2]=0xcc;
-    USBOTGD->mod[3]=0xc;
-
+   
     dcd_event_bus_reset(0, TUSB_SPEED_FULL, true);
 }
 
@@ -291,8 +291,6 @@ extern "C" void dcd_edpt0_status_complete(uint8_t rhport, tusb_control_request_t
     {
         USBOTGD->DEV_ADDRESS = (uint8_t)request->wValue;
     }
-    //txSet(0, USBOTG_EP_RES_NACK);
-    //rxSet(0, USBOTG_EP_RES_ACK);
 }
 
 
@@ -351,7 +349,8 @@ void dcd_int_out(int end_num)
     if ( rx_len < xfer->max_size ||  xfer->xfered_so_far==xfer->total_len)
     {
         // nope
-        rxControl(end_num, USBOTG_EP_RES_MASK, USBOTG_EP_RES_NACK );        
+        rxControl(end_num, USBOTG_EP_RES_MASK, USBOTG_EP_RES_NACK ); 
+        dcd_event_xfer_complete(0, end_num, xfer->xfered_so_far, XFER_RESULT_SUCCESS, true);       
     }else // yes more
     {
         rxControl(end_num,USBOTG_EP_RES_MASK ,USBOTG_EP_RES_ACK);
@@ -386,6 +385,7 @@ void dcd_int_in0()
     }
     return;    
 }
+// in => tx
 void dcd_int_in(int end_num)
 {
     uint8_t endp = end_num |  TUSB_DIR_IN_MASK ;
