@@ -148,7 +148,7 @@ bool dcd_edpt_open(uint8_t rhport, tusb_desc_endpoint_t const *desc_edpt) {
             rxSet(epnum, USBOTG_EP_RES_AUTOTOG | USBOTG_EP_RES_ACK);
         } else {            
             txLenSet(epnum, 0);
-            txSet(epnum, USBOTG_EP_RES_AUTOTOG | USBOTG_EP_RES_NACK | USBOTG_EP_RES_TOG0);
+            txSet(epnum, USBOTG_EP_RES_AUTOTOG | USBOTG_EP_RES_NACK );
         }
     }
     return true;
@@ -209,7 +209,7 @@ bool dcd_edpt_xfer_ep_out( xfer_ctl_t *xfer, uint8_t epnum)
         return true;
     }
     // other op
-    rxControl(epnum,USBOTG_EP_RES_MASK ,USBOTG_EP_RES_ACK);
+    rxControl(epnum,USBOTG_EP_RES_MASK ,USBOTG_EP_RES_ACK  );
     return true;
 }
            
@@ -225,7 +225,7 @@ bool dcd_edpt_xfer(uint8_t rhport, uint8_t ep_addr, uint8_t *buffer, uint16_t to
     xfer_ctl_t *xfer = XFER_CTL_BASE(epnum, dir);
     if(xfer->active)
     {
-        //xAssert(0);
+        xAssert(0);
     }
     xfer->active=true;
     xfer->buffer = buffer;    
@@ -251,6 +251,9 @@ void dcd_int_reset()
     XFER_CTL_BASE(0,0)->max_size = 64;
     XFER_CTL_BASE(0,1)->max_size = 64;
   
+    XFER_CTL_BASE(0,0)->active = false;
+    XFER_CTL_BASE(0,1)->active = false;
+
     rxSet(0, USBOTG_EP_RES_NACK );
     txSet(0, USBOTG_EP_RES_NACK );
     txLenSet(0,0);
@@ -261,7 +264,7 @@ void dcd_int_reset()
     {
         rxSet(ep, USBOTG_EP_RES_NACK | USBOTG_EP_RES_AUTOTOG );
         txSet(ep, USBOTG_EP_RES_NACK | USBOTG_EP_RES_AUTOTOG );
-        USBOTGD->dma[ep] = (uint32_t )getBufferAddress(ep,false);
+        USBOTGD->dma[ep] = (uint32_t )getBufferAddress(ep,false);        
     }
     ep0_tx_tog = true;
     ep0_rx_tog = true;
@@ -299,14 +302,14 @@ extern "C" void dcd_edpt0_status_complete(uint8_t rhport, tusb_control_request_t
 void dcd_int_out0()
 {
     int rx_len = USBOTGD->RX_LEN;    
-    xfer_ctl_t *xfer = XFER_CTL_BASE(0, false);
-    xfer->xfered_so_far += rx_len;
+    xfer_ctl_t *xfer = XFER_CTL_BASE(0, false);    
     
     if(!xfer->total_len) // zlp
     {     
         rxSet(0, USBOTG_EP_RES_NACK +  + ep0_rx_tog * USBOTG_EP_RES_TOG1);  // done
         ep0_rx_tog ^= 1;
         dcd_event_xfer_complete(0, 0, xfer->xfered_so_far, XFER_RESULT_SUCCESS, true);
+        xfer->active=false;
         return;
     }
     if(rx_len)
@@ -318,7 +321,8 @@ void dcd_int_out0()
         }else
         {
             // copy!
-            memcpy( xfer->buffer+ xfer->xfered_so_far, getBufferAddress(0, false), rx_len);            
+            memcpy( xfer->buffer+ xfer->xfered_so_far, getBufferAddress(0, false), rx_len);
+            xfer->xfered_so_far += rx_len;
         }
     }
    
@@ -329,6 +333,7 @@ void dcd_int_out0()
     }else
     {
         rxSet(0,  USBOTG_EP_RES_NACK + ep0_rx_tog * USBOTG_EP_RES_TOG1);
+        xfer->active=false;
         dcd_event_xfer_complete(0, 0, xfer->xfered_so_far, XFER_RESULT_SUCCESS, true);
     }
     
@@ -363,6 +368,7 @@ void dcd_int_in0()
     if(!xfer->total_len)
     {
         txSet(0, USBOTG_EP_RES_NACK +  + ep0_tx_tog * USBOTG_EP_RES_TOG1);  // done
+        xfer->active=false;
         dcd_event_xfer_complete(0, TUSB_DIR_IN_MASK  , xfer->xfered_so_far, XFER_RESULT_SUCCESS, true);
         return;
     }
@@ -371,6 +377,7 @@ void dcd_int_in0()
     if(left==0) // done!
     {        
         txSet(0, USBOTG_EP_RES_NACK +  + ep0_tx_tog * USBOTG_EP_RES_TOG1);  // done
+        xfer->active=false;
         dcd_event_xfer_complete(0, TUSB_DIR_IN_MASK  , xfer->xfered_so_far, XFER_RESULT_SUCCESS, true);           
     }else // next
     {
