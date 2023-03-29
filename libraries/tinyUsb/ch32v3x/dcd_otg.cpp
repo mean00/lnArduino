@@ -159,7 +159,7 @@ bool dcd_edpt_open(uint8_t rhport, tusb_desc_endpoint_t const *desc_edpt) {
 */
 bool dcd_edpt_xfer_ep_in( xfer_ctl_t *xfer, uint8_t epnum) 
 {
-    LDEBUG("Prepare for IN with %d bytes on EP %d\n",xfer->total_len, epnum);
+    LDEBUG("Prepare for IN with %d bytes on EP %d tog tx= %d\n",xfer->total_len, epnum,ep0_tx_tog);
     int short_packet_size = xmin(xfer->total_len, xfer->max_size);
     if(!epnum) // ep0
     {
@@ -172,12 +172,7 @@ bool dcd_edpt_xfer_ep_in( xfer_ctl_t *xfer, uint8_t epnum)
             txLenSet(0, short_packet_size);
             memcpy( getBufferAddress(0,1), xfer->buffer, short_packet_size );            
         }
-        txSet(0, USBOTG_EP_RES_ACK | (ep0_tx_tog ? USBOTG_EP_RES_TOG1 : USBOTG_EP_RES_TOG0));
-       /*/ if(short_packet_size == xfer->max_size)
-        {
-            ep0_tx_tog ^= 1;
-        }
-        */
+        txSet(0, USBOTG_EP_RES_ACK | (ep0_tx_tog * USBOTG_EP_RES_TOG1 ));
         return true;
     }
     // Other EP
@@ -200,7 +195,7 @@ bool dcd_edpt_xfer_ep_in( xfer_ctl_t *xfer, uint8_t epnum)
 */
 bool dcd_edpt_xfer_ep_out( xfer_ctl_t *xfer, uint8_t epnum) 
 {
-    LDEBUG("Prepare for OUT with %d bytes on EP %d\n",xfer->total_len, epnum);
+    LDEBUG("Prepare for OUT with %d bytes on EP %d tog_rx=%d\n",xfer->total_len, epnum,ep0_rx_tog);
     if (!epnum) // ep0
     {
         if(xfer->total_len)
@@ -255,7 +250,7 @@ void dcd_int_reset()
     USBOTGD->INT_EN &= ~USBOTG_INT_EN_BUS_RESET_IE;
     XFER_CTL_BASE(0,0)->max_size = 64;
     XFER_CTL_BASE(0,1)->max_size = 64;
-  //  USBOTGD->DEV_ADDRESS = 0;
+  
     rxSet(0, USBOTG_EP_RES_NACK );
     txSet(0, USBOTG_EP_RES_NACK );
     txLenSet(0,0);
@@ -293,73 +288,101 @@ extern "C" void dcd_edpt0_status_complete(uint8_t rhport, tusb_control_request_t
     {
         USBOTGD->DEV_ADDRESS = (uint8_t)request->wValue;
     }
-
     //txSet(0, USBOTG_EP_RES_NACK);
     //rxSet(0, USBOTG_EP_RES_ACK);
-
 }
 
 
 /**
     It's ep_out so it's a read
 */
-void dcd_int_out(int end_num)
+void dcd_int_out0()
 {
-    int rx_len = USBOTGD->RX_LEN;
-    int endp = end_num;
-    if(end_num==0)
+    int rx_len = USBOTGD->RX_LEN;    
+    xfer_ctl_t *xfer = XFER_CTL_BASE(0, false);
+    xfer->xfered_so_far += rx_len;
+    
+    if(!xfer->total_len) // zlp
+    {     
+        rxSet(0, USBOTG_EP_RES_NACK +  + ep0_rx_tog * USBOTG_EP_RES_TOG1);  // done
+        ep0_rx_tog ^= 1;
+        dcd_event_xfer_complete(0, 0, xfer->xfered_so_far, XFER_RESULT_SUCCESS, true);
+        return;
+    }
+    if(rx_len)
     {
-        rxSet(0,  USBOTG_EP_RES_NACK + ep0_rx_tog * USBOTG_EP_RES_TOG1);
-        xfer_ctl_t *xfer = XFER_CTL_BASE(0, false);
-        xfer->xfered_so_far += rx_len;
-        dcd_event_xfer_complete(0, endp, xfer->xfered_so_far, XFER_RESULT_SUCCESS, true);
-        if(rx_len==0) // zlp
-        {            
-            rxSet(0,  USBOTG_EP_RES_ACK + + ep0_rx_tog * USBOTG_EP_RES_TOG1);
-            ep0_tx_tog = 1;
-            ep0_rx_tog = 1;
+        if(xfer->buffer==NULL)
+        {
+            not_ready++;
+            xAssert(0);
         }else
         {
-            if(xfer->buffer==NULL)
-            {
-                not_ready++;
-            }
-            ep0_rx_tog ^= 1;
+            // copy!
+            memcpy( xfer->buffer+ xfer->xfered_so_far, getBufferAddress(0, false), rx_len);            
         }
-        return;
-    }        
-    xfer_ctl_t *xfer = XFER_CTL_BASE(end_num,false);
+    }
+   
+
+    if(rx_len==xfer->max_size) // more ?
+    {
+        rxSet(0,  USBOTG_EP_RES_ACK + ep0_rx_tog * USBOTG_EP_RES_TOG1);
+    }else
+    {
+        rxSet(0,  USBOTG_EP_RES_NACK + ep0_rx_tog * USBOTG_EP_RES_TOG1);
+        dcd_event_xfer_complete(0, 0, xfer->xfered_so_far, XFER_RESULT_SUCCESS, true);
+    }
+    
+}
+// out-> write
+void dcd_int_out(int end_num)
+{
+    xfer_ctl_t *xfer = XFER_CTL_BASE(end_num,false);    
+    int rx_len = USBOTGD->RX_LEN;
+
     // copy from DMA area to final buffer
     memcpy( xfer->buffer+ xfer->xfered_so_far, getBufferAddress(end_num, false), rx_len);
     xfer->xfered_so_far += rx_len;
+    // More ?
     if ( rx_len < xfer->max_size ||  xfer->xfered_so_far==xfer->total_len)
     {
-        rxControl(end_num, USBOTG_EP_RES_MASK, USBOTG_EP_RES_NACK );
-        dcd_event_xfer_complete(0, endp, xfer->xfered_so_far, XFER_RESULT_SUCCESS, true);
-    }else
+        // nope
+        rxControl(end_num, USBOTG_EP_RES_MASK, USBOTG_EP_RES_NACK );        
+    }else // yes more
     {
         rxControl(end_num,USBOTG_EP_RES_MASK ,USBOTG_EP_RES_ACK);
-    }
-    
+    }    
 }
 //
 // ep_in, it's a write
 //
+void dcd_int_in0()
+{    
+    xfer_ctl_t *xfer = XFER_CTL_BASE(0, 1);                    
+    // assume one transfer is enough (?)
+    xfer->xfered_so_far += xfer->current_transfer;            
+    if(!xfer->total_len)
+    {
+        txSet(0, USBOTG_EP_RES_NACK +  + ep0_tx_tog * USBOTG_EP_RES_TOG1);  // done
+        dcd_event_xfer_complete(0, TUSB_DIR_IN_MASK  , xfer->xfered_so_far, XFER_RESULT_SUCCESS, true);
+        return;
+    }
+    ep0_tx_tog ^=1;  
+    int left = xfer->total_len-xfer->xfered_so_far;
+    if(left==0) // done!
+    {        
+        txSet(0, USBOTG_EP_RES_NACK +  + ep0_tx_tog * USBOTG_EP_RES_TOG1);  // done
+        dcd_event_xfer_complete(0, TUSB_DIR_IN_MASK  , xfer->xfered_so_far, XFER_RESULT_SUCCESS, true);           
+    }else // next
+    {
+        xAssert(0);
+        txSet(0,  USBOTG_EP_RES_ACK + ep0_tx_tog * USBOTG_EP_RES_TOG1); //
+    }
+    return;    
+}
 void dcd_int_in(int end_num)
 {
     uint8_t endp = end_num |  TUSB_DIR_IN_MASK ;
     xfer_ctl_t *xfer = XFER_CTL_BASE(end_num, 1);                    
-    if(end_num==0)
-    {  // assume one transfer is enough (?)
-        xfer->xfered_so_far+=xfer->current_transfer;        
-        int left = xfer->total_len-xfer->xfered_so_far;
-        ep0_tx_tog ^=1;
-        xfer->current_transfer = 0;
-        dcd_event_xfer_complete(0, endp  , xfer->xfered_so_far, XFER_RESULT_SUCCESS, true);
-
-        txSet(0,  USBOTG_EP_RES_NACK + ep0_tx_tog * USBOTG_EP_RES_TOG1); //
-        return;
-    }   
     // finish or queue the next one ?
     xfer->xfered_so_far+=xfer->current_transfer;
     xfer->current_transfer = 0;
@@ -375,10 +398,9 @@ void dcd_int_in(int end_num)
     {
         txControl(end_num, USBOTG_EP_RES_MASK, USBOTG_EP_RES_NACK);
         dcd_event_xfer_complete(0, endp , xfer->xfered_so_far, XFER_RESULT_SUCCESS, true);
-    }
-        
-    
+    }    
 }
+
 /**
 */
 void dcd_int_handler(uint8_t rhport) 
@@ -400,8 +422,7 @@ void dcd_int_handler(uint8_t rhport)
     if(fg & USBOTG_INT_FG_TRANSFER_COMPLETE)
     {
             int token_type = (st >> 4)&3; // 00 OUT Packet, 1 SOF, 2 IN packet , 3 SETUP packet
-            int end_num = st & 0xf;
-            uint8_t endp = end_num | (token_type == PID_IN ? TUSB_DIR_IN_MASK : 0);
+            int end_num = st & 0xf;            
 
             switch(token_type)
             {
@@ -410,7 +431,10 @@ void dcd_int_handler(uint8_t rhport)
                 case PID_OUT : // it's a read 
                     if(st & USBOTG_INT_ST_TOG_OK)
                     {
-                        dcd_int_out(end_num);
+                        if(!end_num)
+                            dcd_int_out0();
+                        else
+                            dcd_int_out(end_num);
                     }else
                     {
                         tog_ko_out++;
@@ -419,7 +443,10 @@ void dcd_int_handler(uint8_t rhport)
                 case PID_IN : // IN, it's a write
                     if(st & USBOTG_INT_ST_TOG_OK)
                     {
-                        dcd_int_in(end_num);
+                        if(!end_num)
+                            dcd_int_in0();
+                        else
+                            dcd_int_in(end_num);;
                     }else
                     {
                         tog_ko_in++;
