@@ -94,6 +94,9 @@ SECTIONS
          * Program code and vague linking
          */
         *(.text .text.* .gnu.linkonce.t.*)
+        *(*.rodata)
+        *(*.rodata.*)
+
         *(.plt)
         *(.eh_frame_hdr)
         *(.eh_frame)
