@@ -42,7 +42,7 @@ IF( USE_CH32v3x_USB_HS ) # ${LN_MCU} STREQUAL "CH32V3x")
     ENDIF()
 ELSE()
     IF( USE_CH32v3x_USB_OTG ) # ${LN_MCU} STREQUAL "CH32V3x") 
-        SET(DRIVERS             ${CH32V3x_FOLDER}/dcd_otg.cpp       ${LNSRC}/lnUsbStack.cpp  ${LNSRC}/lnUsbStubs.cpp)
+            SET(DRIVERS             ${CH32V3x_FOLDER}/dcd_usbfs.c  ${CH32V3x_FOLDER}/dcd_usbfs_platform.cpp     ${LNSRC}/lnUsbStack.cpp  ${LNSRC}/lnUsbStubs.cpp)
         SET(LN_OPT_TUSB_MCU     OPT_MCU_CH32V307)
         INCLUDE_DIRECTORIES(    ${CH32V3x_FOLDER}  )
         IF(1) # No need for high speed at the moment
