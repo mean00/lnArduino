@@ -23,8 +23,8 @@
  */
 #include "tusb_option.h"
 #include "device/dcd.h"
-#include "ch32_otg_reg.h"
-#include "ch32_extra.h"
+#include "ch32_usbfs_reg.h"
+
 
 #define CHECK_ALIGNED(x) { if(((uint32_t)x) &3) TU_ASSERT(0,);}
 LN_USB_OTG_DEVICE *USBOTGD =    (LN_USB_OTG_DEVICE *) USBOTG_BASE;
