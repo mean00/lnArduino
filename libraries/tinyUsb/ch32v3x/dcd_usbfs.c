@@ -42,7 +42,7 @@ LN_USB_OTG_DEVICE *USBOTGD =    (LN_USB_OTG_DEVICE *) USBOTG_BASE;
 #define SPEED_BITS          USBOTG_FULL_SPEED
 #define REPORTED_SPEED      TUSB_SPEED_FULL
 
-#define DISABLE_BIDIR_ENDPOINT
+//#define DISABLE_BIDIR_ENDPOINT
 
 static uint8_t *getBufferAddress(int x, bool dir);
 typedef struct {
