@@ -29,10 +29,9 @@ https://github.com/openwch/ch32v20x/blob/main/EVT/EXAM/USB/USBFS/DEVICE/CH372Dev
 #include "device/dcd.h"
 #include "ch32_otg_reg.h"
 #include "ch32_extra.h"
-#undef USBHSD
+
 #define CHECK_ALIGNED(x) { if(((uint32_t)x) &3) xAssert(0);}
 LN_USB_OTG_DEVICE *USBOTGD =    (LN_USB_OTG_DEVICE *) USBOTG_BASE;
-
 
 #if 0
     #define LDEBUG Logger
@@ -42,14 +41,12 @@ LN_USB_OTG_DEVICE *USBOTGD =    (LN_USB_OTG_DEVICE *) USBOTG_BASE;
 
 volatile uint8_t ep0_tx_tog = 0x01;
 volatile uint8_t ep0_rx_tog = 0x01; 
-int sept=0;
+
 int tog_ko_out=0; /*-*/
 int tog_ko_in=0;
-int not_ready = 0;
 
 
 
-int nbTxComplete=0;
 static uint8_t *getBufferAddress(int x, bool dir);
 // Max number of bi-directional endpoints including EP0
 #define EP_MAX 8
@@ -82,7 +79,123 @@ static int xmin(int a, int b)
 #define XFER_CTL_BASE(_ep, _dir) (&(xfer_status.eps[_ep*2+_dir]))
 static  __attribute__((aligned(4))) all_xfer_t xfer_status;
 
-#include "dcd_otg_misc.cpp"
+#include "dcd_usb_platform.h"
+
+
+/**
+*/
+void dcd_edpt_close_all(uint8_t rhport) {
+    (void)rhport;
+}
+/**
+*/
+/**
+*/
+void dcd_remote_wakeup(uint8_t rhport)
+{
+  (void) rhport;
+  xAssert(0);
+}
+
+/**
+*/
+void rxControl(int epnum, uint32_t mask, uint32_t set)
+{
+    uint32_t reg=USBOTGD->ep[epnum].rx_ctrl;
+    reg&=~ (mask);
+    reg|=set;
+    USBOTGD->ep[epnum].rx_ctrl = reg;
+}
+void txControl(int epnum, uint32_t mask, uint32_t set)
+{
+    uint32_t reg=USBOTGD->ep[epnum].tx_ctrl;
+    reg&=~ (mask);
+    reg|=set;
+    USBOTGD->ep[epnum].tx_ctrl = reg;
+}
+void txSet(int epnum, uint32_t val)
+{
+    USBOTGD->ep[epnum].tx_ctrl = val;
+}
+void rxSet(int epnum, uint32_t val)
+{
+    USBOTGD->ep[epnum].rx_ctrl = val;
+}
+void txLenSet(int epnum, uint32_t size)
+{
+    USBOTGD->ep[epnum].tx_length = size;
+}
+
+//------------
+
+// Out then in
+uint8_t *getBufferAddress(int x, bool is_in)
+{
+    xAssert(x<8);
+    uint8_t *s = xfer_status.buffer[x];
+    if(x)                   // shared TX/RX buffer for EP0
+        return s+is_in*64;
+    return s;
+}
+/**
+0 not used
+   1 4
+   2 3
+   5 6
+   7
+*/
+//                          0         1   2   3  4  5 6  7    
+const uint8_t  offset[8] ={ 0,        0,  1 , 1, 0, 2,2, 3};
+const uint8_t  up[8]     ={ 0,        1,  0,  1, 0, 0,1, 0};
+
+void setEndpointMode(int endpoint, bool mod, bool enable_tx, bool enable_rx)
+{
+
+    if(!endpoint) return;
+    volatile uint8_t *adr = &(USBOTGD->mod[offset[endpoint]]);
+    uint8_t value = *adr;
+    if(up[endpoint])
+    {
+        value&=0x0F;
+        value|=  ( mod + enable_tx*4+enable_rx*8)<<4;
+    }else
+    {
+        value&=0xF0;
+        value|= ( mod + enable_tx*4+enable_rx*8) ;
+    }
+    *adr=value;
+}
+/**
+*/
+void setEndpointDmaAddress(int endpoint, uint32_t adr)
+{
+    USBOTGD->dma[endpoint] = adr;
+}
+
+/**
+*/
+int usbd_ep_close(const uint8_t ep) {
+    (void)ep;
+
+    return 0;
+}
+/**
+*/
+void dcd_edpt_stall(uint8_t rhport, uint8_t ep_addr) {
+    (void)rhport;
+
+   xAssert(0);
+}
+/**
+*/
+void dcd_edpt_clear_stall(uint8_t rhport, uint8_t ep_addr) {
+    (void)rhport;
+    xAssert(0);
+   
+}
+
+
+
 /**
 */
 void dcd_init(uint8_t rhport) {
