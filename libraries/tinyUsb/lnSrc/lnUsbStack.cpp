@@ -12,7 +12,7 @@
 #else
   #define USBD_EXTRA_STACK 0
 #endif
-#define USB_BASE_STACK_SIZE 256
+#define USB_BASE_STACK_SIZE 384
 #define USBD_STACK_SIZE (USB_BASE_STACK_SIZE+USBD_EXTRA_STACK)
 // local prototypes
 void dcd_handle_bus_reset(void);
