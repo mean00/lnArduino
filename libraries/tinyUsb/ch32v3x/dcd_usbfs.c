@@ -176,14 +176,14 @@ int usbd_ep_close(const uint8_t ep) {
 */
 void dcd_edpt_stall(uint8_t rhport, uint8_t ep_addr) {
     (void)rhport;
+    (void)ep_addr;
 
-   TU_ASSERT(0,);
 }
 /**
 */
 void dcd_edpt_clear_stall(uint8_t rhport, uint8_t ep_addr) {
     (void)rhport;
-    TU_ASSERT(0,);
+    (void)ep_addr;
    
 }
 
@@ -234,6 +234,7 @@ void dcd_init(uint8_t rhport) {
 
 void dcd_set_address(uint8_t rhport, uint8_t dev_addr) 
 {
+    (void)dev_addr;
     // Response with zlp status
     dcd_edpt_xfer(rhport, 0x80, NULL, 0);
 }
@@ -368,7 +369,7 @@ bool dcd_edpt_xfer(uint8_t rhport, uint8_t ep_addr, uint8_t *buffer, uint16_t to
 //
 //
 //
-void dcd_int_reset()
+void dcd_int_reset(void)
 {
     USBOTGD->INT_EN &= ~USBOTG_INT_EN_BUS_RESET_IE;
     XFER_CTL_BASE(0,0)->max_size = 64;
@@ -417,7 +418,7 @@ void dcd_edpt0_status_complete(uint8_t rhport, tusb_control_request_t const *req
 /**
     It's ep_out so it's a read
 */
-void dcd_int_out0()
+void dcd_int_out0(void)
 {
     int rx_len = USBOTGD->RX_LEN;    
     xfer_ctl_t *xfer = XFER_CTL_BASE(0, false);    
@@ -482,7 +483,7 @@ void dcd_int_out(int end_num)
 //
 // ep_in, it's a write
 //
-void dcd_int_in0()
+void dcd_int_in0(void)
 {    
     xfer_ctl_t *xfer = XFER_CTL_BASE(0, 1);                    
     // assume one transfer is enough (?)
