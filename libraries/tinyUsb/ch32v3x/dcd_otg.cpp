@@ -34,7 +34,7 @@ https://github.com/openwch/ch32v20x/blob/main/EVT/EXAM/USB/USBFS/DEVICE/CH372Dev
 LN_USB_OTG_DEVICE *USBOTGD =    (LN_USB_OTG_DEVICE *) USBOTG_BASE;
 
 
-#if 1
+#if 0
     #define LDEBUG Logger
 #else
     #define LDEBUG(...)     {}
@@ -146,13 +146,13 @@ bool dcd_edpt_open(uint8_t rhport, tusb_desc_endpoint_t const *desc_edpt) {
     {
         if(desc_edpt->bEndpointAddress & TUSB_DIR_IN_MASK ) // IN ?
         {
-            setEndpointMode(epnum,false, true,false);
+            setEndpointMode(epnum,false, true,true);
             txLenSet(epnum, 0);
             txSet(epnum, USBOTG_EP_RES_AUTOTOG | USBOTG_EP_RES_NACK );
         }
         else
         {
-            setEndpointMode(epnum,false, false,true);
+            setEndpointMode(epnum,false, true,true);
             rxSet(epnum, USBOTG_EP_RES_AUTOTOG | USBOTG_EP_RES_NACK); // ready to receive
         }
     }
