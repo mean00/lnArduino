@@ -68,34 +68,38 @@ void  __attribute__ ((noinline)) HardFault()
 }
 
 
-
+#define DECLARE_INTERRUPT(x) void x()         LN_INTERRUPT_TYPE;
 extern "C"
 {
-void SysTick_Handler() LN_INTERRUPT_TYPE;
-void Ecall_M_Mode_Handler() LN_INTERRUPT_TYPE;
-void Ecall_U_Mode_Handler() LN_INTERRUPT_TYPE;
-void SW_Handler() LN_INTERRUPT_TYPE;
-void USART0_IRQHandler() LN_INTERRUPT_TYPE;
-void DMA0_Channel0_IRQHandler() LN_INTERRUPT_TYPE;
-void DMA0_Channel1_IRQHandler() LN_INTERRUPT_TYPE;
-void DMA0_Channel2_IRQHandler() LN_INTERRUPT_TYPE;
-void DMA0_Channel3_IRQHandler() LN_INTERRUPT_TYPE;
-void DMA0_Channel4_IRQHandler() LN_INTERRUPT_TYPE;
-void DMA0_Channel5_IRQHandler() LN_INTERRUPT_TYPE;
-void DMA0_Channel6_IRQHandler() LN_INTERRUPT_TYPE;
-void DMA0_Channel7_IRQHandler() LN_INTERRUPT_TYPE;
+DECLARE_INTERRUPT( SysTick_Handler)
+DECLARE_INTERRUPT( Ecall_M_Mode_Handler)
+DECLARE_INTERRUPT( Ecall_U_Mode_Handler)
+DECLARE_INTERRUPT( SW_Handler)
+DECLARE_INTERRUPT( USART0_IRQHandler)
+DECLARE_INTERRUPT( DMA0_Channel0_IRQHandler)
+DECLARE_INTERRUPT( DMA0_Channel1_IRQHandler)
+DECLARE_INTERRUPT( DMA0_Channel2_IRQHandler)
+DECLARE_INTERRUPT( DMA0_Channel3_IRQHandler)
+DECLARE_INTERRUPT( DMA0_Channel4_IRQHandler)
+DECLARE_INTERRUPT( DMA0_Channel5_IRQHandler)
+DECLARE_INTERRUPT( DMA0_Channel6_IRQHandler)
+DECLARE_INTERRUPT( DMA0_Channel7_IRQHandler)
 
-void DMA1_Channel0_IRQHandler() LN_INTERRUPT_TYPE;
-void DMA1_Channel1_IRQHandler() LN_INTERRUPT_TYPE;
-void DMA1_Channel2_IRQHandler() LN_INTERRUPT_TYPE;
-void DMA1_Channel3_IRQHandler() LN_INTERRUPT_TYPE;
-void DMA1_Channel4_IRQHandler() LN_INTERRUPT_TYPE;
-void DMA1_Channel5_IRQHandler() LN_INTERRUPT_TYPE;
-void DMA1_Channel6_IRQHandler() LN_INTERRUPT_TYPE;
-void DMA1_Channel7_IRQHandler() LN_INTERRUPT_TYPE;
-void USBHSWakeup_IRQHandler()   LN_INTERRUPT_TYPE;
-void USBHS_IRQHandler()         LN_INTERRUPT_TYPE;
-void OTG_FS_IRQHandler()         LN_INTERRUPT_TYPE;
+DECLARE_INTERRUPT( DMA1_Channel0_IRQHandler)
+DECLARE_INTERRUPT( DMA1_Channel1_IRQHandler)
+DECLARE_INTERRUPT( DMA1_Channel2_IRQHandler)
+DECLARE_INTERRUPT( DMA1_Channel3_IRQHandler)
+DECLARE_INTERRUPT( DMA1_Channel4_IRQHandler)
+DECLARE_INTERRUPT( DMA1_Channel5_IRQHandler)
+DECLARE_INTERRUPT( DMA1_Channel6_IRQHandler)
+DECLARE_INTERRUPT( DMA1_Channel7_IRQHandler)
+DECLARE_INTERRUPT( USBHSWakeup_IRQHandler)
+DECLARE_INTERRUPT( USBHS_IRQHandler)
+DECLARE_INTERRUPT( OTG_FS_IRQHandler)
+
+DECLARE_INTERRUPT(USART1_IRQHandler)
+DECLARE_INTERRUPT(USART2_IRQHandler)
+
 }
 //extern void USB_TX_IRQHandler()     LN_INTERRUPT_TYPE;
 //extern void USB_RX_IRQHandler()     LN_INTERRUPT_TYPE;
@@ -171,8 +175,8 @@ static const uint32_t vecTable[]  __attribute__((aligned(32)))=
     X(unsupported), //.word   SPI1_IRQHandler            /* SPI1 */
     X(unsupported), //.word   SPI2_IRQHandler            /* SPI2 */
     X(USART0_IRQHandler), //.word   USART1_IRQHandler          /* USART1 */
-    X(unsupported), //.word   USART2_IRQHandler          /* USART2 */
-    X(unsupported), //.word   USART3_IRQHandler          /* USART3 */
+    X(USART1_IRQHandler), //.word   USART2_IRQHandler          /* USART2 */
+    X(USART2_IRQHandler), //.word   USART3_IRQHandler          /* USART3 */
     X(unsupported), //.word   EXTI15_10_IRQHandler       /* EXTI Line 15..10 */
     X(unsupported), //.word   RTCAlarm_IRQHandler        /* RTC Alarm through EXTI Line */
     X(unsupported), //.word   USBWakeUp_IRQHandler       /* USB Wakeup from suspend */
@@ -427,27 +431,19 @@ extern "C" void __attribute__ ((noinline))  deadEnd(int code)
     }
 }        
 
-void  __attribute__((weak))  USB_WAKEUP_IRQHandler()
-{
-  xAssert(0);
-}
-void  __attribute__((weak)) USB_TX_IRQHandler()
-{
-    xAssert(0);
-}
-void  __attribute__((weak)) USB_RX_IRQHandler()
-{
-    xAssert(0);
-}
-void  __attribute__((weak))  USBHS_IRQHandler()
-{
-    xAssert(0);
-}
 
-void  __attribute__((weak))  OTG_FS_IRQHandler()
-{
-    xAssert(0);
-}
+#define WEAK_INTERRUPT(x) void  __attribute__((weak))  x() {     xAssert(0); }
+
+WEAK_INTERRUPT(USB_WAKEUP_IRQHandler)
+WEAK_INTERRUPT(USB_TX_IRQHandler)
+WEAK_INTERRUPT(USB_RX_IRQHandler)
+WEAK_INTERRUPT(USBHS_IRQHandler)
+WEAK_INTERRUPT(USART1_IRQHandler)
+WEAK_INTERRUPT(USART2_IRQHandler)
+WEAK_INTERRUPT(OTG_FS_IRQHandler)
+
+
+
 void lnSoftSystemReset()
 {
 }
@@ -461,4 +457,5 @@ extern "C" void   __attribute__((noreturn))  start_c()
 }
 
 // EOF
+
 
