@@ -82,13 +82,13 @@ static void waitCfg0Bit(int mask)
  * @param predivider
  */
 
-static const int Multipliers[]={
-    0,1,1,1,    // 0 1 2 3
+static const uint8_t  Multipliers[]={
+    0,0,0,1,    // 0 1 2 3
     2,3,4,5,    // 4 5 6 7
     6,7,8,9,    // 8 9 10 11
     // the ones below dont work on stm32 !
-    10,11,12,14,// 12 13 14 15
-    15,         // 16 17 18 19
+    10,11,12,13,// 12 13 14 15
+    14, 14, 15        // 16 17 18 19
 };
 /**
  *
@@ -104,6 +104,7 @@ void setPll(int inputClock, int multiplier, int predivider, bool external)
 
     uint32_t c0=*cfg0;
     *cfg1=0;
+    xAssert(multiplier < sizeof(Multipliers));
     int pllMultiplier=Multipliers[multiplier];
 
     SystemCoreClock=(inputClock*multiplier*1000000)/predivider;
