@@ -6,7 +6,7 @@
 #include "stdint.h"
 extern "C"
 {
-#include "riscv_encoding.h"
+//#include "riscv_encoding.h"
 #include "FreeRTOS.h"
 }
 #include "systemHelper.h"

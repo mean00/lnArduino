@@ -11,7 +11,7 @@ MACRO(GENERATE_GD32_FIRMWARE target)
             SET(LN_MCU_EEPROM_SIZE 4 CACHE INTERNAL "")
     ENDIF(NOT LN_MCU_EEPROM_SIZE)
 
-   configure_file( "${AF_FOLDER}/legacy/boards/sipeed-longan-nano/ld.lds.in" "${CMAKE_BINARY_DIR}/linker_script.lds" @ONLY)
+    configure_file( "${AF_FOLDER}/${LN_EXT}/boards/sipeed-longan-nano/ld.lds.in" "${CMAKE_BINARY_DIR}/linker_script.lds" @ONLY)
 
     ADD_EXECUTABLE(${target}  ${AF_FOLDER}/riscv_gd32fx/start.S ${ARGN})
     TARGET_LINK_LIBRARIES(${target} ${USED_LIBS} ) # duplicates are NOT a mistake !

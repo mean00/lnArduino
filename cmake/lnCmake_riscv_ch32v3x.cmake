@@ -11,7 +11,7 @@ MACRO(GENERATE_GD32_FIRMWARE target)
             SET(LN_MCU_EEPROM_SIZE 4 CACHE INTERNAL "")
     ENDIF(NOT LN_MCU_EEPROM_SIZE)
 
-   configure_file( "${AF_FOLDER}/legacy/boards/ch32v3x/ld.lds.in" "${CMAKE_BINARY_DIR}/linker_script.lds" @ONLY)
+    configure_file( "${AF_FOLDER}/riscv_ch32v3x/boards/ch32v3x/ld.lds.in" "${CMAKE_BINARY_DIR}/linker_script.ld" @ONLY)
 
     ADD_EXECUTABLE(${target}  ${AF_FOLDER}/riscv_ch32v3x/start.S ${ARGN})
     TARGET_LINK_LIBRARIES(${target} ${USED_LIBS} ) # duplicates are NOT a mistake !

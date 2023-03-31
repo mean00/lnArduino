@@ -95,7 +95,7 @@ set(CMAKE_CXX_LINK_EXECUTABLE    "<CMAKE_CXX_COMPILER>   <CMAKE_CXX_LINK_FLAGS> 
 SET(CMAKE_EXECUTABLE_SUFFIX_C .elf)
 SET(CMAKE_EXECUTABLE_SUFFIX_CXX .elf)
 
-include_directories(${ARDUINO_GD32_FREERTOS}/legacy/boards/${GD32_BOARD}/)
+include_directories(${ARDUINO_GD32_FREERTOS}/${LN_EXT}/boards/${GD32_BOARD}/)
 
 # Sees optimizaton >=2 are causing issues (???)
 

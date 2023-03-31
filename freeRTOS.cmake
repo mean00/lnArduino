@@ -11,9 +11,9 @@ SET(MEM ${FOS}/portable/MemMang/heap_4.c)
 
 ADD_LIBRARY( FreeRTOS STATIC ${CMN} ${LN_FREERTOS_PORT_SOURCES} ${MEM})
 target_include_directories(FreeRTOS PRIVATE ${FOS}/..)
-target_include_directories(FreeRTOS PRIVATE ${FOS}/../legacy/include)
+target_include_directories(FreeRTOS PRIVATE ${FOS}/../${LN_EXT}/include)
 target_include_directories(FreeRTOS PRIVATE ${FOS}/include)
 target_include_directories(FreeRTOS PRIVATE ${LN_FREERTOS_PORT})
 target_include_directories(FreeRTOS PRIVATE ${CMAKE_SOURCE_DIR})
 
-include_directories(${ARDUINO_GD32_FREERTOS}/legacy/boards/${GD32_BOARD}/)
+include_directories(${ARDUINO_GD32_FREERTOS}/${LN_EXT}/boards/${GD32_BOARD}/)

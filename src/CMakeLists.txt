@@ -31,7 +31,7 @@ SET(OVERLAY_SRCS
                        lnFMC.cpp
                        lnFreeRTOSDebug.cpp                       
                        ${EXTRA_OVERLAY}
-                       ../legacy/boards/${GD32_BOARD}/lnPinMapping.cpp
+                       ../${LN_EXT}/boards/${GD32_BOARD}/lnPinMapping.cpp
                     )
 
 IF(LN_ENABLE_I2C)

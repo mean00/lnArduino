@@ -2,7 +2,7 @@ include(FindPythonInterp)
 MACRO(GENERATE_GD32_FIRMWARE target)
 
   
-    configure_file( "${AF_FOLDER}/legacy/boards/bluepill/clang.lld.in" "${CMAKE_BINARY_DIR}/linker_script.ld" @ONLY)
+    configure_file( "${AF_FOLDER}/${LN_EXT}/boards/bluepill/clang.lld.in" "${CMAKE_BINARY_DIR}/linker_script.ld" @ONLY)
     ADD_EXECUTABLE(${target} ${ARGN}  ${AF_FOLDER}/arm_gd32fx/start.S   ${AF_FOLDER}/arm_gd32fx/start.cpp 
                                                                  ${AF_FOLDER}/arm_gd32fx/vector_table.S) 
     TARGET_LINK_LIBRARIES(${target} ${USED_LIBS} ) # duplicates are NOT a mistake !
