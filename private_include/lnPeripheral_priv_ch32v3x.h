@@ -72,6 +72,7 @@
 
 // Interrupt controller 
 #define LN_PFIC_ADR      (0xE000E000)
+#define LN_STK_ADR       (0xE000F000)
 
 // ??
 #define LN_SYS_TIMER_ADR (0xd1000000)
