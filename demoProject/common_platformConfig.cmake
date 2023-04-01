@@ -22,7 +22,7 @@ IF("${LN_ARCH}" STREQUAL "RISCV") # RISCV
       #-- CLANG --
       # No FPU
       SET(PLATFORM_CLANG_PATH  "/riscv/tools_llvm/bin" CACHE INTERNAL "")
-      SET(PLATFORM_CLANG_VERSION "-16")
+      SET(PLATFORM_CLANG_VERSION "-17")
       IF(USE_HW_FPU)
           SET(PLATFORM_CLANG_SYSROOT "${PLATFORM_CLANG_PATH}/../lib/clang-runtimes/riscv32-none-eabi/riscv32_hard_fp/" CACHE INTERNAL "")
           SET(PLATFORM_CLANG_C_FLAGS "--target=riscv32 -march=rv32imafc -mabi=ilp32f  " CACHE INTERNAL "")      
@@ -52,9 +52,11 @@ ELSE()
       #SET(PLATFORM_CLANG_VERSION "-14")
       #SET(PLATFORM_CLANG_PATH  /opt/llvm_arm/LLVMEmbeddedToolchainForArm-14.0.0/bin)
       #SET(PLATFORM_CLANG_VERSION "")
-      SET(PLATFORM_CLANG_PATH  /opt/llvm_arm/14/bin)
       SET(PLATFORM_CLANG_VERSION "")
       SET(PLATFORM_TOOLCHAIN_PATH "/home/fx/Arduino_stm32/arm-gcc-2021q4/bin")
+      SET(PLATFORM_CLANG_PATH /arm/tools_llvm/bin)
+      SET(PLATFORM_CLANG_VERSION "-17")
+
    ENDIF()
 ENDIF()
 
