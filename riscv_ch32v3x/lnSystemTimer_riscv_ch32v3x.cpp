@@ -21,7 +21,7 @@ static uint64_t tickPerUs16=1;
 /**
  *  This should be called with interrupt disabled
  */
-extern "C" void lnSystemTimerInit()
+void lnSystemTimerInit()
 {
     // number of ticks for a duration of 1 us
     tickPerUs16=((SystemCoreClock*4))/(1000*1000); // *16/4    
@@ -63,6 +63,7 @@ uint64_t lnGetUs64()
     uint64_t tick=lnGetCycle64();
     // convert tick to us
     tick=(tick*16)/tickPerUs16;
+    tick=tick+1000*lnGetMs();
     return tick;    
 }
 /**
