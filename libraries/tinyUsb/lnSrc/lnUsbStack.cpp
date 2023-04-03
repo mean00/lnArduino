@@ -8,11 +8,11 @@
 
 
 #if CFG_TUSB_DEBUG!=0
-  #define USBD_EXTRA_STACK 500
+  #define USBD_EXTRA_STACK 1024
 #else
   #define USBD_EXTRA_STACK 0
 #endif
-#define USB_BASE_STACK_SIZE 384
+#define USB_BASE_STACK_SIZE 1500 // in bytes
 #define USBD_STACK_SIZE (USB_BASE_STACK_SIZE+USBD_EXTRA_STACK)
 // local prototypes
 void dcd_handle_bus_reset(void);
@@ -124,7 +124,7 @@ void    lnUsbStack::sendEvent(lnUsbStackEvents ev)
 */
 void    lnUsbStack::start()
 {
-  (void)xTaskCreate(tusbTrampoline, "usbd", USBD_STACK_SIZE, this, configMAX_PRIORITIES - 1,      NULL);
+  lnCreateTask(tusbTrampoline, "usbd", USBD_STACK_SIZE, this, configMAX_PRIORITIES - 1);
 }
 /**
 

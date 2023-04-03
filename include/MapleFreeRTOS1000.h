@@ -35,6 +35,13 @@ extern "C" {
 #include "queue.h"
 #include "semphr.h"
 #include "event_groups.h"
+
+ bool lnCreateTask( TaskFunction_t pxTaskCode,
+                            const char * const pcName, /*lint !e971 Unqualified char types are allowed for strings and single characters only. */
+                            int stackSizeInBytes, // in bytes  !
+                            void * const pvParameters,
+                            UBaseType_t uxPriority );
+
 }
 
 #endif

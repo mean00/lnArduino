@@ -9,6 +9,7 @@
 
 #define  fos_ms2tick(ms) (((ms)+portTICK_PERIOD_MS-1)/portTICK_PERIOD_MS)
 
+
 #define EVENT_INDEX 1
 
 extern "C"
@@ -23,6 +24,26 @@ void __attribute__((noinline))  __attribute__((noreturn))  do_assert(const char 
         }
 }
 #define xAssert(a) if(!(a)) {do_assert(#a);}
+/**
+    \fn adjustStackSize
+    \brief return size in uint32_t adjusted for the arch
+    The input is in bytes
+*/
+static int adjustStackSize(int stackSizeInBytes)
+{
+    configSTACK_DEPTH_TYPE systemExtraStack = 0;
+
+#if  LN_ARCH==LN_ARCH_RISCV
+        systemExtraStack += 28;  // we have more registers to save... This is probably over kill
+#endif
+#if ARCH_FPU == 1
+        systemExtraStack += 32;
+#endif
+
+    int adjustedStackDepth=(stackSizeInBytes/4) + systemExtraStack;
+    return adjustedStackDepth;
+}
+
 /**
  *
  */
@@ -131,9 +152,10 @@ lnTask::lnTask(const char *name,  int priority, int taskSize)
 /**
  *
  */
+#undef xTaskCreate
 void lnTask::start()
 {
-    BaseType_t er=xTaskCreate(xTask::Trampoline,_name,_taskSize, this,_priority,&_taskHandle);
+    BaseType_t er=xTaskCreate(xTask::Trampoline,_name,adjustStackSize(_taskSize), this,_priority,&_taskHandle);
     xAssert(er==pdPASS);
 }
 /**
@@ -345,4 +367,20 @@ uint32_t lnFastEventGroup::readEvents(uint32_t maskInt)
     END_LOCK();
     return v;
 }
+/**
+
+*/
+
+
+bool lnCreateTask( TaskFunction_t pxTaskCode,
+                            const char * const pcName, /*lint !e971 Unqualified char types are allowed for strings and single characters only. */
+                            int stackSizeInBytes, // in bytes  !, // in bytes!
+                            void * const pvParameters,
+                            UBaseType_t uxPriority)
+{
+    if(pdPASS==xTaskCreate(pxTaskCode, pcName, adjustStackSize(stackSizeInBytes), pvParameters, uxPriority,NULL))
+        return true;
+    xAssert(0);
+}
+
  //EOF

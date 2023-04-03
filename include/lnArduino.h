@@ -38,6 +38,7 @@ extern "C"
 #include "queue.h"
 #include "semphr.h"
 #include "event_groups.h"
+#define xTaskCreate NONONO
 
 }
 
