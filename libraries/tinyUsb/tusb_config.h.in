@@ -16,7 +16,9 @@
 #define CFG_TUD_MIDI             0
 #define CFG_TUD_VENDOR           0
 #define CFG_TUD_DFU_RUNTIME      @LN_USB_DFU_RUNTIME@
+#define CFG_TUD_DFU              @LN_USB_DFU@
 
+#define CFG_TUD_DFU_XFER_BUFSIZE 512
 
 //
 #define CFG_TUD_ENDPOINT0_SIZE    64

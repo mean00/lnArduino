@@ -27,6 +27,12 @@ ELSE()
     SET(LN_USB_DFU_RUNTIME 0 CACHE INTERNAL "")
 ENDIF()
 
+IF( DEFINED LN_USB_DFU)
+    SET(LN_USB_DFU ${LN_USB_DFU} CACHE INTERNAL "")
+ELSE()
+    SET(LN_USB_DFU 0 CACHE INTERNAL "")
+ENDIF()
+
 
 SET(CH32V3x_FOLDER      ${CMAKE_CURRENT_SOURCE_DIR}/ch32v3x/)
 
@@ -64,6 +70,7 @@ ENDIF()
 
 configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/tusb_config.h.in ${CMAKE_BINARY_DIR}/tusb_config.h @ONLY)
 
+
 IF( LN_USB_NB_CDC GREATER 0 )
         SET(CLASS_FILES ${CLASS_FILES} ${TUSB}/class/cdc/cdc_device.c ${LNSRC}/lnUsbCDC.cpp )
 ENDIF()        
@@ -73,7 +80,10 @@ ENDIF()
 IF( LN_USB_DFU_RUNTIME GREATER 0 )
         SET(CLASS_FILES ${CLASS_FILES} ${TUSB}/class/dfu/dfu_rt_device.c ${LNSRC}/lnUsbDFUrt.cpp)
 ENDIF()        
-
+   
+IF( LN_USB_DFU GREATER 0 )
+        SET(CLASS_FILES ${CLASS_FILES} ${TUSB}/class/dfu/dfu_device.c )
+ENDIF()     
 IF(FALSE)
     ADD_DEFINITIONS("-DCFG_TUSB_DEBUG=3")
     ADD_DEFINITIONS("-DCFG_TUSB_DEBUG_PRINTF=Logger_C")
