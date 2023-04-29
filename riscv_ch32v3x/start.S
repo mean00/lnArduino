@@ -14,10 +14,12 @@
 	.extern start_c
 _start:
 	j	handle_reset
+	.word   0x1234; /* base +4 */
+	.word   0x5678  /* base +8 */
+
 	.align  1
 _vector_base:
 	.option norvc;
-	.word   _start
 	.section	.text.handle_reset,"ax",@progbits	
 	.align	1
 handle_reset:
