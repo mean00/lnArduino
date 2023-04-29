@@ -21,6 +21,7 @@ LN_FMC *aFMC=(LN_FMC *)LN_FMC_ADR;
 
 void CH32V3_flashEnhanceMode(bool enable)
 {
+#if 0    
     if(enable)
     {
         aFMC->CTL |= LN_FMC_CTL_CH32_EHMOD;
@@ -28,6 +29,7 @@ void CH32V3_flashEnhanceMode(bool enable)
     {
         aFMC->CTL &= ~LN_FMC_CTL_CH32_EHMOD;
     }
+#endif    
 }
 
 void lnInitFlash_ch32v3x()
