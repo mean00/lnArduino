@@ -141,29 +141,31 @@ SECTIONS
     	    *(.srodata.cst4)
     	    *(.srodata.cst2)
     	    *(.srodata .srodata.*)
+          . = ALIGN(4);
       } > REGION_TEXT
- 
-      .copy_data_flash  :
+
+      .vma_section : 
       {
-            . = ALIGN(4);
-            PROVIDE( _data_lma = .); /* mark copy section start in flash */
-      } > rom 
+         . = ALIGN(4);
+    	    _data_lma = .;
+      } > rom
+     
     /*
      * Ro image to be copied from flash to ram
-     */
+     */                    
         .data :
           {
-            . = ALIGN(4);
             PROVIDE( _data= .); /* mark copy section start in ram */            
-      	    LONG(0)
-            . = ALIGN(8);
+            . = ALIGN(4);
+            . += 8; // marker
+            
             *(.rdata)
-   	    *(.data .data.*)
-    	    . = ALIGN(8);
-    	    PROVIDE( __global_pointer$ = . + 0x800); 
-    	    *(.sdata .sdata.*)
-           *(.got.plt) *(.got)
-            . = ALIGN(8);
+   	        *(.data .data.*)
+    	      . = ALIGN(4);
+    	      PROVIDE( __global_pointer$ = . + 0x800); 
+    	      *(.sdata .sdata.*)
+            *(.got.plt) *(.got)
+            . = ALIGN(4);
               __data_end__ = .;
             PROVIDE( _edata= .); /* mark copy section start in ram */
             PROVIDE( edata= .); /* mark copy section start in ram */
@@ -184,14 +186,14 @@ SECTIONS
           . = ALIGN(8);
           __bss_start   = .;
           __bss_start__ = .;
-	  *(.sbss*)
+	        *(.sbss*)
           *(.bss .bss.* )
           *(COMMON)
           . = ALIGN (8);
           __bss_end__ = .;
           _end = __bss_end__;
           . = ALIGN (8);
-	  _sp = .; 
+	        _sp = .; 
       } > REGION_BSS
 
     /*

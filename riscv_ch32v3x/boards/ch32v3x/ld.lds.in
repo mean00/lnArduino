@@ -120,7 +120,7 @@ SECTIONS
     . = ALIGN(4);
     PROVIDE( _data_lma = . );
   } >rom AT>rom 
-
+ 
   .dalign         :
   {
     . = ALIGN(4);
@@ -130,6 +130,8 @@ SECTIONS
   
   .data          :
   {
+    LONG(0) /* Marker */
+    LONG(0)
     *(.rdata) 
    
     *(.gnu.linkonce.r.*)
