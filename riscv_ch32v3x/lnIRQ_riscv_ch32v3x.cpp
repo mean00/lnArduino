@@ -442,10 +442,17 @@ WEAK_INTERRUPT(USART1_IRQHandler)
 WEAK_INTERRUPT(USART2_IRQHandler)
 WEAK_INTERRUPT(OTG_FS_IRQHandler)
 
-
+/**
+*/
 
 void lnSoftSystemReset()
 {
+    volatile uint32_t *pfic_sctlr=(volatile uint32_t *)(LN_PFIC_ADR+0xd10);
+    *pfic_sctlr=(1<<31);
+    while(1)
+    {
+        __asm__("nop");
+    }
 }
 
 extern "C"
