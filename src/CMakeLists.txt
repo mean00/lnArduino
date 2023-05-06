@@ -4,6 +4,8 @@ IF("${LN_MCU}" STREQUAL "CH32V3x")
     SET(EXTRA_OVERLAY ../riscv_ch32v3x/lnRCU_ch32v3x.cpp)
  ENDIF()
 
+include_directories( ${CMAKE_CURRENT_SOURCE_DIR}/../${LN_EXT} )
+
  SET(TARGET_SPECIFIC_SOURCES
                        ../${LN_EXT}/lnRCU_systemClock_${LN_EXT}.cpp 
                        ../${LN_EXT}/lnIRQ_${LN_EXT}.cpp 
