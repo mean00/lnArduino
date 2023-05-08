@@ -1,5 +1,5 @@
 
-include(lnCmake_${LN_TOOLCHAIN_EXT})
+include(${AF_FOLDER}/${LN_EXT}/cmake/lnCmake_${LN_TOOLCHAIN_EXT}.cmake)
 #______________________________________
 
 MACRO (LN_APPEND_FLAGS target)
