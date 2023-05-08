@@ -29,6 +29,14 @@ pub fn log1<T : uDisplay>(st: &str, v: T)
         log(&string_buf);
     }
 }
+pub fn logx(st: &str, v: u32)
+{
+    let mut string_buf  : heapless::String<64> = String::new();
+    if uwrite!(&mut string_buf, "{}{:#x}",st,v).is_ok()
+    {
+        log(&string_buf);
+    }
+}
 pub fn  log( st : &str )
 {
     unsafe {
