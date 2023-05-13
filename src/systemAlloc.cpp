@@ -36,10 +36,14 @@ void free(void *p)
 {
     sysFree(p);
 }
-
+extern "C" void *memset(void *s, int c, size_t n);
 void *calloc(size_t n, size_t elemSize)
 {
-    return sysAlloc(n*elemSize);
+    int total = n*elemSize;
+    void *xout = sysAlloc(total);
+    if(!xout) return NULL;    
+    memset(xout,0,total);    
+    return xout;
 }
 
 }
