@@ -1,30 +1,31 @@
 /**************************************************************************/
-/*! 
+/*!
     @file     trianglewave.pde
     @author   Adafruit Industries
     @license  BSD (see license.txt)
 
-    This example will generate a triangle wave with the MCP4725 DAC.   
+    This example will generate a triangle wave with the MCP4725 DAC.
 
     This is an example sketch for the Adafruit MCP4725 breakout board
     ----> http://www.adafruit.com/products/935
- 
-    Adafruit invests time and resources providing this open source code, 
-    please support Adafruit and open-source hardware by purchasing 
+
+    Adafruit invests time and resources providing this open source code,
+    please support Adafruit and open-source hardware by purchasing
     products from Adafruit!
 */
 /**************************************************************************/
-#include <Wire.h>
 #include "mcp23017.h"
+#include <Wire.h>
 
 extern void mySetup();
 extern void myLoop();
 
-void setup(void) {
+void setup(void)
+{
     mySetup();
-  
 }
 
-void loop(void) {
+void loop(void)
+{
     myLoop();
 }

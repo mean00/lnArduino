@@ -1,10 +1,10 @@
-#include "lnArduino.h"
 #include "RotaryEncoder.h"
+#include "lnArduino.h"
 
-static lnRotary *current=NULL;
-#define THRESHOLD           3        // 3ms
-#define TIME_LONG_PRESS     1000     // 2sec
-#define TIME_SHORT_PRESS    8
+static lnRotary *current = NULL;
+#define THRESHOLD 3          // 3ms
+#define TIME_LONG_PRESS 1000 // 2sec
+#define TIME_SHORT_PRESS 8
 
 #define R_START 0x0
 
@@ -16,18 +16,18 @@ static lnRotary *current=NULL;
 #define R_CW_BEGIN_M 0x4
 #define R_CCW_BEGIN_M 0x5
 const unsigned char ttable[6][4] = {
-  // R_START (00)
-  {R_START_M,            R_CW_BEGIN,     R_CCW_BEGIN,  R_START},
-  // R_CCW_BEGIN
-  {R_START_M | DIR_CCW, R_START,        R_CCW_BEGIN,  R_START},
-  // R_CW_BEGIN
-  {R_START_M | DIR_CW,  R_CW_BEGIN,     R_START,      R_START},
-  // R_START_M (11)
-  {R_START_M,            R_CCW_BEGIN_M,  R_CW_BEGIN_M, R_START},
-  // R_CW_BEGIN_M
-  {R_START_M,            R_START_M,      R_CW_BEGIN_M, R_START | DIR_CW},
-  // R_CCW_BEGIN_M
-  {R_START_M,            R_CCW_BEGIN_M,  R_START_M,    R_START | DIR_CCW},
+    // R_START (00)
+    {R_START_M, R_CW_BEGIN, R_CCW_BEGIN, R_START},
+    // R_CCW_BEGIN
+    {R_START_M | DIR_CCW, R_START, R_CCW_BEGIN, R_START},
+    // R_CW_BEGIN
+    {R_START_M | DIR_CW, R_CW_BEGIN, R_START, R_START},
+    // R_START_M (11)
+    {R_START_M, R_CCW_BEGIN_M, R_CW_BEGIN_M, R_START},
+    // R_CW_BEGIN_M
+    {R_START_M, R_START_M, R_CW_BEGIN_M, R_START | DIR_CW},
+    // R_CCW_BEGIN_M
+    {R_START_M, R_CCW_BEGIN_M, R_START_M, R_START | DIR_CCW},
 };
 #else
 // Use the full-step state table (emits a code at 00 only)
@@ -37,7 +37,6 @@ const unsigned char ttable[6][4] = {
 #define R_CCW_BEGIN 0x4
 #define R_CCW_FINAL 0x5
 #define R_CCW_NEXT 0x6
-
 
 // Enable this to emit codes twice per step.
 // #define HALF_STEP
@@ -50,60 +49,61 @@ const unsigned char ttable[6][4] = {
 // Counter-clockwise step.
 #define DIR_CCW 0x20
 
-
 const unsigned char ttable[7][4] = {
-  // R_START
-  {R_START,    R_CW_BEGIN,  R_CCW_BEGIN, R_START},
-  // R_CW_FINAL
-  {R_CW_NEXT,  R_START,     R_CW_FINAL,  R_START | DIR_CW},
-  // R_CW_BEGIN
-  {R_CW_NEXT,  R_CW_BEGIN,  R_START,     R_START},
-  // R_CW_NEXT
-  {R_CW_NEXT,  R_CW_BEGIN,  R_CW_FINAL,  R_START},
-  // R_CCW_BEGIN
-  {R_CCW_NEXT, R_START,     R_CCW_BEGIN, R_START},
-  // R_CCW_FINAL
-  {R_CCW_NEXT, R_CCW_FINAL, R_START,     R_START | DIR_CCW},
-  // R_CCW_NEXT
-  {R_CCW_NEXT, R_CCW_FINAL, R_CCW_BEGIN, R_START},
+    // R_START
+    {R_START, R_CW_BEGIN, R_CCW_BEGIN, R_START},
+    // R_CW_FINAL
+    {R_CW_NEXT, R_START, R_CW_FINAL, R_START | DIR_CW},
+    // R_CW_BEGIN
+    {R_CW_NEXT, R_CW_BEGIN, R_START, R_START},
+    // R_CW_NEXT
+    {R_CW_NEXT, R_CW_BEGIN, R_CW_FINAL, R_START},
+    // R_CCW_BEGIN
+    {R_CCW_NEXT, R_START, R_CCW_BEGIN, R_START},
+    // R_CCW_FINAL
+    {R_CCW_NEXT, R_CCW_FINAL, R_START, R_START | DIR_CCW},
+    // R_CCW_NEXT
+    {R_CCW_NEXT, R_CCW_FINAL, R_CCW_BEGIN, R_START},
 };
 #endif
 
+/**
+ */
 
- /**
-  */
- 
-static void myInterrupt(lnPin pin,void *arg)
+static void myInterrupt(lnPin pin, void *arg)
 {
-    lnRotary *w=(lnRotary *)arg;
+    lnRotary *w = (lnRotary *)arg;
     w->rotaryInterrupt();
 }
-static void myPushInterrupt(lnPin pin,void *arg )
+static void myPushInterrupt(lnPin pin, void *arg)
 {
-    lnRotary *w=(lnRotary *)arg;
+    lnRotary *w = (lnRotary *)arg;
     w->pushInterrupt();
 }
 /**
- * 
+ *
  */
 void lnRotary::pushInterrupt()
 {
-    bool state=lnDigitalRead(_pinPush);
-    uint32_t m=millis();
-    if((m-_lastRead)<THRESHOLD) return;
-    if(!state) // down
-    {
-        _down=m;
+    bool state = lnDigitalRead(_pinPush);
+    uint32_t m = millis();
+    if ((m - _lastRead) < THRESHOLD)
         return;
-    }else
+    if (!state) // down
     {
-        uint32_t time=m-_down;
-        if(time>TIME_LONG_PRESS)
+        _down = m;
+        return;
+    }
+    else
+    {
+        uint32_t time = m - _down;
+        if (time > TIME_LONG_PRESS)
         {
-                _events.setEvents(LONG_PRESS);
-        }else
+            _events.setEvents(LONG_PRESS);
+        }
+        else
         {
-            if(time>TIME_SHORT_PRESS)
+            if (time > TIME_SHORT_PRESS)
             {
                 _events.setEvents(SHORT_PRESS);
             }
@@ -111,88 +111,93 @@ void lnRotary::pushInterrupt()
     }
 }
 /**
- * 
- * @return 
+ *
+ * @return
  */
 int lnRotary::process()
 {
-   // Grab state of input pins.
-  unsigned char pinstate = (lnDigitalRead(_pinA) << 1) | lnDigitalRead(_pinB);
- 
-  // Determine new state from the pins and state table.
-  _state = ttable[_state & 0xf][pinstate];
-  // Return emit bits, ie the generated event.
-  return _state & 0x30; 
+    // Grab state of input pins.
+    unsigned char pinstate = (lnDigitalRead(_pinA) << 1) | lnDigitalRead(_pinB);
+
+    // Determine new state from the pins and state table.
+    _state = ttable[_state & 0xf][pinstate];
+    // Return emit bits, ie the generated event.
+    return _state & 0x30;
 }
- /**
-  */
- void lnRotary::rotaryInterrupt()
- {
-     switch(process())
-     {
-        case DIR_CCW:  _count++;_events.setEvents(ROTARY_CHANGE);break;
-        case DIR_CW:   _count--;_events.setEvents(ROTARY_CHANGE);break;
-        default:       break;
-     }
- }
 /**
  */
- lnRotary::lnRotary( lnPin pinPush,lnPin pinA,lnPin pinB ) 
- {
-    current=this;
-    _count=0;    
-    _event=EVENT_NONE;
-    _down=0;
-    _lastRead=0;    
-    _pinA=pinA;
-    _pinB=pinB;
-    _pinPush=pinPush;
-    lnPinMode(_pinA,lnINPUT_PULLUP); 
-    lnPinMode(_pinB,lnINPUT_PULLUP); 
-    lnPinMode(_pinPush,lnINPUT_PULLUP);
+void lnRotary::rotaryInterrupt()
+{
+    switch (process())
+    {
+    case DIR_CCW:
+        _count++;
+        _events.setEvents(ROTARY_CHANGE);
+        break;
+    case DIR_CW:
+        _count--;
+        _events.setEvents(ROTARY_CHANGE);
+        break;
+    default:
+        break;
+    }
+}
+/**
+ */
+lnRotary::lnRotary(lnPin pinPush, lnPin pinA, lnPin pinB)
+{
+    current = this;
+    _count = 0;
+    _event = EVENT_NONE;
+    _down = 0;
+    _lastRead = 0;
+    _pinA = pinA;
+    _pinB = pinB;
+    _pinPush = pinPush;
+    lnPinMode(_pinA, lnINPUT_PULLUP);
+    lnPinMode(_pinB, lnINPUT_PULLUP);
+    lnPinMode(_pinPush, lnINPUT_PULLUP);
     _state = R_START;
-    
- }
- 
- /**
-  * 
-  */
- void        lnRotary::start()
- {
-    noInterrupts(); 
-    lnExtiAttachInterrupt(_pinA,    LN_EDGE_BOTH,myInterrupt,this);
-    lnExtiAttachInterrupt(_pinB,    LN_EDGE_BOTH, myInterrupt,this);
-    lnExtiAttachInterrupt(_pinPush, LN_EDGE_BOTH,myPushInterrupt, this );
+}
+
+/**
+ *
+ */
+void lnRotary::start()
+{
+    noInterrupts();
+    lnExtiAttachInterrupt(_pinA, LN_EDGE_BOTH, myInterrupt, this);
+    lnExtiAttachInterrupt(_pinB, LN_EDGE_BOTH, myInterrupt, this);
+    lnExtiAttachInterrupt(_pinPush, LN_EDGE_BOTH, myPushInterrupt, this);
     lnExtiEnableInterrupt(_pinA);
     lnExtiEnableInterrupt(_pinB);
     lnExtiEnableInterrupt(_pinPush);
-    interrupts();     
- }
- /*
-  */
- int          lnRotary::getCount()
- {
+    interrupts();
+}
+/*
+ */
+int lnRotary::getCount()
+{
     noInterrupts();
-    int c=_count;
-    _count=0;
+    int c = _count;
+    _count = 0;
     interrupts();
     return c;
- }
-/**
- * 
- * @return 
- */
-lnRotary::EVENTS      lnRotary::readEvent()
-{
-    return (EVENTS)_events.readEvents(  SHORT_PRESS |     LONG_PRESS |    ROTARY_CHANGE);
 }
 /**
- * 
- * @return 
+ *
+ * @return
  */
-lnRotary::EVENTS      lnRotary::waitForEvent(int timeout)
+lnRotary::EVENTS lnRotary::readEvent()
 {
-    return (EVENTS)_events.waitEvents(  SHORT_PRESS |     LONG_PRESS |    ROTARY_CHANGE,timeout);
+    return (EVENTS)_events.readEvents(SHORT_PRESS | LONG_PRESS | ROTARY_CHANGE);
 }
- // EOF
-
+/**
+ *
+ * @return
+ */
+lnRotary::EVENTS lnRotary::waitForEvent(int timeout)
+{
+    return (EVENTS)_events.waitEvents(SHORT_PRESS | LONG_PRESS | ROTARY_CHANGE, timeout);
+}
+// EOF

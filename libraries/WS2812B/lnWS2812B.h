@@ -3,30 +3,31 @@
  *  See license file
  */
 #pragma once
-#include "lnWS2812B_base.h"
 #include "lnSPI.h"
+#include "lnWS2812B_base.h"
 /**
- * 
+ *
  * @param nbLeds
  * @param s
  */
 class WS2812B : public WS2812B_base
 {
-public:
-                    WS2812B(int nbLeds, hwlnSPIClass *s);
-        virtual     ~WS2812B();
-        
-             void   begin(); // call this first
-             void   setGlobalBrightness(int value); // between 0 & 255
-             void   setColor(int r,int g, int b); // set all the same color
-             void   setLedColor(int led, int r,int g, int b); // set only one led
-             void   setLedBrightness(int led, int brightness); // set only one led
-             void   update(); // call this to have the changes committed
+  public:
+    WS2812B(int nbLeds, hwlnSPIClass *s);
+    virtual ~WS2812B();
 
-protected:
-        hwlnSPIClass *_spi;
-        uint8_t       *_ledsColorSPI;
-protected:
-         void         convert(int led);
-         void         convertAll();
+    void begin();                                   // call this first
+    void setGlobalBrightness(int value);            // between 0 & 255
+    void setColor(int r, int g, int b);             // set all the same color
+    void setLedColor(int led, int r, int g, int b); // set only one led
+    void setLedBrightness(int led, int brightness); // set only one led
+    void update();                                  // call this to have the changes committed
+
+  protected:
+    hwlnSPIClass *_spi;
+    uint8_t *_ledsColorSPI;
+
+  protected:
+    void convert(int led);
+    void convertAll();
 };

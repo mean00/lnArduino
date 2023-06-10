@@ -2,13 +2,13 @@
 
 #pragma once
 /**
- * 
+ *
  * @param instance
  */
-class TwoWire 
+class TwoWire
 {
-   public:
-         TwoWire(int instance=0);
+  public:
+    TwoWire(int instance = 0);
     virtual ~TwoWire();
     void begin();
     void begin(uint8_t);
@@ -30,19 +30,30 @@ class TwoWire
     virtual int read(void);
     virtual int peek(void);
     virtual void flush(void);
-    void onReceive( void (*)(int) );
-    void onRequest( void (*)(void) );
+    void onReceive(void (*)(int));
+    void onRequest(void (*)(void));
 
-    inline size_t write(unsigned long n) { return write((uint8_t)n); }
-    inline size_t write(long n) { return write((uint8_t)n); }
-    inline size_t write(unsigned int n) { return write((uint8_t)n); }
-    inline size_t write(int n) { return write((uint8_t)n); }
-   };
+    inline size_t write(unsigned long n)
+    {
+        return write((uint8_t)n);
+    }
+    inline size_t write(long n)
+    {
+        return write((uint8_t)n);
+    }
+    inline size_t write(unsigned int n)
+    {
+        return write((uint8_t)n);
+    }
+    inline size_t write(int n)
+    {
+        return write((uint8_t)n);
+    }
+};
 /**
  */
-class Wire: public TwoWire
+class Wire : public TwoWire
 {
-
 };
 
 // EOF
