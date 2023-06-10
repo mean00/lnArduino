@@ -4,6 +4,7 @@
  */
 
 #pragma once
+#include "lnArduino.h"
 
 struct LN_AFIOx
 {

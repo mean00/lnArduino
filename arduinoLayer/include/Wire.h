@@ -1,6 +1,7 @@
 
 
 #pragma once
+#include "lnArduino.h"
 /**
  *
  * @param instance

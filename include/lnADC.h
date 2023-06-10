@@ -6,6 +6,7 @@
  */
 
 #pragma once
+#include "lnArduino.h"
 #include "lnDma.h"
 
 enum lnADC_CYCLES

@@ -3,6 +3,7 @@
  *  See license file
  */
 #pragma once
+#include "lnArduino.h"
 /**
  *
  * \brief If you do a dma transfer

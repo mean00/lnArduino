@@ -3,6 +3,7 @@
  *  See license file
  */
 #pragma once
+#include "lnArduino.h"
 
 struct LN_TIMER_MAPPING
 {

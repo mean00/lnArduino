@@ -4,6 +4,7 @@
  */
 
 #pragma once
+#include "lnArduino.h"
 #include "lnPeripherals.h"
 
 enum lnADC_DIVIDER

@@ -3,6 +3,7 @@
  *  See license file
  */
 #pragma once
+#include "lnArduino.h"
 
 #define PPINS(a, val)                                                                                                  \
     P##a##0 = val, P##a##1, P##a##2, P##a##3, P##a##4, P##a##5, P##a##6, P##a##7, P##a##8, P##a##9, P##a##10,          \
