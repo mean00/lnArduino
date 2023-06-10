@@ -7,11 +7,10 @@
 extern "C"
 {
     void deadEnd(int code);
-
 }
 
 #define ENTER_CRITICAL vPortEnterCritical
-#define EXIT_CRITICAL  vPortExitCritical
+#define EXIT_CRITICAL vPortExitCritical
 
 extern "C" void ENTER_CRITICAL(void);
 extern "C" void EXIT_CRITICAL(void);

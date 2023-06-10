@@ -8,10 +8,10 @@
 
 enum lnEdge
 {
-    LN_EDGE_NONE=0,
-    LN_EDGE_RISING=1,
-    LN_EDGE_FALLING=2,
-    LN_EDGE_BOTH=3,    
+    LN_EDGE_NONE = 0,
+    LN_EDGE_RISING = 1,
+    LN_EDGE_FALLING = 2,
+    LN_EDGE_BOTH = 3,
 };
 
 typedef void lnExtiCallback(lnPin pin, void *cookie);

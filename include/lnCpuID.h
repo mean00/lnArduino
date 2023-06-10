@@ -7,8 +7,7 @@
  */
 class lnCpuID
 {
-public:
-
+  public:
     enum LN_VENDOR
     {
         LN_MCU_STM32,
@@ -22,16 +21,15 @@ public:
         LN_MCU_RISCV,
     };
 
-public:
-        static void         identify();
-        static LN_VENDOR    vendor();
-        static LN_MCU       mcu();
-        static const char   *mcuAsString();
+  public:
+    static void identify();
+    static LN_VENDOR vendor();
+    static LN_MCU mcu();
+    static const char *mcuAsString();
 
-        static int          flashSize();
-        static int          ramSize();
+    static int flashSize();
+    static int ramSize();
 
-        static const char   *idAsString();
-        static int          clockSpeed();
-
+    static const char *idAsString();
+    static int clockSpeed();
 };
