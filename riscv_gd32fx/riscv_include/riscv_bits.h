@@ -5,8 +5,8 @@
 #define likely(x) __builtin_expect((x), 1)
 #define unlikely(x) __builtin_expect((x), 0)
 
-#define ROUNDUP(a, b) ((((a)-1)/(b)+1)*(b))
-#define ROUNDDOWN(a, b) ((a)/(b)*(b))
+#define ROUNDUP(a, b) ((((a)-1) / (b) + 1) * (b))
+#define ROUNDDOWN(a, b) ((a) / (b) * (b))
 
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
@@ -19,17 +19,17 @@
 #define XSTR(x) #x
 
 #if __riscv_xlen == 64
-# define SLL32    sllw
-# define STORE    sd
-# define LOAD     ld
-# define LWU      lwu
-# define LOG_REGBYTES 3
+#define SLL32 sllw
+#define STORE sd
+#define LOAD ld
+#define LWU lwu
+#define LOG_REGBYTES 3
 #else
-# define SLL32    sll
-# define STORE    sw
-# define LOAD     lw
-# define LWU      lw
-# define LOG_REGBYTES 2
+#define SLL32 sll
+#define STORE sw
+#define LOAD lw
+#define LWU lw
+#define LOG_REGBYTES 2
 #endif
 #define REGBYTES (1 << LOG_REGBYTES)
 

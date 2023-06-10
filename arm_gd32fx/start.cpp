@@ -42,10 +42,10 @@
  * they apply.
  */
 
-#include <stddef.h>
 #include "lnArduino.h"
+#include <stddef.h>
 
-extern int  main(void);
+extern int main(void);
 
 extern "C"
 {
@@ -54,12 +54,11 @@ extern "C"
     extern const char __data_start__, __data_end__;
     extern const char __bss_start__, __bss_end__;
     extern const char _lm_rom_img_cfgp;
-    
+
     // stub
-    void _init(void) 
+    void _init(void)
     {
     }
-    
 }
 
 /**
@@ -67,22 +66,22 @@ extern "C"
  * \brief Initialize ram & libc runtime before jumping into actual code
  * careful the libc is not compltetely initialized here, some stuff doesnt work yet
  */
-extern "C" void  __attribute__((noreturn))  start_c(void)
+extern "C" void __attribute__((noreturn)) start_c(void)
 {
-    uint32_t srcAdr= *(uint32_t *)(&_lm_rom_img_cfgp);
+    uint32_t srcAdr = *(uint32_t *)(&_lm_rom_img_cfgp);
     volatile uint32_t *src = (volatile uint32_t *)srcAdr;
-    volatile uint32_t *dst = (volatile uint32_t*)&__data_start__;
-    volatile uint32_t *end = (volatile uint32_t*)&__data_end__;
+    volatile uint32_t *dst = (volatile uint32_t *)&__data_start__;
+    volatile uint32_t *end = (volatile uint32_t *)&__data_end__;
 
-    while (dst < end) 
+    while (dst < end)
     {
-            *dst++ = *src++;
+        *dst++ = *src++;
     }
-    
+
     /* Zero .bss. */
-    volatile uint32_t *zstart = (volatile uint32_t*)&__bss_start__;
-    volatile uint32_t *zend =   (volatile uint32_t*)&__bss_end__;
-    while (zstart < zend) 
+    volatile uint32_t *zstart = (volatile uint32_t *)&__bss_start__;
+    volatile uint32_t *zend = (volatile uint32_t *)&__bss_end__;
+    while (zstart < zend)
     {
         *zstart++ = 0;
     }
@@ -93,8 +92,6 @@ extern "C" void  __attribute__((noreturn))  start_c(void)
     xAssert(0);
     for (;;)
         continue;
-
 }
-
 
 // EOF

@@ -4,32 +4,31 @@
  */
 
 #include "lnArduino.h"
+#include "lnCpuID.h"
 #include "lnFMC.h"
 #include "lnFMC_priv.h"
 #include "lnPeripheral_priv.h"
-#include "lnCpuID.h"
 
-LN_FMC *aFMC=(LN_FMC *)LN_FMC_ADR;
+LN_FMC *aFMC = (LN_FMC *)LN_FMC_ADR;
 
 // extra bits for CH32 chips
-#define LN_FMC_CTL_CH32_FASTUNLOCK (1<<15)
-#define LN_FMC_CTL_CH32_FASTERASE  (1<<17)
-
+#define LN_FMC_CTL_CH32_FASTUNLOCK (1 << 15)
+#define LN_FMC_CTL_CH32_FASTERASE (1 << 17)
 
 /**
  *
  */
 class autoNoInterrupt
 {
-public:
-        autoNoInterrupt()
-        {
-            noInterrupts();
-        }
-        ~autoNoInterrupt()
-        {
-            interrupts();
-        }
+  public:
+    autoNoInterrupt()
+    {
+        noInterrupts();
+    }
+    ~autoNoInterrupt()
+    {
+        interrupts();
+    }
 };
 
 /**
@@ -40,49 +39,51 @@ public:
 /**
 
 */
-bool  CH32_fastUnlock()
+bool CH32_fastUnlock()
 {
     // send unlock sequence
-    aFMC->KEY=0x45670123;
-    aFMC->KEY=0xCDEF89AB;
+    aFMC->KEY = 0x45670123;
+    aFMC->KEY = 0xCDEF89AB;
     // send fast unlock sequence
-    volatile uint32_t *CHF103=(uint32_t *)LN_FMC_ADR;
-    CHF103[9]=0x45670123;
-    CHF103[9]=0xCDEF89AB;
+    volatile uint32_t *CHF103 = (uint32_t *)LN_FMC_ADR;
+    CHF103[9] = 0x45670123;
+    CHF103[9] = 0xCDEF89AB;
 
-    uint32_t v=aFMC->CTL;
-    return !(v  & LN_FMC_CTL_CH32_FASTUNLOCK);
+    uint32_t v = aFMC->CTL;
+    return !(v & LN_FMC_CTL_CH32_FASTUNLOCK);
 }
 //
 //
 //
 bool CH32_fastLock()
 {
-    aFMC->CTL|=LN_FMC_CTL_LK;
+    aFMC->CTL |= LN_FMC_CTL_LK;
     return true;
 }
 // this check if the fast unlock bit is settable
 // it is called early in the boot so it cannot use high level calls
-bool  FMC_hasFastUnlock()
-{    
-  // reset fast unlock
-    aFMC->CTL|=LN_FMC_CTL_CH32_FASTUNLOCK; // clear fast unlock, the bit should go to '1'
-    if(!(aFMC->CTL & LN_FMC_CTL_CH32_FASTUNLOCK))
+bool FMC_hasFastUnlock()
+{
+    // reset fast unlock
+    aFMC->CTL |= LN_FMC_CTL_CH32_FASTUNLOCK; // clear fast unlock, the bit should go to '1'
+    if (!(aFMC->CTL & LN_FMC_CTL_CH32_FASTUNLOCK))
     {
         return false;
     }
     // send unlock sequence
-    aFMC->KEY=0x45670123;
-    aFMC->KEY=0xCDEF89AB;
-    for(int i=0;i<50;i++)  __asm__("nop");
+    aFMC->KEY = 0x45670123;
+    aFMC->KEY = 0xCDEF89AB;
+    for (int i = 0; i < 50; i++)
+        __asm__("nop");
     // send fast unlock sequence
-    volatile uint32_t *CHF103=(uint32_t *)LN_FMC_ADR;
-    CHF103[9]=0x45670123;
-    CHF103[9]=0xCDEF89AB;
-    for(int i=0;i<50;i++) __asm__("nop");
+    volatile uint32_t *CHF103 = (uint32_t *)LN_FMC_ADR;
+    CHF103[9] = 0x45670123;
+    CHF103[9] = 0xCDEF89AB;
+    for (int i = 0; i < 50; i++)
+        __asm__("nop");
 
-    uint32_t v=aFMC->CTL;
-    return !(v  & LN_FMC_CTL_CH32_FASTUNLOCK);
+    uint32_t v = aFMC->CTL;
+    return !(v & LN_FMC_CTL_CH32_FASTUNLOCK);
 }
 
 /**
@@ -92,14 +93,15 @@ bool  FMC_hasFastUnlock()
 static void unlock()
 {
     // is it busy  ?
-    xAssert(!(aFMC->STAT&LN_FMC_STAT_BUSY));    // should NOT be !
-    if(!(aFMC->CTL  & LN_FMC_CTL_LK)) return;   // already unlocked ? nothing to do
+    xAssert(!(aFMC->STAT & LN_FMC_STAT_BUSY)); // should NOT be !
+    if (!(aFMC->CTL & LN_FMC_CTL_LK))
+        return; // already unlocked ? nothing to do
     // send unlock sequence
-    aFMC->KEY=0x45670123;
-    aFMC->KEY=0xCDEF89AB;
+    aFMC->KEY = 0x45670123;
+    aFMC->KEY = 0xCDEF89AB;
     delayMicroseconds(100);
     // verify it is unlocked
-    xAssert(!(aFMC->CTL  & LN_FMC_CTL_LK));
+    xAssert(!(aFMC->CTL & LN_FMC_CTL_LK));
 }
 /**
  * \fn wait till the busy bit disdappear
@@ -107,9 +109,9 @@ static void unlock()
 static void waitNotBusy()
 {
     // is it busy  ?
-    while(1)
+    while (1)
     {
-        if(!(aFMC->STAT&LN_FMC_STAT_BUSY))
+        if (!(aFMC->STAT & LN_FMC_STAT_BUSY))
             return;
     }
 }
@@ -118,23 +120,23 @@ static void waitNotBusy()
 */
 bool lnFMC::eraseStm(const uint32_t startAddress, int sizeInKBytes)
 {
-    uint32_t adr=startAddress;
+    uint32_t adr = startAddress;
     // Check we target an area within the flash (up to 256 kB)
-    xAssert(adr>=0x800*0x10000);
-    xAssert(adr<(0x800*0x10000+256*1024));
+    xAssert(adr >= 0x800 * 0x10000);
+    xAssert(adr < (0x800 * 0x10000 + 256 * 1024));
     // check the start address is 1 kB aligned
-    xAssert(!(adr & ((1<<10)-1)));
+    xAssert(!(adr & ((1 << 10) - 1)));
     autoNoInterrupt noInt;
     unlock();
     // Erase each page
-    for(int i=0;i<sizeInKBytes;i++)
+    for (int i = 0; i < sizeInKBytes; i++)
     {
-        aFMC->CTL|=LN_FMC_CTL_PER;
-        aFMC->ADDR=adr;
-        aFMC->CTL|=LN_FMC_CTL_START;
+        aFMC->CTL |= LN_FMC_CTL_PER;
+        aFMC->ADDR = adr;
+        aFMC->CTL |= LN_FMC_CTL_START;
         waitNotBusy();
-        adr+=1024;
-        aFMC->CTL&=~LN_FMC_CTL_PER;
+        adr += 1024;
+        aFMC->CTL &= ~LN_FMC_CTL_PER;
     }
 
     return true;
@@ -144,25 +146,25 @@ bool lnFMC::eraseStm(const uint32_t startAddress, int sizeInKBytes)
 */
 bool lnFMC::eraseCh32(const uint32_t startAddress, int sizeInKBytes)
 {
-    uint32_t adr=startAddress;
+    uint32_t adr = startAddress;
     // Check we target an area within the flash (up to 256 kB)
-    xAssert(adr>=0x800*0x10000);
-    xAssert(adr<(0x800*0x10000+256*1024));
+    xAssert(adr >= 0x800 * 0x10000);
+    xAssert(adr < (0x800 * 0x10000 + 256 * 1024));
     // check the start address is 1 kB aligned
-    xAssert(!(adr & ((1<<10)-1)));
+    xAssert(!(adr & ((1 << 10) - 1)));
     autoNoInterrupt noInt;
     CH32_fastUnlock();
     // Erase each page
-    for(int i=0;i<sizeInKBytes*8;i++)
+    for (int i = 0; i < sizeInKBytes * 8; i++)
     {
-        aFMC->CTL|=LN_FMC_CTL_CH32_FASTERASE;
-        aFMC->ADDR=adr;
-        aFMC->CTL|=LN_FMC_CTL_START;
+        aFMC->CTL |= LN_FMC_CTL_CH32_FASTERASE;
+        aFMC->ADDR = adr;
+        aFMC->CTL |= LN_FMC_CTL_START;
         waitNotBusy();
-        adr+=128;
-        aFMC->STAT|=LN_FMC_STAT_WP_ENDF; // clear end of process bit
-        aFMC->CTL&=~LN_FMC_CTL_CH32_FASTERASE;
-        aFMC->CTL&=~LN_FMC_CTL_START; // clear start
+        adr += 128;
+        aFMC->STAT |= LN_FMC_STAT_WP_ENDF; // clear end of process bit
+        aFMC->CTL &= ~LN_FMC_CTL_CH32_FASTERASE;
+        aFMC->CTL &= ~LN_FMC_CTL_START; // clear start
     }
     return true;
 }
@@ -175,8 +177,9 @@ bool lnFMC::eraseCh32(const uint32_t startAddress, int sizeInKBytes)
  */
 bool lnFMC::erase(const uint32_t startAddress, int sizeInKBytes)
 {
-  if(lnCpuID::vendor()==lnCpuID::LN_MCU_CH32) return eraseCh32(startAddress,sizeInKBytes);
-  return eraseStm(startAddress,sizeInKBytes);
+    if (lnCpuID::vendor() == lnCpuID::LN_MCU_CH32)
+        return eraseCh32(startAddress, sizeInKBytes);
+    return eraseStm(startAddress, sizeInKBytes);
 }
 /**
 
@@ -184,18 +187,18 @@ bool lnFMC::erase(const uint32_t startAddress, int sizeInKBytes)
 
 static bool checkWriting()
 {
-    uint32_t stat=aFMC->STAT;
+    uint32_t stat = aFMC->STAT;
 
-        aFMC->CTL&=~LN_FMC_CTL_PG;
-       if(stat & (LN_FMC_STAT_PG_ERR+LN_FMC_STAT_WP_ERR))
-       {
-           aFMC->STAT=LN_FMC_STAT_PG_ERR+LN_FMC_STAT_WP_ERR;
-           return false;
-       }
-       aFMC->STAT=LN_FMC_STAT_WP_ENDF;
-       if(!(stat & LN_FMC_STAT_WP_ENDF))
-           return false;
-       return true;
+    aFMC->CTL &= ~LN_FMC_CTL_PG;
+    if (stat & (LN_FMC_STAT_PG_ERR + LN_FMC_STAT_WP_ERR))
+    {
+        aFMC->STAT = LN_FMC_STAT_PG_ERR + LN_FMC_STAT_WP_ERR;
+        return false;
+    }
+    aFMC->STAT = LN_FMC_STAT_WP_ENDF;
+    if (!(stat & LN_FMC_STAT_WP_ENDF))
+        return false;
+    return true;
 }
 /**
  *
@@ -206,55 +209,58 @@ static bool checkWriting()
  */
 bool lnFMC::write(const uint32_t startAddress, const uint8_t *data, int sizeInBytes)
 {
-    uint32_t adr=startAddress;
+    uint32_t adr = startAddress;
     // Check alignment
-    xAssert(adr>=0x800*0x10000);
-    xAssert(adr<(0x800*0x10000+256*1024));
+    xAssert(adr >= 0x800 * 0x10000);
+    xAssert(adr < (0x800 * 0x10000 + 256 * 1024));
     autoNoInterrupt noInt;
     unlock();
 
     // if not aligned at the beginning
-    if(adr&1)
+    if (adr & 1)
     {
         // it is the high byte of the PREVIOUS adr
-        uint8_t *previous=(uint8_t *)adr;
+        uint8_t *previous = (uint8_t *)adr;
         previous--;
-        uint16_t data16=(data[0]<<8)+previous[0];
+        uint16_t data16 = (data[0] << 8) + previous[0];
         // write it
-        aFMC->CTL|=LN_FMC_CTL_PG;
-        *(uint16_t *)previous=(uint32_t )data16;
+        aFMC->CTL |= LN_FMC_CTL_PG;
+        *(uint16_t *)previous = (uint32_t)data16;
         waitNotBusy();
-        if(!checkWriting()) return false;
+        if (!checkWriting())
+            return false;
         //
         adr++;
         sizeInBytes--;
         data++;
     }
     // do N 16 bytes aligned write
-    uint16_t  *adr16=(uint16_t *)adr;
-    int nbWord=sizeInBytes/2;
-    for(int i=0;i<nbWord;i++)
+    uint16_t *adr16 = (uint16_t *)adr;
+    int nbWord = sizeInBytes / 2;
+    for (int i = 0; i < nbWord; i++)
     {
-          uint16_t data16=(data[0])+(data[1]<<8);
-          aFMC->CTL|=LN_FMC_CTL_PG;
-          *adr16=data16;
-          waitNotBusy();
-          if(!checkWriting()) return false;
-          adr16++;
-          data+=2;
+        uint16_t data16 = (data[0]) + (data[1] << 8);
+        aFMC->CTL |= LN_FMC_CTL_PG;
+        *adr16 = data16;
+        waitNotBusy();
+        if (!checkWriting())
+            return false;
+        adr16++;
+        data += 2;
     }
     // not aligned at the end ?
-    if(sizeInBytes&1)
+    if (sizeInBytes & 1)
     {
         // it is the low byte of the NEXT adr
-        uint8_t *next=(uint8_t *)adr16;
+        uint8_t *next = (uint8_t *)adr16;
 
-        uint16_t data16=(data[0])+(0xff<<8); // we let the other byte as is
+        uint16_t data16 = (data[0]) + (0xff << 8); // we let the other byte as is
         // write it
-        aFMC->CTL|=LN_FMC_CTL_PG;
-        *(uint16_t *)next=(uint32_t )data16;
+        aFMC->CTL |= LN_FMC_CTL_PG;
+        *(uint16_t *)next = (uint32_t)data16;
         waitNotBusy();
-        if(!checkWriting()) return false;
+        if (!checkWriting())
+            return false;
         //
     }
     return true;

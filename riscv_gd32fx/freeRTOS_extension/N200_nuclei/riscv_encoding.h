@@ -20,7 +20,8 @@
 
 #include "riscv_bits.h"
 #ifdef __cplusplus
- extern "C" {
+extern "C"
+{
 #endif
 /**
  * \defgroup NMSIS_Core_CSR_Encoding    Core CSR Encodings
@@ -31,177 +32,177 @@
  * The following macros are used for CSR encodings
  *   @{
  */
-#define MSTATUS_UIE         0x00000001
-#define MSTATUS_SIE         0x00000002
-#define MSTATUS_HIE         0x00000004
-#define MSTATUS_MIE         0x00000008
-#define MSTATUS_UPIE        0x00000010
-#define MSTATUS_SPIE        0x00000020
-#define MSTATUS_HPIE        0x00000040
-#define MSTATUS_MPIE        0x00000080
-#define MSTATUS_SPP         0x00000100
-#define MSTATUS_MPP         0x00001800
-#define MSTATUS_FS          0x00006000
-#define MSTATUS_XS          0x00018000
-#define MSTATUS_MPRV        0x00020000
-#define MSTATUS_PUM         0x00040000
-#define MSTATUS_MXR         0x00080000
-#define MSTATUS_VM          0x1F000000
-#define MSTATUS32_SD        0x80000000
-#define MSTATUS64_SD        0x8000000000000000
+#define MSTATUS_UIE 0x00000001
+#define MSTATUS_SIE 0x00000002
+#define MSTATUS_HIE 0x00000004
+#define MSTATUS_MIE 0x00000008
+#define MSTATUS_UPIE 0x00000010
+#define MSTATUS_SPIE 0x00000020
+#define MSTATUS_HPIE 0x00000040
+#define MSTATUS_MPIE 0x00000080
+#define MSTATUS_SPP 0x00000100
+#define MSTATUS_MPP 0x00001800
+#define MSTATUS_FS 0x00006000
+#define MSTATUS_XS 0x00018000
+#define MSTATUS_MPRV 0x00020000
+#define MSTATUS_PUM 0x00040000
+#define MSTATUS_MXR 0x00080000
+#define MSTATUS_VM 0x1F000000
+#define MSTATUS32_SD 0x80000000
+#define MSTATUS64_SD 0x8000000000000000
 
-#define MSTATUS_FS_INITIAL  0x00002000
-#define MSTATUS_FS_CLEAN    0x00004000
-#define MSTATUS_FS_DIRTY    0x00006000
+#define MSTATUS_FS_INITIAL 0x00002000
+#define MSTATUS_FS_CLEAN 0x00004000
+#define MSTATUS_FS_DIRTY 0x00006000
 
-#define SSTATUS_UIE         0x00000001
-#define SSTATUS_SIE         0x00000002
-#define SSTATUS_UPIE        0x00000010
-#define SSTATUS_SPIE        0x00000020
-#define SSTATUS_SPP         0x00000100
-#define SSTATUS_FS          0x00006000
-#define SSTATUS_XS          0x00018000
-#define SSTATUS_PUM         0x00040000
-#define SSTATUS32_SD        0x80000000
-#define SSTATUS64_SD        0x8000000000000000
+#define SSTATUS_UIE 0x00000001
+#define SSTATUS_SIE 0x00000002
+#define SSTATUS_UPIE 0x00000010
+#define SSTATUS_SPIE 0x00000020
+#define SSTATUS_SPP 0x00000100
+#define SSTATUS_FS 0x00006000
+#define SSTATUS_XS 0x00018000
+#define SSTATUS_PUM 0x00040000
+#define SSTATUS32_SD 0x80000000
+#define SSTATUS64_SD 0x8000000000000000
 
-#define CSR_MCACHE_CTL_IE   0x00000001
-#define CSR_MCACHE_CTL_DE   0x00010000
+#define CSR_MCACHE_CTL_IE 0x00000001
+#define CSR_MCACHE_CTL_DE 0x00010000
 
-#define DCSR_XDEBUGVER      (3U<<30)
-#define DCSR_NDRESET        (1<<29)
-#define DCSR_FULLRESET      (1<<28)
-#define DCSR_EBREAKM        (1<<15)
-#define DCSR_EBREAKH        (1<<14)
-#define DCSR_EBREAKS        (1<<13)
-#define DCSR_EBREAKU        (1<<12)
-#define DCSR_STOPCYCLE      (1<<10)
-#define DCSR_STOPTIME       (1<<9)
-#define DCSR_CAUSE          (7<<6)
-#define DCSR_DEBUGINT       (1<<5)
-#define DCSR_HALT           (1<<3)
-#define DCSR_STEP           (1<<2)
-#define DCSR_PRV            (3<<0)
+#define DCSR_XDEBUGVER (3U << 30)
+#define DCSR_NDRESET (1 << 29)
+#define DCSR_FULLRESET (1 << 28)
+#define DCSR_EBREAKM (1 << 15)
+#define DCSR_EBREAKH (1 << 14)
+#define DCSR_EBREAKS (1 << 13)
+#define DCSR_EBREAKU (1 << 12)
+#define DCSR_STOPCYCLE (1 << 10)
+#define DCSR_STOPTIME (1 << 9)
+#define DCSR_CAUSE (7 << 6)
+#define DCSR_DEBUGINT (1 << 5)
+#define DCSR_HALT (1 << 3)
+#define DCSR_STEP (1 << 2)
+#define DCSR_PRV (3 << 0)
 
-#define DCSR_CAUSE_NONE     0
-#define DCSR_CAUSE_SWBP     1
-#define DCSR_CAUSE_HWBP     2
+#define DCSR_CAUSE_NONE 0
+#define DCSR_CAUSE_SWBP 1
+#define DCSR_CAUSE_HWBP 2
 #define DCSR_CAUSE_DEBUGINT 3
-#define DCSR_CAUSE_STEP     4
-#define DCSR_CAUSE_HALT     5
+#define DCSR_CAUSE_STEP 4
+#define DCSR_CAUSE_HALT 5
 
-#define MCONTROL_TYPE(xlen)    (0xfULL<<((xlen)-4))
-#define MCONTROL_DMODE(xlen)   (1ULL<<((xlen)-5))
-#define MCONTROL_MASKMAX(xlen) (0x3fULL<<((xlen)-11))
+#define MCONTROL_TYPE(xlen) (0xfULL << ((xlen)-4))
+#define MCONTROL_DMODE(xlen) (1ULL << ((xlen)-5))
+#define MCONTROL_MASKMAX(xlen) (0x3fULL << ((xlen)-11))
 
-#define MCONTROL_SELECT     (1<<19)
-#define MCONTROL_TIMING     (1<<18)
-#define MCONTROL_ACTION     (0x3f<<12)
-#define MCONTROL_CHAIN      (1<<11)
-#define MCONTROL_MATCH      (0xf<<7)
-#define MCONTROL_M          (1<<6)
-#define MCONTROL_H          (1<<5)
-#define MCONTROL_S          (1<<4)
-#define MCONTROL_U          (1<<3)
-#define MCONTROL_EXECUTE    (1<<2)
-#define MCONTROL_STORE      (1<<1)
-#define MCONTROL_LOAD       (1<<0)
+#define MCONTROL_SELECT (1 << 19)
+#define MCONTROL_TIMING (1 << 18)
+#define MCONTROL_ACTION (0x3f << 12)
+#define MCONTROL_CHAIN (1 << 11)
+#define MCONTROL_MATCH (0xf << 7)
+#define MCONTROL_M (1 << 6)
+#define MCONTROL_H (1 << 5)
+#define MCONTROL_S (1 << 4)
+#define MCONTROL_U (1 << 3)
+#define MCONTROL_EXECUTE (1 << 2)
+#define MCONTROL_STORE (1 << 1)
+#define MCONTROL_LOAD (1 << 0)
 
-#define MCONTROL_TYPE_NONE      0
-#define MCONTROL_TYPE_MATCH     2
+#define MCONTROL_TYPE_NONE 0
+#define MCONTROL_TYPE_MATCH 2
 
-#define MCONTROL_ACTION_DEBUG_EXCEPTION   0
-#define MCONTROL_ACTION_DEBUG_MODE        1
-#define MCONTROL_ACTION_TRACE_START       2
-#define MCONTROL_ACTION_TRACE_STOP        3
-#define MCONTROL_ACTION_TRACE_EMIT        4
+#define MCONTROL_ACTION_DEBUG_EXCEPTION 0
+#define MCONTROL_ACTION_DEBUG_MODE 1
+#define MCONTROL_ACTION_TRACE_START 2
+#define MCONTROL_ACTION_TRACE_STOP 3
+#define MCONTROL_ACTION_TRACE_EMIT 4
 
-#define MCONTROL_MATCH_EQUAL     0
-#define MCONTROL_MATCH_NAPOT     1
-#define MCONTROL_MATCH_GE        2
-#define MCONTROL_MATCH_LT        3
-#define MCONTROL_MATCH_MASK_LOW  4
+#define MCONTROL_MATCH_EQUAL 0
+#define MCONTROL_MATCH_NAPOT 1
+#define MCONTROL_MATCH_GE 2
+#define MCONTROL_MATCH_LT 3
+#define MCONTROL_MATCH_MASK_LOW 4
 #define MCONTROL_MATCH_MASK_HIGH 5
 
-#define MIP_SSIP            (1 << IRQ_S_SOFT)
-#define MIP_HSIP            (1 << IRQ_H_SOFT)
-#define MIP_MSIP            (1 << IRQ_M_SOFT)
-#define MIP_STIP            (1 << IRQ_S_TIMER)
-#define MIP_HTIP            (1 << IRQ_H_TIMER)
-#define MIP_MTIP            (1 << IRQ_M_TIMER)
-#define MIP_SEIP            (1 << IRQ_S_EXT)
-#define MIP_HEIP            (1 << IRQ_H_EXT)
-#define MIP_MEIP            (1 << IRQ_M_EXT)
+#define MIP_SSIP (1 << IRQ_S_SOFT)
+#define MIP_HSIP (1 << IRQ_H_SOFT)
+#define MIP_MSIP (1 << IRQ_M_SOFT)
+#define MIP_STIP (1 << IRQ_S_TIMER)
+#define MIP_HTIP (1 << IRQ_H_TIMER)
+#define MIP_MTIP (1 << IRQ_M_TIMER)
+#define MIP_SEIP (1 << IRQ_S_EXT)
+#define MIP_HEIP (1 << IRQ_H_EXT)
+#define MIP_MEIP (1 << IRQ_M_EXT)
 
-#define MIE_SSIE            MIP_SSIP
-#define MIE_HSIE            MIP_HSIP
-#define MIE_MSIE            MIP_MSIP
-#define MIE_STIE            MIP_STIP
-#define MIE_HTIE            MIP_HTIP
-#define MIE_MTIE            MIP_MTIP
-#define MIE_SEIE            MIP_SEIP
-#define MIE_HEIE            MIP_HEIP
-#define MIE_MEIE            MIP_MEIP
+#define MIE_SSIE MIP_SSIP
+#define MIE_HSIE MIP_HSIP
+#define MIE_MSIE MIP_MSIP
+#define MIE_STIE MIP_STIP
+#define MIE_HTIE MIP_HTIP
+#define MIE_MTIE MIP_MTIP
+#define MIE_SEIE MIP_SEIP
+#define MIE_HEIE MIP_HEIP
+#define MIE_MEIE MIP_MEIP
 
-/* === Nuclei custom CSR bit mask === */
+    /* === Nuclei custom CSR bit mask === */
 
-#define WFE_WFE                     (0x1)
-#define TXEVT_TXEVT                 (0x1)
-#define SLEEPVALUE_SLEEPVALUE       (0x1)
+#define WFE_WFE (0x1)
+#define TXEVT_TXEVT (0x1)
+#define SLEEPVALUE_SLEEPVALUE (0x1)
 
-#define MCOUNTINHIBIT_IR            (1<<2)
-#define MCOUNTINHIBIT_CY            (1<<0)
+#define MCOUNTINHIBIT_IR (1 << 2)
+#define MCOUNTINHIBIT_CY (1 << 0)
 
-#define MILM_CTL_ILM_BPA            (((1ULL<<((__riscv_xlen)-10))-1)<<10)
-#define MILM_CTL_ILM_EN             (1<<0)
+#define MILM_CTL_ILM_BPA (((1ULL << ((__riscv_xlen)-10)) - 1) << 10)
+#define MILM_CTL_ILM_EN (1 << 0)
 
-#define MDLM_CTL_DLM_BPA            (((1ULL<<((__riscv_xlen)-10))-1)<<10)
-#define MDLM_CTL_DLM_EN             (1<<0)
+#define MDLM_CTL_DLM_BPA (((1ULL << ((__riscv_xlen)-10)) - 1) << 10)
+#define MDLM_CTL_DLM_EN (1 << 0)
 
-#define MSUBM_PTYP                  (0x3<<8)
-#define MSUBM_TYP                   (0x3<<6)
+#define MSUBM_PTYP (0x3 << 8)
+#define MSUBM_TYP (0x3 << 6)
 
-#define MDCAUSE_MDCAUSE             (0x3)
+#define MDCAUSE_MDCAUSE (0x3)
 
-#define MMISC_CTL_NMI_CAUSE_FFF     (1<<9)
-#define MMISC_CTL_MISALIGN          (1<<6)
-#define MMISC_CTL_BPU               (1<<3)
+#define MMISC_CTL_NMI_CAUSE_FFF (1 << 9)
+#define MMISC_CTL_MISALIGN (1 << 6)
+#define MMISC_CTL_BPU (1 << 3)
 
-#define MCACHE_CTL_IC_EN            (1<<0)
-#define MCACHE_CTL_IC_SCPD_MOD      (1<<1)
-#define MCACHE_CTL_DC_EN            (1<<16)
+#define MCACHE_CTL_IC_EN (1 << 0)
+#define MCACHE_CTL_IC_SCPD_MOD (1 << 1)
+#define MCACHE_CTL_DC_EN (1 << 16)
 
-#define MTVT2_MTVT2EN               (1<<0)
-#define MTVT2_COMMON_CODE_ENTRY     (((1ULL<<((__riscv_xlen)-2))-1)<<2)
+#define MTVT2_MTVT2EN (1 << 0)
+#define MTVT2_COMMON_CODE_ENTRY (((1ULL << ((__riscv_xlen)-2)) - 1) << 2)
 
-#define MCFG_INFO_TEE               (1<<0)
-#define MCFG_INFO_ECC               (1<<1)
-#define MCFG_INFO_CLIC              (1<<2)
-#define MCFG_INFO_PLIC              (1<<3)
-#define MCFG_INFO_FIO               (1<<4)
-#define MCFG_INFO_PPI               (1<<5)
-#define MCFG_INFO_NICE              (1<<6)
-#define MCFG_INFO_ILM               (1<<7)
-#define MCFG_INFO_DLM               (1<<8)
-#define MCFG_INFO_ICACHE            (1<<9)
-#define MCFG_INFO_DCACHE            (1<<10)
+#define MCFG_INFO_TEE (1 << 0)
+#define MCFG_INFO_ECC (1 << 1)
+#define MCFG_INFO_CLIC (1 << 2)
+#define MCFG_INFO_PLIC (1 << 3)
+#define MCFG_INFO_FIO (1 << 4)
+#define MCFG_INFO_PPI (1 << 5)
+#define MCFG_INFO_NICE (1 << 6)
+#define MCFG_INFO_ILM (1 << 7)
+#define MCFG_INFO_DLM (1 << 8)
+#define MCFG_INFO_ICACHE (1 << 9)
+#define MCFG_INFO_DCACHE (1 << 10)
 
-#define MICFG_IC_SET                (0xF<<0)
-#define MICFG_IC_WAY                (0x7<<4)
-#define MICFG_IC_LSIZE              (0x7<<7)
-#define MICFG_ILM_SIZE              (0x1F<<16)
-#define MICFG_ILM_XONLY             (1<<21)
+#define MICFG_IC_SET (0xF << 0)
+#define MICFG_IC_WAY (0x7 << 4)
+#define MICFG_IC_LSIZE (0x7 << 7)
+#define MICFG_ILM_SIZE (0x1F << 16)
+#define MICFG_ILM_XONLY (1 << 21)
 
-#define MDCFG_DC_SET                (0xF<<0)
-#define MDCFG_DC_WAY                (0x7<<4)
-#define MDCFG_DC_LSIZE              (0x7<<7)
-#define MDCFG_DLM_SIZE              (0x1F<<16)
+#define MDCFG_DC_SET (0xF << 0)
+#define MDCFG_DC_WAY (0x7 << 4)
+#define MDCFG_DC_LSIZE (0x7 << 7)
+#define MDCFG_DLM_SIZE (0x1F << 16)
 
-#define MPPICFG_INFO_PPI_SIZE       (0x1F<<1)
-#define MPPICFG_INFO_PPI_BPA        (((1ULL<<((__riscv_xlen)-10))-1)<<10)
+#define MPPICFG_INFO_PPI_SIZE (0x1F << 1)
+#define MPPICFG_INFO_PPI_BPA (((1ULL << ((__riscv_xlen)-10)) - 1) << 10)
 
-#define MFIOCFG_INFO_FIO_SIZE       (0x1F<<1)
-#define MFIOCFG_INFO_FIO_BPA        (((1ULL<<((__riscv_xlen)-10))-1)<<10)
+#define MFIOCFG_INFO_FIO_SIZE (0x1F << 1)
+#define MFIOCFG_INFO_FIO_BPA (((1ULL << ((__riscv_xlen)-10)) - 1) << 10)
 
 #define SIP_SSIP MIP_SSIP
 #define SIP_STIP MIP_STIP
@@ -212,86 +213,85 @@
 #define PRV_M 3
 
 #define VM_MBARE 0
-#define VM_MBB   1
+#define VM_MBB 1
 #define VM_MBBID 2
-#define VM_SV32  8
-#define VM_SV39  9
-#define VM_SV48  10
+#define VM_SV32 8
+#define VM_SV39 9
+#define VM_SV48 10
 
-#define IRQ_S_SOFT   1
-#define IRQ_H_SOFT   2
-#define IRQ_M_SOFT   3
-#define IRQ_S_TIMER  5
-#define IRQ_H_TIMER  6
-#define IRQ_M_TIMER  7
-#define IRQ_S_EXT    9
-#define IRQ_H_EXT    10
-#define IRQ_M_EXT    11
-#define IRQ_COP      12
-#define IRQ_HOST     13
+#define IRQ_S_SOFT 1
+#define IRQ_H_SOFT 2
+#define IRQ_M_SOFT 3
+#define IRQ_S_TIMER 5
+#define IRQ_H_TIMER 6
+#define IRQ_M_TIMER 7
+#define IRQ_S_EXT 9
+#define IRQ_H_EXT 10
+#define IRQ_M_EXT 11
+#define IRQ_COP 12
+#define IRQ_HOST 13
 
-#define DEFAULT_RSTVEC     0x00001000
-#define DEFAULT_NMIVEC     0x00001004
-#define DEFAULT_MTVEC      0x00001010
+#define DEFAULT_RSTVEC 0x00001000
+#define DEFAULT_NMIVEC 0x00001004
+#define DEFAULT_MTVEC 0x00001010
 #define CONFIG_STRING_ADDR 0x0000100C
-#define EXT_IO_BASE        0x40000000
-#define DRAM_BASE          0x80000000
+#define EXT_IO_BASE 0x40000000
+#define DRAM_BASE 0x80000000
 
 /* === FPU FRM Rounding Mode === */
 /** FPU Round to Nearest, ties to Even*/
-#define FRM_RNDMODE_RNE     0x0
+#define FRM_RNDMODE_RNE 0x0
 /** FPU Round Towards Zero */
-#define FRM_RNDMODE_RTZ     0x1
+#define FRM_RNDMODE_RTZ 0x1
 /** FPU Round Down (towards -inf) */
-#define FRM_RNDMODE_RDN     0x2
+#define FRM_RNDMODE_RDN 0x2
 /** FPU Round Up (towards +inf) */
-#define FRM_RNDMODE_RUP     0x3
+#define FRM_RNDMODE_RUP 0x3
 /** FPU Round to nearest, ties to Max Magnitude */
-#define FRM_RNDMODE_RMM     0x4
+#define FRM_RNDMODE_RMM 0x4
 /**
  * In instruction's rm, selects dynamic rounding mode.
  * In Rounding Mode register, Invalid */
-#define FRM_RNDMODE_DYN     0x7
+#define FRM_RNDMODE_DYN 0x7
 
 /* === FPU FFLAGS Accrued Exceptions === */
 /** FPU Inexact */
-#define FFLAGS_AE_NX        (1<<0)
+#define FFLAGS_AE_NX (1 << 0)
 /** FPU Underflow */
-#define FFLAGS_AE_UF        (1<<1)
+#define FFLAGS_AE_UF (1 << 1)
 /** FPU Overflow */
-#define FFLAGS_AE_OF        (1<<2)
+#define FFLAGS_AE_OF (1 << 2)
 /** FPU Divide by Zero */
-#define FFLAGS_AE_DZ        (1<<3)
+#define FFLAGS_AE_DZ (1 << 3)
 /** FPU Invalid Operation */
-#define FFLAGS_AE_NV        (1<<4)
+#define FFLAGS_AE_NV (1 << 4)
 
 /** Floating Point Register f0-f31, eg. f0 -> FREG(0) */
-#define FREG(idx)           f##idx
-
+#define FREG(idx) f##idx
 
 /* === PMP CFG Bits === */
-#define PMP_R                0x01
-#define PMP_W                0x02
-#define PMP_X                0x04
-#define PMP_A                0x18
-#define PMP_A_TOR            0x08
-#define PMP_A_NA4            0x10
-#define PMP_A_NAPOT          0x18
-#define PMP_L                0x80
+#define PMP_R 0x01
+#define PMP_W 0x02
+#define PMP_X 0x04
+#define PMP_A 0x18
+#define PMP_A_TOR 0x08
+#define PMP_A_NA4 0x10
+#define PMP_A_NAPOT 0x18
+#define PMP_L 0x80
 
-#define PMP_SHIFT            2
-#define PMP_COUNT            16
+#define PMP_SHIFT 2
+#define PMP_COUNT 16
 
 // page table entry (PTE) fields
-#define PTE_V     0x001 // Valid
-#define PTE_R     0x002 // Read
-#define PTE_W     0x004 // Write
-#define PTE_X     0x008 // Execute
-#define PTE_U     0x010 // User
-#define PTE_G     0x020 // Global
-#define PTE_A     0x040 // Accessed
-#define PTE_D     0x080 // Dirty
-#define PTE_SOFT  0x300 // Reserved for Software
+#define PTE_V 0x001    // Valid
+#define PTE_R 0x002    // Read
+#define PTE_W 0x004    // Write
+#define PTE_X 0x008    // Execute
+#define PTE_U 0x010    // User
+#define PTE_G 0x020    // Global
+#define PTE_A 0x040    // Accessed
+#define PTE_D 0x080    // Dirty
+#define PTE_SOFT 0x300 // Reserved for Software
 
 #define PTE_PPN_SHIFT 10
 
@@ -300,13 +300,13 @@
 #ifdef __riscv
 
 #ifdef __riscv64
-# define MSTATUS_SD MSTATUS64_SD
-# define SSTATUS_SD SSTATUS64_SD
-# define RISCV_PGLEVEL_BITS 9
+#define MSTATUS_SD MSTATUS64_SD
+#define SSTATUS_SD SSTATUS64_SD
+#define RISCV_PGLEVEL_BITS 9
 #else
-# define MSTATUS_SD MSTATUS32_SD
-# define SSTATUS_SD SSTATUS32_SD
-# define RISCV_PGLEVEL_BITS 10
+#define MSTATUS_SD MSTATUS32_SD
+#define SSTATUS_SD SSTATUS32_SD
+#define RISCV_PGLEVEL_BITS 10
 #endif /* __riscv64 */
 
 #define RISCV_PGSHIFT 12
@@ -314,10 +314,10 @@
 
 #endif /* __riscv */
 
-#define DOWNLOAD_MODE_FLASHXIP  0
-#define DOWNLOAD_MODE_FLASH     1
-#define DOWNLOAD_MODE_ILM       2
-#define DOWNLOAD_MODE_DDR       3
+#define DOWNLOAD_MODE_FLASHXIP 0
+#define DOWNLOAD_MODE_FLASH 1
+#define DOWNLOAD_MODE_ILM 2
+#define DOWNLOAD_MODE_DDR 3
 
 /**
  * \defgroup NMSIS_Core_CSR_Registers    Core CSR Registers
@@ -545,42 +545,42 @@
 #define CSR_MHPMCOUNTER31H 0xb9f
 
 /* === CLIC CSR Registers === */
-#define CSR_MTVT                0x307
-#define CSR_MNXTI               0x345
-#define CSR_MINTSTATUS          0x346
-#define CSR_MSCRATCHCSW         0x348
-#define CSR_MSCRATCHCSWL        0x349
-#define CSR_MCLICBASE           0x350
+#define CSR_MTVT 0x307
+#define CSR_MNXTI 0x345
+#define CSR_MINTSTATUS 0x346
+#define CSR_MSCRATCHCSW 0x348
+#define CSR_MSCRATCHCSWL 0x349
+#define CSR_MCLICBASE 0x350
 
 /* === Nuclei custom CSR Registers === */
-#define CSR_MCOUNTINHIBIT       0x320
-#define CSR_MILM_CTL            0x7C0
-#define CSR_MDLM_CTL            0x7C1
-#define CSR_MNVEC               0x7C3
-#define CSR_MSUBM               0x7C4
-#define CSR_MDCAUSE             0x7C9
-#define CSR_MCACHE_CTL          0x7CA
-#define CSR_MMISC_CTL           0x7D0
-#define CSR_MSAVESTATUS         0x7D6
-#define CSR_MSAVEEPC1           0x7D7
-#define CSR_MSAVECAUSE1         0x7D8
-#define CSR_MSAVEEPC2           0x7D9
-#define CSR_MSAVECAUSE2         0x7DA
-#define CSR_MSAVEDCAUSE1        0x7DB
-#define CSR_MSAVEDCAUSE2        0x7DC
-#define CSR_PUSHMSUBM           0x7EB
-#define CSR_MTVT2               0x7EC
-#define CSR_JALMNXTI            0x7ED
-#define CSR_PUSHMCAUSE          0x7EE
-#define CSR_PUSHMEPC            0x7EF
-#define CSR_MPPICFG_INFO        0x7F0
-#define CSR_MFIOCFG_INFO        0x7F1
-#define CSR_SLEEPVALUE          0x811
-#define CSR_TXEVT               0x812
-#define CSR_WFE                 0x810
-#define CSR_MICFG_INFO          0xFC0
-#define CSR_MDCFG_INFO          0xFC1
-#define CSR_MCFG_INFO           0xFC2
+#define CSR_MCOUNTINHIBIT 0x320
+#define CSR_MILM_CTL 0x7C0
+#define CSR_MDLM_CTL 0x7C1
+#define CSR_MNVEC 0x7C3
+#define CSR_MSUBM 0x7C4
+#define CSR_MDCAUSE 0x7C9
+#define CSR_MCACHE_CTL 0x7CA
+#define CSR_MMISC_CTL 0x7D0
+#define CSR_MSAVESTATUS 0x7D6
+#define CSR_MSAVEEPC1 0x7D7
+#define CSR_MSAVECAUSE1 0x7D8
+#define CSR_MSAVEEPC2 0x7D9
+#define CSR_MSAVECAUSE2 0x7DA
+#define CSR_MSAVEDCAUSE1 0x7DB
+#define CSR_MSAVEDCAUSE2 0x7DC
+#define CSR_PUSHMSUBM 0x7EB
+#define CSR_MTVT2 0x7EC
+#define CSR_JALMNXTI 0x7ED
+#define CSR_PUSHMCAUSE 0x7EE
+#define CSR_PUSHMEPC 0x7EF
+#define CSR_MPPICFG_INFO 0x7F0
+#define CSR_MFIOCFG_INFO 0x7F1
+#define CSR_SLEEPVALUE 0x811
+#define CSR_TXEVT 0x812
+#define CSR_WFE 0x810
+#define CSR_MICFG_INFO 0xFC0
+#define CSR_MDCFG_INFO 0xFC1
+#define CSR_MCFG_INFO 0xFC2
 
 /** @} */ /** End of Doxygen Group NMSIS_Core_CSR_Registers **/
 
@@ -599,17 +599,17 @@
 #define CAUSE_MACHINE_ECALL 0xb
 
 /* Exception Subcode in MDCAUSE CSR */
-#define DCAUSE_FAULT_FETCH_PMP      0x1
-#define DCAUSE_FAULT_FETCH_INST     0x2
+#define DCAUSE_FAULT_FETCH_PMP 0x1
+#define DCAUSE_FAULT_FETCH_INST 0x2
 
-#define DCAUSE_FAULT_LOAD_PMP       0x1
-#define DCAUSE_FAULT_LOAD_INST      0x2
-#define DCAUSE_FAULT_LOAD_NICE      0x3
+#define DCAUSE_FAULT_LOAD_PMP 0x1
+#define DCAUSE_FAULT_LOAD_INST 0x2
+#define DCAUSE_FAULT_LOAD_NICE 0x3
 
-#define DCAUSE_FAULT_STORE_PMP      0x1
-#define DCAUSE_FAULT_STORE_INST     0x2
+#define DCAUSE_FAULT_STORE_PMP 0x1
+#define DCAUSE_FAULT_STORE_INST 0x2
 
-/** @} */ /** End of Doxygen Group NMSIS_Core_CSR_Encoding **/
+    /** @} */ /** End of Doxygen Group NMSIS_Core_CSR_Encoding **/
 
 #ifdef __cplusplus
 }

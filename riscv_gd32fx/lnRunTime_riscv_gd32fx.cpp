@@ -4,8 +4,6 @@ extern void lnExtiJtagNoResetOnly();
 
 void lnRunTimeInit()
 {
-
-
 }
 
 void lnRunTimeInitPostPeripherals()
@@ -14,4 +12,3 @@ void lnRunTimeInitPostPeripherals()
 }
 
 // EOF
-
