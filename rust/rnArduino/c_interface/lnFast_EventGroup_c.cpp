@@ -2,16 +2,16 @@
 #include "lnArduino.h"
 extern "C"
 {
-    #include "lnFast_EventGroup_c.h"
+#include "lnFast_EventGroup_c.h"
 }
 
 #define WRAPME(x) ((lnFastEventGroup *)x)
 
-lnfast_event_group_c *   lnfast_event_group_create()
+lnfast_event_group_c *lnfast_event_group_create()
 {
     return (lnfast_event_group_c *)new lnFastEventGroup;
 }
-void  lnfast_event_group_delete(const lnfast_event_group_c *f)
+void lnfast_event_group_delete(const lnfast_event_group_c *f)
 {
     delete WRAPME(f);
 }

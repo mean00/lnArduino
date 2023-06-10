@@ -11,14 +11,13 @@ struct LN_SYSTIMERx
     uint32_t MTIME_HI;
     uint32_t MTIMECMP_LO;
     uint32_t MTIMECMP_HI;
-    
 };
 
 struct LN_SYSTIMER64x
 {
     uint64_t MTIME64;
-    uint64_t MTIMECMP64;    
+    uint64_t MTIMECMP64;
 };
 
-typedef volatile LN_SYSTIMERx LN_SYSTIMER;    
-typedef volatile LN_SYSTIMER64x LN_SYSTIMER64;    
+typedef volatile LN_SYSTIMERx LN_SYSTIMER;
+typedef volatile LN_SYSTIMER64x LN_SYSTIMER64;

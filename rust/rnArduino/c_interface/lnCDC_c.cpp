@@ -1,7 +1,7 @@
 
-#include "lnArduino.h"
-#include "include/lnUsbStack.h"
 #include "include/lnUsbCDC.h"
+#include "include/lnUsbStack.h"
+#include "lnArduino.h"
 extern "C"
 {
 #include "lnCDC_c.h"
@@ -10,7 +10,7 @@ extern "C"
 /*
 
 */
-lncdc_c *   lncdc_create(uint32_t instance)
+lncdc_c *lncdc_create(uint32_t instance)
 {
     return (lncdc_c *)(new lnUsbCDC((int)instance));
 }
@@ -18,32 +18,32 @@ lncdc_c *   lncdc_create(uint32_t instance)
 /*
 
 */
-void        lncdc_delete(lncdc_c *instance)
+void lncdc_delete(lncdc_c *instance)
 {
     delete WRAPME(instance);
-    instance=NULL;    
+    instance = NULL;
 }
 
 /*
 
 */
-int         lncdc_read(lncdc_c *instance, uint8_t *buffer, int maxSize)
+int lncdc_read(lncdc_c *instance, uint8_t *buffer, int maxSize)
 {
-    return WRAPME(instance)->read(buffer,maxSize);
+    return WRAPME(instance)->read(buffer, maxSize);
 }
 
 /*
 
 */
-int         lncdc_write(lncdc_c *instance, const uint8_t *buffer, int maxSize)
+int lncdc_write(lncdc_c *instance, const uint8_t *buffer, int maxSize)
 {
-    return WRAPME(instance)->write(buffer,maxSize);
+    return WRAPME(instance)->write(buffer, maxSize);
 }
 
 /*
 
 */
-void        lncdc_flush(lncdc_c *instance)
+void lncdc_flush(lncdc_c *instance)
 {
     return WRAPME(instance)->flush();
 }
@@ -51,7 +51,7 @@ void        lncdc_flush(lncdc_c *instance)
 /*
 
 */
-void        lncdc_clear_input_buffers(lncdc_c *instance)
+void lncdc_clear_input_buffers(lncdc_c *instance)
 {
     return WRAPME(instance)->clear_input_buffers();
 }
@@ -59,10 +59,10 @@ void        lncdc_clear_input_buffers(lncdc_c *instance)
 /*
 
 */
-void        lncdc_set_event_handler(lncdc_c *instance, cdc_event_handler *handler, void *cookie)
+void lncdc_set_event_handler(lncdc_c *instance, cdc_event_handler *handler, void *cookie)
 {
     lnUsbCDC::lnUsbCDCEventsHandler *e_handler = (lnUsbCDC::lnUsbCDCEventsHandler *)handler;
-    return WRAPME(instance)->setEventHandler(e_handler,cookie);
+    return WRAPME(instance)->setEventHandler(e_handler, cookie);
 }
-          
+
 // EOF
