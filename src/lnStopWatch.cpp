@@ -4,48 +4,50 @@
  */
 #include "lnStopWatch.h"
 /**
- * 
+ *
  * @param startAt
- * @return 
+ * @return
  */
 uint32_t now(uint32_t startAt)
 {
-    uint32_t tick=lnGetMs();
-    if(tick>=startAt) return tick-startAt;
-    uint32_t wrap=0xFFFFFFFFUL;
-    uint32_t val=wrap-startAt;
-    val+=tick;
+    uint32_t tick = lnGetMs();
+    if (tick >= startAt)
+        return tick - startAt;
+    uint32_t wrap = 0xFFFFFFFFUL;
+    uint32_t val = wrap - startAt;
+    val += tick;
     return val;
 }
 
 /**
- * 
+ *
  * @param ms
  */
 lnStopWatch::lnStopWatch(int ms)
 {
-    _start=now(0);
-    _end=ms;
+    _start = now(0);
+    _end = ms;
 }
 /**
- * 
+ *
  * @param durationMs
- * @return 
+ * @return
  */
 bool lnStopWatch::restart(int durationMs)
 {
-    _start=now(0);
-    _end=durationMs;
+    _start = now(0);
+    _end = durationMs;
     return true;
 }
 /**
- * 
- * @return 
+ *
+ * @return
  */
 bool lnStopWatch::elapsed()
 {
-    uint32_t xnow=now(_start);
-    if(xnow>_end) return true;
+    uint32_t xnow = now(_start);
+    if (xnow > _end)
+        return true;
     return false;
 }
 
@@ -53,26 +55,22 @@ bool lnStopWatch::elapsed()
 
 extern uint32_t lnGetCycle32();
 
-
 lnCycleClock::lnCycleClock()
 {
 }
 
-void  lnCycleClock::restart()
+void lnCycleClock::restart()
 {
-    _start=lnGetCycle32();
+    _start = lnGetCycle32();
 }
 /**
- * 
- * @return 
+ *
+ * @return
  */
-uint32_t  lnCycleClock::elapsed()
+uint32_t lnCycleClock::elapsed()
 {
-    uint32_t after=lnGetCycle32();
-    return after-_start; // to do : handle wrap
-    
+    uint32_t after = lnGetCycle32();
+    return after - _start; // to do : handle wrap
 }
-
-
 
 //

@@ -4,64 +4,66 @@
  */
 
 #include "lnArduino.h"
+#include "lnDma.h"
 #include "lnSPI.h"
 #include "lnSPI_priv.h"
-#include "lnDma.h"
 /**
- * 
+ *
  * @param wordSize
  * @param nbBytes
  * @param data
  * @param repeat
- * @return 
+ * @return
  */
 
-int nbReq=0;
-int nbInterrupt=0;
-int nbSkipped=0;
+int nbReq = 0;
+int nbInterrupt = 0;
+int nbSkipped = 0;
 
-bool hwlnSPIClass::dmaWriteInternal(int wordSize,int nbTransfer, const uint8_t *data,bool repeat)
+bool hwlnSPIClass::dmaWriteInternal(int wordSize, int nbTransfer, const uint8_t *data, bool repeat)
 {
-    bool r=true;
-    if(!nbTransfer) return true;
-    LN_SPI_Registers *d=(LN_SPI_Registers *)_adr;
-    
+    bool r = true;
+    if (!nbTransfer)
+        return true;
+    LN_SPI_Registers *d = (LN_SPI_Registers *)_adr;
+
     // that will clear errror
-    updateMode(d,lnTxOnly); // tx only
-    
+    updateMode(d, lnTxOnly); // tx only
+
     // 1- Configure DMA
     txDma.beginTransfer();
-    txDma.attachCallback(exTxDone,this);    
-    txDma.setWordSize(wordSize,wordSize);        
-    txDma.doMemoryToPeripheralTransferNoLock(nbTransfer, (uint16_t *)data, (uint16_t *)&d->DATA,repeat);        
-    
+    txDma.attachCallback(exTxDone, this);
+    txDma.setWordSize(wordSize, wordSize);
+    txDma.doMemoryToPeripheralTransferNoLock(nbTransfer, (uint16_t *)data, (uint16_t *)&d->DATA, repeat);
+
     // 2- Configure SPI
-    updateMode(d,lnTxOnly); // tx only
-    updateDataSize(d,wordSize);// 16 bits at a time
-    updateDmaTX(d,true); // activate DMA
+    updateMode(d, lnTxOnly);     // tx only
+    updateDataSize(d, wordSize); // 16 bits at a time
+    updateDmaTX(d, true);        // activate DMA
 
     // 3- Go!
-    
-    nbReq++;    
-    if(d->STAT & LN_SPI_STAT_CONFERR )
+
+    nbReq++;
+    if (d->STAT & LN_SPI_STAT_CONFERR)
     {
         txDma.endTransfer();
         Logger("Conf Error\n");
         return false;
-    }    
-    csOn();    
+    }
+    csOn();
     senable();
-    if(false==_done.take(100)) // 100 ms should be plenty enough!
+    if (false == _done.take(100)) // 100 ms should be plenty enough!
     {
-        r=false;
-    }else
+        r = false;
+    }
+    else
     {
-        waitForCompletion(); 
+        waitForCompletion();
     }
     txDma.endTransfer();
-    csOff();    
+    csOff();
     sdisable();
-    updateDmaTX(d,false);
+    updateDmaTX(d, false);
     return r;
 }
 
@@ -69,59 +71,57 @@ bool hwlnSPIClass::dmaWriteInternal(int wordSize,int nbTransfer, const uint8_t *
  */
 bool hwlnSPIClass::dmaWrite(int nbBytes, const uint8_t *data)
 {
-    return dmaWriteInternal(8,nbBytes,data,false);
+    return dmaWriteInternal(8, nbBytes, data, false);
 }
 
 /**
  */
 bool hwlnSPIClass::dmaWrite16(int nbWord, const uint16_t *data)
 {
-    return dmaWriteInternal(16,nbWord,(uint8_t *)data,false);
+    return dmaWriteInternal(16, nbWord, (uint8_t *)data, false);
 }
-
-
 
 /**
  */
 bool hwlnSPIClass::dmaWrite16Repeat(int nbWord, const uint16_t data)
 {
-    return dmaWriteInternal(16,nbWord,(uint8_t *)&data,true);
+    return dmaWriteInternal(16, nbWord, (uint8_t *)&data, true);
 }
 
-
 /**
- * 
+ *
  * @param c
  */
-void hwlnSPIClass::exTxDone(void *c,lnDMA::DmaInterruptType it)
+void hwlnSPIClass::exTxDone(void *c, lnDMA::DmaInterruptType it)
 {
     nbInterrupt++;
-    hwlnSPIClass *i=(hwlnSPIClass *)c;
+    hwlnSPIClass *i = (hwlnSPIClass *)c;
     i->txDone();
 }
 
 /**
- * 
+ *
  */
-bool hwlnSPIClass::asyncDmaWrite16(int nbTransfer, const uint16_t *data,lnSpiCallback *cb,void *cookie,bool repeat)
+bool hwlnSPIClass::asyncDmaWrite16(int nbTransfer, const uint16_t *data, lnSpiCallback *cb, void *cookie, bool repeat)
 {
-    int wordSize=16;
-    bool r=true;
+    int wordSize = 16;
+    bool r = true;
     _done.tryTake();
-    if(!nbTransfer) return true;
-    LN_SPI_Registers *d=(LN_SPI_Registers *)_adr;
-    
+    if (!nbTransfer)
+        return true;
+    LN_SPI_Registers *d = (LN_SPI_Registers *)_adr;
+
     // that will clear errror
-    updateMode(d,lnTxOnly); // tx only
-    
+    updateMode(d, lnTxOnly); // tx only
+
     // 1- Configure DMA
     txDma.beginTransfer();
-    txDma.setWordSize(wordSize,wordSize);        
-    updateDataSize(d,wordSize);// 16 bits at a time        
-    return nextDmaWrite16(nbTransfer,data,cb,cookie,repeat);
+    txDma.setWordSize(wordSize, wordSize);
+    updateDataSize(d, wordSize); // 16 bits at a time
+    return nextDmaWrite16(nbTransfer, data, cb, cookie, repeat);
 }
 /**
- * 
+ *
  */
 bool hwlnSPIClass::finishAsyncDma()
 {
@@ -132,58 +132,59 @@ bool hwlnSPIClass::finishAsyncDma()
  */
 bool hwlnSPIClass::waitForAsyncDmaDone()
 {
-    LN_SPI_Registers *d=(LN_SPI_Registers *)_adr;
-    bool r=true;
-    if(false==_done.take(60*1000)) // 100 ms should be plenty enough!
+    LN_SPI_Registers *d = (LN_SPI_Registers *)_adr;
+    bool r = true;
+    if (false == _done.take(60 * 1000)) // 100 ms should be plenty enough!
     {
-        r=false;
-    }else
+        r = false;
+    }
+    else
     {
-        waitForCompletion(); 
+        waitForCompletion();
     }
     txDma.endTransfer();
-    csOff();    
+    csOff();
     sdisable();
-    updateDmaTX(d,false);
+    updateDmaTX(d, false);
     return r;
 }
 /**
  */
-void asyncTrampoline(void *a,lnDMA::DmaInterruptType b)
+void asyncTrampoline(void *a, lnDMA::DmaInterruptType b)
 {
-    hwlnSPIClass *me=(hwlnSPIClass *)a;
-    me->invokeCallback();    
+    hwlnSPIClass *me = (hwlnSPIClass *)a;
+    me->invokeCallback();
 }
 /**
- * 
+ *
  */
 void hwlnSPIClass::invokeCallback()
 {
-    lnSpiCallback *c=_callback;
-    _callback=NULL;
+    lnSpiCallback *c = _callback;
+    _callback = NULL;
     xAssert(c);
     c(_callbackCookie);
 }
 /**
- * 
+ *
  */
-bool hwlnSPIClass::nextDmaWrite16(int nbTransfer, const uint16_t *data,lnSpiCallback *cb,void *cookie,bool repeat)
+bool hwlnSPIClass::nextDmaWrite16(int nbTransfer, const uint16_t *data, lnSpiCallback *cb, void *cookie, bool repeat)
 {
     bool r;
-    if(!nbTransfer) return false;
-    LN_SPI_Registers *d=(LN_SPI_Registers *)_adr;
+    if (!nbTransfer)
+        return false;
+    LN_SPI_Registers *d = (LN_SPI_Registers *)_adr;
 
-    _callback=cb;
-    _callbackCookie=cookie;
+    _callback = cb;
+    _callbackCookie = cookie;
 
-    txDma.attachCallback(asyncTrampoline,this);        
-    txDma.doMemoryToPeripheralTransferNoLock(nbTransfer, (uint16_t *)data, (uint16_t *)&d->DATA,repeat);        
-    
+    txDma.attachCallback(asyncTrampoline, this);
+    txDma.doMemoryToPeripheralTransferNoLock(nbTransfer, (uint16_t *)data, (uint16_t *)&d->DATA, repeat);
+
     // 2- Configure SPI
-    updateMode(d,lnTxOnly); // tx only    
-    updateDmaTX(d,true); // activate DMA
-    d->CTL0 |=LN_SPI_CTL0_SPIEN;
+    updateMode(d, lnTxOnly); // tx only
+    updateDmaTX(d, true);    // activate DMA
+    d->CTL0 |= LN_SPI_CTL0_SPIEN;
     return true;
 }
 // EOF
-

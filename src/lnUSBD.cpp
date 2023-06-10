@@ -35,10 +35,22 @@ extern "C" void dcd_int_handler(uint8_t rhport);
 int EndPoints::ep_bufferTail;
 int EndPoints::ep_nbEp;
 
-#define CLEAR_INTERRUPT(x)   {  aUSBD0->USBD_INTF &= ~(LN_USBD_INTF_##x##IF);      }
-#define DISABLE_INTERRUPT(x) {  aUSBD0->USBD_CTL &= ~(LN_USBD_CTL_##x##IE);    }
-#define CLEAR_CONTROL(x)     {  aUSBD0->USBD_CTL &= ~(LN_USBD_CTL_##x);   }
-#define SET_CONTROL(x)       {  aUSBD0->USBD_CTL |= (LN_USBD_CTL_##x);    }
+#define CLEAR_INTERRUPT(x)                                                                                             \
+    {                                                                                                                  \
+        aUSBD0->USBD_INTF &= ~(LN_USBD_INTF_##x##IF);                                                                  \
+    }
+#define DISABLE_INTERRUPT(x)                                                                                           \
+    {                                                                                                                  \
+        aUSBD0->USBD_CTL &= ~(LN_USBD_CTL_##x##IE);                                                                    \
+    }
+#define CLEAR_CONTROL(x)                                                                                               \
+    {                                                                                                                  \
+        aUSBD0->USBD_CTL &= ~(LN_USBD_CTL_##x);                                                                        \
+    }
+#define SET_CONTROL(x)                                                                                                 \
+    {                                                                                                                  \
+        aUSBD0->USBD_CTL |= (LN_USBD_CTL_##x);                                                                         \
+    }
 
 /**
  */
@@ -60,8 +72,8 @@ lnUsbDevice::~lnUsbDevice()
  */
 bool lnUsbDevice::init()
 {
-  // Only do low level hw setup here
-  // the follow up will be in hwReset
+    // Only do low level hw setup here
+    // the follow up will be in hwReset
     // first disable interrupt
     irqEnabled(false);
     // 48 Mhz input to usb
@@ -115,7 +127,7 @@ bool lnUsbDevice::irqEnabled(bool onoff)
 */
 void lnUsbDevice::copyFromSRAM(uint8_t *dest, int srcOffset, int bytes)
 {
-    xAssert( !(srcOffset & 1));
+    xAssert(!(srcOffset & 1));
     int nbWord = bytes / 2;
     volatile uint16_t *ram = (volatile uint16_t *)aUSBD0_SRAM;
     ram += srcOffset;
@@ -177,8 +189,8 @@ void lnUsbDevice::copyToSRAM(int destOffset, uint8_t *src, int bytes)
 {
     int nbWords = (bytes + 1) / 2; // might overread by one byte,not an issue
     volatile uint16_t *ram = (volatile uint16_t *)aUSBD0_SRAM;
-    xAssert( !(destOffset & 1));
-    ram += destOffset ;
+    xAssert(!(destOffset & 1));
+    ram += destOffset;
     if (((uint32_t)src) & 1) // not aligned
     {
         uint8_t *s8 = src;
@@ -231,7 +243,8 @@ bool lnUsbDevice::registerEventHandler(const lnUsbEventHandler *h)
  * @return <return_description>
  * @details <details>
  */
-#define MASK_CLEAR      (0xffff & ~LN_USBD_EPxCS_RX_DTG & ~LN_USBD_EPxCS_TX_DTG & ~LN_USBD_EPxCS_RX_STA_MASK & ~LN_USBD_EPxCS_TX_STA_MASK)
+#define MASK_CLEAR                                                                                                     \
+    (0xffff & ~LN_USBD_EPxCS_RX_DTG & ~LN_USBD_EPxCS_TX_DTG & ~LN_USBD_EPxCS_RX_STA_MASK & ~LN_USBD_EPxCS_TX_STA_MASK)
 void lnUsbDevice::clearTxRx(int ep, bool isTx)
 {
     uint32_t reg = aUSBD0->USBD_EPCS[ep & 7] & 0xffff;
@@ -339,7 +352,7 @@ void lnUsbDevice::clearDTG(int ep, bool isTx)
     }
     else
     {
-       if (reg & LN_USBD_EPxCS_RX_DTG)
+        if (reg & LN_USBD_EPxCS_RX_DTG)
             change = LN_USBD_EPxCS_RX_DTG;
     }
     if (change)
@@ -391,7 +404,7 @@ void lnUsbDevice::resetEps()
 /**
 
 */
-void      lnUsbDevice::hwReset()
+void lnUsbDevice::hwReset()
 {
 #if 0 // According to GD doc...
 1. Clear the CLOSE bit in USBD_CTL register, then clear the SETRST bit.
@@ -403,28 +416,26 @@ void      lnUsbDevice::hwReset()
 program USBD_ADDR to set the device address to 0 and enable USB module function.
 7. Configure endpoint 0 and prepare to receive SETUP packet.
 #endif
-// Force host reset by asserting PA12 low for 10 ms
-lnDigitalWrite(PA12,0);
-lnPinMode(PA12, lnOUTPUT); // D+
-lnDigitalWrite(PA12,0);
-lnDelay(10);
-lnPinMode(PA12, lnINPUT_FLOATING); // D+
+    // Force host reset by asserting PA12 low for 10 ms
+    lnDigitalWrite(PA12, 0);
+    lnPinMode(PA12, lnOUTPUT); // D+
+    lnDigitalWrite(PA12, 0);
+    lnDelay(10);
+    lnPinMode(PA12, lnINPUT_FLOATING); // D+
 
-CLEAR_CONTROL(CLOSE);
-CLEAR_CONTROL(SETRST);
-aUSBD0->USBD_INTF &= LN_USBD_INTF_RSTIF; // clear all except reset
-// Clear all interrupts
-aUSBD0->USBD_BADDR = 0; // Descriptors at the begining
-aUSBD0->USBD_DADDR = 0; // address 0, disabled
-aUSBD0->USBD_STAT=0;
+    CLEAR_CONTROL(CLOSE);
+    CLEAR_CONTROL(SETRST);
+    aUSBD0->USBD_INTF &= LN_USBD_INTF_RSTIF; // clear all except reset
+    // Clear all interrupts
+    aUSBD0->USBD_BADDR = 0; // Descriptors at the begining
+    aUSBD0->USBD_DADDR = 0; // address 0, disabled
+    aUSBD0->USBD_STAT = 0;
 
 #define GG(x) LN_USBD_CTL_##x
-uint32_t inter=aUSBD0->USBD_CTL;
-inter|= GG(RSTIE) + GG(PMOUIE) + GG(STIE); // + GG(WKUPIE) + GG(SPSIE); //+ GG(ESOFIE); //Ignore ESOFIE/SOFIE +GG(ESOFIE)++GG(SOFIE);  GG(ERRIE) +
-aUSBD0->USBD_CTL=inter;
-
-
-
+    uint32_t inter = aUSBD0->USBD_CTL;
+    inter |= GG(RSTIE) + GG(PMOUIE) + GG(STIE); // + GG(WKUPIE) + GG(SPSIE); //+ GG(ESOFIE); //Ignore ESOFIE/SOFIE
+                                                // +GG(ESOFIE)++GG(SOFIE);  GG(ERRIE) +
+    aUSBD0->USBD_CTL = inter;
 }
 /**
  */
@@ -472,8 +483,8 @@ void lnUsbDevice::irq()
     if (flags & LN_USBD_INTF_RSTIF /*|| (aUSBD0->USBD_CTL & LN_USBD_CTL_SETRST)*/)
     {
         CLEAR_INTERRUPT(RST);
-      //  CLEAR_CONTROL(SETRST);
-      //  CLEAR_CONTROL(RSTIE);
+        //  CLEAR_CONTROL(SETRST);
+        //  CLEAR_CONTROL(RSTIE);
         _handler->event(lnUsbEventHandler::UsbReset);
         return;
     }
@@ -487,19 +498,19 @@ void lnUsbDevice::irq()
         {
             if (f & LN_USBD_INTF_DIR) // OUT Type PC-> DEV
             {
-              uint32_t reg = _usbInstance->getEpStatusReg(LN_USBD_INTF_EPNUM(f));
-              if (reg & LN_USBD_EPxCS_RX_ST)
-              {
-                _handler->event(lnUsbEventHandler::UsbTransferRxCompleted, LN_USBD_INTF_EPNUM(f));
-              }
+                uint32_t reg = _usbInstance->getEpStatusReg(LN_USBD_INTF_EPNUM(f));
+                if (reg & LN_USBD_EPxCS_RX_ST)
+                {
+                    _handler->event(lnUsbEventHandler::UsbTransferRxCompleted, LN_USBD_INTF_EPNUM(f));
+                }
             }
             else // In Type Ddev->PC
             {
-                  uint32_t reg = _usbInstance->getEpStatusReg(LN_USBD_INTF_EPNUM(f));
-                  if ((reg & LN_USBD_EPxCS_TX_ST))
-                  {
+                uint32_t reg = _usbInstance->getEpStatusReg(LN_USBD_INTF_EPNUM(f));
+                if ((reg & LN_USBD_EPxCS_TX_ST))
+                {
                     _handler->event(lnUsbEventHandler::UsbTransferTxCompleted, LN_USBD_INTF_EPNUM(f));
-                  }
+                }
             }
             f = aUSBD0->USBD_INTF;
         }

@@ -20,7 +20,7 @@ void initTask(void *)
 {
     LoggerInit();
     setup();
-    while(1)
+    while (1)
     {
         loop();
     }
@@ -34,7 +34,6 @@ void resetMe(const Peripherals periph)
 {
     lnPeripherals::reset(periph);
     lnPeripherals::enable(periph);
-
 }
 void disabled(const Peripherals periph)
 {
@@ -49,7 +48,7 @@ int main()
     lnRunTimeInit();
     // Initialize system
     lnInitSystemClock();
-    //ECLIC init
+    // ECLIC init
     lnIrqSysInit();
 
     // The LEDs are all on GPIO A
@@ -72,7 +71,6 @@ int main()
     // init DMA
     lnDmaSysInit();
 
-
     // Init SPI0/1/2
     disabled(pSPI0);
     disabled(pSPI1);
@@ -89,17 +87,16 @@ int main()
     disabled(pTIMER6);
 
     // DAC
-     disabled(pDAC);
+    disabled(pDAC);
 
-     // ADC
-     resetMe(pADC0);
-     resetMe(pADC1);
-
+    // ADC
+    resetMe(pADC0);
+    resetMe(pADC1);
 
     lnRunTimeInitPostPeripherals();
 
     // Start freertos
-    lnCreateTask( initTask,"entryTask",1024,NULL,2 );        
+    lnCreateTask(initTask, "entryTask", 1024, NULL, 2);
     vTaskStartScheduler();
     lnGetFreeRTOSDebug();
     deadEnd(25);
