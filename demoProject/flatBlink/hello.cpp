@@ -1,7 +1,6 @@
 #include "lnArduino.h"
 
-
-#ifdef __arm__ 
+#ifdef __arm__
 #define LED PC13
 #else
 #define LED PA2
@@ -9,24 +8,23 @@
 
 void setup()
 {
-    pinMode(LED,OUTPUT);
-    
+    pinMode(LED, OUTPUT);
 }
 /**
- * 
+ *
  */
-int roundup=0;
+int roundup = 0;
 void loop()
 {
-    bool onoff=true;
-    digitalWrite(LED,true);
-    
-    while(1)
+    bool onoff = true;
+    digitalWrite(LED, true);
+
+    while (1)
     {
         roundup++;
         xDelay(500);
         digitalToggle(LED);
-        onoff=!onoff;
+        onoff = !onoff;
         Logger("*Hey*\n");
     }
 }

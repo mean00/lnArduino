@@ -1,6 +1,6 @@
 #include "lnArduino.h"
-#include "lnTimer.h"
 #include "lnDAC.h"
+#include "lnTimer.h"
 #include "math.h"
 
 #include "nvm_gd32.h"
@@ -11,7 +11,7 @@
 
 void setup()
 {
-    pinMode(LN_SYSTEM_LED,OUTPUT);
+    pinMode(LN_SYSTEM_LED, OUTPUT);
 }
 /**
  *
@@ -20,42 +20,50 @@ void setup()
 void stop()
 {
     Logger("** FAILURE ** \n");
-    while(1)
+    while (1)
     {
         delay(40);
     }
 }
 
-#define TAIST(x) {bool result=x;if(!result) {Logger("FAILURE of %s at line %d \n",#x,__LINE__);stop();return;}}
+#define TAIST(x)                                                                                                       \
+    {                                                                                                                  \
+        bool result = x;                                                                                               \
+        if (!result)                                                                                                   \
+        {                                                                                                              \
+            Logger("FAILURE of %s at line %d \n", #x, __LINE__);                                                       \
+            stop();                                                                                                    \
+            return;                                                                                                    \
+        }                                                                                                              \
+    }
 
-      int val;
+int val;
 
 void InitNvm(lnNvmGd32 &nvm)
 {
 
-   uint8_t v=1;
-   TAIST(nvm.write(1,1,&v));
-   v=0;
+    uint8_t v = 1;
+    TAIST(nvm.write(1, 1, &v));
+    v = 0;
 
-   nvm.dumpEntries(-1);
+    nvm.dumpEntries(-1);
 
-   TAIST(nvm.read(1,1,&v));
-   TAIST(v==1);
+    TAIST(nvm.read(1, 1, &v));
+    TAIST(v == 1);
 
-   v=2;
-   TAIST(nvm.write(1,1,&v));
-   nvm.dumpEntries(-1);
-   v=0;
-   TAIST(nvm.read(1,1,&v));
-   TAIST(v==2);
+    v = 2;
+    TAIST(nvm.write(1, 1, &v));
+    nvm.dumpEntries(-1);
+    v = 0;
+    TAIST(nvm.read(1, 1, &v));
+    TAIST(v == 2);
 
-   v=3;
-   TAIST(nvm.write(1,1,&v));
-   nvm.dumpEntries(-1);
-   v=0;
-   TAIST(nvm.read(1,1,&v));
-   TAIST(v==3);
-
+    v = 3;
+    TAIST(nvm.write(1, 1, &v));
+    nvm.dumpEntries(-1);
+    v = 0;
+    TAIST(nvm.read(1, 1, &v));
+    TAIST(v == 3);
 }
 
 void TestNvm()
@@ -63,33 +71,31 @@ void TestNvm()
     uint8_t v;
     lnNvmGd32 nvm;
     TAIST(nvm.begin());
-    TAIST(nvm.read(1,1,&v));
-    TAIST(v==3);
+    TAIST(nvm.read(1, 1, &v));
+    TAIST(v == 3);
 }
-   int roundx;
+int roundx;
 void loop()
 {
-   lnNvmGd32 nvm;
-  // nvm.format();
-  // delay(5000);
-   Logger("Starting...\n");
-   if(!nvm.begin())
-   {
-      Logger("Formating\n");
-       nvm.format();
-   }
+    lnNvmGd32 nvm;
+    // nvm.format();
+    // delay(5000);
+    Logger("Starting...\n");
+    if (!nvm.begin())
+    {
+        Logger("Formating\n");
+        nvm.format();
+    }
 
-   for(int roundx=0;roundx<10;roundx++)
-   {
-       Logger("Round %d  \n",roundx);
-       InitNvm(nvm);
-   }
+    for (int roundx = 0; roundx < 10; roundx++)
+    {
+        Logger("Round %d  \n", roundx);
+        InitNvm(nvm);
+    }
 
-
-
-   Logger("End => ALL OK !\n");
-   while(1)
-   {
-       delay(10);
-   }
+    Logger("End => ALL OK !\n");
+    while (1)
+    {
+        delay(10);
+    }
 }

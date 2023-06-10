@@ -1,7 +1,7 @@
-#include "lnArduino.h"
-#include "include/lnUsbStack.h"
-#include "include/lnUsbCDC.h"
 #include "hello.h"
+#include "include/lnUsbCDC.h"
+#include "include/lnUsbStack.h"
+#include "lnArduino.h"
 
 #define LED LN_SYSTEM_LED
 /**
@@ -13,7 +13,9 @@ void setup()
     pinMode(PB9, OUTPUT);
 }
 #define MEVENT(x)                                                                                                      \
-    case lnUsbStack::USB_##x: Logger(#x); break;
+    case lnUsbStack::USB_##x:                                                                                          \
+        Logger(#x);                                                                                                    \
+        break;
 
 void helloUsbEvent(void *cookie, lnUsbStack::lnUsbStackEvents event)
 {
@@ -23,22 +25,24 @@ void helloUsbEvent(void *cookie, lnUsbStack::lnUsbStackEvents event)
         MEVENT(DISCONNECT)
         MEVENT(SUSPEND)
         MEVENT(RESUME)
-        default: xAssert(0); break;
+    default:
+        xAssert(0);
+        break;
     }
 }
-lnUsbCDC *cdc=NULL;
+lnUsbCDC *cdc = NULL;
 uint8_t buffer[100];
 lnFastEventGroup *event_group;
-void cdcEventHandler(void *cookie, int interface,lnUsbCDC::lnUsbCDCEvents event,uint32_t payload)
+void cdcEventHandler(void *cookie, int interface, lnUsbCDC::lnUsbCDCEvents event, uint32_t payload)
 {
-    event_group->setEvents( 1 << event);
+    event_group->setEvents(1 << event);
 }
 
 void loop()
 {
     Logger("Starting lnTUSB Test\n");
 
-    event_group= new lnFastEventGroup();
+    event_group = new lnFastEventGroup();
     event_group->takeOwnership();
 
     lnUsbStack *usb = new lnUsbStack;
@@ -46,44 +50,42 @@ void loop()
     usb->setConfiguration(desc_hs_configuration, desc_fs_configuration, &desc_device, &desc_device_qualifier);
     usb->setEventHandler(NULL, helloUsbEvent);
 
-    cdc=new lnUsbCDC(0);
-    cdc->setEventHandler(cdcEventHandler,NULL);
+    cdc = new lnUsbCDC(0);
+    cdc->setEventHandler(cdcEventHandler, NULL);
     usb->start();
     while (1)
     {
         uint32_t t = event_group->waitEvents(0xffffffff, 1000);
-        if(!t)
+        if (!t)
         {
             lnDigitalToggle(LED);
             lnDigitalToggle(PB8);
             lnDigitalToggle(PB9);
             continue;
         }
-        if( t & (1<<lnUsbCDC::CDC_SESSION_START))
+        if (t & (1 << lnUsbCDC::CDC_SESSION_START))
         {
-             Logger("CDC SESSION START\n");
+            Logger("CDC SESSION START\n");
         }
-        if( t & (1<<lnUsbCDC::CDC_SESSION_END))
+        if (t & (1 << lnUsbCDC::CDC_SESSION_END))
         {
-             Logger("CDC SESSION END\n");
+            Logger("CDC SESSION END\n");
         }
-        if( t & (1<<lnUsbCDC::CDC_SET_SPEED))
+        if (t & (1 << lnUsbCDC::CDC_SET_SPEED))
         {
             Logger("CDC SET SPEED\n");
         }
-        if( t & (1<<lnUsbCDC::CDC_DATA_AVAILABLE))
+        if (t & (1 << lnUsbCDC::CDC_DATA_AVAILABLE))
         {
-             Logger("Dt\n");
-            int n=cdc->read(buffer,100);
-            if(n)
+            Logger("Dt\n");
+            int n = cdc->read(buffer, 100);
+            if (n)
             {
-                cdc->write((uint8_t *)">",1);
-                cdc->write(buffer,n);
+                cdc->write((uint8_t *)">", 1);
+                cdc->write(buffer, n);
                 cdc->flush();
             }
         }
-        
     }
 }
 // EOF
- 

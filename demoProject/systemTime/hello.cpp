@@ -1,31 +1,29 @@
 #include "lnArduino.h"
 
-
 #define LED LN_SYSTEM_LED
 
 void setup()
 {
-    pinMode(LED,OUTPUT);
-    
+    pinMode(LED, OUTPUT);
 }
 /**
- * 
+ *
  */
-int roundup=0;
+int roundup = 0;
 void test_time(int ms)
 {
-    int before=lnGetUs();
+    int before = lnGetUs();
     xDelay(ms);
-    int after=lnGetUs();
-    Logger("Before=%d \n",before);
-    Logger("After=%d \n",after);
-    Logger("delta=%d , should be %d 000\n",after-before,ms);
+    int after = lnGetUs();
+    Logger("Before=%d \n", before);
+    Logger("After=%d \n", after);
+    Logger("delta=%d , should be %d 000\n", after - before, ms);
 }
 void loop()
 {
-    bool onoff=true;
-    digitalWrite(LED,true);
- 
+    bool onoff = true;
+    digitalWrite(LED, true);
+
     Logger("Starting a 1 sec wait...\n");
     xDelay(1000);
     Logger("End of 1 sec wait\n");
@@ -33,12 +31,12 @@ void loop()
     test_time(50);
     test_time(100);
     test_time(200);
-    
-    while(1)
+
+    while (1)
     {
         roundup++;
         xDelay(500);
         digitalToggle(LED);
-        onoff=!onoff;   
+        onoff = !onoff;
     }
 }
