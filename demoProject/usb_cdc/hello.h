@@ -1,4 +1,6 @@
 #pragma once
+#include "include/lnUsbCDC.h"
+#include "include/lnUsbStack.h"
 #define _PID_MAP(itf, n) ((CFG_TUD_##itf) << (n))
 
 #define USB_VID 0xCafe
