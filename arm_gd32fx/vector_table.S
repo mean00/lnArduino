@@ -36,10 +36,6 @@ __stm32_vector_table:
 /* CM3 core interrupts */
 	.long	__msp_init-4
 	.long	__exc_reset
-    .long   __trap
-    .long   __trap
-	.long   __trap
-	.long   __trap
 	.word   0x1234
 	.word   0x5678
 	.size	__stm32_vector_table, . - __stm32_vector_table
