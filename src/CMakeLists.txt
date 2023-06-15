@@ -6,6 +6,7 @@ IF("${LN_MCU}" STREQUAL "CH32V3x")
 
 include_directories( ${CMAKE_CURRENT_SOURCE_DIR}/../${LN_EXT} )
 
+
  SET(TARGET_SPECIFIC_SOURCES
                        ../${LN_EXT}/lnRCU_systemClock_${LN_EXT}.cpp 
                        ../${LN_EXT}/lnIRQ_${LN_EXT}.cpp 
@@ -47,6 +48,16 @@ IF(LN_ENABLE_SPI)
 ENDIF(LN_ENABLE_SPI)
 
 ADD_LIBRARY(gd32_overlay STATIC  ${OVERLAY_SRCS} )
+
+
+
+IF(LN_INITIAL_STACK_SIZE)
+  MESSAGE(STATUS "Altering initial stack size to ${LN_INITIAL_STACK_SIZE}")  
+  TARGET_COMPILE_DEFINITIONS(gd32_overlay PRIVATE LN_INITIAL_STACK_SIZE=${LN_INITIAL_STACK_SIZE})
+ENDIF()
+
+
+
 ADD_LIBRARY(gd32_lowlevel STATIC  systemHelper.cpp lnStubs.cpp)
 
 TARGET_COMPILE_DEFINITIONS(gd32_overlay PRIVATE LN_MCU_SPEED=${LN_MCU_SPEED})

@@ -96,7 +96,10 @@ int main()
     lnRunTimeInitPostPeripherals();
 
     // Start freertos
-    lnCreateTask(initTask, "entryTask", 1024, NULL, 2);
+#ifndef LN_INITIAL_STACK_SIZE
+  #define LN_INITIAL_STACK_SIZE 1024    // 
+#endif                                        // 
+    lnCreateTask(initTask, "entryTask", LN_INITIAL_STACK_SIZE, NULL, 2);
     vTaskStartScheduler();
     lnGetFreeRTOSDebug();
     deadEnd(25);
