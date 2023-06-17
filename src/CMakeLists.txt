@@ -49,12 +49,16 @@ ENDIF(LN_ENABLE_SPI)
 
 ADD_LIBRARY(gd32_overlay STATIC  ${OVERLAY_SRCS} )
 
+MACRO(ALTER nm text)
+  IF(${nm})
+    MESSAGE(STATUS "Altering ${text} to ${${nm}}")
+    TARGET_COMPILE_DEFINITIONS(gd32_overlay PRIVATE ${nm}=${${nm}})
+  ENDIF()
+ENDMACRO()
 
+ALTER(LN_INITIAL_STACK_SIZE "initial stack size")
+ALTER(LN_INITIAL_TASK_PRIORITY "initial task priority")
 
-IF(LN_INITIAL_STACK_SIZE)
-  MESSAGE(STATUS "Altering initial stack size to ${LN_INITIAL_STACK_SIZE}")  
-  TARGET_COMPILE_DEFINITIONS(gd32_overlay PRIVATE LN_INITIAL_STACK_SIZE=${LN_INITIAL_STACK_SIZE})
-ENDIF()
 
 
 
