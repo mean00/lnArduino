@@ -116,7 +116,7 @@ ENDIF()
 #SET(LN_CLANG_LIBC /home/fx/Arduino_stm32/arm-gcc-2020q4/bin/../lib/gcc/arm-none-eabi/10.2.1/thumb/v7-m/nofp/libgcc.a CACHE INTERNAL "")
 #SET(LN_CLANG_MULTILIB thumb/v7-m/nofp CACHE INTERNAL "")
 
-SET(G32_DEBUG_FLAGS "-g3 ${LN_LTO}  -Oz -gdwarf-2" CACHE INTERNAL "")
+SET(G32_DEBUG_FLAGS "-g3 ${LN_LTO}  -Oz  -gdwarf-4" CACHE INTERNAL "")
 
 SET(GD32_LD_EXTRA "  -Wl,--unresolved-symbols=report-all -Wl,--warn-common  " CACHE INTERNAL "")
 #
