@@ -11,6 +11,14 @@
 extern lnSerial *serial0 = NULL;
 volatile uint32_t lnScratchRegister;
 
+extern "C" void Logger_crash(const char *st)
+{
+    serial0->disableInterrupt();
+    serial0->init();
+    serial0->setSpeed(115200);
+    serial0->rawWrite(st);
+}
+
 extern "C" void Logger_C(const char *fmt, ...)
 {
     static char buffer[128];

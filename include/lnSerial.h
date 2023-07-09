@@ -45,7 +45,7 @@ class lnSerial
     void consume(int n);
 
     static void interrupts(int instance);
-
+    void rawWrite(const char *c); // Write in polling mode
   protected:
     void txInterruptHandler(void);
     void rxInterruptHandler(void);

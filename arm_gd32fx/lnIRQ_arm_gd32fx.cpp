@@ -268,11 +268,15 @@ extern "C"
  *
  * @param code
  */
+ extern "C" void Logger_crash(const char *st);
 extern "C" void deadEnd(int code)
 {
     static int lastErrorCode;
     __asm__("cpsid if"); // disable interrupt
     lastErrorCode = code;
+    Logger_crash("**** CRASH ***\n");
+    Logger_crash("**** CRASH ***\n");
+    Logger_crash("**** CRASH ***\n");
     __asm__("bkpt 1");
     while (1)
     {
