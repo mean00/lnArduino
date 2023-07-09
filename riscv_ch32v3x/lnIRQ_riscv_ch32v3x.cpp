@@ -430,10 +430,15 @@ DMA_IRQ(1, 4)
 DMA_IRQ(1, 5)
 DMA_IRQ(1, 6)
 
+extern "C" void Logger_crash(const char *st);
+
 extern "C" void __attribute__((noinline)) deadEnd(int code)
 {
     // No interrrupt
     ENTER_CRITICAL();
+    Logger_crash("**** CRASH *****");
+    Logger_crash("**** CRASH *****");
+    Logger_crash("**** CRASH *****");
     while (1)
     {
         // blink red light...
