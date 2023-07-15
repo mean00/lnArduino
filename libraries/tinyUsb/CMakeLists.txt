@@ -3,15 +3,6 @@
 
 SET(TUSB ${CMAKE_CURRENT_SOURCE_DIR}/src/src)
 SET(LNSRC ${CMAKE_CURRENT_SOURCE_DIR}/lnSrc)
-include_directories( ${AF_FOLDER}/private_include)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/private_include)
-include_directories( ${TUSB})
-include_directories( ${TUSB}/common)
-include_directories( ${TUSB}/device)
-include_directories( ${TUSB}/class/device/cdc)
-include_directories( ${TUSB}/class/device/dfu)
 
 IF(NOT DEFINED LN_USB_NB_CDC)
     MESSAGE(FATAL_ERROR "SET LN_USB_NB_CDC to the number of CDC interface you use")
@@ -100,3 +91,15 @@ SET(SRCS  ${CLASS_FILES}
           )
 add_library(tinyUsb STATIC ${SRCS})
 target_include_directories(tinyUsb PRIVATE ${CMAKE_BINARY_DIR})
+target_include_directories(tinyUsb PRIVATE ${AF_FOLDER}/private_include)
+target_include_directories(tinyUsb PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(tinyUsb PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_include_directories(tinyUsb PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/private_include)
+target_include_directories(tinyUsb PUBLIC ${TUSB})
+target_include_directories(tinyUsb PUBLIC ${TUSB}/common)
+target_include_directories(tinyUsb PUBLIC ${TUSB}/device)
+target_include_directories(tinyUsb PUBLIC ${TUSB}/class/device/cdc)
+target_include_directories(tinyUsb PUBLIC ${TUSB}/class/device/dfu)
+
+
+target_link_libraries(tinyUsb lnArduinoInternal)
