@@ -1,18 +1,17 @@
-include(../setup.cmake)
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/../private_include)
 IF("${LN_MCU}" STREQUAL "CH32V3x")
-    SET(EXTRA_OVERLAY ../riscv_ch32v3x/lnRCU_ch32v3x.cpp)
+    SET(EXTRA_OVERLAY ${LN_MCU_FOLDER}/lnRCU_ch32v3x.cpp)
  ENDIF()
 
-include_directories( ${CMAKE_CURRENT_SOURCE_DIR}/../${LN_EXT} )
+include_directories( ${LN_MCU_FOLDER} )
 
 
  SET(TARGET_SPECIFIC_SOURCES
-                       ../${LN_EXT}/lnRCU_systemClock_${LN_EXT}.cpp 
-                       ../${LN_EXT}/lnIRQ_${LN_EXT}.cpp 
-                       ../${LN_EXT}/lnRunTime_${LN_EXT}.cpp
-                       ../${LN_EXT}/lnSystemTimer_${LN_EXT}.cpp 
-                       ../${LN_EXT}/lnCpuID_${LN_EXT}.cpp 
+                       ${LN_MCU_FOLDER}/lnRCU_systemClock_${LN_EXT}.cpp 
+                       ${LN_MCU_FOLDER}/lnIRQ_${LN_EXT}.cpp 
+                       ${LN_MCU_FOLDER}/lnRunTime_${LN_EXT}.cpp
+                       ${LN_MCU_FOLDER}/lnSystemTimer_${LN_EXT}.cpp 
+                       ${LN_MCU_FOLDER}/lnCpuID_${LN_EXT}.cpp 
                        )
 
 SET(OVERLAY_SRCS       
@@ -34,20 +33,22 @@ SET(OVERLAY_SRCS
                        lnFMC.cpp
                        lnFreeRTOSDebug.cpp                       
                        ${EXTRA_OVERLAY}
-                       ../${LN_EXT}/boards/${GD32_BOARD}/lnPinMapping.cpp
+                       ${LN_MCU_FOLDER}/boards/${GD32_BOARD}/lnPinMapping.cpp
                     )
 
 IF(LN_ENABLE_I2C)
   LIST(APPEND OVERLAY_SRCS lnI2C.cpp lnI2C_impl.cpp  )
-  LN_APPEND_FLAGS(../${LN_EXT}/lnIRQ_${LN_EXT}.cpp -DLN_ENABLE_I2C)
+  LN_APPEND_FLAGS( ${LN_MCU_FOLDER}/lnIRQ_${LN_EXT}.cpp -DLN_ENABLE_I2C)
 ENDIF(LN_ENABLE_I2C)
 
 IF(LN_ENABLE_SPI)
   LIST(APPEND OVERLAY_SRCS lnSPI.cpp lnSPI_dma.cpp  )
-  LN_APPEND_FLAGS(../${LN_EXT}/lnIRQ_${LN_EXT}.cpp -DLN_ENABLE_SPI)
+  LN_APPEND_FLAGS( ${LN_MCU_FOLDER}/lnIRQ_${LN_EXT}.cpp -DLN_ENABLE_SPI)
 ENDIF(LN_ENABLE_SPI)
 
 ADD_LIBRARY(gd32_overlay STATIC  ${OVERLAY_SRCS} )
+TARGET_LINK_LIBRARIES(gd32_overlay  lnArduinoInternal)
+
 
 MACRO(ALTER nm text)
   IF(${nm})
@@ -63,6 +64,7 @@ ALTER(LN_INITIAL_TASK_PRIORITY "initial task priority")
 
 
 ADD_LIBRARY(gd32_lowlevel STATIC  systemHelper.cpp lnStubs.cpp)
+TARGET_LINK_LIBRARIES(gd32_lowlevel  lnArduinoInternal)
 
 TARGET_COMPILE_DEFINITIONS(gd32_overlay PRIVATE LN_MCU_SPEED=${LN_MCU_SPEED})
 IF(LN_USE_INTERNAL_CLOCK)                                     
@@ -83,7 +85,8 @@ IF(LN_ENABLE_USBD)
   ELSE()    
     SET(IMPL lnUSBD.cpp)
   ENDIF()
-  ADD_LIBRARY(gd32_usb_usbd STATIC  ${IMPL})                                    
+  ADD_LIBRARY(gd32_usb_usbd STATIC  ${IMPL})    
+  TARGET_LINK_LIBRARIES(gd32_usb_usbd  lnArduinoInternal)                                
   SET(TUSB ${CMAKE_CURRENT_SOURCE_DIR}/../libraries/tinyUsb/src)
   target_include_directories( gd32_usb_usbd  PRIVATE ${TUSB}/common ${TUSB} ${TUSB}/..)
 ENDIF(LN_ENABLE_USBD)

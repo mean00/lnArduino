@@ -1,5 +1,5 @@
 
-include(${AF_FOLDER}/${LN_EXT}/cmake/lnCmake_${LN_TOOLCHAIN_EXT}.cmake)
+include(${LN_MCU_FOLDER}/cmake/lnCmake_${LN_TOOLCHAIN_EXT}.cmake)
 #______________________________________
 
 MACRO (LN_APPEND_FLAGS target)
@@ -22,7 +22,7 @@ ENDMACRO (LN_APPEND_FLAGS)
 
 
 MACRO(USE_LIBRARY lib)
-    add_subdirectory(${AF_FOLDER}/libraries/${lib})
-    include_directories(${AF_FOLDER}/libraries/${lib})
+    add_subdirectory(${ARDUINO_GD32_FREERTOS}/libraries/${lib})
+    include_directories(${ARDUINO_GD32_FREERTOS}/libraries/${lib})
     LIST(APPEND USED_LIBS ${lib})
 ENDMACRO(USE_LIBRARY lib)

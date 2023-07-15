@@ -11,10 +11,10 @@ MACRO(GENERATE_GD32_FIRMWARE target)
             SET(LN_MCU_EEPROM_SIZE 4 CACHE INTERNAL "")
     ENDIF(NOT LN_MCU_EEPROM_SIZE)
 
-    configure_file( "${AF_FOLDER}/riscv_ch32v3x/boards/ch32v3x/ld.lds.in" "${CMAKE_BINARY_DIR}/linker_script.ld" @ONLY)
+    configure_file( "${LN_MCU_FOLDER}/boards/ch32v3x/ld.lds.in" "${CMAKE_BINARY_DIR}/linker_script.ld" @ONLY)
 
-    ADD_EXECUTABLE(${target}  ${AF_FOLDER}/riscv_ch32v3x/start.S ${ARGN})
-    TARGET_LINK_LIBRARIES(${target} ${USED_LIBS} ) # duplicates are NOT a mistake !
+    ADD_EXECUTABLE(${target}  ${LN_MCU_FOLDER}/start.S ${ARGN})
+    TARGET_LINK_LIBRARIES(${target} ${USED_LIBS} lnArduino ) # duplicates are NOT a mistake !
     TARGET_LINK_LIBRARIES(${target} embeddedPrintf gd32_overlay gd32Arduino   FreeRTOS  gd32_lowlevel c  c gcc ) # dupicates are NOT a mistake !
     TARGET_LINK_OPTIONS(${target}  PRIVATE "-T${CMAKE_BINARY_DIR}/linker_script.ld" )
 
