@@ -1,4 +1,4 @@
-include(FindPythonInterp)
+include(FindPython3)
 MACRO(GENERATE_GD32_FIRMWARE target)
 
   
