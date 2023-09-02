@@ -4,6 +4,9 @@
  */
 
 #include "stdint.h"
+
+#pragma clang diagnostic ignored "-Wextra"
+
 extern "C"
 {
 // #include "riscv_encoding.h"

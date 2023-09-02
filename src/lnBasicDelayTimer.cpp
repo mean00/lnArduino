@@ -7,6 +7,8 @@
 #include "lnBasicTimer_priv.h"
 #include "lnPinMapping.h"
 
+#pragma clang diagnostic ignored "-Wextra"
+
 lnBasicDelayTimer *btimerInstances[2] = {NULL, NULL};
 extern LN_BTimers_Registers *aBTimers[];
 
