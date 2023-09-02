@@ -9,6 +9,8 @@
 #include "lnGPIO.h"
 #include "lnPeripheral_priv.h"
 
+#pragma clang diagnostic ignored "-Wextra"
+
 LN_EXTI_Register *aExiti = (LN_EXTI_Register *)LN_EXTI_ADR;
 
 #define LN_EXTI_NB_SOURCES 19

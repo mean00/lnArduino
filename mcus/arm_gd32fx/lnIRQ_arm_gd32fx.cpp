@@ -11,6 +11,7 @@
 #include "lnRCU.h"
 #include "lnSCB_arm_priv.h"
 
+#pragma clang diagnostic ignored "-Wextra"
 /**
  *
  */

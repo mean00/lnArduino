@@ -11,6 +11,8 @@
 #include "lnTimer.h"
 #include "lnTimer_priv.h"
 
+#pragma clang diagnostic ignored "-Wextra"
+
 #warning PROPERLY INITIALIZE IT
 #warning PROPERLY INITIALIZE IT
 #warning PROPERLY INITIALIZE IT
