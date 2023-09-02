@@ -1,3 +1,4 @@
+#
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/../private_include)
 INCLUDE(${CMAKE_CURRENT_SOURCE_DIR}/../setup.cmake)
 IF("${LN_MCU}" STREQUAL "CH32V3x")
@@ -13,6 +14,7 @@ include_directories( ${LN_MCU_FOLDER} )
                        ${LN_MCU_FOLDER}/lnRunTime_${LN_EXT}.cpp
                        ${LN_MCU_FOLDER}/lnSystemTimer_${LN_EXT}.cpp 
                        ${LN_MCU_FOLDER}/lnCpuID_${LN_EXT}.cpp 
+                       CACHE INTERNAL ""
                        )
 
 SET(OVERLAY_SRCS       
@@ -35,6 +37,7 @@ SET(OVERLAY_SRCS
                        lnFreeRTOSDebug.cpp                       
                        ${EXTRA_OVERLAY}
                        ${LN_MCU_FOLDER}/boards/${GD32_BOARD}/lnPinMapping.cpp
+                       CACHE INTERNAL ""
                     )
 
 IF(LN_ENABLE_I2C)
@@ -82,13 +85,13 @@ ENDIF()
 #
 IF(LN_ENABLE_USBD)
   IF(USE_CH32v3x_USB_HS) #IF("${LN_MCU}" STREQUAL "CH32V3x")
-    SET(IMPL ../riscv_ch32v3x/lnUSBD_ch32v3x.cpp)    
+    SET(IMPL ../riscv_ch32v3x/lnUSBD_ch32v3x.cpp CACHE INTERNAL "")    
   ELSE()    
-    SET(IMPL lnUSBD.cpp)
+    SET(IMPL lnUSBD.cpp CACHE INTERNAL "")
   ENDIF()
-  ADD_LIBRARY(gd32_usb_usbd STATIC  ${IMPL})    
+  ADD_LIBRARY(gd32_usb_usbd STATIC  ${IMPL} )
   TARGET_LINK_LIBRARIES(gd32_usb_usbd  lnArduinoInternal)                                
-  SET(TUSB ${CMAKE_CURRENT_SOURCE_DIR}/../libraries/tinyUsb/src)
+  SET(TUSB ${CMAKE_CURRENT_SOURCE_DIR}/../libraries/tinyUsb/src CACHE INTERNAL "")
   target_include_directories( gd32_usb_usbd  PRIVATE ${TUSB}/common ${TUSB} ${TUSB}/..)
 ENDIF(LN_ENABLE_USBD)
 
