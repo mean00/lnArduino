@@ -31,7 +31,7 @@ void lnPinMode(const lnPin xpin, const GpioMode mode)
     LN_GPIO *port = gpio[xpin >> 4];
     const LN_PIN_MAPPING *lnPin = pinMappings + xpin;
     xAssert(lnPin->pin == xpin);
-    int pin = xpin & 0xf;
+    uint32_t pin = xpin & 0xf;
     volatile uint32_t *CTL;
 
     uint32_t value;
@@ -86,7 +86,7 @@ void lnPinMode(const lnPin xpin, const GpioMode mode)
         CTL = &(port->CTL0);
     }
     uint32_t ref = *CTL;
-    ref &= ~(0Xf << (pin * 4));
+    ref &= ~(0x0f << (pin * 4));
     ref |= value << (pin * 4);
     *CTL = ref;
 }
