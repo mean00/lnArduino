@@ -1,6 +1,6 @@
 
 SET(CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/ArduinoToolchainGd32.cmake)
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.20)
 
 IF(True) #NOT ARDUINO_GD32_FREERTOS)
 
@@ -16,7 +16,7 @@ IF(True) #NOT ARDUINO_GD32_FREERTOS)
 
         # Already merged APPLY_PATCH_IF_NEEDED(patch_tinyusb tinyusb_no_static.patch        libraries/tinyUsb      "dont use freertos static constructs ")
 
-        OPTION(LN_ENABLE_USBD "Enable USBD support")
+        OPTION(LN_ENABLE_USBD "Enable USBD support" OFF)
         OPTION(LN_ENABLE_I2C  "Enable I2C support" ON)
         OPTION(LN_ENABLE_SPI  "Enable SPI support" ON)
 
@@ -70,6 +70,6 @@ IF(True) #NOT ARDUINO_GD32_FREERTOS)
         target_include_directories(lnArduino INTERFACE ${ARDUINO_GD32_FREERTOS}/include)
         target_include_directories(lnArduino INTERFACE ${LN_MCU_FOLDER})
         IF(LN_ENABLE_USBD) 
-          TARGET_LINK_LIBRARIES(lnArduino INTERFACE gd32_usb_usbd )       
+          #TARGET_LINK_LIBRARIES(lnArduino INTERFACE gd32_usb_usbd )       
         ENDIF(LN_ENABLE_USBD)  
 ENDIF()
