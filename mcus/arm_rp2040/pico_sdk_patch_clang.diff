@@ -1,0 +1,25 @@
+diff --git a/cmake/preload/toolchains/pico_arm_clang.cmake b/cmake/preload/toolchains/pico_arm_clang.cmake
+index 2e600c8..33899fa 100644
+--- a/cmake/preload/toolchains/pico_arm_clang.cmake
++++ b/cmake/preload/toolchains/pico_arm_clang.cmake
+@@ -20,7 +20,6 @@ pico_find_compiler(PICO_OBJDUMP llvm-objdump)
+ set(CMAKE_C_COMPILER ${PICO_COMPILER_CC} CACHE FILEPATH "C compiler")
+ set(CMAKE_CXX_COMPILER ${PICO_COMPILER_CXX} CACHE FILEPATH "C++ compiler")
+ set(CMAKE_C_OUTPUT_EXTENSION .o)
+-
+ # todo should we be including CMakeASMInformation anyway - i guess that is host side
+ set(CMAKE_ASM_COMPILER ${PICO_COMPILER_ASM} CACHE FILEPATH "ASM compiler")
+ set(CMAKE_ASM_COMPILE_OBJECT "<CMAKE_ASM_COMPILER> <DEFINES> <INCLUDES> <FLAGS> -o <OBJECT>   -c <SOURCE>")
+@@ -42,6 +41,10 @@ option(PICO_DEOPTIMIZED_DEBUG "Build debug builds with -O0" 0)
+ 
+ # Oz is preferred for Clang (verses CMake default -Os) see also https://gitlab.kitware.com/cmake/cmake/-/issues/22458
+ set(CMAKE_C_FLAGS_MINSIZEREL "-Oz -DNDEBUG")
+-
+-set(ARM_TOOLCHAIN_COMMON_FLAGS "--target=armv6m-none-eabi -mfloat-abi=soft -march=armv6m --sysroot ${PICO_COMPILER_DIR}/../lib/clang-runtimes/armv6m_soft_nofp")
++find_path(PICO_COMPILER_SYSROOT NAMES include/stdio.h 
++                HINTS 
++                    ${PICO_COMPILER_DIR}/../lib/clang-runtimes/arm-none-eabi/armv6m_soft_nofp
++                    ${PICO_COMPILER_DIR}/../lib/clang-runtimes/armv6m_soft_nofp
++         )
++set(ARM_TOOLCHAIN_COMMON_FLAGS "--target=armv6m-none-eabi -mfloat-abi=soft -march=armv6m --target=armv6m-none-eabi -mcpu=cortex-m0plus -Wno-duplicate-decl-specifier -Wno-unused-command-line-argument -Wno-macro-redefined -Wno-unused-function -Wno-gnu-designator -fno-exceptions -fno-rtti --sysroot ${PICO_COMPILER_SYSROOT}/") 
+ include(${CMAKE_CURRENT_LIST_DIR}/set_flags.cmake)
