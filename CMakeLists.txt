@@ -55,7 +55,7 @@ IF(True) #NOT ARDUINO_GD32_FREERTOS)
         include(./arduino.cmake)
         include(./embeddedPrintf.cmake)
 
-        add_subdirectory(src)
+        add_subdirectory(${LN_MCU_FOLDER}/src)
 
         IF(LN_ENABLE_RUST)
                 add_subdirectory(rust) # Generate C++->C for easy Rust binding
