@@ -1,3 +1,4 @@
+# https://github.com/raspberrypi/pico-sdk/issues/196
 diff --git a/cmake/preload/toolchains/pico_arm_clang.cmake b/cmake/preload/toolchains/pico_arm_clang.cmake
 index 2e600c8..33899fa 100644
 --- a/cmake/preload/toolchains/pico_arm_clang.cmake
