@@ -94,4 +94,15 @@ extern "C" void __attribute__((noreturn)) start_c(void)
         continue;
 }
 
+int main()
+{
+    while(1)
+    {
+        __asm__("nop");
+    }
+}
+void do_assert(const char *a)
+{
+    __asm__("bkpt #0");
+}
 // EOF

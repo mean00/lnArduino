@@ -1,6 +1,6 @@
 /*
  * libmaple linker script for "JTAG" builds.
- *
+ * RP2040 GCC
  * A "JTAG" build puts .text (and .rodata) in Flash, and
  * .data/.bss/heap (of course) in SRAM, but links starting at the
  * Flash and SRAM starting addresses (0x08000000 and 0x20000000

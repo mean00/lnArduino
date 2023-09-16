@@ -39,6 +39,10 @@ SET(GD32_BOARD       rp2040 CACHE INTERNAL "")
 #SET(LN_LTO "-flto")
 # Speed
 
+# OK, now setup the pico sdk
+
+
+
 IF(NOT DEFINED LN_MCU_SPEED)
     SET(LN_MCU_SPEED 72000000)
 ENDIF()
