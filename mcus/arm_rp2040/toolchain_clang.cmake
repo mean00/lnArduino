@@ -3,7 +3,7 @@
 MESSAGE(STATUS "Setting up RP2040/arm cmake environment")
 IF(NOT DEFINED LN_EXT)
 SET(LN_EXT arm_rp2040 CACHE INTERNAL "")
-SET(LN_TOOLCHAIN_EXT  arm_rp2040 CACHE INTERNAL "")
+SET(LN_TOOLCHAIN_EXT  arm_rp2040_clang CACHE INTERNAL "")
 
 include(${AF_FOLDER}/../platformConfig.cmake)
 
