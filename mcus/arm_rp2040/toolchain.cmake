@@ -1,8 +1,8 @@
 #=============================================================================#
-MESSAGE(STATUS "Setting up GD32/arm cmake environment")
+MESSAGE(STATUS "Setting up RP2040/arm cmake environment")
 IF(NOT DEFINED LN_EXT)
-SET(LN_EXT arm_gd32fx CACHE INTERNAL "")
-SET(LN_TOOLCHAIN_EXT  arm_gd32fx CACHE INTERNAL "")
+SET(LN_EXT arm_rp2040 CACHE INTERNAL "")
+SET(LN_TOOLCHAIN_EXT  arm_rp2040 CACHE INTERNAL "")
 include(${AF_FOLDER}/../platformConfig.cmake)
 
 IF(NOT PLATFORM_TOOLCHAIN_PATH)
@@ -35,7 +35,7 @@ SET(CMAKE_CXX_COMPILER_ID "GNU" CACHE INTERNAL "")
 set(CMAKE_C_COMPILER_WORKS      TRUE)
 set(CMAKE_CXX_COMPILER_WORKS    TRUE)
 #
-SET(GD32_BOARD       bluepill CACHE INTERNAL "")
+SET(GD32_BOARD       rp2040 CACHE INTERNAL "")
 #SET(LN_LTO "-flto")
 # Speed
 
@@ -93,15 +93,8 @@ SET(GD32_SPECS  "--specs=${LN_SPEC}.specs")
 
 # M3 or M4 ?
 
-IF( "${LN_MCU}" STREQUAL "M3")
-    SET(GD32_MCU "  -mcpu=cortex-m3 -mthumb  -march=armv7-m ")
-ELSE()
-    IF( "${LN_MCU}" STREQUAL "M4")
-        SET(GD32_MCU "-mcpu=cortex-m4  -mfloat-abi=hard -mfpu=fpv4-sp-d16  -mthumb -DLN_USE_FPU=1")        
-     ELSE()
-         MESSAGE(FATAL_ERROR "Unsupported MCU : only M3 is supported (works for M0+) : ${LN_MCU}")
-     ENDIF()
-ENDIF()
+
+SET(GD32_MCU "  -mcpu=cortex-m0plus -mthumb  -march=armv6-m ")
 
 SET(G32_DEBUG_FLAGS "-g3 ${LN_LTO}  -O1 " CACHE INTERNAL "")
 
@@ -113,9 +106,9 @@ SET(CMAKE_ASM_FLAGS "${GD32_C_FLAGS}" CACHE INTERNAL "")
 SET(CMAKE_CXX_FLAGS "${GD32_C_FLAGS}  -fno-rtti -fno-exceptions -fno-threadsafe-statics" CACHE INTERNAL "") 
 #
 SET(GD32_LD_FLAGS "-nostdlib ${GD32_SPECS} ${GD32_MCU} ${GD32_LD_EXTRA}" CACHE INTERNAL "")
-SET(GD32_LD_LIBS "-lm -lc -lgcc" CACHE INTERNAL "")
+SET(GD32_LD_LIBS "-lm -lc -lgcc -lgcc" CACHE INTERNAL "")
 #
-set(CMAKE_CXX_LINK_EXECUTABLE    "<CMAKE_CXX_COMPILER>   <CMAKE_CXX_LINK_FLAGS>  <LINK_FLAGS> ${LN_LTO} -lgcc -Xlinker -print-memory-usage -Xlinker --gc-sections  -Wl,--start-group  <OBJECTS> <LINK_LIBRARIES> -Wl,--end-group  -Wl,--cref -Wl,-Map,<TARGET>.map   -o <TARGET> ${GD32_LD_FLAGS} ${GD32_LD_LIBS}" CACHE INTERNAL "")
+set(CMAKE_CXX_LINK_EXECUTABLE    "<CMAKE_CXX_COMPILER>   <CMAKE_CXX_LINK_FLAGS>  <LINK_FLAGS> ${LN_LTO} -lgcc -xarmgd -Xlinker -print-memory-usage -Xlinker --gc-sections  -Wl,--start-group  <OBJECTS> <LINK_LIBRARIES> -Wl,--end-group  -Wl,--cref -Wl,-Map,<TARGET>.map   -o <TARGET> ${GD32_LD_FLAGS} ${GD32_LD_LIBS}" CACHE INTERNAL "")
 SET(CMAKE_EXECUTABLE_SUFFIX_C .elf CACHE INTERNAL "")
 SET(CMAKE_EXECUTABLE_SUFFIX_CXX .elf CACHE INTERNAL "")
 

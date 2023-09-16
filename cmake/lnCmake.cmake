@@ -1,5 +1,8 @@
 
-include(${LN_MCU_FOLDER}/cmake/lnCmake_${LN_TOOLCHAIN_EXT}.cmake)
+IF(USE_CLANG)
+    SET(EXTRA "_clang")
+ENDIF()    
+include(${LN_MCU_FOLDER}/cmake/lnCmake_${LN_TOOLCHAIN_EXT}${EXTRA}.cmake)
 #______________________________________
 
 MACRO (LN_APPEND_FLAGS target)
