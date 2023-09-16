@@ -6,7 +6,8 @@ MACRO(GENERATE_GD32_FIRMWARE target)
     ADD_EXECUTABLE(${target} ${ARGN}  ${LN_MCU_FOLDER}/start.S   ${LN_MCU_FOLDER}/start.cpp      ${LN_MCU_FOLDER}/vector_table.S) 
     TARGET_LINK_LIBRARIES(${target} ${USED_LIBS} lnArduino) # duplicates are NOT a mistake !
     # duplicates are NOT a mistake !
-    TARGET_LINK_LIBRARIES(${target} embeddedPrintf gd32_overlay gd32Arduino   FreeRTOS  gd32_lowlevel c ) 
+    # TARGET_LINK_LIBRARIES(${target} embeddedPrintf gd32_overlay gd32Arduino   FreeRTOS  gd32_lowlevel c ) 
+    TARGET_LINK_LIBRARIES(${target} embeddedPrintf  FreeRTOS   c ) 
     IF(LN_CUSTOM_LD_SCRIPT)
         SET(SCRIPT ${LN_CUSTOM_LD_SCRIPT} CACHE INTERNAL "")
     ELSE()

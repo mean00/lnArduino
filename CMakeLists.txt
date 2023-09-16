@@ -40,7 +40,7 @@ IF(True) #NOT ARDUINO_GD32_FREERTOS)
         target_include_directories(lnArduinoInternal INTERFACE ${ARDUINO_GD32_FREERTOS}/${LN_EXT}/include/)
         target_include_directories(lnArduinoInternal INTERFACE ${ARDUINO_GD32_FREERTOS}/arduinoLayer/include)
         target_include_directories(lnArduinoInternal INTERFACE ${CMAKE_BINARY_DIR}) # To catch generated files
-        target_include_directories(lnArduinoInternal INTERFACE ${LN_MCU_FOLDER})
+        target_include_directories(lnArduinoInternal INTERFACE ${LN_MCU_FOLDER})        
 
 
         IF(LN_BOOTLOADER_SIZE)
@@ -67,6 +67,7 @@ IF(True) #NOT ARDUINO_GD32_FREERTOS)
         ADD_LIBRARY(lnArduino INTERFACE)
         target_link_libraries(lnArduino INTERFACE  gd32Arduino FreeRTOS embeddedPrintf lnArduinoInternal)
         target_include_directories(lnArduino INTERFACE ${ARDUINO_GD32_FREERTOS})
+        target_include_directories(lnArduino INTERFACE ${ARDUINO_GD32_FREERTOS}/include)
         target_include_directories(lnArduino INTERFACE ${LN_MCU_FOLDER})
         IF(LN_ENABLE_USBD) 
           TARGET_LINK_LIBRARIES(lnArduino INTERFACE gd32_usb_usbd )       

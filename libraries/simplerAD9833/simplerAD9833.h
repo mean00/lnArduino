@@ -25,9 +25,9 @@
   BSD license, all text above must be included in any redistribution
  ****************************************************/
 #pragma once
+#include "lnGPIO.h"
+#include "lnSPI.h"
 #include "vector"
-#include <lnGPIO.h>
-#include <lnSPI.h>
 
 /**
  *
