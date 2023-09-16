@@ -93,7 +93,7 @@ extern "C" void __attribute__((noreturn)) start_c(void)
     for (;;)
         continue;
 }
-
+FILE *const stdout=NULL;
 int main()
 {
     while(1)
