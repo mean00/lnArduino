@@ -58,6 +58,8 @@ IF(True) #NOT ARDUINO_GD32_FREERTOS)
 
         add_subdirectory(${LN_MCU_FOLDER}/src)
 
+        add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src)
+
         IF(LN_ENABLE_RUST)
                 add_subdirectory(rust) # Generate C++->C for easy Rust binding
         ENDIF(LN_ENABLE_RUST)
@@ -66,7 +68,7 @@ IF(True) #NOT ARDUINO_GD32_FREERTOS)
         # Ok let's create our public libary
         # a firmmware should link against that one
         ADD_LIBRARY(lnArduino INTERFACE)
-        target_link_libraries(lnArduino INTERFACE  gd32Arduino FreeRTOS embeddedPrintf lnArduinoInternal)
+        target_link_libraries(lnArduino INTERFACE ln_utils gd32Arduino FreeRTOS embeddedPrintf lnArduinoInternal)
         target_include_directories(lnArduino INTERFACE ${ARDUINO_GD32_FREERTOS})
         target_include_directories(lnArduino INTERFACE ${ARDUINO_GD32_FREERTOS}/include)
         target_include_directories(lnArduino INTERFACE ${LN_MCU_FOLDER})

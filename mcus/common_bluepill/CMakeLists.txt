@@ -20,7 +20,7 @@ include_directories( ${LN_MCU_FOLDER} )
 
 SET(OVERLAY_SRCS       
                        ${TARGET_SPECIFIC_SOURCES}
-                       MapleFreeRTOS1000_pp.cpp systemAlloc.cpp lnDebug.cpp lnSerial.cpp lnGPIO.cpp                      
+                       lnSerial.cpp lnGPIO.cpp                      
                        lnDma.cpp 
                        lnSystemInit.cpp lnRCU.cpp 
                        lnExti.cpp
@@ -29,13 +29,13 @@ SET(OVERLAY_SRCS
                        lnDelayTimer.cpp
                        lnTimer.cpp
                        lnDmaTimer.cpp
-                       lnStopWatch.cpp
+                       #lnStopWatch.cpp
                        lnDAC.cpp
                        lnADC.cpp
                        lnADC_base.cpp
                        lnADC_timing.cpp
                        lnFMC.cpp
-                       lnFreeRTOSDebug.cpp                       
+                       #lnFreeRTOSDebug.cpp                       
                        ${EXTRA_OVERLAY}
                        ${LN_MCU_FOLDER}/boards/${GD32_BOARD}/lnPinMapping.cpp
                        CACHE INTERNAL ""
@@ -69,7 +69,9 @@ ALTER(LN_INITIAL_TASK_PRIORITY "initial task priority")
 
 
 
-ADD_LIBRARY(gd32_lowlevel STATIC  systemHelper.cpp lnStubs.cpp)
+#ADD_LIBRARY(gd32_lowlevel STATIC  systemHelper.cpp lnStubs.cpp)
+ADD_LIBRARY(gd32_lowlevel STATIC   lnStubs.cpp)
+
 TARGET_LINK_LIBRARIES(gd32_lowlevel  lnArduinoInternal)
 target_include_directories(gd32_lowlevel PRIVATE arduinoLayer/include include FreeRTOS/include . ${LN_MCU_FOLDER}/boards private_include ${LN_MCU_FOLDER}/include)
 

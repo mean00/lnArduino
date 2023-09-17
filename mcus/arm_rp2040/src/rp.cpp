@@ -23,9 +23,10 @@ void initTask(void *)
 
 int main()
 {
- //   stdio_init_all();
-    while(1)
+    LoggerInit();
+    setup();
+    while (1)
     {
-        __asm__("nop");
+        loop();
     }
 }
