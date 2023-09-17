@@ -63,7 +63,7 @@ SET(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 #---------------------------------------------------------
 SET(PICO_COMPILER  pico_arm_clang CACHE INTERNAL "")
 SET(PICO_TOOLCHAIN_PATH  /arm/tools_llvm/bin CACHE INTERNAL "")    
-SET(LD_SCRIPT ${CMAKE_BINARY_DIR}/linker_script.ld)
+SET(LD_SCRIPT ${CMAKE_BINARY_DIR}/linker_script.ld CACHE INTERNAL "")
 set(PICO_BOARD "pico")
 SET(PICO_COMPILER  pico_arm_clang CACHE INTERNAL "")
 SET(PICO_TOOLCHAIN_PATH  ${PLATFORM_CLANG_PATH} CACHE INTERNAL "")    

@@ -54,6 +54,12 @@ ${PICO_SDK_PATH}/src/rp2_common/pico_stdio/stdio.c
 ${PICO_SDK_PATH}/src/rp2_common/pico_stdio_uart/stdio_uart.c
 ${PICO_SDK_PATH}/src/rp2_common/pico_stdlib/stdlib.c
 ${PICO_SDK_PATH}/src/rp2_common/pico_standard_link/crt0.S
+
+
+${CMAKE_CURRENT_SOURCE_DIR}/rp_gpio.cpp
+${CMAKE_CURRENT_SOURCE_DIR}/rp_serial.cpp
+
+
 )
 
 
@@ -85,7 +91,7 @@ target_include_directories(rplib PUBLIC
         ${PICO_SDK_PATH}/src/rp2_common/hardware_uart/include  
         ${PICO_SDK_PATH}/src/rp2_common/hardware_vreg/include  
         ${PICO_SDK_PATH}/src/rp2_common/hardware_watchdog/include  
-        ${PICO_SDK_PATH}/src/rp2_common/hardware_xosc/include  
+        ${PICO_SDK_PATH}/src/rp2_common/hardware_xosc/include          
         ${PICO_SDK_PATH}/src/rp2_common/pico_bootrom/include  
         ${PICO_SDK_PATH}/src/rp2_common/pico_double/include  
         ${PICO_SDK_PATH}/src/rp2_common/pico_float/include  
@@ -98,7 +104,11 @@ target_include_directories(rplib PUBLIC
         ${PICO_SDK_PATH}/src/rp2_common/pico_stdio/include  
         ${PICO_SDK_PATH}/src/rp2_common/pico_stdio_uart/include  
         ${PICO_SDK_PATH}/src/rp2_common/boot_stage2/asminclude
+
+        
+
             )
+#target_include_directories(rplib PRIVATE  ${CMAKE_CURRENT_SOURCE_DIR}/../include)
 target_include_directories(rplib PUBLIC  ${CMAKE_CURRENT_SOURCE_DIR}/../include)
 target_link_libraries(rplib  PRIVATE lnArduinoInternal )            
 #target_link_libraries(lnArduino PUBLIC rplib )

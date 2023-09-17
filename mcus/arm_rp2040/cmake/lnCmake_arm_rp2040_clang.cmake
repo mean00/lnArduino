@@ -14,7 +14,7 @@ MACRO(GENERATE_GD32_FIRMWARE target)
     ELSE()
         SET(SCRIPT "${CMAKE_BINARY_DIR}/linker_script.ld" CACHE INTERNAL "")
     ENDIF()
-    TARGET_LINK_OPTIONS(${target}  PRIVATE "-T${LD_SCRIPT}")
+    TARGET_LINK_OPTIONS(${target}  PRIVATE "-T${SCRIPT}")
     #pico_set_linker_script( ${target} ${LD_SCRIPT})
     add_custom_command(TARGET ${target}
                    POST_BUILD
