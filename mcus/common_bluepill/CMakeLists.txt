@@ -1,5 +1,6 @@
 #
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/../../private_include)
+
 INCLUDE(${CMAKE_CURRENT_SOURCE_DIR}/../../setup.cmake)
 IF("${LN_MCU}" STREQUAL "CH32V3x")
     SET(EXTRA_OVERLAY ${LN_MCU_FOLDER}/lnRCU_ch32v3x.cpp)
@@ -52,7 +53,7 @@ ENDIF(LN_ENABLE_SPI)
 
 ADD_LIBRARY(gd32_overlay STATIC  ${OVERLAY_SRCS} )
 TARGET_LINK_LIBRARIES(gd32_overlay  lnArduinoInternal)
-
+TARGET_INCLUDE_DIRECTORIES(gd32_overlay PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 MACRO(ALTER nm text)
   IF(${nm})
@@ -67,8 +68,10 @@ ALTER(LN_INITIAL_TASK_PRIORITY "initial task priority")
 
 
 
+
 ADD_LIBRARY(gd32_lowlevel STATIC  systemHelper.cpp lnStubs.cpp)
 TARGET_LINK_LIBRARIES(gd32_lowlevel  lnArduinoInternal)
+target_include_directories(gd32_lowlevel PRIVATE arduinoLayer/include include FreeRTOS/include . ${LN_MCU_FOLDER}/boards private_include ${LN_MCU_FOLDER}/include)
 
 TARGET_COMPILE_DEFINITIONS(gd32_overlay PRIVATE LN_MCU_SPEED=${LN_MCU_SPEED})
 IF(LN_USE_INTERNAL_CLOCK)                                     

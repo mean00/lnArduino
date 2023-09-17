@@ -94,5 +94,3 @@ enum LnIRQ
     LN_IRQ_DMA1_Channel4,
     LN_IRQ_ARM_LAST
 };
-
-#define LN_SYSTEM_LED PC13

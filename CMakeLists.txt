@@ -40,7 +40,8 @@ IF(True) #NOT ARDUINO_GD32_FREERTOS)
         target_include_directories(lnArduinoInternal INTERFACE ${ARDUINO_GD32_FREERTOS}/${LN_EXT}/include/)
         target_include_directories(lnArduinoInternal INTERFACE ${ARDUINO_GD32_FREERTOS}/arduinoLayer/include)
         target_include_directories(lnArduinoInternal INTERFACE ${CMAKE_BINARY_DIR}) # To catch generated files
-        target_include_directories(lnArduinoInternal INTERFACE ${LN_MCU_FOLDER})        
+        target_include_directories(lnArduinoInternal INTERFACE ${LN_MCU_FOLDER})
+        target_include_directories(lnArduinoInternal INTERFACE ${LN_MCU_FOLDER}/include)        
 
 
         IF(LN_BOOTLOADER_SIZE)
