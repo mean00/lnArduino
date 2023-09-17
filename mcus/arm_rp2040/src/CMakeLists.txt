@@ -58,6 +58,7 @@ ${PICO_SDK_PATH}/src/rp2_common/pico_standard_link/crt0.S
 
 ${CMAKE_CURRENT_SOURCE_DIR}/rp_gpio.cpp
 ${CMAKE_CURRENT_SOURCE_DIR}/rp_serial.cpp
+${CMAKE_CURRENT_SOURCE_DIR}/rp_irq.cpp
 
 
 )

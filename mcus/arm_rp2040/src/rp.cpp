@@ -1,6 +1,7 @@
 #include "lnArduino.h"
 #include "stdio.h"
 #include "lnDma.h"
+#include "lnIRQ.h"
 FILE *const stdout=NULL;
 
 extern void setup();
@@ -25,9 +26,23 @@ void initTask(void *)
 #define LN_INITIAL_STACK_SIZE 1024
 #define LN_INITIAL_TASK_PRIORITY 2
 uint32_t SystemCoreClock = 100000000;
+
+extern "C" {
+    void xPortSysTickHandler( void );
+    void xPortPendSVHandler( void );    
+    void vPortSVCHandler( void );
+}
+
+
 int main()
 {
     LoggerInit();
+
+    lnSetInterruptHandler(LN_IRQ_SYSTICK, xPortSysTickHandler);
+    lnSetInterruptHandler(LN_IRQ_PENDSV,  xPortPendSVHandler);
+    lnSetInterruptHandler(LN_IRQ_SVCALL,  vPortSVCHandler);
+
+
     lnCreateTask(initTask, "entryTask", LN_INITIAL_STACK_SIZE, NULL, LN_INITIAL_TASK_PRIORITY);
     vTaskStartScheduler();
     //lnGetFreeRTOSDebug();
@@ -35,7 +50,7 @@ int main()
 }
 
 extern "C" void deadEnd(int code)
-{
+{    
     __asm__("bkpt #0");
 }
 
