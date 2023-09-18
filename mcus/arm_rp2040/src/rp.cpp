@@ -2,6 +2,9 @@
 #include "stdio.h"
 #include "lnDma.h"
 #include "lnIRQ.h"
+
+#include "hardware/gpio.h"
+
 FILE *const stdout=NULL;
 
 extern void setup();
@@ -36,6 +39,11 @@ extern "C" {
 
 int main()
 {
+
+    gpio_set_function(GPIO7, GPIO_FUNC_UART); // use GPIO6 (TX) and 7(Rx) for uart
+    gpio_set_function(GPIO6, GPIO_FUNC_UART);
+
+
     LoggerInit();
 
     lnSetInterruptHandler(LN_IRQ_SYSTICK, xPortSysTickHandler);
