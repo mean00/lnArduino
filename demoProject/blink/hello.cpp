@@ -1,14 +1,12 @@
 #include "lnArduino.h"
+#include "pico/stdlib.h"
+#include "hardware/gpio.h"
 
-#ifdef __arm__
-#define LED PC13
-#else
-#define LED PA2
-#endif
+#define LED LN_SYSTEM_LED
 
 void setup()
 {
-    pinMode(LED, OUTPUT);
+   lnPinMode(LED, lnOUTPUT);
 }
 /**
  *
@@ -16,15 +14,16 @@ void setup()
 int roundup = 0;
 void loop()
 {
-    bool onoff = true;
-    digitalWrite(LED, true);
+    lnDigitalWrite(LED, false);
+    xDelay(1000);
+    lnDigitalWrite(LED, true);
+    xDelay(1000);
 
     while (1)
     {
         roundup++;
         xDelay(500);
-        digitalToggle(LED);
-        onoff = !onoff;
+        lnDigitalToggle(LED);
         Logger("*Hey*\n");
     }
 }

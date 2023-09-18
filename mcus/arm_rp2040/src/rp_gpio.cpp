@@ -9,26 +9,28 @@
 void lnPinMode(const lnPin pin, const lnGpioMode mode)
 {
     gpio_init(pin);
-    gpio_set_function(pin, GPIO_FUNC_PIO0);
+    gpio_set_function(pin, GPIO_FUNC_SIO);
+    
+
+#define AS_INPUT(pin, up, down)       gpio_set_pulls(pin,up, down);   \
+                    gpio_set_dir(pin,false); \
+                    gpio_set_input_enabled(pin,true);
+
     switch(mode)
     {
         case lnFLOATING : 
+                    AS_INPUT(pin,false,false);
                     break;
         case lnINPUT_PULLUP:
-                    gpio_set_dir(pin,false);
-                    gpio_set_pulls(pin,true, false);
-                    gpio_set_input_enabled(pin,true);
+                    AS_INPUT(pin,true,false);
                     break;    
         case lnINPUT_PULLDOWN :
-                    gpio_set_dir(pin,false);
-                    gpio_set_pulls(pin,false, true);
-                    gpio_set_input_enabled(pin,true);
+                    AS_INPUT(pin,false,true);
                     break;
         case lnOUTPUT:
+                    gpio_set_input_enabled(pin,false);
+                    gpio_set_pulls(pin,false, false);  
                     gpio_set_dir(pin,true);
-                    gpio_set_pulls(pin,false, false);
-                    gpio_set_input_enabled(pin,false);
-                    gpio_set_input_enabled(pin,false);
                     break;
         default:
                     xAssert(0);
@@ -57,7 +59,7 @@ void lnDigitalWrite(const lnPin pin, bool value)
 
 bool lnDigitalRead(const lnPin pin)
 {
-
+    return gpio_get(pin);
 }
 /**
     \fn    
@@ -65,7 +67,7 @@ bool lnDigitalRead(const lnPin pin)
 
 void lnDigitalToggle(const lnPin pin)
 {
-
+    gpio_xor_mask( 1<<pin);
 }
 /**
     \fn    
