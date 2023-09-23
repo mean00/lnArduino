@@ -13,7 +13,7 @@ void lnPinMode(const lnPin pin, const lnGpioMode mode)
     {
         case lnUART : 
                     fun = LN_RP_GPIO_CONTROL_FUNC( UART );
-                    lnGpio->PINS[pin].control = fun; // is this enough ?
+                    lnGpio->PINS[pin].control = fun + LN_RP_GPIO_CONTROL_OE(NORMAL); 
                     return; 
         case lnFLOATING : 
                     // 

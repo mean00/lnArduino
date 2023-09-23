@@ -39,8 +39,8 @@ extern "C" {
 
 int main()
 {
- //   lnPinMode( GPIO7, lnUART);
- //   lnPinMode( GPIO6, lnUART);
+    lnPinMode( GPIO17, lnUART);
+    lnPinMode( GPIO16, lnUART);
 
 
     LoggerInit();
