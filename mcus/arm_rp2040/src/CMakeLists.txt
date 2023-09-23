@@ -6,8 +6,11 @@ add_custom_command(
   DEPENDS 
   )
 
-
+SET(RP_LN_SOURCES
+        ln_rp_gpio.cpp
+)
 SET(RP_SDK_SOURCES
+
 ${PICO_SDK_PATH}/src/common/pico_sync/critical_section.c
 ${PICO_SDK_PATH}/src/common/pico_sync/lock_core.c
 ${PICO_SDK_PATH}/src/common/pico_sync/mutex.c
@@ -64,7 +67,7 @@ ${CMAKE_CURRENT_SOURCE_DIR}/rp_irq.cpp
 )
 
 
-add_library(rplib STATIC rp.cpp ${CMAKE_CURRENT_SOURCE_DIR}/../conf/bs2_default_padded_checksummed.S ${RP_SDK_SOURCES})
+add_library(rplib STATIC rp.cpp ${CMAKE_CURRENT_SOURCE_DIR}/../conf/bs2_default_padded_checksummed.S ${RP_LN_SOURCES} ${RP_SDK_SOURCES})
 target_include_directories(rplib PUBLIC 
         ${PICO_SDK_PATH}
         ${PICO_SDK_PATH}/src/boards/include  
@@ -111,5 +114,6 @@ target_include_directories(rplib PUBLIC
             )
 #target_include_directories(rplib PRIVATE  ${CMAKE_CURRENT_SOURCE_DIR}/../include)
 target_include_directories(rplib PUBLIC  ${CMAKE_CURRENT_SOURCE_DIR}/../include)
-target_link_libraries(rplib  PRIVATE lnArduinoInternal )            
+target_include_directories(rplib  PRIVATE ../private_include )
+target_link_libraries(rplib  PRIVATE lnArduinoInternal )
 #target_link_libraries(lnArduino PUBLIC rplib )

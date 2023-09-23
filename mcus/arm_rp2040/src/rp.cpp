@@ -39,9 +39,8 @@ extern "C" {
 
 int main()
 {
-
-    gpio_set_function(GPIO7, GPIO_FUNC_UART); // use GPIO6 (TX) and 7(Rx) for uart
-    gpio_set_function(GPIO6, GPIO_FUNC_UART);
+ //   lnPinMode( GPIO7, lnUART);
+ //   lnPinMode( GPIO6, lnUART);
 
 
     LoggerInit();
