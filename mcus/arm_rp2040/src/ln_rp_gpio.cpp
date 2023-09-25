@@ -1,40 +1,40 @@
+#include "ln_rp_gpio.h"
 #include "lnArduino.h"
 #include "lnGPIO.h"
-#include "ln_rp_gpio.h"
 
 /**
-    \fn    
+    \fn
 */
 void lnPinMode(const lnPin pin, const lnGpioMode mode)
 {
-    uint32_t fun = LN_RP_GPIO_CONTROL_FUNC( SIO );
-    uint32_t pad,control;
-    switch(mode)
+    uint32_t fun = LN_RP_GPIO_CONTROL_FUNC(SIO);
+    uint32_t pad, control;
+    switch (mode)
     {
-        case lnUART : 
-                    fun = LN_RP_GPIO_CONTROL_FUNC( UART );
-                    lnGpio->PINS[pin].control = fun + LN_RP_GPIO_CONTROL_OE(NORMAL); 
-                    return; 
-        case lnFLOATING : 
-                    // 
-                    pad = LN_RP_PADS_OUTPUT_DISABLE; // input disabled by default
-                    control = LN_RP_GPIO_CONTROL_OE_DISABLE;
-                    break;
-        case lnINPUT_PULLUP:
-                    pad = LN_RP_PADS_INPUT_ENABLE +  LN_RP_PADS_OUTPUT_DISABLE + LN_RP_PADS_PULLUP; // 
-                    control =  LN_RP_GPIO_CONTROL_OE_DISABLE ;
-                    break;    
-        case lnINPUT_PULLDOWN :
-                    pad = LN_RP_PADS_INPUT_ENABLE + LN_RP_PADS_OUTPUT_DISABLE + LN_RP_PADS_PULLDOWN; // 
-                    control = LN_RP_GPIO_CONTROL_OE_DISABLE ;
-                    break;
-        case lnOUTPUT:                    
-                    pad =  LN_RP_PADS_DRIVE(12MA);
-                    control =  LN_RP_GPIO_CONTROL_OE(ENABLE) ; // 12 mA
-                    break;
-        default:
-                    xAssert(0);
-                    break;
+    case lnUART:
+        fun = LN_RP_GPIO_CONTROL_FUNC(UART);
+        lnGpio->PINS[pin].control = fun + LN_RP_GPIO_CONTROL_OE(NORMAL);
+        return;
+    case lnFLOATING:
+        //
+        pad = LN_RP_PADS_OUTPUT_DISABLE; // input disabled by default
+        control = LN_RP_GPIO_CONTROL_OE_DISABLE;
+        break;
+    case lnINPUT_PULLUP:
+        pad = LN_RP_PADS_INPUT_ENABLE + LN_RP_PADS_OUTPUT_DISABLE + LN_RP_PADS_PULLUP; //
+        control = LN_RP_GPIO_CONTROL_OE_DISABLE;
+        break;
+    case lnINPUT_PULLDOWN:
+        pad = LN_RP_PADS_INPUT_ENABLE + LN_RP_PADS_OUTPUT_DISABLE + LN_RP_PADS_PULLDOWN; //
+        control = LN_RP_GPIO_CONTROL_OE_DISABLE;
+        break;
+    case lnOUTPUT:
+        pad = LN_RP_PADS_DRIVE(12MA);
+        control = LN_RP_GPIO_CONTROL_OE(ENABLE); // 12 mA
+        break;
+    default:
+        xAssert(0);
+        break;
     }
     lnPads->PADS[pin] = pad;
     lnGpio->PINS[pin].control = fun + control;
@@ -48,34 +48,34 @@ void lnPinMode(const lnPin pin, const lnGpioMode mode)
     */
 }
 /**
-    \fn    
+    \fn
 */
 
 void lnDigitalWrite(const lnPin pin, bool value)
 {
-    if(value)
-        lnSio->GPIO_OUT_SET = 1<<pin;
+    if (value)
+        lnSio->GPIO_OUT_SET = 1 << pin;
     else
-        lnSio->GPIO_OUT_CLR = 1<<pin;
+        lnSio->GPIO_OUT_CLR = 1 << pin;
 }
 /**
-    \fn    
+    \fn
 */
 
 bool lnDigitalRead(const lnPin pin)
 {
-    return !!(lnSio->GPIO_IN & (1<<pin));
+    return !!(lnSio->GPIO_IN & (1 << pin));
 }
 /**
-    \fn    
+    \fn
 */
 
 void lnDigitalToggle(const lnPin pin)
 {
-    lnSio->GPIO_OUT_XOR = 1<<pin;
+    lnSio->GPIO_OUT_XOR = 1 << pin;
 }
 /**
-    \fn    
+    \fn
     //----------------- This is bluepill common specific !-------------
 */
 
@@ -85,18 +85,18 @@ volatile uint32_t *lnGetGpioToggleRegister(int port) // Bop register for port "p
     return NULL;
 }
 /**
-    \fn    
+    \fn
      Direction register for the bit 0..7 of port "port" , A=0, B=1, ...
      //----------------- This is bluepill common specific !-------------
 */
 
-volatile uint32_t *lnGetGpioDirectionRegister(  int port) 
+volatile uint32_t *lnGetGpioDirectionRegister(int port)
 {
     xAssert(0);
     return NULL;
 }
 /**
-    \fn    
+    \fn
     //----------------- This is bluepill common specific !-------------
 */
 
@@ -106,7 +106,7 @@ volatile uint32_t *lnGetGpioValueRegister(int port) // Bit value for LOW bits of
     return NULL;
 }
 /**
-    \fn    
+    \fn
     //----------------- This is bluepill common specific !-------------
 */
 

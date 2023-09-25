@@ -1,11 +1,11 @@
 #include "lnArduino.h"
-#include "stdio.h"
 #include "lnDma.h"
 #include "lnIRQ.h"
+#include "stdio.h"
 
 #include "hardware/gpio.h"
 
-FILE *const stdout=NULL;
+FILE *const stdout = NULL;
 
 extern void setup();
 extern void loop();
@@ -30,42 +30,38 @@ void initTask(void *)
 #define LN_INITIAL_TASK_PRIORITY 2
 uint32_t SystemCoreClock = 100000000;
 
-extern "C" {
-    void xPortSysTickHandler( void );
-    void xPortPendSVHandler( void );    
-    void vPortSVCHandler( void );
+extern "C"
+{
+    void xPortSysTickHandler(void);
+    void xPortPendSVHandler(void);
+    void vPortSVCHandler(void);
 }
-
 
 int main()
 {
-    lnPinMode( GPIO17, lnUART);
-    lnPinMode( GPIO16, lnUART);
-
+    lnPinMode(GPIO17, lnUART);
+    lnPinMode(GPIO16, lnUART);
 
     LoggerInit();
 
     lnSetInterruptHandler(LN_IRQ_SYSTICK, xPortSysTickHandler);
-    lnSetInterruptHandler(LN_IRQ_PENDSV,  xPortPendSVHandler);
-    lnSetInterruptHandler(LN_IRQ_SVCALL,  vPortSVCHandler);
-
+    lnSetInterruptHandler(LN_IRQ_PENDSV, xPortPendSVHandler);
+    lnSetInterruptHandler(LN_IRQ_SVCALL, vPortSVCHandler);
 
     lnCreateTask(initTask, "entryTask", LN_INITIAL_STACK_SIZE, NULL, LN_INITIAL_TASK_PRIORITY);
     vTaskStartScheduler();
-    //lnGetFreeRTOSDebug();
+    // lnGetFreeRTOSDebug();
     deadEnd(25);
 }
 
 extern "C" void deadEnd(int code)
-{    
+{
     __asm__("bkpt #0");
 }
 
 lnDMA::lnDMA(lnDMA::DmaTransferType type, int dmaEngine, int dmaChannel, int sourceWith, int targetWidth)
 {
-
 }
 lnDMA::~lnDMA()
 {
-
 }

@@ -2,25 +2,23 @@
 #include "lnIRQ_arm.h"
 #include "lnSerial.h"
 
-#include "hardware/uart.h"
 #include "hardware/irq.h"
+#include "hardware/uart.h"
 
-struct lnUart_t 
+struct lnUart_t
 {
     uart_inst_t *hw;
-
 };
 
-static const lnUart_t uarts[2]={ { ((uart_inst_t *)uart0_hw)},{ ((uart_inst_t *)uart1_hw)}};
+static const lnUart_t uarts[2] = {{((uart_inst_t *)uart0_hw)}, {((uart_inst_t *)uart1_hw)}};
 
-lnDMA dummyDma(lnDMA::DMA_MEMORY_TO_PERIPH, 0,0,0,0);
-
+lnDMA dummyDma(lnDMA::DMA_MEMORY_TO_PERIPH, 0, 0, 0, 0);
 
 /**
     \fn
     \brief
 */
-lnSerial::lnSerial(int instance, int rxBufferSize ) : _txDma( dummyDma)
+lnSerial::lnSerial(int instance, int rxBufferSize) : _txDma(dummyDma)
 {
     _instance = instance;
     init();
@@ -31,7 +29,7 @@ lnSerial::lnSerial(int instance, int rxBufferSize ) : _txDma( dummyDma)
 */
 bool lnSerial::init()
 {
-    uart_inst_t  *u=uarts[_instance].hw;
+    uart_inst_t *u = uarts[_instance].hw;
     uart_init(u, 115200);
     uart_set_hw_flow(u, false, false);
     uart_set_format(u, 8, 1, UART_PARITY_NONE);
@@ -43,7 +41,7 @@ bool lnSerial::init()
 */
 bool lnSerial::setSpeed(int speed)
 {
-    uart_inst_t  *u=uarts[_instance].hw;
+    uart_inst_t *u = uarts[_instance].hw;
     uart_set_baudrate(u, speed);
     return true;
 }
@@ -61,14 +59,14 @@ bool lnSerial::enableRx(bool enabled)
 */
 bool lnSerial::transmit(int size, const uint8_t *buffer)
 {
-    uart_inst_t  *u=uarts[_instance].hw;
-    for(int i=0;i<size;i++)
+    uart_inst_t *u = uarts[_instance].hw;
+    for (int i = 0; i < size; i++)
     {
-        if(!(uart_is_writable(u)))
+        if (!(uart_is_writable(u)))
         {
             __asm__("nop");
         }
-        uart_get_hw(u)->dr = *buffer++;        
+        uart_get_hw(u)->dr = *buffer++;
     }
     return true;
 }
@@ -78,7 +76,7 @@ bool lnSerial::transmit(int size, const uint8_t *buffer)
 */
 bool lnSerial::dmaTransmit(int size, const uint8_t *buffer)
 {
-    return transmit(size,buffer);
+    return transmit(size, buffer);
 }
 /**
     \fn
@@ -86,7 +84,6 @@ bool lnSerial::dmaTransmit(int size, const uint8_t *buffer)
 */
 void lnSerial::disableInterrupt()
 {
-
 }
 /**
     \fn
@@ -101,7 +98,6 @@ void lnSerial::enableInterrupt(bool txInterruptEnabled)
 */
 void lnSerial::purgeRx()
 {
-
 }
 /**
     \fn
@@ -109,7 +105,6 @@ void lnSerial::purgeRx()
 */
 void lnSerial::_interrupt(void)
 {
-    
 }
 /**
     \fn
@@ -155,7 +150,6 @@ void lnSerial::txInterruptHandler(void)
 */
 void lnSerial::rxInterruptHandler(void)
 {
-    
 }
 /**
     \fn
@@ -185,9 +179,8 @@ void lnSerial::txDmaCb()
     \fn
     \brief
 */
- void lnSerial::_dmaCallback(void *c, lnDMA::DmaInterruptType it)
+void lnSerial::_dmaCallback(void *c, lnDMA::DmaInterruptType it)
 {
-
 }
 /**
     \fn
@@ -195,6 +188,5 @@ void lnSerial::txDmaCb()
 */
 void lnSerial::interrupts(int instance)
 {
-
 }
 // EOF
