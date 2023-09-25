@@ -1,12 +1,10 @@
 #include "lnArduino.h"
-#include "pico/stdlib.h"
-#include "hardware/gpio.h"
 
 #define LED LN_SYSTEM_LED
 
 void setup()
 {
-   lnPinMode(LED, lnOUTPUT);
+    lnPinMode(LED, lnOUTPUT);
 }
 /**
  *
