@@ -15,7 +15,7 @@ MACRO(GENERATE_GD32_FIRMWARE target)
 
     ADD_EXECUTABLE(${target}  ${AF_FOLDER}/riscv_gd32fx/start.S ${ARGN})
     TARGET_LINK_LIBRARIES(${target} ${USED_LIBS} ) # duplicates are NOT a mistake !
-    TARGET_LINK_LIBRARIES(${target} embeddedPrintf gd32_overlay gd32Arduino   FreeRTOS  gd32_lowlevel c  c gcc ) # dupicates are NOT a mistake !
+    TARGET_LINK_LIBRARIES(${target} embeddedPrintf lnArduino_impl FreeRTOS   c gcc ) # dupicates are NOT a mistake !
     TARGET_LINK_OPTIONS(${target}  PRIVATE "-T${CMAKE_BINARY_DIR}/linker_script.lds" )
 
     add_custom_command(TARGET ${target}

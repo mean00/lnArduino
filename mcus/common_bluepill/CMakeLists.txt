@@ -51,14 +51,16 @@ IF(LN_ENABLE_SPI)
   LN_APPEND_FLAGS( ${LN_MCU_FOLDER}/lnIRQ_${LN_EXT}.cpp -DLN_ENABLE_SPI)
 ENDIF(LN_ENABLE_SPI)
 
-ADD_LIBRARY(gd32_overlay STATIC  ${OVERLAY_SRCS} )
-TARGET_LINK_LIBRARIES(gd32_overlay  lnArduinoInternal)
-TARGET_INCLUDE_DIRECTORIES(gd32_overlay PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+SET(OVERLAY_SRCS ${OVERLAY_SRCS} lnStubs.cpp )
+
+ADD_LIBRARY(lnArduino_impl STATIC  ${OVERLAY_SRCS} )
+TARGET_LINK_LIBRARIES(lnArduino_impl  lnArduinoInternal)
+TARGET_INCLUDE_DIRECTORIES(lnArduino_impl PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 MACRO(ALTER nm text)
   IF(${nm})
     MESSAGE(STATUS "Altering ${text} to ${${nm}}")
-    TARGET_COMPILE_DEFINITIONS(gd32_overlay PRIVATE ${nm}=${${nm}})
+    TARGET_COMPILE_DEFINITIONS(lnArduino_impl PRIVATE ${nm}=${${nm}})
   ENDIF()
 ENDMACRO()
 
@@ -66,23 +68,15 @@ ALTER(LN_INITIAL_STACK_SIZE "initial stack size")
 ALTER(LN_INITIAL_TASK_PRIORITY "initial task priority")
 
 
-
-
-
-#ADD_LIBRARY(gd32_lowlevel STATIC  systemHelper.cpp lnStubs.cpp)
-ADD_LIBRARY(gd32_lowlevel STATIC   lnStubs.cpp)
-
-TARGET_LINK_LIBRARIES(gd32_lowlevel  lnArduinoInternal)
-target_include_directories(gd32_lowlevel PRIVATE arduinoLayer/include include FreeRTOS/include . ${LN_MCU_FOLDER}/boards private_include ${LN_MCU_FOLDER}/include)
-
-TARGET_COMPILE_DEFINITIONS(gd32_overlay PRIVATE LN_MCU_SPEED=${LN_MCU_SPEED})
+TARGET_COMPILE_DEFINITIONS(lnArduino_impl PRIVATE LN_MCU_SPEED=${LN_MCU_SPEED})
+TARGET_INCLUDE_DIRECTORIES(lnArduino_impl PRIVATE arduinoLayer/include include FreeRTOS/include . ${LN_MCU_FOLDER}/boards private_include ${LN_MCU_FOLDER}/include)
 IF(LN_USE_INTERNAL_CLOCK)                                     
-        TARGET_COMPILE_DEFINITIONS(gd32_overlay PRIVATE LN_USE_INTERNAL_CLOCK)
+        TARGET_COMPILE_DEFINITIONS(lnArduino_impl PRIVATE LN_USE_INTERNAL_CLOCK)
 ENDIF(LN_USE_INTERNAL_CLOCK)                                     
 
 If(LN_DEBUG_UART)
   MESSAGE(STATUS "Using uart ${LN_DEBUG_UART} for debug")
-  TARGET_COMPILE_DEFINITIONS(gd32_overlay PRIVATE LN_DEBUG_UART=${LN_DEBUG_UART})
+  TARGET_COMPILE_DEFINITIONS(lnArduino_impl PRIVATE LN_DEBUG_UART=${LN_DEBUG_UART})
 ENDIF()
 
 #
@@ -94,10 +88,9 @@ IF(LN_ENABLE_USBD)
   ELSE()    
     SET(IMPL lnUSBD.cpp CACHE INTERNAL "")
   ENDIF()
-  ADD_LIBRARY(gd32_usb_usbd STATIC  ${IMPL} )
-  TARGET_LINK_LIBRARIES(gd32_usb_usbd  lnArduinoInternal)                                
+  target_sources(lnArduino_impl PRIVATE ${IMPL})
   SET(TUSB ${CMAKE_CURRENT_SOURCE_DIR}/../libraries/tinyUsb/src CACHE INTERNAL "")
-  target_include_directories( gd32_usb_usbd  PRIVATE ${TUSB}/common ${TUSB} ${TUSB}/..)
+  target_include_directories( lnArduino_impl  PRIVATE ${TUSB}/common ${TUSB} ${TUSB}/..)
 ENDIF(LN_ENABLE_USBD)
 
 
