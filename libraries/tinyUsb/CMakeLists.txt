@@ -66,6 +66,7 @@ ELSE()
             SET(DRIVERS             ${LNSRC}/lnTinyUsbImpl.cpp        ${LNSRC}/lnUsbStack.cpp ${LNSRC}/lnUsbLL.cpp)
             SET(LN_OPT_TUSB_MCU     OPT_MCU_STM32F1)
             SET(LN_OPT_MODE         OPT_MODE_FULL_SPEED)  
+            
         ENDIF()
     ENDIF()
 ENDIF()
@@ -116,5 +117,8 @@ target_include_directories(tinyUsb PUBLIC ${TUSB}/device)
 target_include_directories(tinyUsb PUBLIC ${TUSB}/class/device/cdc)
 target_include_directories(tinyUsb PUBLIC ${TUSB}/class/device/dfu)
 
+IF("${LN_OPT_TUSB_MCU}" STREQUAL    "OPT_MCU_STM32F1")
+        target_compile_definitions(tinyUsb PUBLIC STM32F103xB )
+ENDIF()
 
 target_link_libraries(tinyUsb lnArduinoInternal)

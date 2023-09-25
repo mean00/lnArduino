@@ -14,3 +14,9 @@ add_library(lnarduino_c_bindings STATIC ${C}/lnI2C_c.cpp
                                         ${C}/lnFast_EventGroup_c.cpp
                                         ${USB} )
 target_link_libraries(lnarduino_c_bindings lnArduinoInternal)
+
+IF(LN_ENABLE_USBD)
+    target_link_libraries(lnarduino_c_bindings tinyUsb)
+ENDIF()
+
+
