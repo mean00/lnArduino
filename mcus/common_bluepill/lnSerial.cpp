@@ -142,19 +142,19 @@ void lnSerial::purgeRx()
     RE_ENABLE_INTERRUPT();
 }
 /**
-*/
+ */
 void lnSerial::rawWrite(const char *c)
 {
     LN_USART_Registers *d = (LN_USART_Registers *)_adr;
-    while(*c)
+    while (*c)
     {
-        const char a=*c++;
+        const char a = *c++;
         volatile uint32_t stat = d->STAT;
         while (!(stat & (LN_USART_STAT_TBE)))
-        {            
+        {
             stat = d->STAT;
         }
-        d->DATA =a;
+        d->DATA = a;
     }
 }
 

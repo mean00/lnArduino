@@ -98,12 +98,12 @@ int main()
     // Start freertos
 
 #ifndef LN_INITIAL_TASK_PRIORITY
-  #define LN_INITIAL_TASK_PRIORITY 2    // 
-#endif                                        // 
+#define LN_INITIAL_TASK_PRIORITY 2 //
+#endif                             //
 
 #ifndef LN_INITIAL_STACK_SIZE
-  #define LN_INITIAL_STACK_SIZE 1024    // 
-#endif                                        // 
+#define LN_INITIAL_STACK_SIZE 1024 //
+#endif                             //
     lnCreateTask(initTask, "entryTask", LN_INITIAL_STACK_SIZE, NULL, LN_INITIAL_TASK_PRIORITY);
     vTaskStartScheduler();
     lnGetFreeRTOSDebug();
