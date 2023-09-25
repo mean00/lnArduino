@@ -4,6 +4,8 @@
 SET(TUSB ${CMAKE_CURRENT_SOURCE_DIR}/src/src)
 SET(LNSRC ${CMAKE_CURRENT_SOURCE_DIR}/lnSrc)
 
+
+
 IF(NOT DEFINED LN_USB_NB_CDC)
     MESSAGE(FATAL_ERROR "SET LN_USB_NB_CDC to the number of CDC interface you use")
 ENDIF(NOT DEFINED LN_USB_NB_CDC)
@@ -25,7 +27,8 @@ ELSE()
 ENDIF()
 
 
-SET(CH32V3x_FOLDER      ${CMAKE_CURRENT_SOURCE_DIR}/ch32v3x/)
+SET(CH32V3x_FOLDER ${CMAKE_CURRENT_SOURCE_DIR}/ch32v3x/)
+SET(RP2040_FOLDER  ${CMAKE_CURRENT_SOURCE_DIR}/rp2040/)
 
 IF( USE_CH32v3x_USB_HS ) # ${LN_MCU} STREQUAL "CH32V3x") 
     SET(DRIVERS             ${CH32V3x_FOLDER}/dcd_usbhs.cpp       ${LNSRC}/lnUsbStack.cpp  ${LNSRC}/lnUsbStubs.cpp)
@@ -49,9 +52,15 @@ ELSE()
             ADD_DEFINITIONS(-DCFG_TUD_MAX_SPEED=OPT_MODE_HIGH_SPEED -DLN_USB_SPEED=TUSB_SPEED_HIGH -DTUD_OPT_HIGH_SPEED=1)        
         ENDIF()
     ELSE()
-        SET(DRIVERS             ${LNSRC}/lnTinyUsbImpl.cpp          ${LNSRC}/lnUsbStack.cpp ${LNSRC}/lnUsbLL.cpp)
-        SET(LN_OPT_TUSB_MCU     OPT_MCU_STM32F1)
-        SET(LN_OPT_MODE         OPT_MODE_FULL_SPEED)  
+        IF(USE_RP2040)
+            SET(DRIVERS             ${RP2040_FOLDER}/rp2040_usb.cpp)
+            SET(LN_OPT_TUSB_MCU     OPT_MCU_RP2040)
+            SET(LN_OPT_MODE         OPT_MODE_FULL_SPEED)  
+        ELSE()        
+            SET(DRIVERS             ${LNSRC}/lnTinyUsbImpl.cpp          ${LNSRC}/lnUsbStack.cpp ${LNSRC}/lnUsbLL.cpp)
+            SET(LN_OPT_TUSB_MCU     OPT_MCU_STM32F1)
+            SET(LN_OPT_MODE         OPT_MODE_FULL_SPEED)  
+        ENDIF()
     ENDIF()
 ENDIF()
 
