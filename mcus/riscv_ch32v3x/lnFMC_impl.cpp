@@ -136,7 +136,7 @@ bool lnFMC::erase(const uint32_t startAddress, int sizeInKBytes)
     xAssert(adr > 8 * 1024);
     // check the start address is 1 kB aligned
     xAssert(!(adr & ((1 << 10) - 1)));
-    adr+=0x08000000; // some leftover from older chip it seems
+    adr += 0x08000000; // some leftover from older chip it seems
     autoNoInterrupt noInt;
     CH32_fastUnlock();
     // Erase each page
