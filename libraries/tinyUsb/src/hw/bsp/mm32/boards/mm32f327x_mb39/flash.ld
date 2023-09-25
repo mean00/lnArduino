@@ -1,4 +1,4 @@
-/* 
+/*
  * The MIT License (MIT)
  *
  * Copyright (c) 2020 MM32 SE TEAM
@@ -110,7 +110,7 @@ SECTIONS
   _sidata = LOADADDR(.data);
 
   /* Initialized data sections goes into RAM, load LMA copy after code */
-  .data : 
+  .data :
   {
     . = ALIGN(4);
     _sdata = .;        /* create a global symbol at data start */
@@ -121,12 +121,12 @@ SECTIONS
     _edata = .;        /* define a global symbol at data end */
   } >RAM AT> FLASH
 
-  
+
   /* Uninitialized data section */
   . = ALIGN(4);
   .bss :
   {
-    /* This is used by the startup in order to initialize the .bss secion */
+    /* This is used by the startup in order to initialize the .bss section */
     _sbss = .;         /* define a global symbol at bss start */
     __bss_start__ = _sbss;
     *(.bss)
@@ -149,7 +149,7 @@ SECTIONS
     . = ALIGN(8);
   } >RAM
 
-  
+
 
   /* Remove information from the standard libraries */
   /DISCARD/ :
