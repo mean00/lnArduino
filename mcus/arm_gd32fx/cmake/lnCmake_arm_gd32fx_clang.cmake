@@ -3,7 +3,7 @@ MACRO(GENERATE_GD32_FIRMWARE target)
 
   
     configure_file( "${LN_MCU_FOLDER}/boards/bluepill/clang.lld.in" "${CMAKE_BINARY_DIR}/linker_script.ld" @ONLY)
-    ADD_EXECUTABLE(${target} ${ARGN}  ${LN_MCU_FOLDER}/start.S   ${LN_MCU_FOLDER}/start.cpp      ${LN_MCU_FOLDER}/vector_table.S) 
+    ADD_EXECUTABLE(${target} ${ARGN}  ${LN_MCU_FOLDER}/src/start.S   ${LN_MCU_FOLDER}/src/start.cpp      ${LN_MCU_FOLDER}/src/vector_table.S) 
     TARGET_LINK_LIBRARIES(${target} ${USED_LIBS} lnArduino) # duplicates are NOT a mistake !
     # duplicates are NOT a mistake !
     TARGET_LINK_LIBRARIES(${target}  embeddedPrintf lnArduino_impl FreeRTOS  c ) 

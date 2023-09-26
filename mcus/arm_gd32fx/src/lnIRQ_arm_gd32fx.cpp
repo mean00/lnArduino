@@ -269,7 +269,7 @@ extern "C"
  *
  * @param code
  */
- extern "C" void Logger_crash(const char *st);
+extern "C" void Logger_crash(const char *st);
 extern "C" void deadEnd(int code)
 {
     static int lastErrorCode;

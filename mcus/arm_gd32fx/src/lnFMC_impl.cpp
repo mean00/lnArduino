@@ -225,7 +225,8 @@ bool lnFMC::write(const uint32_t startAddress, const uint8_t *data, int sizeInBy
         uint16_t data16 = (data[0] << 8) + previous[0];
         // write it
         aFMC->CTL |= LN_FMC_CTL_PG;
-        __asm__("nop");__asm__("nop");
+        __asm__("nop");
+        __asm__("nop");
         *(uint16_t *)previous = (uint32_t)data16;
         waitNotBusy();
         if (!checkWriting())
@@ -242,7 +243,8 @@ bool lnFMC::write(const uint32_t startAddress, const uint8_t *data, int sizeInBy
     {
         uint16_t data16 = (data[0]) + (data[1] << 8);
         aFMC->CTL |= LN_FMC_CTL_PG;
-        __asm__("nop");__asm__("nop");
+        __asm__("nop");
+        __asm__("nop");
         *adr16 = data16;
         waitNotBusy();
         if (!checkWriting())
@@ -259,7 +261,8 @@ bool lnFMC::write(const uint32_t startAddress, const uint8_t *data, int sizeInBy
         uint16_t data16 = (data[0]) + (0xff << 8); // we let the other byte as is
         // write it
         aFMC->CTL |= LN_FMC_CTL_PG;
-        __asm__("nop");__asm__("nop");
+        __asm__("nop");
+        __asm__("nop");
         *(uint16_t *)next = (uint32_t)data16;
         waitNotBusy();
         if (!checkWriting())
