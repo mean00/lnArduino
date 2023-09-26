@@ -1,7 +1,9 @@
-add_subdirectory(../../common_bluepill common_bp)
 SET(S ${CMAKE_CURRENT_SOURCE_DIR})
-target_include_directories(lnArduino_impl PRIVATE ${S})
+
+add_subdirectory(../../common_bluepill common_bp)
+
 target_include_directories(lnArduino_impl PRIVATE ${S} ${S}/../include)
+
 target_sources( lnArduino_impl PRIVATE
     ${S}/lnCpuID_riscv_ch32v3x.cpp  
     ${S}/lnFMC_impl.cpp  
