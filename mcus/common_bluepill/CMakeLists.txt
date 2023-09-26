@@ -23,16 +23,6 @@ SET(OVERLAY_SRCS
                        CACHE INTERNAL ""
                     )
 
-IF(LN_ENABLE_I2C)
-  LIST(APPEND OVERLAY_SRCS lnI2C.cpp lnI2C_impl.cpp  )
-  LN_APPEND_FLAGS( ${LN_MCU_FOLDER}/lnIRQ_${LN_EXT}.cpp -DLN_ENABLE_I2C)
-ENDIF(LN_ENABLE_I2C)
-
-IF(LN_ENABLE_SPI)
-  LIST(APPEND OVERLAY_SRCS lnSPI.cpp lnSPI_dma.cpp  )
-  LN_APPEND_FLAGS( ${LN_MCU_FOLDER}/lnIRQ_${LN_EXT}.cpp -DLN_ENABLE_SPI)
-ENDIF(LN_ENABLE_SPI)
-
 
 
 ADD_LIBRARY(lnArduino_impl STATIC  ${OVERLAY_SRCS} )
@@ -60,6 +50,18 @@ If(LN_DEBUG_UART)
   MESSAGE(STATUS "Using uart ${LN_DEBUG_UART} for debug")
   TARGET_COMPILE_DEFINITIONS(lnArduino_impl PRIVATE LN_DEBUG_UART=${LN_DEBUG_UART})
 ENDIF()
+
+#
+
+
+IF(LN_ENABLE_I2C)
+  target_sources(lnArduino_impl PRIVATE lnI2C.cpp lnI2C_impl.cpp  )  
+ENDIF(LN_ENABLE_I2C)
+
+IF(LN_ENABLE_SPI)
+  target_sources(lnArduino_impl PRIVATE lnSPI.cpp lnSPI_dma.cpp  )
+ENDIF(LN_ENABLE_SPI)
+
 
 #
 #

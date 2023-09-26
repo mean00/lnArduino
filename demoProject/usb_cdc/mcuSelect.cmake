@@ -1,4 +1,4 @@
-IF(1) # ARM
+IF(0) # ARM
     IF(1)
         SET(LN_ARCH            "ARM" CACHE INTERNAL "")
         SET(LN_MCU             "M3"  CACHE INTERNAL "")
