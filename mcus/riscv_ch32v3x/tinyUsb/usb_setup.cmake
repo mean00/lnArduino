@@ -1,0 +1,13 @@
+SET(CH32V3x_FOLDER ${LN_MCU_FOLDER}/tinyUsb/)
+#SET(LN_OPT_MODE         OPT_MODE_HIGH_SPEED)
+#ADD_DEFINITIONS(-DCFG_TUD_MAX_SPEED=OPT_MODE_HIGH_SPEED -DLN_USB_SPEED=TUSB_SPEED_HIGH -DTUD_OPT_HIGH_SPEED=1)        
+SET(LN_OPT_MODE         OPT_MODE_FULL_SPEED)
+SET(LN_OPT_TUSB_MCU     OPT_MCU_CH32V307)
+INCLUDE_DIRECTORIES(    ${CH32V3x_FOLDER}  )
+
+IF( USE_CH32v3x_USB_HS ) 
+    SET(DRIVERS             ${CH32V3x_FOLDER}/dcd_usbhs.cpp       ${LNSRC}/lnUsbStack.cpp  ${LNSRC}/lnUsbStubs.cpp)
+ELSE( )
+    SET(DRIVERS             ${CH32V3x_FOLDER}/dcd_usbfs.c  ${CH32V3x_FOLDER}/dcd_usbfs_platform.cpp     ${LNSRC}/lnUsbStack.cpp  ${LNSRC}/lnUsbStubs.cpp)
+ENDIF()        
+
