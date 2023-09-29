@@ -18,11 +18,18 @@ IF(LN_ENABLE_USBD)
         target_sources( lnArduino_impl PRIVATE ${S}/lnUSBD_ch32v3x.cpp)
 ENDIF()
 
-
 IF(LN_ENABLE_I2C)
-  LN_APPEND_FLAGS( ${S}/lnIRQ_riscv_ch32v3x.cpp -DLN_ENABLE_I2C)
-ENDIF(LN_ENABLE_I2C)
+  target_compile_definitions(lnArduino_impl PRIVATE LN_ENABLE_I2C )
+ENDIF()
 
-IF(LN_ENABLE_SPI)  
-  LN_APPEND_FLAGS(  ${S}/lnIRQ_riscv_ch32v3x.cpp -DLN_ENABLE_SPI)
-ENDIF(LN_ENABLE_SPI)
+IF(LN_ENABLE_SPI)
+  target_compile_definitions(lnArduino_impl PRIVATE LN_ENABLE_SPI )
+ENDIF()
+
+#IF(LN_ENABLE_I2C)
+#  LN_APPEND_FLAGS( ${S}/lnIRQ_riscv_ch32v3x.cpp -DLN_ENABLE_I2C)
+#ENDIF(LN_ENABLE_I2C)
+
+#IF(LN_ENABLE_SPI)  
+#  LN_APPEND_FLAGS(  ${S}/lnIRQ_riscv_ch32v3x.cpp -DLN_ENABLE_SPI)
+#ENDIF(LN_ENABLE_SPI)
