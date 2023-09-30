@@ -7,16 +7,23 @@
 #include "lnUSBD.h"
 #include "lnUSBD_priv.h"
 
+lnUsbDevice *_usbInstance = NULL;
+
 
 /**
  */
 lnUsbDevice::lnUsbDevice(int port)
 {
+   xAssert(port == 0);
+    _handler = NULL;
+    _usbInstance = this;    
 }
 /**
  */
 lnUsbDevice::~lnUsbDevice()
 {
+    _usbInstance = NULL;
+
 }
 /**
  */
@@ -44,7 +51,7 @@ bool lnUsbDevice::irqEnabled(bool onoff)
  */
 bool lnUsbDevice::registerEventHandler(const lnUsbEventHandler *h)
 {
-   
+    _handler = h;
     return true;
 }
 
