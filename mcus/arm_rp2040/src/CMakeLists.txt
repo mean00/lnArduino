@@ -61,10 +61,7 @@ ${PICO_SDK_PATH}/src/rp2_common/pico_standard_link/crt0.S
 
 ${CMAKE_CURRENT_SOURCE_DIR}/rp_serial.cpp
 ${CMAKE_CURRENT_SOURCE_DIR}/rp_irq.cpp
-
-
 )
-
 
 add_library(rplib STATIC rp.cpp ${CMAKE_CURRENT_SOURCE_DIR}/../conf/bs2_default_padded_checksummed.S ${RP_LN_SOURCES} ${RP_SDK_SOURCES})
 target_include_directories(rplib PUBLIC 
@@ -107,22 +104,8 @@ target_include_directories(rplib PUBLIC
         ${PICO_SDK_PATH}/src/rp2_common/pico_stdio/include  
         ${PICO_SDK_PATH}/src/rp2_common/pico_stdio_uart/include  
         ${PICO_SDK_PATH}/src/rp2_common/boot_stage2/asminclude
-
-        
-
-            )
-#target_include_directories(rplib PRIVATE  ${CMAKE_CURRENT_SOURCE_DIR}/../include)
+  )
 target_include_directories(rplib PUBLIC  ${CMAKE_CURRENT_SOURCE_DIR}/../include)
 target_include_directories(rplib  PRIVATE ../private_include )
 target_link_libraries(rplib  PRIVATE lnArduinoInternal )
-#target_link_libraries(lnArduino PUBLIC rplib )
 
-
-IF(LN_ENABLE_USBD)
-  SET(IMPL rp_usb.cpp CACHE INTERNAL "")
-  ADD_LIBRARY(gd32_usb_usbd STATIC  ${IMPL} )
-  SET(TUSB ${CMAKE_CURRENT_SOURCE_DIR}/../libraries/tinyUsb/src CACHE INTERNAL "")
-
-  TARGET_LINK_LIBRARIES(gd32_usb_usbd  PRIVATE lnArduinoInternal)  
-  target_include_directories( gd32_usb_usbd  PRIVATE ${TUSB}/common ${TUSB} ${TUSB}/..)
-ENDIF(LN_ENABLE_USBD)

@@ -76,6 +76,6 @@ target_include_directories(tinyUsb PUBLIC ${TUSB}/class/device/dfu)
 
 target_link_libraries(tinyUsb lnArduinoInternal)
 
-if ("${LN_OPT_TUSB_MCU}" STREQUAL "OPT_MCU_STM32F1")
-    target_compile_definitions(tinyUsb PUBLIC STM32F103xB=1)
-endif()
+
+target_compile_definitions(tinyUsb PUBLIC  "${LN_TUSB_EXTRA_DEF}")
+target_include_directories(tinyUsb PRIVATE "${LN_TUSB_EXTRA_IDIR}")
