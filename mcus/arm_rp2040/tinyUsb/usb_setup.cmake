@@ -5,6 +5,27 @@ SET(DRIVERS             ${RP2040_FOLDER}/rp2040_usb.cpp  ${RP2040_FOLDER}/lnUSBD
 SET(LN_OPT_TUSB_MCU     OPT_MCU_RP2040)
 SET(LN_OPT_MODE         OPT_MODE_FULL_SPEED)  
 
-SET(LN_TUSB_EXTRA_IDIR  /pico/pico-sdk/src/host/hardware_uart/include/hardware/uart.h
-/pico/pico-sdk/src/rp2_common/hardware_uart/include/ /pico/pico-sdk/src/rp2_common/hardware_gpio/include/ /pico/pico-sdk/src/common/pico_time/include/ /pico/pico-sdk/src/rp2_common/pico_stdio/include/ /pico/pico-sdk/src/rp2_common/pico_platform/include/ /pico/pico-sdk/ /pico/pico-sdk/src/common/pico_base/include/ /pico/pico-sdk/src/rp2_common/hardware_timer/include/ /pico/pico-sdk/src/rp2_common/hardware_resets/include/ /pico/pico-sdk/src/rp2_common/hardware_irq/include/ /pico/pico-sdk/src/common/pico_stdlib/include/pico/ ${PICO_SDK_PATH}/src/boards/include/boards/  ${PICO_SDK_PATH}/src/rp2040/hardware_structs/include/ ${PICO_SDK_PATH}/src/rp2_common/hardware_base/include/ ${PICO_SDK_PATH}/src/rp2040/hardware_regs/include)
-SET(LN_TUSB_EXTRA_DEF   "__force_inline=__always_inline")
+FOREACH( subdir 
+                    src/host/hardware_uart/include/hardware/
+                    src/rp2_common/hardware_uart/include/ 
+                    src/rp2_common/hardware_gpio/include/ 
+                    src/common/pico_time/include/
+                    src/rp2_common/pico_stdio/include/ 
+                    src/rp2_common/pico_platform/include/ 
+                    / 
+                    src/common/pico_base/include/ 
+                    src/rp2_common/hardware_timer/include/ 
+                    src/rp2_common/hardware_resets/include/ 
+                    src/rp2_common/hardware_irq/include/ 
+                    src/common/pico_stdlib/include/pico/
+                    src/boards/include/boards/  
+                    src/rp2040/hardware_structs/include/ 
+                    src/rp2_common/hardware_base/include/ 
+                    src/rp2040/hardware_regs/include
+        )
+        LIST(APPEND idir  ${PICO_SDK_PATH}/${subdir})
+
+ENDFOREACH()        
+
+SET(LN_TUSB_EXTRA_IDIR ${idir} )
+#SET(LN_TUSB_EXTRA_DEF   "__force_inline=__always_inline")
