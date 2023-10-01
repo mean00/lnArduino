@@ -1,7 +1,7 @@
 SET(RP2040_FOLDER       ${LN_MCU_FOLDER}/tinyUsb/)
 SET(PICO_USB_FOLDER     ${PICO_SDK_PATH}/lib/tinyusb/src/portable/raspberrypi/rp2040/)
 
-SET(DRIVERS             ${RP2040_FOLDER}/rp2040_usb.cpp  ${RP2040_FOLDER}/lnUSBD_rp2040.cpp   ${LNSRC}/lnUsbStack.cpp ${LNSRC}/lnUsbStubs.cpp  ${PICO_USB_FOLDER}/dcd_rp2040.c ${PICO_USB_FOLDER}/rp2040_usb.c)
+SET(DRIVERS             ${LNSRC}/lnUsbStack.cpp ${RP2040_FOLDER}/rp2040_usb.cpp  ${RP2040_FOLDER}/lnUSBD_rp2040.cpp   ${PICO_USB_FOLDER}/dcd_rp2040.c ${PICO_USB_FOLDER}/rp2040_usb.c)
 SET(LN_OPT_TUSB_MCU     OPT_MCU_RP2040)
 SET(LN_OPT_MODE         OPT_MODE_FULL_SPEED)  
 
@@ -23,3 +23,5 @@ FOREACH( subdir
 ENDFOREACH()        
 
 SET(LN_TUSB_EXTRA_IDIR ${idir} )
+
+#  ${LNSRC}/lnUsbStubs.cpp   
