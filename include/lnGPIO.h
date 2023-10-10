@@ -71,5 +71,8 @@ class lnFastIO
     uint32_t _onbit, _offbit;
 };
 
+#define LN_GPIO_OUTPUT_OD_HIZ 1
+#define LN_GPIO_OUTPUT_OD_GND 0
+
 #include "lnExti.h"
 // EOF
