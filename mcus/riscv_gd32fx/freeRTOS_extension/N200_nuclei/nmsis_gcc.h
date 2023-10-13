@@ -263,7 +263,7 @@ extern "C"
  */
 #define _FLD2VAL(field, value) (((uint32_t)(value)&field##_Msk) >> field##_Pos)
 
-        /** @} */ /* end of group NMSIS_Core_PeriphAccess */
+    /** @} */ /* end of group NMSIS_Core_PeriphAccess */
 
 #ifdef __cplusplus
 }

@@ -165,8 +165,8 @@ void lnPeripherals::disable(const Peripherals periph)
     _rcuAction(periph, RCU_DISABLE);
 }
 /**
- * @brief 
- * 
+ * @brief
+ *
  */
 extern uint32_t _rcuClockApb1;
 void lnPeripherals::enableUsb48Mhz()
@@ -175,34 +175,33 @@ void lnPeripherals::enableUsb48Mhz()
     if (usb48M)
         return;
     usb48M = true;
-// This is a not well coded
-// In short, the GD32F303 has a internal 48M RC oscillator we can
-// use to drive USB
-// We assume that if we are running a GD32 chip it is a GD32F303    
+    // This is a not well coded
+    // In short, the GD32F303 has a internal 48M RC oscillator we can
+    // use to drive USB
+    // We assume that if we are running a GD32 chip it is a GD32F303
 
 #if defined(LN_USE_INTERNAL_CLOCK)
-    volatile uint32_t *addctl = (volatile uint32_t *)(LN_RCU_ADR+ 0xc0);
+    volatile uint32_t *addctl = (volatile uint32_t *)(LN_RCU_ADR + 0xc0);
     switch (lnCpuID::vendor())
     {
     case lnCpuID::LN_MCU_GD32:
-            // activate 48M  internal RC            
-            *addctl |= LN_GD_RCU_ADDCTL_IRC48M_EN; // enable 48M
-            while(1)
+        // activate 48M  internal RC
+        *addctl |= LN_GD_RCU_ADDCTL_IRC48M_EN; // enable 48M
+        while (1)
+        {
+            if (*addctl & LN_GD_RCU_ADDCTL_IRC48M_STB) // clock stabilized
             {
-                if(*addctl & LN_GD_RCU_ADDCTL_IRC48M_STB)  // clock stabilized
-                {
-                    break;
-                }
+                break;
             }
-            // Use IRC48M as usb source
-            *addctl |= LN_GD_RCU_ADDCTL_IRC48M_SEL;
-            return;
-            break;
+        }
+        // Use IRC48M as usb source
+        *addctl |= LN_GD_RCU_ADDCTL_IRC48M_SEL;
+        return;
+        break;
     default:
-            break;
+        break;
     }
 #endif
-
 
     // careful, the usb clock must be off !
     int scaler = (2 * lnPeripherals::getClock(pSYSCLOCK)) / 48000000;
