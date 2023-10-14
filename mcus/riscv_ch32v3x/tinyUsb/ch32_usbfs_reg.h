@@ -1,4 +1,4 @@
-
+#include "stdint.h"
 #define USBOTG_BASE 0x50000000
 
 typedef struct
