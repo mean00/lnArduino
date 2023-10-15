@@ -113,3 +113,12 @@ typedef volatile LN_RCUx LN_RCU;
 #define LN_RCU_CFG1_PLL1_MUL(x) ((x) << 8)
 #define LN_RCU_CFG1_PREDV1_DIV(x) ((x) << 4)
 #define LN_RCU_CFG1_PREDV0_DIV(x) ((x) << 0)
+
+// This is Gigadevice specific, at least on GD32F303
+// It drives the internal 48Mhz clock that can be used
+// to drive USB in crystal less setup
+#define LN_GD_RCU_ADDCTL_IRC48M_EN (1 << 16)
+#define LN_GD_RCU_ADDCTL_IRC48M_STB (1 << 17)
+#define LN_GD_RCU_ADDCTL_IRC48M_SEL (1 << 0)
+
+// EOF

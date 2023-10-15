@@ -93,7 +93,10 @@ static const int Multipliers[] = {
     6, 7, 8, 9, // 8 9 10 11
     // the ones below dont work on stm32 !
     10, 11, 12, 12, // 12 13 14 15
-    14, 16, 17, 18  // 16 17 18 19
+    14, 16, 17, 18, // 16 17 18 19
+    // Needed for internal clock
+    19, 20, 21, 22, 23, // 20 21 22 23 24 96Mhz
+
 };
 /**
  *
@@ -109,6 +112,10 @@ void setPll(int inputClock, int multiplier, int predivider, bool external)
 
     uint32_t c0 = *cfg0;
     *cfg1 = 0;
+    if (multiplier > sizeof(Multipliers) / sizeof(int))
+    {
+        xAssert(0);
+    }
     int pllMultiplier = Multipliers[multiplier];
 
     SystemCoreClock = (inputClock * multiplier * 1000000) / predivider;

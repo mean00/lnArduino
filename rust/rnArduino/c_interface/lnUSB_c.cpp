@@ -69,7 +69,7 @@ void lnusb_setConfiguration(lnusb_c *inst)
 }
 /**
  */
-void lnusb_setEventHandler(lnusb_c *inst, const void *cookie,  lnUsbStackEventHandler *const ev)
+void lnusb_setEventHandler(lnusb_c *inst, const void *cookie, lnUsbStackEventHandler *const ev)
 {
     lnUsbStack::lnUsbStackEventHandler *ev_c = (lnUsbStack::lnUsbStackEventHandler *)ev;
 
