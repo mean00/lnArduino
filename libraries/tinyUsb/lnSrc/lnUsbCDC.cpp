@@ -80,7 +80,8 @@ void lnUsbCDC::clear_input_buffers()
 }
 
 //---- hooks ---
-#define PREMABLE(itf) lnUsbCDC *me=_cdc_instances[itf]; xAssert(me);
+// On the RP2040 we may receive event from the other (uninitialied port)
+#define PREMABLE(itf) lnUsbCDC *me=_cdc_instances[itf]; xAssert(me); //if(!me) return;
 #define FORWARD_EVENT(ifg,event) PREMABLE(itf);  me->incomingEvent(event);
 //---
 

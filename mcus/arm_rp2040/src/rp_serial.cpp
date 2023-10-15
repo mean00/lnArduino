@@ -14,6 +14,7 @@ static const lnUart_t uarts[2] = {{((uart_inst_t *)uart0_hw)}, {((uart_inst_t *)
 
 lnDMA dummyDma(lnDMA::DMA_MEMORY_TO_PERIPH, 0, 0, 0, 0);
 
+
 /**
     \fn
     \brief
@@ -33,6 +34,7 @@ bool lnSerial::init()
     uart_init(u, 115200);
     uart_set_hw_flow(u, false, false);
     uart_set_format(u, 8, 1, UART_PARITY_NONE);
+    uart_set_fifo_enabled(u,true);
     return true;
 }
 /**
@@ -59,15 +61,18 @@ bool lnSerial::enableRx(bool enabled)
 */
 bool lnSerial::transmit(int size, const uint8_t *buffer)
 {
+    _txMutex.lock();
     uart_inst_t *u = uarts[_instance].hw;
+    io_rw_32 *dr= &(uart_get_hw(u)->dr);
     for (int i = 0; i < size; i++)
     {
         if (!(uart_is_writable(u)))
         {
             __asm__("nop");
         }
-        uart_get_hw(u)->dr = *buffer++;
+        *dr = *buffer++;
     }
+    _txMutex.unlock();
     return true;
 }
 /**
