@@ -26,13 +26,31 @@ LN_AFIO *aAfio = (LN_AFIO *)LN_AFIO_ADR;
  * @param pin
  * @param mode
  */
-void lnPinMode(const lnPin xpin, const GpioMode mode)
+void lnPinMode(const lnPin xpin, const GpioMode mode, const int speedInMhz)
 {
     LN_GPIO *port = gpio[xpin >> 4];
     const LN_PIN_MAPPING *lnPin = pinMappings + xpin;
     xAssert(lnPin->pin == xpin);
     uint32_t pin = xpin & 0xf;
     volatile uint32_t *CTL;
+
+#define SPEED_50MHZ 3
+#define SPEED_10MHZ 1
+#define SPEED_2MHZ 2
+
+    uint32_t speed;
+    if (speedInMhz == 0 || speed >= 50)
+    {
+        speed = SPEED_50MHZ;
+    }
+    else if (speedInMhz >= 10)
+    {
+        speed = SPEED_10MHZ;
+    }
+    else
+    {
+        speed = SPEED_2MHZ;
+    }
 
     uint32_t value;
     switch (mode)
@@ -56,10 +74,10 @@ void lnPinMode(const lnPin xpin, const GpioMode mode)
         break;
 
     case lnOUTPUT:
-        value = LNGPIOSET(LN_CTL_MD_OUTPUT, LN_CTL_OUTPUT_PP);
+        value = LNGPIOSET(speed, LN_CTL_OUTPUT_PP);
         break;
     case lnOUTPUT_OPEN_DRAIN:
-        value = LNGPIOSET(LN_CTL_MD_OUTPUT, LN_CTL_OUTPUT_OD);
+        value = LNGPIOSET(speed, LN_CTL_OUTPUT_OD);
         break;
     case lnPWM:
         xAssert(lnPin->timer != -1);
@@ -67,10 +85,10 @@ void lnPinMode(const lnPin xpin, const GpioMode mode)
         // lnTimer::setPwmMode(lnPin->timer, lnPin->timerChannel);
 
     case lnALTERNATE_PP:
-        value = LNGPIOSET(LN_CTL_MD_OUTPUT, LN_CTL_OUTPUT_ALTERNAT_PP);
+        value = LNGPIOSET(speed, LN_CTL_OUTPUT_ALTERNAT_PP);
         break;
     case lnALTERNATE_OD:
-        value = LNGPIOSET(LN_CTL_MD_OUTPUT, LN_CTL_OUTPUT_ALTERNAT_OD);
+        value = LNGPIOSET(speed, LN_CTL_OUTPUT_ALTERNAT_OD);
         break;
     default:
         xAssert(0);
