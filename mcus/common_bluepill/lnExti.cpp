@@ -148,13 +148,12 @@ void lnExtiDisableInterrupt(const lnPin pin)
     aExiti->PD = 1 << source; // clear pending interrupt
 }
 
-// this is for the risc version
-void lnExtiJtagNoResetOnly()
+static void setPCF0(int value)
 {
     LN_AFIO *afio = (LN_AFIO *)LN_AFIO_ADR;
     uint32_t v = afio->PCF0;
     v &= LN_AFIO_PCF0_SWJ_MASK;
-    v |= LN_AFIO_PCF0_SWJ_SET(1); // Jtag,no reset, frees up PB4
+    v |= LN_AFIO_PCF0_SWJ_SET(value); // Jtag,no reset, frees up PB4
     afio->PCF0 = v;
     // Do partial remap on timer1 to follow bluepill layout
     v = afio->PCF0;
@@ -162,19 +161,20 @@ void lnExtiJtagNoResetOnly()
     v |= 1 << 8;
     afio->PCF0 = v;
 }
+
+// this is for the risc version
+void lnExtiJtagNoResetOnly()
+{
+    setPCF0(1); // SWD+Jtag,no reset, frees up PB4
+}
 // Arm version
 void lnExtiSWDOnly()
 {
-    LN_AFIO *afio = (LN_AFIO *)LN_AFIO_ADR;
-    uint32_t v = afio->PCF0;
-    v &= LN_AFIO_PCF0_SWJ_MASK;
-    v |= LN_AFIO_PCF0_SWJ_SET(2); // SWD, no Jtag
-    afio->PCF0 = v;
-    // Do partial remap on timer1 to follow bluepill layout
-    v = afio->PCF0;
-    v &= ~(3 << 8);
-    v |= 1 << 8;
-    afio->PCF0 = v;
+    setPCF0(2); // SWD, no Jtag
+}
+void lnExtiNoSWD()
+{
+    setPCF0(4); // no SWD, no Jtag
 }
 
 void EXTI_IrqHandler(int maskS, int maskE)

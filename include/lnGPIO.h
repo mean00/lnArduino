@@ -27,7 +27,7 @@ enum lnGpioMode
 };
 #define GpioMode lnGpioMode
 // typedef int lnPin;
-void lnPinMode(const lnPin pin, const lnGpioMode mode);
+void lnPinMode(const lnPin pin, const lnGpioMode mode, const int speedInMhz = 0);
 void lnDigitalWrite(const lnPin pin, bool value);
 bool lnDigitalRead(const lnPin pin);
 void lnDigitalToggle(const lnPin pin);
