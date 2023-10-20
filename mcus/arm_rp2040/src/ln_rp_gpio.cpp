@@ -5,7 +5,7 @@
 /**
     \fn
 */
-void lnPinMode(const lnPin pin, const lnGpioMode mode)
+void lnPinMode(const lnPin pin, const lnGpioMode mode, const int speedInMhz )
 {
     uint32_t fun = LN_RP_GPIO_CONTROL_FUNC(SIO);
     uint32_t pad, control;
