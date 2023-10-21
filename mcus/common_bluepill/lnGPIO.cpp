@@ -62,6 +62,7 @@ void lnPinMode(const lnPin xpin, const GpioMode mode, const int speedInMhz)
         value = LNGPIOSET(LN_CTL_MD_INPUT, LN_CTL_INPUT_ANALOG);
         break;
     case lnFLOATING:
+    case lnINPUT_FLOATING:
         value = LNGPIOSET(LN_CTL_MD_INPUT, LN_CTL_INPUT_FLOATING);
         break;
     case lnINPUT_PULLUP:

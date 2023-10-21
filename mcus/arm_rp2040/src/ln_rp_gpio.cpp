@@ -20,6 +20,10 @@ void lnPinMode(const lnPin pin, const lnGpioMode mode, const int speedInMhz )
         pad = LN_RP_PADS_OUTPUT_DISABLE; // input disabled by default
         control = LN_RP_GPIO_CONTROL_OE_DISABLE;
         break;
+    case lnINPUT_FLOATING:
+        pad = LN_RP_PADS_INPUT_ENABLE + LN_RP_PADS_OUTPUT_DISABLE ; //
+        control = LN_RP_GPIO_CONTROL_OE_DISABLE;
+        break;
     case lnINPUT_PULLUP:
         pad = LN_RP_PADS_INPUT_ENABLE + LN_RP_PADS_OUTPUT_DISABLE + LN_RP_PADS_PULLUP; //
         control = LN_RP_GPIO_CONTROL_OE_DISABLE;
@@ -35,7 +39,7 @@ void lnPinMode(const lnPin pin, const lnGpioMode mode, const int speedInMhz )
     case lnOUTPUT:
         pad = LN_RP_PADS_DRIVE(12MA);
         control = LN_RP_GPIO_CONTROL_OE(ENABLE); // 12 mA
-        break;
+        break;        
     default:
         xAssert(0);
         break;

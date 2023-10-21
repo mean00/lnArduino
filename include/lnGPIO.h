@@ -13,11 +13,11 @@
 enum lnGpioMode
 {
     lnFLOATING = 0,
-    lnINPUT_FLOATING = 0,
+    lnINPUT_FLOATING = 1,
     lnINPUT_PULLUP = 2,
     lnINPUT_PULLDOWN = 3,
-    lnOUTPUT = 1,
-    lnOUTPUT_OPEN_DRAIN = 4,
+    lnOUTPUT = 4,
+    lnOUTPUT_OPEN_DRAIN = 5,
     lnALTERNATE_PP,
     lnALTERNATE_OD,
     lnPWM,
