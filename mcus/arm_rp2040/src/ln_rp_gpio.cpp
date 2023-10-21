@@ -60,7 +60,7 @@ void lnOpenDrainClose(const lnPin pin, const bool close)
     uint32_t fun = LN_RP_GPIO_CONTROL_FUNC(SIO);
     uint32_t pad, control;
 
-    if(close) /passing
+    if(close) //passing
     {
         lnSio->GPIO_OUT_CLR = 1 << pin;
         pad = LN_RP_PADS_DRIVE(12MA);
