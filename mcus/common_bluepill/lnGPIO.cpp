@@ -127,7 +127,22 @@ void lnRemapTimerPin(int timer)
         xAssert(0);
     }
 }
+#define LN_GPIO_OUTPUT_OD_HIZ 1
+#define LN_GPIO_OUTPUT_OD_GND 0
 
+/**
+ * @brief 
+ * 
+ * @param pin 
+ * @param close 
+ */
+void lnOpenDrainClose(const lnPin pin, const bool close)
+{
+    bool s = LN_GPIO_OUTPUT_OD_GND;
+    if(!close)
+        s = LN_GPIO_OUTPUT_OD_HIZ;
+    lnDigitalWrite(pin, s);
+}
 /**
  *
  * @param pin

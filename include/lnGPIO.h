@@ -31,6 +31,8 @@ void lnPinMode(const lnPin pin, const lnGpioMode mode, const int speedInMhz = 0)
 void lnDigitalWrite(const lnPin pin, bool value);
 bool lnDigitalRead(const lnPin pin);
 void lnDigitalToggle(const lnPin pin);
+void lnOpenDrainClose(const lnPin pin, const bool close); // if true, the open drain is passing, else it is hiz
+
 volatile uint32_t *lnGetGpioToggleRegister(int port); // Bop register for port "port" with port A:0, B:1, ...
 volatile uint32_t *lnGetGpioDirectionRegister(
     int port); // Direction register for the bit 0..7 of port "port" , A=0, B=1, ...
@@ -71,8 +73,6 @@ class lnFastIO
     uint32_t _onbit, _offbit;
 };
 
-#define LN_GPIO_OUTPUT_OD_HIZ 1
-#define LN_GPIO_OUTPUT_OD_GND 0
 
 #include "lnExti.h"
 // EOF
