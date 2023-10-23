@@ -21,8 +21,9 @@ pub mod rn_exti;
 pub mod rn_fast_event_group;
 pub mod rn_adc_timer;
 pub mod rn_spi;
+pub mod rn_logger;
 // embedded hal
-pub mod rn_hal_gpio;
+//pub mod rn_hal_gpio;
 
 #[cfg(feature = "cdc")]
 pub mod rn_usb_cdc;

@@ -1,12 +1,10 @@
 #![allow(dead_code)]
 
 use crate::rnarduino as rn;
-use cty::{c_char,c_void};
+use cty::{c_void};
 use crate::rnarduino::{UBaseType_t,TaskHandle_t};
 use alloc::vec::Vec;
 use alloc::boxed::Box;
-use heapless::String;
-use ufmt::{   uwrite,uDisplay };
 //--
 pub fn delay_ms(to : u32)
 {
@@ -20,32 +18,6 @@ pub fn delay_us(to : u32)
         rn::lnDelayUs(to);
     }
 }
-
-pub fn log1<T : uDisplay>(st: &str, v: T)
-{
-    let mut string_buf  : heapless::String<64> = String::new();
-    if uwrite!(&mut string_buf, "{}{}",st,v).is_ok()
-    {
-        log(&string_buf);
-    }
-}
-pub fn logx(st: &str, v: u32)
-{
-    let mut string_buf  : heapless::String<64> = String::new();
-    if uwrite!(&mut string_buf, "{}{:#x}",st,v).is_ok()
-    {
-        log(&string_buf);
-    }
-}
-pub fn  log( st : &str )
-{
-    unsafe {
-        rn::Logger_chars(st.len() as i32, st.as_ptr() as *const c_char);
-        // n: cty::c_int, data: *const cty::c_char);
-        //rn::Logger(st.as_ptr() as *const c_char);
-    }
-}
-
 
 pub fn  get_time_ms() -> u32
 {
