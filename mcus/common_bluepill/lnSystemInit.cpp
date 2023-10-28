@@ -2,7 +2,7 @@
 #include "lnArduino.h"
 #include "lnPeripheral_priv.h"
 
-uint8_t ucHeap[configTOTAL_HEAP_SIZE];
+__attribute__((section(".initial_heap"))) uint8_t ucHeap[configTOTAL_HEAP_SIZE];
 
 extern void setup();
 extern void loop();

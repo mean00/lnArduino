@@ -218,6 +218,8 @@ SECTIONS
         __bss_start__ = .;
         *(.bss .bss.* .gnu.linkonce.b.*)
         *(COMMON)
+        /* Put ucheap here, it may be overwritten at startup , dont care at that time */
+        *(.initial_heap)
         . = ALIGN (8);
         __bss_end__ = .;
         _end = __bss_end__;

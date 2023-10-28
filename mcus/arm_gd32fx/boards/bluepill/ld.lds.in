@@ -217,6 +217,7 @@ SECTIONS
         __bss_start__ = .;
         *(.bss .bss.* .gnu.linkonce.b.*)
         *(COMMON)
+          *(.initial_heap) /* this may be used as initial stack, ucheap can be overwrriten dont care */
         . = ALIGN (8);
         __bss_end__ = .;
         _end = __bss_end__;
