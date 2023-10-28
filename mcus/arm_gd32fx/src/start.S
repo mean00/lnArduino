@@ -50,7 +50,9 @@
         .type __trap, %function
 __start__:
         .fnstart
-        ldr r1,=__msp_init-4
+/* Msp _init is at the end of the ram where ucHeap is, we offset if by 128 bytees because
+there is a marker a the end of ucHeap. All this to avoid wating the initial stack */
+        ldr r1,=__msp_init-128
         mov sp,r1
         ldr r1,=start_c
         bx r1
