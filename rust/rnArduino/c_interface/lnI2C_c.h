@@ -1,10 +1,11 @@
 #pragma once
+#include "stdbool.h"
 #include "stdint.h"
 
-struct ln_i2c_c // opaque
+typedef struct // opaque
 {
     void *dummy;
-};
+} ln_i2c_c;
 
 ln_i2c_c *lni2c_create(int instance, int speed);
 void lni2c_delete(ln_i2c_c *i2c);

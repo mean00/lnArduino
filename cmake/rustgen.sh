@@ -10,7 +10,13 @@ output=$2
 ME=$0
 export ME=`realpath $ME`
 export ME=`dirname $ME`
-export BINDGEN=/usr/bin/bindgen
+export BINDGEN=~/.cargo/bin/bindgen
+if [ -f "$BINDGEN" ]; then
+        echo "."
+else
+  export BINDGEN="/usr/bin/bindgen"
+fi
+echo " bindgen is $BINDGEN ."
 export LN=`realpath $ME/..` 
 
 export PLATFORM_TOOLCHAIN_PATH=`cmake -DHOME=$LN -P $ME/toolchain_env.cmake 2>& 1`
