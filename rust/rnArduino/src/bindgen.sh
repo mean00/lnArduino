@@ -2,5 +2,5 @@
 #
 export out=rnarduino.rs
 # rustified_enum
-bash ../../../cmake/rustgen_c.sh  lnAll.h   ${out}
+bash ../../../cmake/rustgen.sh  lnAll.h   ${out}
 
