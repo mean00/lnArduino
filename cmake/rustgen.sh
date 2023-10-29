@@ -46,6 +46,8 @@ $BINDGEN      --use-core --no-doc-comments \
     -- -x c++   -DLN_ARCH=LN_ARCH_ARM \
     -I$LN -I$LN/include/  -I$LN/arduinoLayer/include/ \
     -I$LN/FreeRTOS/include/  \
+    -I$LN/mcus/arm_gd32fx/boards/bluepill/ \
+    -I$LN/mcus/arm_gd32fx/include/ \
     -I$LN/legacy/boards/bluepill/ \
     -I$LN/FreeRTOS/portable/GCC/ARM_CM3/ \
     -target "thumbv7m-none-eabi"  \

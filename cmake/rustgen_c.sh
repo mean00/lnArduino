@@ -1,6 +1,7 @@
 #!/bin/bash
 #set -x
 #
+#set -x
 if [ "$#" -ne 2 ]; then
     echo "rustgen.sh xxx.h xxx.rs"
     exit 1
@@ -40,9 +41,11 @@ $BINDGEN      --use-core --no-doc-comments \
     --rustified-enum "ln.*" \
     -o $2.tmp \
     -- -x c   -DLN_ARCH=LN_ARCH_ARM \
-    -I$LN -I$LN/include/  -I$LN/arduinoLayer/include/ \
+    -I$LN \
+    -I$LN/include/  \
+    -I$LN/arduinoLayer/include/ \
     -I$LN/FreeRTOS/include/  \
-    -I$LN/legacy/boards/bluepill/ \
+    -I$LN/mcus/arm_gd32fx/include/ \
     -I$LN/FreeRTOS/portable/GCC/ARM_CM3/ \
     -target "thumbv7m-none-eabi"  \
     -I${PLATFORM_TOOLCHAIN_PATH}/../arm-none-eabi/include/ \
