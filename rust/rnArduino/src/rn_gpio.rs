@@ -69,10 +69,16 @@ pub fn digitalRead( pin: rnPin) -> bool
 pub fn pinMode( pin : rnPin, mode: rnGpioMode)
 {
     unsafe {
-            rn::lnPinMode(pin,mode);
+            rn::lnPinMode(pin,mode,0);
     }
 }
 
+pub fn pinModeSpeed( pin : rnPin, mode: rnGpioMode,speed: i32)
+{
+    unsafe {
+            rn::lnPinMode(pin,mode,speed);
+    }
+}
 
 pub fn digital_write( pin: rnPin, value: bool)
 {
@@ -96,7 +102,14 @@ pub fn digital_read( pin: rnPin) -> bool
 pub fn pin_mode( pin : rnPin, mode: rnGpioMode)
 {
     unsafe {
-            rn::lnPinMode(pin,mode);
+            rn::lnPinMode(pin,mode,0);
+    }
+}
+
+pub fn pin_mode_speed( pin : rnPin, mode: rnGpioMode, speed: i32)
+{
+    unsafe {
+            rn::lnPinMode(pin,mode,speed);
     }
 }
 
