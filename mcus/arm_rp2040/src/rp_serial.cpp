@@ -35,6 +35,7 @@ bool lnSerial::init()
     uart_set_hw_flow(u, false, false);
     uart_set_format(u, 8, 1, UART_PARITY_NONE);
     uart_set_fifo_enabled(u,true);
+    uart_set_irq_enables(u, false, false); // disable Rx & Tx
     return true;
 }
 /**
@@ -66,7 +67,7 @@ bool lnSerial::transmit(int size, const uint8_t *buffer)
     io_rw_32 *dr= &(uart_get_hw(u)->dr);
     for (int i = 0; i < size; i++)
     {
-        if (!(uart_is_writable(u)))
+        while (!(uart_is_writable(u)))
         {
             __asm__("nop");
         }
