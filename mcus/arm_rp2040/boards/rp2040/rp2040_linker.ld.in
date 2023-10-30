@@ -29,6 +29,7 @@ MEMORY
     SCRATCH_Y(rwx) : ORIGIN = 0x20041000, LENGTH = 4k
 }
 
+EXTERN(_reset_handler) /* _entry_point */
 ENTRY(_reset_handler) /* _entry_point */
 
 SECTIONS
