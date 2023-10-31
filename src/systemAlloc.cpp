@@ -26,6 +26,14 @@ extern "C"
     {
         return vPortFree(p);
     }
+    //----------------------------------
+    //
+    void __attribute__((noreturn)) do_assert(const char *a);
+    void *realloc(void *ptr, size_t size)
+    {
+        do_assert("realloc");
+    }
+ 
 
     //----------------------------------
     void *malloc(size_t size)

@@ -12,6 +12,12 @@ extern void loop();
 
 uint8_t ucHeap[configTOTAL_HEAP_SIZE];
 
+extern "C" void alarm_pool_init_default()
+{
+    //xAssert(0);
+    #warning this is a stub to avoid pulling the pico-sdk libc malloc
+}
+
 /**
  *
  * @param
