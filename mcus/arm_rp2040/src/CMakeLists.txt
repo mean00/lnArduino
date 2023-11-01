@@ -8,6 +8,7 @@ add_custom_command(
 
 SET(RP_LN_SOURCES
         ln_rp_gpio.cpp
+        ln_rp_dma.cpp
 )
 SET(RP_SDK_SOURCES
 
@@ -68,7 +69,7 @@ ${CMAKE_CURRENT_SOURCE_DIR}/rp_irq.cpp
 
 add_library(rplib STATIC rp.cpp ${CMAKE_CURRENT_SOURCE_DIR}/../conf/bs2_default_padded_checksummed.S ${RP_LN_SOURCES} ${RP_SDK_SOURCES})
 target_include_directories(rplib PUBLIC 
-        ${PICO_SDK_PATH}
+        ${PICO_SDK_PATH}        
         ${PICO_SDK_PATH}/src/boards/include  
         ${PICO_SDK_PATH}/src/common/pico_base/include  
         ${PICO_SDK_PATH}/src/common/pico_binary_info/include  
@@ -95,6 +96,7 @@ target_include_directories(rplib PUBLIC
         ${PICO_SDK_PATH}/src/rp2_common/hardware_vreg/include  
         ${PICO_SDK_PATH}/src/rp2_common/hardware_watchdog/include  
         ${PICO_SDK_PATH}/src/rp2_common/hardware_xosc/include          
+        ${PICO_SDK_PATH}/src/rp2_common/hardware_dma/include       
         ${PICO_SDK_PATH}/src/rp2_common/pico_bootrom/include  
         ${PICO_SDK_PATH}/src/rp2_common/pico_double/include  
         ${PICO_SDK_PATH}/src/rp2_common/pico_float/include  

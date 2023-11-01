@@ -1,0 +1,53 @@
+/**
+ * @file ln_rp_dma_priv.h
+ * @author mean00
+ * @brief simple dma
+ * @version 0.1
+ * @date 2023-11-01
+ * 
+ * @copyright Copyright (c) 2023
+ * 
+ */
+
+#pragma once
+#include "lnArduino.h" 
+/**
+ * @brief describe one channel
+ * 
+ */
+struct LN_RP_DMA_structx
+{
+    uint32_t DMA_READ;      // read address pointer
+    uint32_t DMA_WRITE;     // dma write address
+    uint32_t DMA_COUNT;     // # of transfer
+    uint32_t DMA_CONTROL;   // Control/setup   
+};
+
+typedef volatile LN_RP_DMA_structx LN_RP_DMA_struct; 
+
+
+#define RP_DMA_CHANNEL(x) (LN_RP_DMA_struct *)(0x50000000+x*0x40)
+
+// --  Control register --
+#define LN_RP_DMA_CONTROL_ENABLE            (1<<0) // enable
+#define LN_RP_DMA_CONTROL_HIGH_PRIO         (1<<1) // high prio
+#define LN_RP_DMA_CONTROL_SET_DATA_SIZE_8   (0<<2)
+#define LN_RP_DMA_CONTROL_SET_DATA_SIZE_16  (1<<2)
+#define LN_RP_DMA_CONTROL_SET_DATA_SIZE_32  (2<<2)
+#define LN_RP_DMA_CONTROL_INCR_READ         (1<<4)
+#define LN_RP_DMA_CONTROL_INCR_WRITE        (1<<5)
+#define LN_RP_DMA_CONTROL_CIRCULAR_SIZE(pow_of_2) ( (pow_of_2)<<6)
+#define LN_RP_DMA_CONTROL_CIRCULAR_READ     (0<<10)
+#define LN_RP_DMA_CONTROL_CIRCULAR_WRITE    (1<<10)
+// chain ignored
+#define LN_RP_DMA_CONTROL_TREQ(x)           (x<<15) 
+// quiet ignored
+// bswp ignored
+// sniff ignored
+#define LN_RP_DMA_CONTROL_IS_BUSY_MASK      (1<<24)
+#define LN_RP_DMA_CONTROL_IS_ERROR_MASK     (7<<29)
+
+
+#define LN_RP_DMA_CHANNEL_COUNT             12
+
+// EOF

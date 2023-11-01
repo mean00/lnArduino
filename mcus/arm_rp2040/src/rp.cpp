@@ -11,7 +11,7 @@ extern void setup();
 extern void loop();
 
 uint8_t ucHeap[configTOTAL_HEAP_SIZE];
-
+extern void  lnRpDmaSysInit();
 extern "C" void alarm_pool_init_default()
 {
     //xAssert(0);
@@ -47,8 +47,7 @@ int main()
 {
     lnPinMode(GPIO17, lnUART);
     lnPinMode(GPIO16, lnUART);
-
-    LoggerInit();
+    lnRpDmaSysInit();    
 
     lnSetInterruptHandler(LN_IRQ_SYSTICK, xPortSysTickHandler);
     lnSetInterruptHandler(LN_IRQ_PENDSV, xPortPendSVHandler);
