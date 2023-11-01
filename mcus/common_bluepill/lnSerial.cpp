@@ -47,9 +47,18 @@ static const UsartMapping usartMapping[3] = {
 class lnSerial : public lnSerialCore
 {
   public:   
+
+    enum txState
+    {
+        txTransmittingIdle,
+        txTransmittingInterrupt,
+        txTransmittingDMA,
+        txTransmittingLast
+    };
+
   // public API
          lnSerial(int instance, int rxBufferSize = 128);
-    bool init();
+    bool init(lnSerialMode mode);
     bool setSpeed(int speed);
     bool enableRx(bool enabled);
     bool transmit(int size, const uint8_t *buffer);
@@ -160,11 +169,12 @@ bool lnSerial::setSpeed(int speed)
  *
  * @return
  */
-bool lnSerial::init()
+bool lnSerial::init(lnSerialMode mode)
 {
     LN_USART_Registers *d = (LN_USART_Registers *)_adr;
     const UsartMapping *e = usartMapping + _instance;
 
+    _mode=mode;
     switch (_instance)
     {
     case 0:

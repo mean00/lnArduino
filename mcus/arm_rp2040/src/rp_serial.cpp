@@ -58,7 +58,7 @@ class lnRpSerial : public lnSerialCore
   public:   
   // public API
          lnRpSerial(int instance, int rxBufferSize = 128);
-    bool init();
+    bool init(lnSerialMode more);
     bool setSpeed(int speed);
     bool enableRx(bool enabled);
     bool transmit(int size, const uint8_t *buffer);
@@ -117,9 +117,11 @@ lnRpSerial::lnRpSerial(int instance, int rxBufferSize) : lnSerialCore(instance, 
     \fn
     \brief
 */
-bool lnRpSerial::init()
+bool lnRpSerial::init(lnSerialMode mode)
 {
     uart_inst_t *u = (uart_inst_t *)uarts[_instance].hw;
+
+    _mode = mode;
     uart_init(u, 115200);
     uart_set_hw_flow(u, false, false);
     uart_set_format(u, 8, 1, UART_PARITY_NONE);
@@ -167,7 +169,7 @@ bool lnRpSerial::transmit(int size, const uint8_t *buffer)
 bool lnRpSerial::transmitIrq(int size, const uint8_t *buffer)
 {
     _txMutex.lock();
-    // Fill in the uart
+    // Pre-fill the uart
     txLimit=size;
     txCurrent=0;
     txData=buffer;
@@ -175,6 +177,7 @@ bool lnRpSerial::transmitIrq(int size, const uint8_t *buffer)
     io_rw_32 *dr= &(uart_get_hw(u)->dr);
     while ((uart_is_writable(u)) && txCurrent<txLimit)
             *dr = txData[txCurrent++];
+    // if more to do, let the irq handle it
     if(txCurrent!=txLimit)
     {
          uart_set_irq_enables(u, false, true); // enable Tx

@@ -22,22 +22,20 @@ class lnSerialCore
     {
         dataAvailable,
     };
-    enum txState
+    enum lnSerialMode
     {
-        txTransmittingIdle,
-        txTransmittingInterrupt,
-        txTransmittingDMA,
-        txTransmittingLast
+        txOnly,
+        txRx
     };
     lnSerialCore(int instance, int rxBufferSize = 128)
     {
-
+        _instance=instance;
     }
     virtual  ~lnSerialCore()
     {
     
     }
-    virtual bool init()=0;
+    virtual bool init(lnSerialMode mode)=0;
     virtual bool setSpeed(int speed)=0;
     virtual bool enableRx(bool enabled)=0;
     virtual bool transmit(int size, const uint8_t *buffer)=0;
@@ -56,6 +54,7 @@ class lnSerialCore
     virtual void consume(int n)=0;
 
   protected:
+    lnSerialMode      _mode;
     int               _instance;
     xMutex            _txMutex;
     xBinarySemaphore  _txDone;
