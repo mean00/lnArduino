@@ -28,8 +28,8 @@ class lnRpDMA
     //
 
     #define DREQ_SPLAT(x,count, start) \
-                        LN_DMA_DREQ_##x##_##count##_TX = start, \
-                        LN_DMA_DREQ_##x##_##count##_RX
+                        LN_DMA_DREQ_##x##count##_TX = start, \
+                        LN_DMA_DREQ_##x##count##_RX
 
     enum LN_RP_DMA_DREQ
     {

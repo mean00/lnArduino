@@ -10,6 +10,8 @@
 
 #pragma clang diagnostic ignored "-Wextra"
 
+class lnSerial;
+
 LN_USART_Registers *usart0 = (LN_USART_Registers *)LN_USART0_ADR;
 static lnSerial *SerialInstance[5] = {NULL, NULL, NULL, NULL, NULL};
 // 0   1    2    3
@@ -39,8 +41,67 @@ static const UsartMapping usartMapping[3] = {
  */
 #define M(x) usartMapping[instance].x
 
-lnSerial::lnSerial(int instance, int rxBufferSize)
-    : _txDma(lnDMA::DMA_MEMORY_TO_PERIPH, M(dmaEngine), M(dmaTxChannel), 8, 32)
+/**
+ */
+#include "lnDma.h"
+class lnSerial : public lnSerialCore
+{
+  public:   
+  // public API
+         lnSerial(int instance, int rxBufferSize = 128);
+    bool init();
+    bool setSpeed(int speed);
+    bool enableRx(bool enabled);
+    bool transmit(int size, const uint8_t *buffer);
+    bool dmaTransmit(int size, const uint8_t *buffer);
+    void purgeRx();
+    int  read(int max, uint8_t *to);
+    void disableInterrupt();
+    void enableInterrupt(bool txInterruptEnabled);
+    // no copy interface
+    int getReadPointer(uint8_t **to);
+    void consume(int n);
+
+  // implementation    
+    void _interrupt(void);
+    
+    static void interrupts(int instance);
+    void rawWrite(const char *c); // Write in polling mode
+  protected:
+    void txInterruptHandler(void);
+    void rxInterruptHandler(void);
+    bool _programTx(void);
+
+  protected:
+    bool        _enableTx(txState mode);    
+    LnIRQ       _irq;
+    uint32_t    _adr;
+    // tx
+    volatile const uint8_t *_cur, *_tail;
+    txState _txState;
+    lnDMA _txDma;
+    int _lastTransferSize;
+    // rx
+    int _rxBufferSize;
+    int _rxHead, _rxTail;
+    uint8_t *_rxBuffer;
+    bool _rxEnabled;
+    int _rxError;
+    //
+    int modulo(int in);
+
+  protected:
+    void txDmaCb();
+    static void _dmaCallback(void *c, lnDMA::DmaInterruptType it);
+};
+/**
+ * @brief Construct a new ln Serial::ln Serial object
+ * 
+ * @param instance 
+ * @param rxBufferSize 
+ */
+lnSerial::lnSerial(int instance, int rxBufferSize) : lnSerialCore(instance, rxBufferSize),
+     _txDma(lnDMA::DMA_MEMORY_TO_PERIPH, M(dmaEngine), M(dmaTxChannel), 8, 32)
 {
     const UsartMapping *m = usartMapping + instance;
     _instance = instance;
@@ -538,5 +599,16 @@ IRQHANDLER(2)
 IRQHANDLER(3)
 
 const unsigned short int *_ctype_b;
+/**
+ * @brief Create a Ln Serial object
+ * 
+ * @param instance 
+ * @param rxBufferSize 
+ * @return lnSerialCore* 
+ */
+lnSerialCore *createLnSerial(int instance, int rxBufferSize)
+{
+    return new lnSerial(instance,rxBufferSize);
+}
 
 // EOF

@@ -19,4 +19,7 @@
 
 #define LN_RP_DMA           0x50000000
 
+#define LN_RP_UART0         0x40034000
+#define LN_RP_UART1         0x40038000
+
 // EOF

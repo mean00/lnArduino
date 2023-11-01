@@ -90,7 +90,7 @@ lnRpDMA::lnRpDMA(DmaTransferType type, LN_RP_DMA_DREQ req, int dmaChannel, int t
  */
 lnRpDMA::~lnRpDMA()
 {
-    _dma->DMA_CONTROL &= ~LN_RP_DMA_CONTROL_ENABLE;
+    _dma->DMA_CONTROL &= ~LN_RP_DMA_CONTROL_ENABLE; 
 }
 /**
  * @brief 
@@ -133,7 +133,7 @@ bool  lnRpDMA::doMemoryToPeripheralTransferNoLock(int count, const uint32_t *sou
     {
          control |=LN_RP_DMA_CONTROL_INCR_READ;
     }    
-    _dma->DMA_CONTROL = _control+LN_RP_DMA_CONTROL_ENABLE;    
+    _dma->DMA_CONTROL = _control;    
     return true;
 }
 /**
@@ -153,7 +153,7 @@ bool lnRpDMA::doPeripheralToMemoryTransferNoLock(int count, const uint32_t *sour
     uint32_t control = _dma->DMA_CONTROL;
     control &=( LN_RP_DMA_CONTROL_INCR_READ+LN_RP_DMA_CONTROL_INCR_WRITE);
     control |=LN_RP_DMA_CONTROL_INCR_WRITE;
-    _dma->DMA_CONTROL = _control+LN_RP_DMA_CONTROL_ENABLE;    
+    _dma->DMA_CONTROL = _control;    
     return true;
 }
 /**
@@ -162,7 +162,7 @@ bool lnRpDMA::doPeripheralToMemoryTransferNoLock(int count, const uint32_t *sour
  */
 void lnRpDMA::beginTransfer()
 {   
-    _dma->DMA_CONTROL |= LN_RP_DMA_CONTROL_ENABLE;
+    _dma->DMA_CONTROL |= LN_RP_DMA_CONTROL_ENABLE; // this reg is  a trigger, writing it starts DMA
 }
 /**
  * @brief 
@@ -187,6 +187,6 @@ void lnRpDMA::endTransfer()
  */
 void lnRpDMA::cancelTransfer()
 {
-    _dma->DMA_CONTROL &= ~LN_RP_DMA_CONTROL_ENABLE;
+    _dma->DMA_CONTROL &= ~LN_RP_DMA_CONTROL_ENABLE;    
 }
 // EOF
