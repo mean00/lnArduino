@@ -52,6 +52,9 @@ def build_single(arch, mcu,use, proj,extra,extra_title):
         return False
     if exec_makethingie("BUILD",makeParam)==False:
         return False
+    #if it i sok, cleanup
+    os.chdir(cwd+'/../demoProject/'+str(proj))
+    subprocess.check_call(['rm','-Rf',build_dir])
     return True
     #os.chdir(cwd)
     print(str(projects))
