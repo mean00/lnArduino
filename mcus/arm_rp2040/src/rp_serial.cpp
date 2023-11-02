@@ -32,7 +32,7 @@ static lnRpSerial *rpSerialInstances[2]={NULL,NULL};
 struct lnUart_t
 {
     const uart_inst_t *hw;
-    const uint32_t    dreq_tx;
+    const lnRpDMA::LN_RP_DMA_DREQ    dreq_tx;
     const uint32_t    channel_tx;
     const int         irq;
     irq_handler_t     irq_handler;
@@ -76,10 +76,12 @@ class lnRpSerial : public lnSerialCore
     void irq_handler();
     bool transmitIrq(int size, const uint8_t *buffer);
     bool transmitPolling(int size, const uint8_t *buffer);
-
+    void txDmaCb();
     int  txLimit;
     int  txCurrent;
-    const uint8_t *txData;
+    const uint8_t *_txData;
+
+    lnRpDMA *_txDma;
 
 };
 /**
@@ -111,7 +113,23 @@ lnRpSerial::lnRpSerial(int instance, int rxBufferSize) : lnSerialCore(instance, 
     xAssert(instance < 2);
     xAssert(!rpSerialInstances[instance])
     _instance = instance;        
+    _txDma = NULL;
     rpSerialInstances[instance]=this;
+}
+
+static void cbTxDma(void *cookie)
+{
+   lnRpSerial *serial = (lnRpSerial*)cookie;
+   serial->txDmaCb();
+}
+/**
+ * @brief 
+ * 
+ */
+void lnRpSerial::txDmaCb()
+{
+    _txDma->endTransfer();
+    _txDone.give();
 }
 /**
     \fn
@@ -127,8 +145,22 @@ bool lnRpSerial::init(lnSerialMode mode)
     uart_set_format(u, 8, 1, UART_PARITY_NONE);
     uart_set_fifo_enabled(u,false);
     irq_set_exclusive_handler(uarts[_instance].irq, uarts[_instance].irq_handler);
-    uart_set_irq_enables(u, false, false); // disable Rx & Tx
-    irq_set_enabled(uarts[_instance].irq, true);
+    uart_set_irq_enables(u, false, false); // disable Rx & Tx    
+    if(_mode==lnSerialCore::txOnly)
+    { // ok initialize DMA, we are only Txing
+        const lnUart_t *t = uarts+_instance;
+        _txDma = new lnRpDMA(   
+                                lnRpDMA::DMA_MEMORY_TO_PERIPH, 
+                                t->dreq_tx, 
+                                t->channel_tx, 
+                                8 ); // can we do 8bytes access ?
+        _txDma->attachCallback(cbTxDma,this);      
+    }    
+    // enable uart dma cap
+    volatile uint32_t *de = (uint32_t *)u;
+    de+=0x48/4;
+    *de = 1<<1; // tx dma enable        
+    irq_set_enabled(uarts[_instance].irq, false); // cut the irq at nvic level
     return true;
 }
 /**
@@ -154,38 +186,10 @@ bool lnRpSerial::enableRx(bool enabled)
     \brief
 */
 bool lnRpSerial::transmit(int size, const uint8_t *buffer)
-{
-    //return transmitPolling(size,buffer);
-    return transmitIrq(size,buffer);   
+{  
+        return transmitIrq(size,buffer);   
 }
-/**
- * @brief 
- * 
- * @param size 
- * @param buffer 
- * @return true 
- * @return false 
- */
-bool lnRpSerial::transmitIrq(int size, const uint8_t *buffer)
-{
-    _txMutex.lock();
-    // Pre-fill the uart
-    txLimit=size;
-    txCurrent=0;
-    txData=buffer;
-    uart_inst_t *u = (uart_inst_t *)uarts[_instance].hw;
-    io_rw_32 *dr= &(uart_get_hw(u)->dr);
-    while ((uart_is_writable(u)) && txCurrent<txLimit)
-            *dr = txData[txCurrent++];
-    // if more to do, let the irq handle it
-    if(txCurrent!=txLimit)
-    {
-         uart_set_irq_enables(u, false, true); // enable Tx
-        _txDone.take();
-    }
-    _txMutex.unlock();
-    return true;
-}
+
 /**
  * @brief 
  * 
@@ -212,12 +216,62 @@ bool lnRpSerial::transmitPolling(int size, const uint8_t *buffer)
 }
 
 /**
+ * @brief 
+ * 
+ * @param size 
+ * @param buffer 
+ * @return true 
+ * @return false 
+ */
+bool lnRpSerial::transmitIrq(int size, const uint8_t *buffer)
+{
+    _txMutex.lock();
+    
+    // Pre-fill the uart
+    txLimit=size;
+    txCurrent=0;
+    _txData=buffer;
+    uart_inst_t *u = (uart_inst_t *)uarts[_instance].hw;
+    io_rw_32 *dr= &(uart_get_hw(u)->dr);
+    while ((uart_is_writable(u)) && txCurrent<txLimit)
+            *dr = _txData[txCurrent++];
+    // if more to do, let the irq handle it
+    if(txCurrent!=txLimit)
+    {
+        irq_set_enabled(uarts[_instance].irq, true); // enable nvic IRQ
+        uart_set_irq_enables(u, false, true); // enable Tx
+        _txDone.take();
+    }
+    _txMutex.unlock();
+    return true;
+}
+/**
     \fn
     \brief
 */
 bool lnRpSerial::dmaTransmit(int size, const uint8_t *buffer)
 {
-    return transmit(size, buffer);
+
+    return transmitIrq( size, buffer);
+
+//--------------
+
+    if(!size) return true;
+    _txMutex.lock();
+    xAssert(_txDma);
+    uart_inst_t *u = (uart_inst_t *)uarts[_instance].hw;
+    _txDma->doMemoryToPeripheralTransferNoLock(size,  (const uint32_t *)buffer, (const uint32_t *)&(uart_get_hw(u)->dr));
+    
+    io_rw_32 *dr= &(uart_get_hw(u)->dr);
+    while (!uart_is_writable(u)) __asm__("nop");
+    *dr = *_txData;
+
+    uart_set_irq_enables(u, false, true); // enable Tx
+
+    _txDma->beginTransfer();    
+    _txDone.take();
+    _txMutex.unlock();
+    return true;
 }
 /**
  * @brief 
@@ -228,7 +282,7 @@ void lnRpSerial::irq_handler()
     uart_inst_t *u = (uart_inst_t *)uarts[_instance].hw;
     io_rw_32 *dr= &(uart_get_hw(u)->dr);
     while ((uart_is_writable(u)) && txCurrent<txLimit)
-            *dr = txData[txCurrent++];
+            *dr = _txData[txCurrent++];
     if(txCurrent==txLimit)
     {
          uart_set_irq_enables(u, false, false); // disable Tx

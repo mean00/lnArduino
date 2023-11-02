@@ -17,7 +17,8 @@
 
 #define LN_PPB_BASE_ADR     0xe0000000
 
-#define LN_RP_DMA           0x50000000
+#define LN_RP_DMA_CHANNEL_BASE   0x50000000 
+#define LN_RP_DMA_CONTROL   (LN_RP_DMA_CHANNEL_BASE+0x400)
 
 #define LN_RP_UART0         0x40034000
 #define LN_RP_UART1         0x40038000

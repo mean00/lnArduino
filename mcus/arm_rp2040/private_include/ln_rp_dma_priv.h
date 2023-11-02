@@ -11,11 +11,12 @@
 
 #pragma once
 #include "lnArduino.h" 
+#include "ln_rp_memory_map.h"
 /**
  * @brief describe one channel
  * 
  */
-struct LN_RP_DMA_structx
+struct LN_RP_DMA_channelx
 {
     uint32_t DMA_READ;      // read address pointer
     uint32_t DMA_WRITE;     // dma write address
@@ -23,10 +24,23 @@ struct LN_RP_DMA_structx
     uint32_t DMA_CONTROL;   // Control/setup   
 };
 
-typedef volatile LN_RP_DMA_structx LN_RP_DMA_struct; 
+struct LN_RP_DMAx
+{
+    uint32_t  INTR;  // interrupt status
+    uint32_t  INTE0; // int enable for IRQ 0
+    uint32_t  INTF0; // int force for IRQ 0
+    uint32_t  INTS0; // int status for IRQ 0, write 1 to clear the interrupt
+    uint32_t  dummy[1];
+    uint32_t  INTE1; // int enable for IRQ 1
+    uint32_t  INTF1; // int force for IRQ 1
+    uint32_t  INTS1; // int status for IRQ 1
+};
+
+typedef volatile LN_RP_DMA_channelx LN_RP_DMA_channel; 
+typedef volatile LN_RP_DMAx LN_RP_DMA; 
 
 
-#define RP_DMA_CHANNEL(x) (LN_RP_DMA_struct *)(0x50000000+x*0x40)
+#define RP_DMA_CHANNEL(x) (LN_RP_DMA_channel *)(LN_RP_DMA_CHANNEL_BASE+x*0x40)
 
 // --  Control register --
 #define LN_RP_DMA_CONTROL_ENABLE            (1<<0) // enable

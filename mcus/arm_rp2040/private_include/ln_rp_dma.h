@@ -15,8 +15,8 @@
  * 
  */
 
-struct LN_RP_DMA_structx;
-typedef volatile LN_RP_DMA_structx LN_RP_DMA_struct; 
+struct LN_RP_DMA_channelx;
+typedef volatile LN_RP_DMA_channelx LN_RP_DMA_channel; 
 
 class lnRpDMA
 {
@@ -78,5 +78,5 @@ class lnRpDMA
     LN_RP_DMA_DREQ  _req;
 
     uint32_t        _control; // initial value of the control register    
-    LN_RP_DMA_struct *_dma;
+    LN_RP_DMA_channel *_dma;
 };

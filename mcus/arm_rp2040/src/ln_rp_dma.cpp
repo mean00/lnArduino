@@ -19,8 +19,12 @@ lnMutex *dmaMuteces[LN_RP_DMA_CHANNEL_COUNT]={   NULL,NULL,NULL,NULL,
                                                 NULL,NULL,NULL,NULL};
 
 
-void dma_irq_handler()
+LN_RP_DMA *dmactrl  = (LN_RP_DMA *)LN_RP_DMA_CONTROL;
+
+void dma_irq0_handler()
 {
+    uint32_t flags = dmactrl->INTS0;
+    dmactrl->INTS0=flags; // ack the DMA interrupt
     xAssert(0);
 }
 /**
@@ -29,7 +33,7 @@ void dma_irq_handler()
  */
 void lnRpDmaSysInit()
 {
-    LN_RP_DMA_struct *dma;
+    LN_RP_DMA_channel *dma;
     irq_set_enabled(DMA_IRQ_0, false);
     for(int i=0;i<LN_RP_DMA_CHANNEL_COUNT;i++)
     {
@@ -37,10 +41,10 @@ void lnRpDmaSysInit()
         dma = RP_DMA_CHANNEL(i);
         dma->DMA_CONTROL = 0; // dis
     }
-
-    irq_set_exclusive_handler(DMA_IRQ_0, dma_irq_handler);
+    dmactrl->INTE0=0;
+    dmactrl->INTE1=0; // disable all channel's interrupt
+    irq_set_exclusive_handler(DMA_IRQ_0, dma_irq0_handler);
     irq_set_enabled(DMA_IRQ_0, true);
-
 }
 
 /**
@@ -158,10 +162,12 @@ bool lnRpDMA::doPeripheralToMemoryTransferNoLock(int count, const uint32_t *sour
 }
 /**
  * @brief 
- * 
+ * dma_channel_set_irq0_enabled
  */
 void lnRpDMA::beginTransfer()
 {   
+    dmactrl->INTE0 |= (1<<_channel);
+    //dmactrl->INTF0 |= (1<<_channel);
     _dma->DMA_CONTROL |= LN_RP_DMA_CONTROL_ENABLE; // this reg is  a trigger, writing it starts DMA
 }
 /**
@@ -179,6 +185,7 @@ uint32_t lnRpDMA::getCurrentCount()
  */
 void lnRpDMA::endTransfer()
 {
+    dmactrl->INTE0 &= ~(1<<_channel);
     _dma->DMA_CONTROL &= ~LN_RP_DMA_CONTROL_ENABLE;
 }
 /**
@@ -187,6 +194,7 @@ void lnRpDMA::endTransfer()
  */
 void lnRpDMA::cancelTransfer()
 {
+    dmactrl->INTE0 &= ~(1<<_channel);
     _dma->DMA_CONTROL &= ~LN_RP_DMA_CONTROL_ENABLE;    
 }
 // EOF
