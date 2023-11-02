@@ -218,6 +218,9 @@ SECTIONS
         __bss_start__ = .;
         *(.bss .bss.* .gnu.linkonce.b.*)
         *(COMMON)
+      } > REGION_BSS
+    .bss2 (NOLOAD) : 
+      {
         /* Put ucheap here, it may be overwritten at startup , dont care at that time */
         *(.initial_heap)
         . = ALIGN (8);

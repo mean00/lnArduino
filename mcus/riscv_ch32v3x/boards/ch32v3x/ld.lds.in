@@ -163,8 +163,12 @@ SECTIONS
     *(.bss .bss.*)
     *(.gnu.linkonce.b.*)
     *(COMMON)
+   } > >ram AT>ram 
+   .bss2 (NOLOAD) : 
+   {
+    *(.initial_heap)
     . = ALIGN(4);
-  } >ram AT>ram 
+    } >ram AT>ram 
 
   . = ALIGN(8);
   PROVIDE( _end = . ); /*0X2000,0340*/

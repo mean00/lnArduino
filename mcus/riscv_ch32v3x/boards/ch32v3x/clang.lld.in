@@ -189,6 +189,10 @@ SECTIONS
 	        *(.sbss*)
           *(.bss .bss.* )
           *(COMMON)
+      } > REGION_BSS
+      .bss2 (NOLOAD) : 
+      {
+          *(.initial_heap)
           . = ALIGN (8);
           __bss_end__ = .;
           _end = __bss_end__;
