@@ -146,15 +146,9 @@ bool lnRpSerial::init(lnSerialMode mode)
     uart_set_fifo_enabled(u,false);
     irq_set_exclusive_handler(uarts[_instance].irq, uarts[_instance].irq_handler);
     uart_set_irq_enables(u, false, false); // disable Rx & Tx    
-
-    // enable uart dma cap
-    /* not needed, init does it already
-    volatile uint32_t *de = (uint32_t *)u;
-    de+=0x48/4;
-    *de = 1<<1; */// tx dma enable  
-
     if(_mode==lnSerialCore::txOnly)
-    { // ok initialize DMA, we are only Txing
+    { 
+        // ok initialize DMA, we are only Txing
         const lnUart_t *t = uarts+_instance;
         _txDma = new lnRpDMA(   
                                 lnRpDMA::DMA_MEMORY_TO_PERIPH, 
@@ -260,13 +254,6 @@ bool lnRpSerial::dmaTransmit(int size, const uint8_t *buffer)
     xAssert(_txDma);
     uart_inst_t *u = (uart_inst_t *)uarts[_instance].hw;
     _txDma->doMemoryToPeripheralTransferNoLock(size,  (const uint32_t *)buffer, (const uint32_t *)&(uart_get_hw(u)->dr));
-    
-    io_rw_32 *dr= &(uart_get_hw(u)->dr);
-    while (!uart_is_writable(u)) __asm__("nop");
-    *dr = *_txData;
-
-    uart_set_irq_enables(u, false, true); // enable Tx
-
     _txDma->beginTransfer();    
     _txDone.take();
     _txMutex.unlock();

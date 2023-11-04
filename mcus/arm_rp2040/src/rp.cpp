@@ -1,5 +1,4 @@
 #include "lnArduino.h"
-#include "lnDma.h"
 #include "lnIRQ.h"
 #include "stdio.h"
 
@@ -12,6 +11,10 @@ extern void loop();
 
 uint8_t ucHeap[configTOTAL_HEAP_SIZE];
 extern void  lnRpDmaSysInit();
+/**
+ * @brief 
+ * 
+ */
 extern "C" void alarm_pool_init_default()
 {
     //xAssert(0);
@@ -42,7 +45,11 @@ extern "C"
     void xPortPendSVHandler(void);
     void vPortSVCHandler(void);
 }
-
+/**
+ * @brief 
+ * 
+ * @return int 
+ */
 int main()
 {
     lnPinMode(GPIO17, lnUART);
@@ -62,11 +69,4 @@ int main()
 extern "C" void deadEnd(int code)
 {
     __asm__("bkpt #0");
-}
-
-lnDMA::lnDMA(lnDMA::DmaTransferType type, int dmaEngine, int dmaChannel, int sourceWith, int targetWidth)
-{
-}
-lnDMA::~lnDMA()
-{
 }
