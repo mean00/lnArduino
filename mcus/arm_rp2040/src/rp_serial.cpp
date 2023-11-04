@@ -146,6 +146,13 @@ bool lnRpSerial::init(lnSerialMode mode)
     uart_set_fifo_enabled(u,false);
     irq_set_exclusive_handler(uarts[_instance].irq, uarts[_instance].irq_handler);
     uart_set_irq_enables(u, false, false); // disable Rx & Tx    
+
+    // enable uart dma cap
+    /* not needed, init does it already
+    volatile uint32_t *de = (uint32_t *)u;
+    de+=0x48/4;
+    *de = 1<<1; */// tx dma enable  
+
     if(_mode==lnSerialCore::txOnly)
     { // ok initialize DMA, we are only Txing
         const lnUart_t *t = uarts+_instance;
@@ -156,10 +163,7 @@ bool lnRpSerial::init(lnSerialMode mode)
                                 8 ); // can we do 8bytes access ?
         _txDma->attachCallback(cbTxDma,this);      
     }    
-    // enable uart dma cap
-    volatile uint32_t *de = (uint32_t *)u;
-    de+=0x48/4;
-    *de = 1<<1; // tx dma enable        
+         
     irq_set_enabled(uarts[_instance].irq, false); // cut the irq at nvic level
     return true;
 }
@@ -251,11 +255,6 @@ bool lnRpSerial::transmitIrq(int size, const uint8_t *buffer)
 */
 bool lnRpSerial::dmaTransmit(int size, const uint8_t *buffer)
 {
-
-    return transmitIrq( size, buffer);
-
-//--------------
-
     if(!size) return true;
     _txMutex.lock();
     xAssert(_txDma);

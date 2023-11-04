@@ -33,10 +33,10 @@ class lnRpDMA
 
     enum LN_RP_DMA_DREQ
     {
-        DREQ_SPLAT(SPI,0,26),
-        DREQ_SPLAT(SPI,1,28),
-        DREQ_SPLAT(UART,0,30),
-        DREQ_SPLAT(UART,1,32),
+        DREQ_SPLAT(SPI,0,16),
+        DREQ_SPLAT(SPI,1,18),
+        DREQ_SPLAT(UART,0,20),
+        DREQ_SPLAT(UART,1,22),
         DREQ_SPLAT(I2C,0,32),
         DREQ_SPLAT(I2C,1,34),
         LN_DMA_DREQ_ADC = 36,
@@ -66,7 +66,8 @@ class lnRpDMA
     void endTransfer();
     void cancelTransfer();
     
-    uint32_t getCurrentCount();    
+    uint32_t getCurrentCount();   
+    void  invokeCallback() { xAssert(_cb); _cb(_cookie);}
 
   protected:
     int             _channel;

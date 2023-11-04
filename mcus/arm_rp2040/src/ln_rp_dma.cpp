@@ -14,10 +14,12 @@
 #include "hardware/regs/intctrl.h"
 #include "hardware/irq.h"
 
-lnMutex *dmaMuteces[LN_RP_DMA_CHANNEL_COUNT]={   NULL,NULL,NULL,NULL,
+static lnMutex *dmaMuteces[LN_RP_DMA_CHANNEL_COUNT]={   NULL,NULL,NULL,NULL,
                                                 NULL,NULL,NULL,NULL,
                                                 NULL,NULL,NULL,NULL};
-
+static lnRpDMA *dmaInstances[LN_RP_DMA_CHANNEL_COUNT] = {   NULL,NULL,NULL,NULL,
+                                                NULL,NULL,NULL,NULL,
+                                                NULL,NULL,NULL,NULL};
 
 LN_RP_DMA *dmactrl  = (LN_RP_DMA *)LN_RP_DMA_CONTROL;
 
@@ -25,7 +27,18 @@ void dma_irq0_handler()
 {
     uint32_t flags = dmactrl->INTS0;
     dmactrl->INTS0=flags; // ack the DMA interrupt
-    xAssert(0);
+    flags &= dmactrl->INTE0;
+    uint32_t copy = flags;
+    for(int i=0;i<12 && copy;i++)
+    {
+        int bit = 1<<i;
+        if(copy & bit)
+        {
+            xAssert( dmaInstances[i])
+            dmaInstances[i]->invokeCallback();
+        }
+        copy&=~bit;
+    }    
 }
 /**
  * @brief 
@@ -84,7 +97,9 @@ lnRpDMA::lnRpDMA(DmaTransferType type, LN_RP_DMA_DREQ req, int dmaChannel, int t
         default : xAssert(0);break;
     }
     _control |= LN_RP_DMA_CONTROL_TREQ(_req);
+    _control |= LN_RP_DMA_CONTROL_CHAIN_TO(_channel); // chain to self
     //
+    dmaInstances[_channel]=this;
     _dma = RP_DMA_CHANNEL(_channel);
     _dma->DMA_CONTROL = _control; // disable it while we are at it
 }
@@ -94,6 +109,7 @@ lnRpDMA::lnRpDMA(DmaTransferType type, LN_RP_DMA_DREQ req, int dmaChannel, int t
  */
 lnRpDMA::~lnRpDMA()
 {
+    dmaInstances[_channel]=0;
     _dma->DMA_CONTROL &= ~LN_RP_DMA_CONTROL_ENABLE; 
 }
 /**

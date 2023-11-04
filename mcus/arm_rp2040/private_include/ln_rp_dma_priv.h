@@ -53,7 +53,8 @@ typedef volatile LN_RP_DMAx LN_RP_DMA;
 #define LN_RP_DMA_CONTROL_CIRCULAR_SIZE(pow_of_2) ( (pow_of_2)<<6)
 #define LN_RP_DMA_CONTROL_CIRCULAR_READ     (0<<10)
 #define LN_RP_DMA_CONTROL_CIRCULAR_WRITE    (1<<10)
-// chain ignored
+#define LN_RP_DMA_CONTROL_CHAIN_TO(x)       (x<<11)
+
 #define LN_RP_DMA_CONTROL_TREQ(x)           (x<<15) 
 // quiet ignored
 // bswp ignored
