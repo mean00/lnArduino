@@ -113,7 +113,7 @@ class lnSerialBp : public lnSerialCore
  * @param instance 
  * @param rxBufferSize 
  */
-lnSerialBp::lnSerialBp(int instance, lnSerialMode mode, int rxBufferSize) : lnSerialCore(instance, rxBufferSize),
+lnSerialBp::lnSerialBp(int instance, lnSerialMode mode, int rxBufferSize) : lnSerialCore(instance ),
      _txDma(lnDMA::DMA_MEMORY_TO_PERIPH, M(dmaEngine), M(dmaTxChannel), 8, 32)
 {
     const UsartMapping *m = usartMapping + instance;

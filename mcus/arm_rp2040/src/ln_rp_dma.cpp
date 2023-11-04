@@ -176,7 +176,7 @@ bool  lnRpDMA::doMemoryToPeripheralTransferNoLock(int count, const uint32_t *sou
  * @return true 
  * @return false 
  */
-bool lnRpDMA::doPeripheralToMemoryTransferNoLock(int count, const uint32_t *source, const uint32_t *target)
+bool lnRpDMA::doPeripheralToMemoryTransferNoLock(int count, const uint32_t *source, const uint32_t *target, bool wrap)
 {
     xAssert(!(_dma->DMA_CONTROL & LN_RP_DMA_CONTROL_ENABLE ));
     _dma->DMA_COUNT=count;
@@ -207,6 +207,16 @@ uint32_t lnRpDMA::getCurrentCount()
 {
     return _dma->DMA_COUNT;    
 }
+
+void lnRpDMA::disableInterrupt()
+{
+    dmactrl->INTE0 &= ~(1<<_channel);
+}
+void lnRpDMA::enableInterrupt()
+{
+    dmactrl->INTE0 |= (1<<_channel);
+}
+
 /**
  * @brief 
  * 

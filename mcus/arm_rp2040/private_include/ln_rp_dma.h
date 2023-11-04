@@ -60,12 +60,15 @@ class lnRpDMA
     void detachCallback();
 
     bool doMemoryToPeripheralTransferNoLock(int count, const uint32_t *source, const uint32_t *target,  bool repeat=false);
-    bool doPeripheralToMemoryTransferNoLock(int count, const uint32_t *source, const uint32_t *target);
+    bool doPeripheralToMemoryTransferNoLock(int count, const uint32_t *source, const uint32_t *target, bool wrap = false);
     
     void beginTransfer();
     void endTransfer();
     void cancelTransfer();
     
+    void disableInterrupt();
+    void enableInterrupt();
+
     uint32_t getCurrentCount();   
     void  invokeCallback() { xAssert(_cb); _cb(_cookie);}
 

@@ -67,6 +67,7 @@ int main()
 }
 
 extern "C" void deadEnd(int code)
+
 {
     __asm__("bkpt #0");
 }
