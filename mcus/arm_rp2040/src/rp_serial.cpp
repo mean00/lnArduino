@@ -32,19 +32,18 @@ static lnRpSerial *rpSerialInstances[2]={NULL,NULL};
 struct lnUart_t
 {
     const uart_inst_t *hw;
-    const lnRpDMA::LN_RP_DMA_DREQ    dreq_tx;
-    const uint32_t    channel_tx;
+    const lnRpDMA::LN_RP_DMA_DREQ    dreq_tx;    
     const int         irq;
     irq_handler_t     irq_handler;
 };
 
 /*
 */
-static const lnUart_t uarts[2] = {{((const uart_inst_t *)uart0_hw), lnRpDMA::LN_DMA_DREQ_UART0_TX  , LN_RP_UART0_CHANNEL_TX, 
+static const lnUart_t uarts[2] = {{((const uart_inst_t *)uart0_hw), lnRpDMA::LN_DMA_DREQ_UART0_TX  ,  
                                                 UART0_IRQ,uart0_irq_handler
                                         }, 
                                         {
-                                        ((const uart_inst_t *)uart1_hw),  lnRpDMA::LN_DMA_DREQ_UART1_TX, LN_RP_UART1_CHANNEL_TX, 
+                                        ((const uart_inst_t *)uart1_hw),  lnRpDMA::LN_DMA_DREQ_UART1_TX,  
                                                     UART1_IRQ  ,uart1_irq_handler
                                         }
                                 };
@@ -153,7 +152,6 @@ bool lnRpSerial::init(lnSerialMode mode)
         _txDma = new lnRpDMA(   
                                 lnRpDMA::DMA_MEMORY_TO_PERIPH, 
                                 t->dreq_tx, 
-                                t->channel_tx, 
                                 8 ); // can we do 8bytes access ?
         _txDma->attachCallback(cbTxDma,this);      
     }    

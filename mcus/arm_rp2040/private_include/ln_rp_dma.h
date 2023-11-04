@@ -53,7 +53,7 @@ class lnRpDMA
         DMA_PRIORITY_HIGH = 2,        
     };
 
-    lnRpDMA(DmaTransferType type, LN_RP_DMA_DREQ treq, int dmaChannel, int transferWidth, DmaPriority prio = DMA_PRIORITY_LOW);
+    lnRpDMA(DmaTransferType type, LN_RP_DMA_DREQ treq, int transferWidth, DmaPriority prio = DMA_PRIORITY_LOW);
     ~lnRpDMA();
 
     void attachCallback(doneCallback *cb, void *cookie);

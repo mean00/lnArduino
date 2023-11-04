@@ -14,15 +14,15 @@
 #include "hardware/regs/intctrl.h"
 #include "hardware/irq.h"
 
-static lnMutex *dmaMuteces[LN_RP_DMA_CHANNEL_COUNT]={   NULL,NULL,NULL,NULL,
-                                                NULL,NULL,NULL,NULL,
-                                                NULL,NULL,NULL,NULL};
 static lnRpDMA *dmaInstances[LN_RP_DMA_CHANNEL_COUNT] = {   NULL,NULL,NULL,NULL,
                                                 NULL,NULL,NULL,NULL,
                                                 NULL,NULL,NULL,NULL};
 
 LN_RP_DMA *dmactrl  = (LN_RP_DMA *)LN_RP_DMA_CONTROL;
-
+/**
+ * @brief 
+ * 
+ */
 void dma_irq0_handler()
 {
     uint32_t flags = dmactrl->INTS0;
@@ -43,14 +43,26 @@ void dma_irq0_handler()
 /**
  * @brief 
  * 
+ * @return int 
+ */
+static int lookupFreeChannel()
+{
+    for(int i=0;i<LN_RP_DMA_CHANNEL_COUNT;i++)
+        if(!dmaInstances[i]) return i;
+    xAssert(0);
+    return 0;
+}
+
+/**
+ * @brief 
+ * 
  */
 void lnRpDmaSysInit()
 {
     LN_RP_DMA_channel *dma;
     irq_set_enabled(DMA_IRQ_0, false);
     for(int i=0;i<LN_RP_DMA_CHANNEL_COUNT;i++)
-    {
-        dmaMuteces[i]=new lnMutex;        
+    {        
         dma = RP_DMA_CHANNEL(i);
         dma->DMA_CONTROL = 0; // dis
     }
@@ -68,10 +80,10 @@ void lnRpDmaSysInit()
  * @param sourceWith 
  * @param targetWidth 
  */
-lnRpDMA::lnRpDMA(DmaTransferType type, LN_RP_DMA_DREQ req, int dmaChannel, int transferWidth, DmaPriority prio )
+lnRpDMA::lnRpDMA(DmaTransferType type, LN_RP_DMA_DREQ req, int transferWidth, DmaPriority prio )
 {
     _control = 0;
-    _channel = dmaChannel;
+    _channel = lookupFreeChannel();
     _type = type;    
     _transferWidth = transferWidth;    
     _priority = prio;
