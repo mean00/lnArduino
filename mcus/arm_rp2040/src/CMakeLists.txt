@@ -38,14 +38,14 @@ ${PICO_SDK_PATH}/src/rp2_common/hardware_xosc/xosc.c
 ${PICO_SDK_PATH}/src/rp2_common/pico_bit_ops/bit_ops_aeabi.S
 ${PICO_SDK_PATH}/src/rp2_common/pico_bootrom/bootrom.c
 ${PICO_SDK_PATH}/src/rp2_common/pico_divider/divider.S
-${PICO_SDK_PATH}/src/rp2_common/pico_double/double_aeabi.S
-${PICO_SDK_PATH}/src/rp2_common/pico_double/double_init_rom.c
-${PICO_SDK_PATH}/src/rp2_common/pico_double/double_math.c
-${PICO_SDK_PATH}/src/rp2_common/pico_double/double_v1_rom_shim.S
-${PICO_SDK_PATH}/src/rp2_common/pico_float/float_aeabi.S
-${PICO_SDK_PATH}/src/rp2_common/pico_float/float_init_rom.c
-${PICO_SDK_PATH}/src/rp2_common/pico_float/float_math.c
-${PICO_SDK_PATH}/src/rp2_common/pico_float/float_v1_rom_shim.S
+# {PICO_SDK_PATH}/src/rp2_common/pico_double/double_aeabi.S
+# ${PICO_SDK_PATH}/src/rp2_common/pico_double/double_init_rom.c
+# ${PICO_SDK_PATH}/src/rp2_common/pico_double/double_math.c
+# ${PICO_SDK_PATH}/src/rp2_common/pico_double/double_v1_rom_shim.S
+# ${PICO_SDK_PATH}/src/rp2_common/pico_float/float_aeabi.S
+# ${PICO_SDK_PATH}/src/rp2_common/pico_float/float_init_rom.c
+# ${PICO_SDK_PATH}/src/rp2_common/pico_float/float_math.c
+# ${PICO_SDK_PATH}/src/rp2_common/pico_float/float_v1_rom_shim.S
 ${PICO_SDK_PATH}/src/rp2_common/pico_int64_ops/pico_int64_ops_aeabi.S
 ${PICO_SDK_PATH}/src/rp2_common/pico_mem_ops/mem_ops_aeabi.S
 ${PICO_SDK_PATH}/src/rp2_common/pico_platform/platform.c

@@ -27,7 +27,7 @@ class lnSerialCore
         txOnly,
         txRx
     };
-    lnSerialCore(int instance, int rxBufferSize = 128)
+    lnSerialCore(int instance)
     {
         _instance=instance;
     }
@@ -35,7 +35,7 @@ class lnSerialCore
     {
     
     }
-    virtual bool init(lnSerialMode mode)=0;
+    virtual bool init()=0;
     virtual bool setSpeed(int speed)=0;
     virtual bool enableRx(bool enabled)=0;
     virtual bool transmit(int size, const uint8_t *buffer)=0;
@@ -61,6 +61,6 @@ class lnSerialCore
     lnSerialCallback  *_cb;
     void              *_cbCookie;
 };
-lnSerialCore *createLnSerial(int instance, int rxBufferSize = 128);
+lnSerialCore *createLnSerial(int instance,lnSerialCore::lnSerialMode mode,  int rxBufferSize = 128);
 
 // EOF

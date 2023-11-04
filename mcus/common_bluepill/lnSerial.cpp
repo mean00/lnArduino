@@ -10,10 +10,10 @@
 
 #pragma clang diagnostic ignored "-Wextra"
 
-class lnSerial;
+class lnSerialBp;
 
 LN_USART_Registers *usart0 = (LN_USART_Registers *)LN_USART0_ADR;
-static lnSerial *SerialInstance[5] = {NULL, NULL, NULL, NULL, NULL};
+static lnSerialBp *SerialInstance[5] = {NULL, NULL, NULL, NULL, NULL};
 // 0   1    2    3
 
 /**
@@ -44,7 +44,11 @@ static const UsartMapping usartMapping[3] = {
 /**
  */
 #include "lnDma.h"
-class lnSerial : public lnSerialCore
+/**
+ * @brief 
+ * 
+ */
+class lnSerialBp : public lnSerialCore
 {
   public:   
 
@@ -57,8 +61,8 @@ class lnSerial : public lnSerialCore
     };
 
   // public API
-         lnSerial(int instance, int rxBufferSize = 128);
-    bool init(lnSerialMode mode);
+         lnSerialBp(int instance, lnSerialMode mode, int rxBufferSize = 128);
+    bool init();
     bool setSpeed(int speed);
     bool enableRx(bool enabled);
     bool transmit(int size, const uint8_t *buffer);
@@ -89,7 +93,7 @@ class lnSerial : public lnSerialCore
     volatile const uint8_t *_cur, *_tail;
     txState _txState;
     lnDMA _txDma;
-    int _lastTransferSize;
+    
     // rx
     int _rxBufferSize;
     int _rxHead, _rxTail;
@@ -109,13 +113,14 @@ class lnSerial : public lnSerialCore
  * @param instance 
  * @param rxBufferSize 
  */
-lnSerial::lnSerial(int instance, int rxBufferSize) : lnSerialCore(instance, rxBufferSize),
+lnSerialBp::lnSerialBp(int instance, lnSerialMode mode, int rxBufferSize) : lnSerialCore(instance, rxBufferSize),
      _txDma(lnDMA::DMA_MEMORY_TO_PERIPH, M(dmaEngine), M(dmaTxChannel), 8, 32)
 {
     const UsartMapping *m = usartMapping + instance;
     _instance = instance;
     _irq = m->irq;
     _adr = m->usartEngine;
+    _mode = mode;
     xAssert(SerialInstance[instance] == NULL);
     SerialInstance[instance] = this;
     _txState = txTransmittingIdle;
@@ -128,7 +133,7 @@ lnSerial::lnSerial(int instance, int rxBufferSize) : lnSerialCore(instance, rxBu
     _rxError = 0;
 }
 
-void lnSerial::enableInterrupt(bool tx)
+void lnSerialBp::enableInterrupt(bool tx)
 {
     if (tx || _rxEnabled)
         lnEnableInterrupt(_irq);
@@ -138,7 +143,7 @@ void lnSerial::enableInterrupt(bool tx)
 
 /**
  */
-int lnSerial::modulo(int in)
+int lnSerialBp::modulo(int in)
 {
     if (in >= _rxBufferSize)
         return in - _rxBufferSize;
@@ -150,7 +155,7 @@ int lnSerial::modulo(int in)
  * @param speed
  * @return
  */
-bool lnSerial::setSpeed(int speed)
+bool lnSerialBp::setSpeed(int speed)
 {
     int freq;
 
@@ -169,12 +174,11 @@ bool lnSerial::setSpeed(int speed)
  *
  * @return
  */
-bool lnSerial::init(lnSerialMode mode)
+bool lnSerialBp::init()
 {
     LN_USART_Registers *d = (LN_USART_Registers *)_adr;
     const UsartMapping *e = usartMapping + _instance;
 
-    _mode=mode;
     switch (_instance)
     {
     case 0:
@@ -199,7 +203,7 @@ bool lnSerial::init(lnSerialMode mode)
 */
 #define RE_ENABLE_INTERRUPT() enableInterrupt(_txState == txTransmittingInterrupt || _txState == txTransmittingLast)
 
-void lnSerial::purgeRx()
+void lnSerialBp::purgeRx()
 {
     LN_USART_Registers *d = (LN_USART_Registers *)_adr;
     disableInterrupt();
@@ -214,7 +218,7 @@ void lnSerial::purgeRx()
 }
 /**
  */
-void lnSerial::rawWrite(const char *c)
+void lnSerialBp::rawWrite(const char *c)
 {
     LN_USART_Registers *d = (LN_USART_Registers *)_adr;
     while (*c)
@@ -232,7 +236,7 @@ void lnSerial::rawWrite(const char *c)
 /**
 
 */
-bool lnSerial::enableRx(bool enabled)
+bool lnSerialBp::enableRx(bool enabled)
 {
     LN_USART_Registers *d = (LN_USART_Registers *)_adr;
     d->CTL0 &= ~LN_USART_CTL0_UEN;
@@ -260,7 +264,7 @@ bool lnSerial::enableRx(bool enabled)
  *
  * @return
  */
-bool lnSerial::_programTx()
+bool lnSerialBp::_programTx()
 {
     LN_USART_Registers *d = (LN_USART_Registers *)_adr;
     d->CTL0 &= ~LN_USART_CTL0_UEN;
@@ -313,13 +317,12 @@ bool lnSerial::_programTx()
  * @param buffer
  * @return
  */
-bool lnSerial::transmit(int size, const uint8_t *buffer)
+bool lnSerialBp::transmit(int size, const uint8_t *buffer)
 {
     // return true;
     LN_USART_Registers *d = (LN_USART_Registers *)_adr;
     _txMutex.lock();
-    ENTER_CRITICAL();
-    _lastTransferSize = size;
+    ENTER_CRITICAL();    
     _tail = buffer + size;
     _cur = buffer + 1;
     if (size == 1)
@@ -344,7 +347,7 @@ bool lnSerial::transmit(int size, const uint8_t *buffer)
 /**
  *
  */
-void lnSerial::txDmaCb()
+void lnSerialBp::txDmaCb()
 {
     LN_USART_Registers *d = (LN_USART_Registers *)_adr;
     // disable TC & TBE
@@ -360,9 +363,9 @@ void lnSerial::txDmaCb()
  *
  * @param c
  */
-void lnSerial::_dmaCallback(void *c, lnDMA::DmaInterruptType it)
+void lnSerialBp::_dmaCallback(void *c, lnDMA::DmaInterruptType it)
 {
-    lnSerial *i = (lnSerial *)c;
+    lnSerialBp *i = (lnSerialBp *)c;
     i->txDmaCb();
 }
 
@@ -372,14 +375,13 @@ void lnSerial::_dmaCallback(void *c, lnDMA::DmaInterruptType it)
  * @param buffer
  * @return
  */
-bool lnSerial::dmaTransmit(int size, const uint8_t *buffer)
+bool lnSerialBp::dmaTransmit(int size, const uint8_t *buffer)
 {
     // return true;
     LN_USART_Registers *d = (LN_USART_Registers *)_adr;
     _txMutex.lock();        // lock uart
     _txDma.beginTransfer(); // lock dma
     ENTER_CRITICAL();
-    _lastTransferSize = size;
     _txState = txTransmittingDMA;
     _programTx();
     d->STAT &= ~LN_USART_STAT_TC;
@@ -409,7 +411,7 @@ volatile int serialRound = 0;
 /**
 
 */
-void lnSerial::_interrupt(void)
+void lnSerialBp::_interrupt(void)
 {
     serialRound++;
     LN_USART_Registers *d = (LN_USART_Registers *)_adr;
@@ -433,7 +435,7 @@ void lnSerial::_interrupt(void)
 /**
 
 */
-void lnSerial::rxInterruptHandler(void)
+void lnSerialBp::rxInterruptHandler(void)
 {
     LN_USART_Registers *d = (LN_USART_Registers *)_adr;
     volatile int stat = d->STAT;
@@ -469,7 +471,7 @@ void lnSerial::rxInterruptHandler(void)
 /**
 
 */
-void lnSerial::txInterruptHandler(void)
+void lnSerialBp::txInterruptHandler(void)
 {
     LN_USART_Registers *d = (LN_USART_Registers *)_adr;
     volatile int stat = d->STAT;
@@ -507,7 +509,7 @@ void lnSerial::txInterruptHandler(void)
 /**
 
 */
-void lnSerial::disableInterrupt()
+void lnSerialBp::disableInterrupt()
 {
     const UsartMapping *m = usartMapping + _instance;
     lnDisableInterrupt(m->irq);
@@ -515,9 +517,9 @@ void lnSerial::disableInterrupt()
 /**
 
 */
-void lnSerial::interrupts(int instance)
+void lnSerialBp::interrupts(int instance)
 {
-    lnSerial *inst = SerialInstance[instance];
+    lnSerialBp *inst = SerialInstance[instance];
     xAssert(inst);
     inst->_interrupt();
 }
@@ -528,7 +530,7 @@ void lnSerial::interrupts(int instance)
 /**
  * \fn int read(int max, uint8_t *to)
  */
-int lnSerial::read(int max, uint8_t *to)
+int lnSerialBp::read(int max, uint8_t *to)
 {
     int total = 0;
     while (1)
@@ -564,7 +566,7 @@ int lnSerial::read(int max, uint8_t *to)
 /**
  *
  */
-int lnSerial::getReadPointer(uint8_t **to)
+int lnSerialBp::getReadPointer(uint8_t **to)
 {
     disableInterrupt();
     if (_rxHead == _rxTail) // source empty or target full
@@ -586,7 +588,7 @@ int lnSerial::getReadPointer(uint8_t **to)
     return z;
 }
 
-void lnSerial::consume(int n)
+void lnSerialBp::consume(int n)
 {
     disableInterrupt();
     _rxHead = modulo(_rxHead + n);
@@ -599,7 +601,7 @@ void lnSerial::consume(int n)
         void USART##x##_IRQHandler() LN_INTERRUPT_TYPE;                                                                \
         void USART##x##_IRQHandler()                                                                                   \
         {                                                                                                              \
-            lnSerial::interrupts(x);                                                                                   \
+            lnSerialBp::interrupts(x);                                                                                   \
         }                                                                                                              \
     }
 
@@ -616,9 +618,9 @@ const unsigned short int *_ctype_b;
  * @param rxBufferSize 
  * @return lnSerialCore* 
  */
-lnSerialCore *createLnSerial(int instance, int rxBufferSize)
+lnSerialCore *createLnSerial(int instance, lnSerialCore::lnSerialMode mode, int rxBufferSize)
 {
-    return new lnSerial(instance,rxBufferSize);
+    return new lnSerialBp(instance,mode, rxBufferSize);
 }
 
 // EOF

@@ -13,7 +13,7 @@ volatile uint32_t lnScratchRegister;
 
 extern "C" void Logger_crash(const char *st)
 {    
-    serial0->init(lnSerialCore::txOnly);
+    serial0->init();
     serial0->setSpeed(115200);
     serial0->rawWrite(st);
 }
@@ -72,7 +72,7 @@ void LoggerInit()
 #ifdef LN_DEBUG_UART
     debugUart = LN_DEBUG_UART;
 #endif
-    serial0 = createLnSerial(debugUart,16);
-    serial0->init( lnSerialCore::txOnly);
+    serial0 = createLnSerial(debugUart,lnSerialCore::txOnly, 16);
+    serial0->init();
     serial0->setSpeed(115200);
 }
