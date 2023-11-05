@@ -28,6 +28,12 @@ static void uart1_irq_handler(void);
 
 static lnRpSerialTxOnly *rpSerialInstances[2]={NULL,NULL};
 
+#if 0
+    #define xParanoid xAssert
+#else
+    #define xParanoid(...) {}
+#endif
+
 /**
  * @brief     We dont use DMA for Rx 
  * 
@@ -454,7 +460,7 @@ void lnRpSerialRxTx::rxDmaCb()
 void lnRpSerialRxTx::copyToBuffer(uint32_t startFrom, uint32_t count)
 {
     bool was_empty = _ring.empty();
-    xAssert( startFrom+count <=_ring.size())
+    xParanoid( startFrom+count <=_ring.size())
     _ring.put(count, _rxDmaBuffer+startFrom);
     if(was_empty && count)
     {
@@ -506,6 +512,8 @@ void lnRpSerialRxTx::purgeRx()
  * @param to 
  * @return int 
  */
+
+// we should not be needing this, to be optimized later...
 #define DISABLE_INTERRUPTS() taskENTER_CRITICAL()
 #define ENABLE_INTERRUPTS()  taskEXIT_CRITICAL()
 

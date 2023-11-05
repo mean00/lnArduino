@@ -57,21 +57,48 @@ class lnRingBuffer
         {            
             int size = CMIN(insize,free());
             // FIXME : optimize!
-            for(int i=0;i<size;i++)
+            int c;
+            while(size)
             {
-                _buffer[_head++ & _mask] = data[i];
-                
-            }                       
+                int h = _head & _mask;
+                int t = _tail & _mask;
+                if(h>=t)
+                {
+                    // copy till the end
+                    c=CMIN(_size-h,size);
+                }else
+                {
+                    c=CMIN(t-h,size);
+                }
+                memcpy(_buffer+h,data,c);
+                _head=_head+c;
+                data+=c;
+                size-=c;
+            }
+            //for(int i=0;i<size;i++)  _buffer[_head++ & _mask] = data[i];
             return true;
         }
         int get(int size, uint8_t *data)
         {            
             size = CMIN(size,count());
-            for(int i=0;i<size;i++)
+            int c;
+            while(size)
             {
-                data[i]=_buffer[_tail & _mask];
-                _tail++;
-            }         
+                int h = _head & _mask;
+                int t = _tail & _mask;
+                if(h>t)
+                {                    
+                    c=CMIN(h-t,size);
+                }else
+                {
+                    c=CMIN(_size-t,size);
+                }
+                memcpy(_buffer+t,data,c);
+                _tail=_tail+c;
+                data+=c;
+                size-=c;
+            }
+            //for(int i=0;i<size;i++)            {                data[i]=_buffer[_tail & _mask];                _tail++;                     
             if(_tail==_head) 
                 flush();
             return size;
