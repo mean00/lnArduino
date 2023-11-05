@@ -11,7 +11,7 @@
 #include "lnArduino.h"
 #include "lnIRQ_arm.h"
 #include "lnSerial.h"
-#include "lnCircularBuffer.h"
+#include "lnRingBuffer.h"
 
 #include "hardware/irq.h"
 #include "hardware/uart.h"
