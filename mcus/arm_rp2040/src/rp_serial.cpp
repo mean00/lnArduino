@@ -504,6 +504,7 @@ void lnRpSerialRxTx::purgeRx()
     uart_inst_t *u = (uart_inst_t *)uarts[_instance].hw;
     while(uart_is_readable(u))
         uart_getc(u);
+    _ring.flush();
 }
 /**
  * @brief 

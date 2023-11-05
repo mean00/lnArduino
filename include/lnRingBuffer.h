@@ -63,8 +63,7 @@ class lnRingBuffer
                 int h = _head & _mask;
                 int t = _tail & _mask;
                 if(h>=t)
-                {
-                    // copy till the end
+                {   // copy till the end
                     c=CMIN(_size-h,size);
                 }else
                 {
