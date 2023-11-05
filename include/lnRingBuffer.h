@@ -24,7 +24,7 @@ class lnRingBuffer
             delete _buffer;
             _buffer=NULL;
         }
-       
+        int  size() { return _size;}
         bool empty() { return (_head==_tail);}
         bool full()  { return (_head==(_tail+_size));}
         int  count() {return _head-_tail;}

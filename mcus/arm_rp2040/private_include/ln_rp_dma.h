@@ -62,6 +62,8 @@ class lnRpDMA
     bool doMemoryToPeripheralTransferNoLock(int count, const uint32_t *source, const uint32_t *target,  bool repeat=false);
     bool doPeripheralToMemoryTransferNoLock(int count, const uint32_t *source, const uint32_t *target, bool wrap = false);
     
+    bool continuePeripheralToMemoryTransferNoLock(int count,  const uint32_t *target);
+
     void beginTransfer();
     void endTransfer();
     void cancelTransfer();

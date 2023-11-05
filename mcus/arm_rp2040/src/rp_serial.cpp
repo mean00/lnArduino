@@ -431,6 +431,8 @@ void lnRpSerialRxTx::rxDmaCb()
     // copy to copy
     uint32_t copyFrom=_rxDmaLastIndex;
     _rxDmaLastIndex=0;
+      uart_inst_t *u = (uart_inst_t *)uarts[_instance].hw;
+    _rxDma->continuePeripheralToMemoryTransferNoLock(UART_RX_DMA_BUFFER,  (const uint32_t *) _rxDmaBuffer );
     _rxDma->beginTransfer(); // next!   
              
     if(toCopy) // we assume we'll be faster than the DMA
@@ -452,6 +454,7 @@ void lnRpSerialRxTx::rxDmaCb()
 void lnRpSerialRxTx::copyToBuffer(uint32_t startFrom, uint32_t count)
 {
     bool was_empty = _ring.empty();
+    xAssert( startFrom+count <=_ring.size())
     _ring.put(count, _rxDmaBuffer+startFrom);
     if(was_empty && count)
     {

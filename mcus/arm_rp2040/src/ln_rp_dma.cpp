@@ -190,6 +190,25 @@ bool lnRpDMA::doPeripheralToMemoryTransferNoLock(int count, const uint32_t *sour
 }
 /**
  * @brief 
+ * 
+ * @param count 
+ * @param target 
+ * @return true 
+ * @return false 
+ */
+bool lnRpDMA::continuePeripheralToMemoryTransferNoLock(int count,  const uint32_t *target)
+{    
+    _dma->DMA_COUNT=count;    
+    _dma->DMA_WRITE=(uint32_t )target;
+    uint32_t control = _dma->DMA_CONTROL;
+    control &=( LN_RP_DMA_CONTROL_INCR_READ+LN_RP_DMA_CONTROL_INCR_WRITE);
+    control |=LN_RP_DMA_CONTROL_INCR_WRITE;
+    _dma->DMA_CONTROL = _control;    
+    return true;
+}
+
+/**
+ * @brief 
  * dma_channel_set_irq0_enabled
  */
 void lnRpDMA::beginTransfer()
