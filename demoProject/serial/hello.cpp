@@ -56,8 +56,8 @@ void loop()
 {
     // Logger("Starting lnUart Test\n");
 
-    lnSerialCore *serial = createLnSerial(2);
-    serial->init(lnSerialCore::txRx);
+    lnSerialCore *serial = createLnSerial(2, lnSerialCore::txRx);
+    serial->init();
     serial->setSpeed(115200);
     rxTask receiveTask(serial);
     receiveTask.start();
