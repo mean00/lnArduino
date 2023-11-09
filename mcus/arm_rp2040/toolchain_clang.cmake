@@ -108,7 +108,7 @@ MESSAGE(STATUS "GD32 C++ compiler ${CMAKE_CXX_COMPILER}")
 
 SET(MINI_SYSROOT "${PLATFORM_CLANG_PATH}/../lib/clang-runtimes/arm-none-eabi/armv6m_soft_nofp/" CACHE INTERNAL "")
 SET(GD32_LIBC "-L${MINI_SYSROOT}/lib " CACHE INTERNAL "")
-SET(GD32_MCU "-mcpu=cortex-m0plus --target=armv6m-none-eabi  -DPICO_RP2040_USB_FAST_IRQ=0  " CACHE INTERNAL "")
+SET(GD32_MCU "-mcpu=cortex-m0plus --target=armv6m-none-eabi -DUSE_RP2040  -DPICO_RP2040_USB_FAST_IRQ=0  " CACHE INTERNAL "")
 
 #____________________________
 # CLANG LINK USING GCC LIBS

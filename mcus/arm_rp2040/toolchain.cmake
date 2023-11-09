@@ -112,7 +112,7 @@ SET(GD32_SPECS  "--specs=${LN_SPEC}.specs")
 # M3 or M4 ?
 
 
-SET(GD32_MCU "  -mcpu=cortex-m0plus -mthumb  -march=armv6-m -DPICO_RP2040_USB_FAST_IRQ=0")
+SET(GD32_MCU "  -mcpu=cortex-m0plus -mthumb  -march=armv6-m -DPICO_RP2040_USB_FAST_IRQ=0  -DUSE_RP2040 ")
 
 SET(G32_DEBUG_FLAGS "-g3 ${LN_LTO}  -O1 " CACHE INTERNAL "")
 
