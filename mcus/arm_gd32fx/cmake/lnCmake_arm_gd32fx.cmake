@@ -20,7 +20,13 @@ MACRO(GENERATE_GD32_FIRMWARE target)
                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
                    COMMENT "Generating bin file"
     )
-
+    add_custom_command(TARGET ${target}
+        POST_BUILD
+        COMMAND ${CMAKE_OBJCOPY} -Obinary $<TARGET_FILE:${target}> $<TARGET_FILE:${target}>.tmp
+        COMMAND python3 ${CMAKE_SOURCE_DIR}/scripts/lnARMChecksum.py  $<TARGET_FILE:${target}>.tmp $<TARGET_FILE:${target}>.ck_bin
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        COMMENT "Generating checksumed bin file"
+)
 ENDMACRO(GENERATE_GD32_FIRMWARE target)
 
 MACRO(USE_LIBRARY lib)

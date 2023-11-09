@@ -21,6 +21,17 @@ MACRO(GENERATE_GD32_FIRMWARE target)
                    COMMENT "Generating bin file"
     )
 
+    find_program ( elf2uf2      NAMES elf2uf2-rs)    
+    if( "x${elf2uf2}" STREQUAL "xelf2uf2-NOTFOUND")
+        MESSAGE(WARNING "elf2uf2-rs not found, install it trough cargo install elf2uf2-rs" )
+    else()
+     add_custom_command(TARGET ${target}
+        POST_BUILD                
+        COMMAND elf2uf2-rs  $<TARGET_FILE:${target}> $<TARGET_FILE:${target}>.uf2
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        COMMENT "Generating uf2 files"        
+        )
+    endif()
 ENDMACRO(GENERATE_GD32_FIRMWARE target)
 
 MACRO(USE_LIBRARY lib)

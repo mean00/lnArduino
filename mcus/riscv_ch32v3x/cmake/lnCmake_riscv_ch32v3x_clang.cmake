@@ -39,7 +39,12 @@ MACRO(GENERATE_GD32_FIRMWARE target)
                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
                    COMMENT "Memory summary"
     )
-
+    add_custom_command(TARGET ${target}
+        POST_BUILD
+        COMMAND python3 ${CMAKE_SOURCE_DIR}/scripts/lnCH32Checksum.py  $<TARGET_FILE:${target}>.bin $<TARGET_FILE:${target}>.ck_bin
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        COMMENT "Generating checksumed file"
+    )
 
 ENDMACRO(GENERATE_GD32_FIRMWARE target)
 
