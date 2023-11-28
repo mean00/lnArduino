@@ -133,3 +133,20 @@ extern "C"
     {                                                                                                                  \
         do_assert(#a);                                                                                                 \
     }
+/**
+ * @brief
+ *
+ */
+class lnPeriodicTimer
+{
+  public:
+    lnPeriodicTimer(const char *name, int periodInMs);
+    virtual ~lnPeriodicTimer();
+    virtual void timerCallback();
+    bool start();
+    bool stop();
+
+  protected:
+    TimerHandle_t _handle;
+};
+// EOF
