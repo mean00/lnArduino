@@ -47,3 +47,6 @@ MACRO(USE_LIBRARY lib)
     include_directories(${AF_FOLDER}/libraries/${lib})
     LIST(APPEND USED_LIBS ${lib})
 ENDMACRO(USE_LIBRARY lib)
+
+MACRO(HASH_GD32_FIRMWARE target)        
+ENDMACRO()

@@ -26,14 +26,16 @@ MACRO(GENERATE_GD32_FIRMWARE target)
                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
                    COMMENT "Memory summary"
     )
+ENDMACRO()
+MACRO(HASH_GD32_FIRMWARE target)    
     add_custom_command(TARGET ${target}
         POST_BUILD
         COMMAND ${CMAKE_OBJCOPY} -Obinary $<TARGET_FILE:${target}> $<TARGET_FILE:${target}>.tmp
-        COMMAND python3 ${CMAKE_SOURCE_DIR}/scripts/lnARMChecksum.py  $<TARGET_FILE:${target}>.tmp $<TARGET_FILE:${target}>.ck_bin
+        COMMAND python3 ${AF_FOLDER}/script/lnARMChecksum.py  $<TARGET_FILE:${target}>.tmp $<TARGET_FILE:${target}>.ck_bin
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         COMMENT "Generating checksumed bin file"
     )
-ENDMACRO(GENERATE_GD32_FIRMWARE target)
+ENDMACRO()
 
 MACRO(USE_LIBRARY lib)
     add_subdirectory(${AF_FOLDER}/libraries/${lib})
