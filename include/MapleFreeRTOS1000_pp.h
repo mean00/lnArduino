@@ -142,11 +142,12 @@ class lnPeriodicTimer
   public:
     lnPeriodicTimer(const char *name, int periodInMs);
     virtual ~lnPeriodicTimer();
-    virtual void timerCallback();
+    virtual void timerCallback() = 0;
     bool start();
     bool stop();
+    bool restart();
 
   protected:
-    TimerHandle_t _handle;
+    TimerHandle_t _timerHandle;
 };
 // EOF

@@ -392,7 +392,7 @@ static void lnTimerCallbackFunction(TimerHandle_t xTimer)
  */
 lnPeriodicTimer::lnPeriodicTimer(const char *name, int periodInMs)
 {
-    _handle = xTimerCreate(name, periodInMs, true, this, lnTimerCallbackFunction);
+    _timerHandle = xTimerCreate(name, periodInMs, true, this, lnTimerCallbackFunction);
 }
 /**
  * @brief
@@ -402,7 +402,26 @@ lnPeriodicTimer::lnPeriodicTimer(const char *name, int periodInMs)
  */
 bool lnPeriodicTimer::start()
 {
-    xTimerStart(_handle, 0);
+    xTimerStart(_timerHandle, 0);
+    return true;
+}
+/**
+ * @brief
+ *
+ * @return true
+ * @return false
+ */
+bool lnPeriodicTimer::restart()
+{
+    if (underInterrupt)
+    {
+        BaseType_t wake = pdFALSE;
+        xTimerResetFromISR(_timerHandle, &wake);
+    }
+    else
+    {
+        xTimerReset(_timerHandle, 1);
+    }
     return true;
 }
 /**
@@ -413,7 +432,7 @@ bool lnPeriodicTimer::start()
  */
 bool lnPeriodicTimer::stop()
 {
-    xTimerStop(_handle, 0);
+    xTimerStop(_timerHandle, 1);
     return true;
 }
 /**
