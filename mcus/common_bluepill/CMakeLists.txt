@@ -3,7 +3,9 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/../../private_include)
 
 
 SET(OVERLAY_SRCS       
-                       lnSerial.cpp lnGPIO.cpp                      
+                       lnSerial.cpp 
+                       lnSerialCore.cpp 
+                       lnGPIO.cpp                      
                        lnDma.cpp 
                        lnSystemInit.cpp lnRCU.cpp 
                        lnExti.cpp

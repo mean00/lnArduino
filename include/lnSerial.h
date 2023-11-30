@@ -5,16 +5,13 @@
 
 #pragma once
 #include "lnArduino.h"
-
-
-
-
+#include <type_traits>
 
 /**
- * @brief 
- * 
+ * @brief
+ *
  */
- 
+
 class lnSerialCore
 {
   public:
@@ -25,24 +22,55 @@ class lnSerialCore
     enum lnSerialMode
     {
         txOnly,
-        txRx
+        txRx,
+        txRxDma
     };
     lnSerialCore(int instance)
     {
-        _instance=instance;
+        _instance = instance;
     }
-    virtual  ~lnSerialCore()
+    virtual ~lnSerialCore()
     {
-    
     }
-    virtual bool init()=0;
-    virtual bool setSpeed(int speed)=0;
-    virtual bool enableRx(bool enabled)=0;
-    virtual bool transmit(int size, const uint8_t *buffer)=0;
-    virtual bool dmaTransmit(int size, const uint8_t *buffer)=0;
-    virtual void purgeRx()=0;
-    virtual int read(int max, uint8_t *to)=0;
-    virtual void rawWrite(const char *st)=0;
+    virtual bool init() = 0;
+    virtual bool setSpeed(int speed) = 0;
+
+  protected:
+    int _instance;
+};
+/**
+ * @brief
+ *
+ */
+class lnSerialTxOnly : public lnSerialCore
+{
+  public:
+    lnSerialTxOnly(int instance) : lnSerialCore(instance)
+    {
+    }
+    virtual ~lnSerialTxOnly()
+    {
+    }
+    virtual bool transmit(int size, const uint8_t *buffer) = 0;
+    virtual bool rawWrite(int size, const uint8_t *buffer) = 0;
+};
+/**
+ * @brief
+ *
+ */
+class lnSerialRxTx : public lnSerialCore
+{
+  public:
+    lnSerialRxTx(int instance) : lnSerialCore(instance)
+    {
+    }
+    virtual ~lnSerialRxTx()
+    {
+    }
+    virtual bool transmit(int size, const uint8_t *buffer) = 0;
+    virtual bool enableRx(bool enabled) = 0;
+    virtual void purgeRx() = 0;
+    virtual int read(int max, uint8_t *to) = 0;
     typedef void lnSerialCallback(void *cookie, lnSerialCore::Event event);
     void setCallback(lnSerialCallback *cb, void *cookie)
     {
@@ -50,17 +78,15 @@ class lnSerialCore
         _cbCookie = cookie;
     }
     // no copy interface
-    virtual int getReadPointer(uint8_t **to)=0;
-    virtual void consume(int n)=0;
+    virtual int getReadPointer(uint8_t **to) = 0;
+    virtual void consume(int n) = 0;
 
   protected:
-    lnSerialMode      _mode;
-    int               _instance;
-    xMutex            _txMutex;
-    xBinarySemaphore  _txDone;
-    lnSerialCallback  *_cb;
-    void              *_cbCookie;
+    lnSerialCallback *_cb;
+    void *_cbCookie;
 };
-lnSerialCore *createLnSerial(int instance,lnSerialCore::lnSerialMode mode,  int rxBufferSize = 128);
+
+lnSerialTxOnly *createLnSerialTxOnly(int instance, bool dma = true);
+lnSerialRxTx *createLnSerialRxTx(int instance, int rxBufferSize = 128, bool dma = true);
 
 // EOF

@@ -8,14 +8,14 @@
 #include "stdarg.h"
 #define LOGGER_USE_DMA 1
 
-extern lnSerialCore *serial0 = NULL;
+extern lnSerialTxOnly *serial0 = NULL;
 volatile uint32_t lnScratchRegister;
 
 extern "C" void Logger_crash(const char *st)
-{    
+{
     serial0->init();
     serial0->setSpeed(115200);
-    serial0->rawWrite(st);
+    serial0->rawWrite(strlen(st), (const uint8_t *)st);
 }
 
 extern "C" void Logger_C(const char *fmt, ...)
@@ -37,11 +37,7 @@ extern "C" void Logger_chars(int n, const char *data)
 {
     if (!n)
         return; // 0 sized dma does not work...
-#ifdef LOGGER_USE_DMA
-    serial0->dmaTransmit(n, (uint8_t *)data);
-#else
     serial0->transmit(n, (uint8_t *)data);
-#endif
 }
 
 /**
@@ -72,7 +68,11 @@ void LoggerInit()
 #ifdef LN_DEBUG_UART
     debugUart = LN_DEBUG_UART;
 #endif
-    serial0 = createLnSerial(debugUart,lnSerialCore::txOnly, 16);
+    bool dma = false;
+#ifdef LOGGER_USE_DMA
+    dma = true;
+#endif
+    serial0 = createLnSerialTxOnly(debugUart, dma);
     serial0->init();
     serial0->setSpeed(115200);
 }

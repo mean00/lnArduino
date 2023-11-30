@@ -1,3 +1,4 @@
+#ifdef NONONO
 /*
  *  (C) 2021 MEAN00 fixounet@free.fr
  *  See license file
@@ -45,13 +46,12 @@ static const UsartMapping usartMapping[3] = {
  */
 #include "lnDma.h"
 /**
- * @brief 
- * 
+ * @brief
+ *
  */
 class lnSerialBp : public lnSerialCore
 {
-  public:   
-
+  public:
     enum txState
     {
         txTransmittingIdle,
@@ -60,24 +60,24 @@ class lnSerialBp : public lnSerialCore
         txTransmittingLast
     };
 
-  // public API
-         lnSerialBp(int instance, lnSerialMode mode, int rxBufferSize = 128);
+    // public API
+    lnSerialBp(int instance, lnSerialMode mode, int rxBufferSize = 128);
     bool init();
     bool setSpeed(int speed);
     bool enableRx(bool enabled);
     bool transmit(int size, const uint8_t *buffer);
     bool dmaTransmit(int size, const uint8_t *buffer);
     void purgeRx();
-    int  read(int max, uint8_t *to);
+    int read(int max, uint8_t *to);
     void disableInterrupt();
     void enableInterrupt(bool txInterruptEnabled);
     // no copy interface
     int getReadPointer(uint8_t **to);
     void consume(int n);
 
-  // implementation    
+    // implementation
     void _interrupt(void);
-    
+
     static void interrupts(int instance);
     void rawWrite(const char *c); // Write in polling mode
   protected:
@@ -86,14 +86,14 @@ class lnSerialBp : public lnSerialCore
     bool _programTx(void);
 
   protected:
-    bool        _enableTx(txState mode);    
-    LnIRQ       _irq;
-    uint32_t    _adr;
+    bool _enableTx(txState mode);
+    LnIRQ _irq;
+    uint32_t _adr;
     // tx
     volatile const uint8_t *_cur, *_tail;
     txState _txState;
     lnDMA _txDma;
-    
+
     // rx
     int _rxBufferSize;
     int _rxHead, _rxTail;
@@ -109,12 +109,12 @@ class lnSerialBp : public lnSerialCore
 };
 /**
  * @brief Construct a new ln Serial::ln Serial object
- * 
- * @param instance 
- * @param rxBufferSize 
+ *
+ * @param instance
+ * @param rxBufferSize
  */
-lnSerialBp::lnSerialBp(int instance, lnSerialMode mode, int rxBufferSize) : lnSerialCore(instance ),
-     _txDma(lnDMA::DMA_MEMORY_TO_PERIPH, M(dmaEngine), M(dmaTxChannel), 8, 32)
+lnSerialBp::lnSerialBp(int instance, lnSerialMode mode, int rxBufferSize)
+    : lnSerialCore(instance), _txDma(lnDMA::DMA_MEMORY_TO_PERIPH, M(dmaEngine), M(dmaTxChannel), 8, 32)
 {
     const UsartMapping *m = usartMapping + instance;
     _instance = instance;
@@ -322,7 +322,7 @@ bool lnSerialBp::transmit(int size, const uint8_t *buffer)
     // return true;
     LN_USART_Registers *d = (LN_USART_Registers *)_adr;
     _txMutex.lock();
-    ENTER_CRITICAL();    
+    ENTER_CRITICAL();
     _tail = buffer + size;
     _cur = buffer + 1;
     if (size == 1)
@@ -601,7 +601,7 @@ void lnSerialBp::consume(int n)
         void USART##x##_IRQHandler() LN_INTERRUPT_TYPE;                                                                \
         void USART##x##_IRQHandler()                                                                                   \
         {                                                                                                              \
-            lnSerialBp::interrupts(x);                                                                                   \
+            lnSerialBp::interrupts(x);                                                                                 \
         }                                                                                                              \
     }
 
@@ -613,14 +613,14 @@ IRQHANDLER(3)
 const unsigned short int *_ctype_b;
 /**
  * @brief Create a Ln Serial object
- * 
- * @param instance 
- * @param rxBufferSize 
- * @return lnSerialCore* 
+ *
+ * @param instance
+ * @param rxBufferSize
+ * @return lnSerialCore*
  */
 lnSerialCore *createLnSerial(int instance, lnSerialCore::lnSerialMode mode, int rxBufferSize)
 {
-    return new lnSerialBp(instance,mode, rxBufferSize);
+    return new lnSerialBp(instance, mode, rxBufferSize);
 }
-
+#endif
 // EOF
