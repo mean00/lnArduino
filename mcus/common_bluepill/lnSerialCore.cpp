@@ -14,6 +14,7 @@ class lnSerialBp;
 
 LN_USART_Registers *usart0 = (LN_USART_Registers *)LN_USART0_ADR;
 class lnSerialBpCore;
+static bool ln_serial_rawWrite(LN_USART_Registers *d, int count, unsigned char const *c);
 static lnSerialBpCore *SerialInstance[5] = {NULL, NULL, NULL, NULL, NULL};
 // 0   1    2    3
 
@@ -202,5 +203,26 @@ lnSerialTxOnly *createLnSerialTxOnly(int instance, bool dma)
     // if(dma) return new lnSerialBpTxOnlyDma(instance);
     return new lnSerialBpTxOnlyInterrupt(instance);
 }
-
+/**
+ * @brief
+ *
+ * @param count
+ * @param c
+ * @return true
+ * @return false
+ */
+bool ln_serial_rawWrite(LN_USART_Registers *d, int count, unsigned char const *c)
+{
+    while (count--)
+    {
+        const char a = *c++;
+        volatile uint32_t stat = d->STAT;
+        while (!(stat & (LN_USART_STAT_TBE)))
+        {
+            stat = d->STAT;
+        }
+        d->DATA = a;
+    }
+    return true;
+}
 // EOF

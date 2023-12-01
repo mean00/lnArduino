@@ -1,4 +1,7 @@
-//----------------------------------------
+/**
+ * @brief
+ *
+ */
 class lnSerialBpTxOnlyInterrupt : public lnSerialBpCore, public lnSerialTxOnly
 {
   public:
@@ -15,7 +18,11 @@ class lnSerialBpTxOnlyInterrupt : public lnSerialBpCore, public lnSerialTxOnly
     virtual bool transmit(int size, const uint8_t *buffer);
     void txInterruptHandler(void);
     virtual void _interrupt(void);
-    virtual bool rawWrite(int size, const uint8_t *buffer);
+    virtual bool rawWrite(int count, const uint8_t *buffer)
+    {
+        LN_USART_Registers *d = (LN_USART_Registers *)_adr;
+        return ln_serial_rawWrite(d, count, buffer);
+    }
 };
 
 /**
@@ -26,17 +33,26 @@ class lnSerialBpTxOnlyInterrupt : public lnSerialBpCore, public lnSerialTxOnly
 lnSerialBpTxOnlyInterrupt::lnSerialBpTxOnlyInterrupt(int instance) : lnSerialTxOnly(instance), lnSerialBpCore(instance)
 {
 }
-bool lnSerialBpTxOnlyInterrupt::rawWrite(int count, unsigned char const *c)
-{
-    return true;
-}
-void lnSerialBpTxOnlyInterrupt::_interrupt()
-{
-}
 
 /**
-
-*/
+ * @brief
+ *
+ */
+void lnSerialBpTxOnlyInterrupt::_interrupt()
+{
+    LN_USART_Registers *d = (LN_USART_Registers *)_adr;
+#define ALL_INTERRUPTS (LN_USART_STAT_TC + LN_USART_STAT_TBE + LN_USART_STAT_OVERR)
+    volatile int stat = d->STAT & d->CTL0 & ALL_INTERRUPTS; // filter enabled interrupt only
+    if (stat & (LN_USART_STAT_TC + LN_USART_STAT_TBE))
+    {
+        if (_txState == txTransmittingInterrupt || _txState == txTransmittingLast)
+            txInterruptHandler();
+    }
+}
+/**
+ * @brief
+ *
+ */
 void lnSerialBpTxOnlyInterrupt::txInterruptHandler(void)
 {
     LN_USART_Registers *d = (LN_USART_Registers *)_adr;
@@ -85,7 +101,7 @@ bool lnSerialBpTxOnlyInterrupt::transmit(int size, const uint8_t *buffer)
     _txMutex.lock();
     ENTER_CRITICAL();
     _tail = buffer + size;
-    _cur = buffer + 1;
+    _cur = buffer;
     if (size == 1)
     {
         _txState = txTransmittingLast;
@@ -95,8 +111,6 @@ bool lnSerialBpTxOnlyInterrupt::transmit(int size, const uint8_t *buffer)
         _txState = txTransmittingInterrupt;
     }
     d->STAT &= ~(LN_USART_STAT_TC);
-    // send 1st byte
-    d->DATA = (uint32_t)buffer[0];
     // enable TB interrupt
     _programTx();
     EXIT_CRITICAL();
