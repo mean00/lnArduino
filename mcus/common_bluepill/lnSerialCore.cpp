@@ -200,7 +200,8 @@ IRQHANDLER(3)
 
 lnSerialTxOnly *createLnSerialTxOnly(int instance, bool dma)
 {
-    // if(dma) return new lnSerialBpTxOnlyDma(instance);
+    if (dma)
+        return new lnSerialBpTxOnlyDma(instance);
     return new lnSerialBpTxOnlyInterrupt(instance);
 }
 /**
