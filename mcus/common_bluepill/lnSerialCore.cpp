@@ -23,18 +23,20 @@ static lnSerialBpCore *SerialInstance[5] = {NULL, NULL, NULL, NULL, NULL};
 struct UsartMapping
 {
     uint32_t usartEngine;
-    uint32_t dmaEngine;
-    int dmaTxChannel;
-    LnIRQ irq;
-    lnPin tx;
-    lnPin rx;
-    Peripherals periph;
+    const uint8_t dmaEngine;
+    const uint8_t dmaTxChannel;
+    const uint8_t dmaRxChannel;
+    const uint8_t filler;
+    const LnIRQ irq;
+    const lnPin tx;
+    const lnPin rx;
+    const Peripherals periph;
 };
 static const UsartMapping usartMapping[3] = {
     // Adr        DMA CH IRQ         TX   RX   periperal
-    {LN_USART0_ADR, 0, 3, LN_IRQ_USART0, PA9, PA10, pUART0},
-    {LN_USART1_ADR, 0, 6, LN_IRQ_USART1, PA2, PA3, pUART1},
-    {LN_USART2_ADR, 0, 1, LN_IRQ_USART2, PB10, PB11, pUART2},
+    {LN_USART0_ADR, 0, 3, 4, 0, LN_IRQ_USART0, PA9, PA10, pUART0},
+    {LN_USART1_ADR, 0, 6, 5, 0, LN_IRQ_USART1, PA2, PA3, pUART1},
+    {LN_USART2_ADR, 0, 1, 2, 0, LN_IRQ_USART2, PB10, PB11, pUART2},
 };
 /**
  *
@@ -191,9 +193,10 @@ IRQHANDLER(1)
 IRQHANDLER(2)
 IRQHANDLER(3)
 
+#include "lnSerialRxTx.cpp"
+#include "lnSerialRxTxDma.cpp"
 #include "lnSerialTxOnly.cpp"
 #include "lnSerialTxOnlyDma.cpp"
-#include "lnSerialRxTx.cpp"
 /**
  * @brief Create a Ln Serial Tx Only object
  *
@@ -217,8 +220,8 @@ lnSerialTxOnly *createLnSerialTxOnly(int instance, bool dma)
  */
 lnSerialRxTx *createLnSerialRxTx(int instance, int rxBufferSize, bool dma)
 {
-    // if (dma)
-    //     return new lnSerialBpTxOnlyDma(instance);
+    if (dma)
+        return new lnSerialBpRxTxDma(instance, rxBufferSize);
     return new lnSerialBpRxTx(instance, rxBufferSize);
 }
 /**
