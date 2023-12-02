@@ -7,7 +7,10 @@ class lnSerialBpRxTx : public lnSerialBpTxOnlyInterrupt, public lnSerialRxTx
   public:
     lnSerialBpRxTx(int instance, int bufferSize);
     virtual ~lnSerialBpRxTx();
-    // virtual bool transmit(int size, const uint8_t *buffer) ;
+    virtual bool transmit(int size, const uint8_t *buffer)
+    {
+        return lnSerialBpTxOnlyInterrupt::transmit(size, buffer);
+    }
     virtual bool enableRx(bool enabled);
     virtual void purgeRx();
     virtual int read(int max, uint8_t *to);
@@ -16,12 +19,10 @@ class lnSerialBpRxTx : public lnSerialBpTxOnlyInterrupt, public lnSerialRxTx
     virtual void consume(int n);
     virtual void _interrupt(void);
     void rxInterruptHandler(void);
-
-    int _rxBufferSize;
-    int _rxHead, _rxTail;
-    uint8_t *_rxBuffer;
-    bool _rxEnabled;
-    int _rxError;
+    void enableRxInterrupt()
+    {
+        enableInterrupt(_txState == txTransmittingInterrupt || _txState == txTransmittingLast, true);
+    }
     //
     int modulo(int in)
     {
@@ -29,9 +30,26 @@ class lnSerialBpRxTx : public lnSerialBpTxOnlyInterrupt, public lnSerialRxTx
             return in - _rxBufferSize;
         return in;
     }
+    bool init()
+    {
+        return lnSerialBpCore::init();
+    }
+    bool setSpeed(int speed)
+    {
+        return lnSerialBpCore::setSpeed(speed);
+    }
+    virtual bool rawWrite(int count, const uint8_t *buffer)
+    {
+        LN_USART_Registers *d = (LN_USART_Registers *)_adr;
+        return ln_serial_rawWrite(d, count, buffer);
+    }
+    int _rxBufferSize;
+    int _rxHead, _rxTail;
+    uint8_t *_rxBuffer;
+    bool _rxEnabled;
+    int _rxError;
+    //
 };
-#define RE_ENABLE_INTERRUPT()                                                                                          \
-    enableInterrupt(_txState == txTransmittingInterrupt || _txState == txTransmittingLast, true)
 
 /**
  * @brief
@@ -102,6 +120,9 @@ void lnSerialBpRxTx::rxInterruptHandler(void)
 lnSerialBpRxTx::lnSerialBpRxTx(int instance, int bufferSize)
     : lnSerialBpTxOnlyInterrupt(instance), lnSerialRxTx(instance)
 {
+    _rxEnabled = false;
+    _rxBufferSize = bufferSize;
+    _rxBuffer = new uint8_t[_rxBufferSize];
 }
 /**
  * @brief Destroy the ln Serial Bp Rx Tx::ln Serial Bp Rx Tx object
@@ -109,6 +130,8 @@ lnSerialBpRxTx::lnSerialBpRxTx(int instance, int bufferSize)
  */
 lnSerialBpRxTx::~lnSerialBpRxTx()
 {
+    delete[] _rxBuffer;
+    _rxBuffer = NULL;
 }
 /**
  * @brief
@@ -121,7 +144,7 @@ int lnSerialBpRxTx::getReadPointer(uint8_t **to)
     disableInterrupt();
     if (_rxHead == _rxTail) // source empty or target full
     {
-        RE_ENABLE_INTERRUPT();
+        enableRxInterrupt();
         return 0;
     }
     int z = 0;
@@ -134,7 +157,7 @@ int lnSerialBpRxTx::getReadPointer(uint8_t **to)
         z = _rxTail - _rxHead;
     }
     *to = _rxBuffer + _rxHead;
-    RE_ENABLE_INTERRUPT();
+    enableRxInterrupt();
     return z;
 }
 /**
@@ -152,7 +175,7 @@ int lnSerialBpRxTx::read(int max, uint8_t *to)
         disableInterrupt();
         if ((_rxHead == _rxTail) || !max) // source empty or target full
         {
-            RE_ENABLE_INTERRUPT();
+            enableRxInterrupt();
             return total;
         }
         int z = 0;
@@ -168,7 +191,7 @@ int lnSerialBpRxTx::read(int max, uint8_t *to)
             z = max;
         memcpy(to, _rxBuffer + _rxHead, z);
         _rxHead = modulo(_rxHead + z);
-        RE_ENABLE_INTERRUPT();
+        enableRxInterrupt();
         total += z;
         to += z;
         max -= z;
@@ -191,7 +214,7 @@ void lnSerialBpRxTx::purgeRx()
         lnScratchRegister = d->DATA;
         stat = d->STAT;
     }
-    RE_ENABLE_INTERRUPT();
+    enableRxInterrupt();
 }
 /**
  * @brief
@@ -218,7 +241,7 @@ bool lnSerialBpRxTx::enableRx(bool enabled)
         _rxEnabled = false;
         d->CTL0 &= ~LN_USART_CTL0_REN;
         d->CTL0 &= ~LN_USART_CTL0_RBNEIE;
-        RE_ENABLE_INTERRUPT();
+        enableRxInterrupt();
     }
     d->CTL0 |= LN_USART_CTL0_UEN;
     return true;
@@ -233,7 +256,7 @@ void lnSerialBpRxTx::consume(int n)
 {
     disableInterrupt();
     _rxHead = modulo(_rxHead + n);
-    RE_ENABLE_INTERRUPT();
+    enableRxInterrupt();
 }
 
 // EOF

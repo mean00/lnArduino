@@ -157,10 +157,6 @@ bool lnSerialBpCore::init()
     d->CTL0 |= LN_USART_CTL0_UEN; // enable uart
     return true;
 }
-/**
-  \brief purge fifo and uart registers
-*/
-#define RE_ENABLE_INTERRUPT() enableInterrupt(_txState == txTransmittingInterrupt || _txState == txTransmittingLast)
 
 /**
 
@@ -195,14 +191,35 @@ IRQHANDLER(1)
 IRQHANDLER(2)
 IRQHANDLER(3)
 
+#include "lnSerialRxTx.cpp"
 #include "lnSerialTxOnly.cpp"
 #include "lnSerialTxOnlyDma.cpp"
-
+/**
+ * @brief Create a Ln Serial Tx Only object
+ *
+ * @param instance
+ * @param dma
+ * @return lnSerialTxOnly*
+ */
 lnSerialTxOnly *createLnSerialTxOnly(int instance, bool dma)
 {
     if (dma)
         return new lnSerialBpTxOnlyDma(instance);
     return new lnSerialBpTxOnlyInterrupt(instance);
+}
+/**
+ * @brief Create a Ln Serial Rx Tx object
+ *
+ * @param instance
+ * @param rxBufferSize
+ * @param dma
+ * @return lnSerialRxTx*
+ */
+lnSerialRxTx *createLnSerialRxTx(int instance, int rxBufferSize, bool dma)
+{
+    // if (dma)
+    //     return new lnSerialBpTxOnlyDma(instance);
+    return new lnSerialBpRxTx(instance, rxBufferSize);
 }
 /**
  * @brief
