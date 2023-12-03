@@ -52,3 +52,4 @@ typedef volatile DMA_structx DMA_struct;
 #define LN_DMA_CHAN_KEEP_MASK 0xffff8000U
 
 #define LN_DMA_CHAN_WIDTH_MASK (~((3 << 10) + (3 << 8)))
+#define LN_DMA_CHAN_ALL_INTERRUPT_MASK (LN_DMA_CHAN_TFTFIE + LN_DMA_CHAN_HTFIE + LN_DMA_CHAN_ERRIE)
