@@ -318,7 +318,7 @@ bool lnDMA::doMemoryToPeripheralTransferNoLock(int count, const uint16_t *source
         if (bothInterrupts)
             control |= LN_DMA_CHAN_HTFIE;
     }
-
+    _interruptMask = control & _interruptMask;
     c->CTL = control | LN_DMA_CHAN_ENABLE; // GO!
     lnEnableInterrupt(_irq);
     return true;
@@ -336,7 +336,6 @@ uint32_t lnDMA::getCurrentCount()
     uint32_t v = c->CNT;
     return v;
 }
-
 /**
  *
  */
@@ -362,7 +361,26 @@ void lnDMA::resume()
     control |= LN_DMA_CHAN_ENABLE;
     c->CTL = control;
 }
-
+/**
+ * @brief
+ *
+ */
+void lnDMA::enableInterrupt()
+{
+    DMA_struct *d = (DMA_struct *)_dma;
+    DMA_channels *c = d->channels + _channelInt;
+    c->CTL |= _interruptMask;
+}
+/**
+ * @brief
+ *
+ */
+void lnDMA::disableInterrupt()
+{
+    DMA_struct *d = (DMA_struct *)_dma;
+    DMA_channels *c = d->channels + _channelInt;
+    c->CTL &= ~LN_DMA_CHAN_ALL_INTERRUPT_MASK;
+}
 /**
  *
  * @param count
@@ -414,6 +432,7 @@ bool lnDMA::doPeripheralToMemoryTransferNoLock(int count, const uint16_t *target
             control |= LN_DMA_CHAN_HTFIE;
     }
 #warning NOT ATOMIC
+    _interruptMask = control & _interruptMask;
     c->CTL = control | LN_DMA_CHAN_ENABLE; // GO!
     lnEnableInterrupt(_irq);
     return true;
@@ -440,7 +459,7 @@ bool lnDMA::setInterruptMask(bool full, bool half)
 
     // clear interrupts if any
     CLEAR_DMA_INTERRUPT();
-
+    _interruptMask = control & _interruptMask;
     c->CTL = control;
     return true;
 }
