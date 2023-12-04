@@ -2,7 +2,24 @@
  * @brief
  *
  */
-class lnSerialBpRxTxDma : public lnSerialBpTxOnlyDma, public lnSerialRxTx, public lnPeriodicTimer
+
+/**
+ * @brief This is to avoid non virtual thunk gdb does not like that
+ *
+ */
+class lnSerialBpRxTxDma;
+class timerLink : public lnPeriodicTimer
+{
+  public:
+    timerLink(lnSerialBpRxTxDma *parent) : lnPeriodicTimer()
+    {
+        _parent = parent;
+    }
+    lnSerialBpRxTxDma *_parent;
+    void timerCallback();
+};
+
+class lnSerialBpRxTxDma : public lnSerialBpTxOnlyDma, public lnSerialRxTx
 {
   public:
     lnSerialBpRxTxDma(int instance, int bufferSize);
@@ -40,11 +57,13 @@ class lnSerialBpRxTxDma : public lnSerialBpTxOnlyDma, public lnSerialRxTx, publi
     void startRxDma();
     void timerCallback();
     virtual void _interrupt(void);
+
     //---
     static void _RxdmaCallback(void *c, lnDMA::DmaInterruptType it);
     void rxDma(lnDMA::DmaInterruptType type);
 
     void checkForNewData();
+    timerLink _timer;
     int _rxBufferSize;
     int _rxMask = 0;
     int _rxHead, _rxTail;
@@ -64,7 +83,7 @@ void lnSerialBpRxTxDma::_interrupt(void)
 
 lnSerialBpRxTxDma::lnSerialBpRxTxDma(int instance, int bufferSize)
     : lnSerialBpTxOnlyDma(instance), lnSerialRxTx(instance),
-      _rxDma(lnDMA::DMA_PERIPH_TO_MEMORY, M(dmaEngine), M(dmaRxChannel), 32, 8), lnPeriodicTimer("uart", 20)
+      _rxDma(lnDMA::DMA_PERIPH_TO_MEMORY, M(dmaEngine), M(dmaRxChannel), 32, 8), _timer(this)
 {
     _rxBuffer = new uint8_t[bufferSize];
     _rxEnabled = false;
@@ -72,6 +91,7 @@ lnSerialBpRxTxDma::lnSerialBpRxTxDma(int instance, int bufferSize)
     _rxDma.attachCallback(_rxDmaCb, this);
     _rxHead = _rxTail = 0;
     _rxMask = _rxBufferSize - 1;
+    _timer.init("uart", 20);
     xAssert((_rxBufferSize & (~_rxMask)) == _rxBufferSize); // must be a power of 2
 }
 /**
@@ -132,14 +152,15 @@ bool lnSerialBpRxTxDma::enableRx(bool enabled)
         d->CTL0 |= LN_USART_CTL0_RBNEIE;
         d->CTL0 |= LN_USART_CTL0_REN;
         d->CTL2 |= LN_USART_CTL2_DMA_RX;
-        // lnPeriodicTimer::start();
+
+        _timer.start();
         startRxDma();
     }
     else
     {
         disableRxDmaInterrupt();
         _rxDma.pause();
-        // lnPeriodicTimer::stop();
+        _timer.stop();
         _rxEnabled = false;
         d->CTL0 &= ~LN_USART_CTL0_REN;
         d->CTL0 &= ~LN_USART_CTL0_RBNEIE;
@@ -154,7 +175,7 @@ bool lnSerialBpRxTxDma::enableRx(bool enabled)
  */
 void lnSerialBpRxTxDma::timerCallback()
 {
-    ENTER_CRITICAL();
+    ENTER_CRITICAL(); // we are in a task, need to block interrupt and other tasks
     checkForNewData();
     EXIT_CRITICAL();
 }
@@ -247,7 +268,19 @@ void lnSerialBpRxTxDma::consume(int n)
 //---
 void lnSerialBpRxTxDma::checkForNewData()
 {
-    xAssert(0);
+    if (!_rxEnabled)
+        return;
+    int count = _rxDma.getCurrentCount(); // between N and 1, 0 means transfer done
+    count = _rxBufferSize - count;
+    if (count != _rxHead)
+    {
+        if (_rxHead >= _rxTail)
+        {
+            _rxHead = count + (_rxHead & ~_rxMask);
+        }
+        xAssert(_cb);
+        _cb(_cbCookie, lnSerialCore::dataAvailable);
+    }
 }
 /**
  * @brief
@@ -265,22 +298,32 @@ void lnSerialBpRxTxDma::rxDma(lnDMA::DmaInterruptType type)
         {
             newData = true;
             _rxHead = (_rxHead & ~_rxMask) + (_rxBufferSize >> 1);
-            break;
         }
+        break;
     case lnDMA::DMA_INTERRUPT_FULL:
         if (current != (_rxBufferSize - 1))
         {
             newData = true;
             _rxHead = (_rxHead & ~_rxMask) + _rxBufferSize;
-            break;
         }
+        break;
     default:
         xAssert(0);
     }
     if (newData)
     {
+        _timer.restart();
         xAssert(_cb);
         _cb(_cbCookie, lnSerialCore::dataAvailable);
     }
 }
+/**
+ * @brief
+ *
+ */
+void timerLink::timerCallback()
+{
+    _parent->timerCallback();
+}
+
 // EOF
