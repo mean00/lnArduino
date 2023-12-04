@@ -380,7 +380,7 @@ bool lnCreateTask(
  */
 static void lnTimerCallbackFunction(TimerHandle_t xTimer)
 {
-    lnPeriodicTimer *t = (lnPeriodicTimer *)xTimer;
+    lnPeriodicTimer *t = (lnPeriodicTimer *)pvTimerGetTimerID(xTimer);
     xAssert(t);
     t->timerCallback();
 }
@@ -390,7 +390,16 @@ static void lnTimerCallbackFunction(TimerHandle_t xTimer)
  * @param name
  * @param periodInMs
  */
-lnPeriodicTimer::lnPeriodicTimer(const char *name, int periodInMs)
+lnPeriodicTimer::lnPeriodicTimer()
+{
+}
+/**
+ * @brief Construct a new ln Periodic Timer::init object
+ *
+ * @param name
+ * @param periodInMs
+ */
+void lnPeriodicTimer::init(const char *name, int periodInMs)
 {
     _timerHandle = xTimerCreate(name, periodInMs, true, this, lnTimerCallbackFunction);
 }
@@ -402,7 +411,7 @@ lnPeriodicTimer::lnPeriodicTimer(const char *name, int periodInMs)
  */
 bool lnPeriodicTimer::start()
 {
-    xTimerStart(_timerHandle, 0);
+    xTimerStart(_timerHandle, 1);
     return true;
 }
 /**

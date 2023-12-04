@@ -140,9 +140,10 @@ extern "C"
 class lnPeriodicTimer
 {
   public:
-    lnPeriodicTimer(const char *name, int periodInMs);
+    lnPeriodicTimer();
     virtual ~lnPeriodicTimer();
     virtual void timerCallback() = 0;
+    void init(const char *name, int periodInMs);
     bool start();
     bool stop();
     bool restart();
