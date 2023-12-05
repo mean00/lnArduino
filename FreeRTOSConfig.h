@@ -70,11 +70,11 @@ extern void do_assert(const char *a);
 #define configTASK_NOTIFICATION_ARRAY_ENTRIES 5
 
 // If we use timers
-#define configTIMER_TASK_PRIORITY 5
+#define configTIMER_TASK_PRIORITY 1
 #define configUSE_TIMERS 1
 #define configTIMER_TASK_STACK_DEPTH 400
-#define configTIMER_QUEUE_LENGTH 10
-#define INCLUDE_xTimerPendFunctionCall 1
+#define configTIMER_QUEUE_LENGTH 5
+#define INCLUDE_xTimerPendFunctionCall 0
 /* Co-routine definitions. */
 #define configUSE_CO_ROUTINES 0
 #define configMAX_CO_ROUTINE_PRIORITIES (2)
