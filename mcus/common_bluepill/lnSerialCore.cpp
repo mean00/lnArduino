@@ -193,10 +193,11 @@ IRQHANDLER(1)
 IRQHANDLER(2)
 IRQHANDLER(3)
 
-#include "lnSerialRxTx.cpp"
-#include "lnSerialRxTxDma.cpp"
 #include "lnSerialTxOnly.cpp"
 #include "lnSerialTxOnlyDma.cpp"
+#include "lnSerialRxTx.cpp"
+#include "lnSerialRxTxDma.cpp"
+
 /**
  * @brief Create a Ln Serial Tx Only object
  *
