@@ -2,7 +2,6 @@
  * @brief
  *
  */
-#include "lnRingBuffer.h"
 
 /**
  * @brief This is to avoid non virtual thunk gdb does not like that
@@ -38,8 +37,11 @@ class lnSerialBpRxTxDma : public lnSerialBpTxOnlyDma, public lnSerialRxTx
         LN_USART_Registers *d = (LN_USART_Registers *)_adr;
         return ln_serial_rawWrite(d, count, buffer);
     }
+    bool transmit(int size, const uint8_t *buffer)
+    {
+        return lnSerialBpTxOnlyDma::transmit(size, buffer);
+    }
     //----
-    bool transmit(int size, const uint8_t *buffer);
     static void _rxDmaCb(void *me, lnDMA::DmaInterruptType type);
     virtual bool enableRx(bool enabled);
     virtual void purgeRx();
@@ -61,110 +63,16 @@ class lnSerialBpRxTxDma : public lnSerialBpTxOnlyDma, public lnSerialRxTx
     static void _RxdmaCallback(void *c, lnDMA::DmaInterruptType it);
     void rxDma(lnDMA::DmaInterruptType type);
 
-    void igniteTx();
-
     void checkForNewData();
     timerLink _timer;
     int _rxBufferSize;
     int _rxMask = 0;
     int _rxHead, _rxTail;
     bool _rxEnabled;
-    int _inFlight;
     lnDMA _rxDma;
     uint8_t *_rxBuffer;
-    lnRingBuffer _txRingBuffer;
-    lnBinarySemaphore _txRingSem;
-    bool _txing;
 };
-/**
- * @brief
- *
- * @param c
- * @param it
- */
 
-void lnSerialBpRxTxDma::_dmaCallback2(void *c, lnDMA::DmaInterruptType it)
-{
-    lnSerialBpRxTxDma *i = (lnSerialBpRxTxDma *)c;
-    i->txDmaCb2(it);
-}
-/**
- * @brief
- *
- * @param it
- */
-void lnSerialBpRxTxDma::txDmaCb2(lnDMA::DmaInterruptType it)
-{
-    uint8_t *to;
-    _txRingBuffer.consume(_inFlight);
-    _inFlight = 0;
-    _txRingSem.give(); // space freed, wake up thread
-
-    int nb = _txRingBuffer.getReadPointer(&to);
-    if (!nb) // done !
-    {
-        _txing = false;
-        return;
-    }
-    // send remainer
-    LN_USART_Registers *d = (LN_USART_Registers *)_adr;
-    _inFlight = nb;
-    _txDma.doMemoryToPeripheralTransferNoLock(nb, (uint16_t *)to, (uint16_t *)&(d->DATA), false);
-}
-/**
- * @brief
- *
- * @param size
- * @param buffer
- * @return true
- * @return false
- */
-bool lnSerialBpRxTxDma::transmit(int size, const uint8_t *buffer)
-{
-    while (size)
-    {
-        ENTER_CRITICAL();
-        int nb = _txRingBuffer.free();
-        if (!nb)
-        {
-            _txRingSem.tryTake(); // wait for a fresh sem post, not an old one
-            EXIT_CRITICAL();
-            _txRingSem.take();
-            continue;
-        }
-        if (nb > size)
-            nb = size;
-        _txRingBuffer.put(nb, buffer);
-        buffer += nb, size -= nb;
-        EXIT_CRITICAL();
-        if (!_txing)
-            igniteTx();
-    }
-    return true;
-}
-/**
- * @brief
- *
- */
-void lnSerialBpRxTxDma::igniteTx() // if we get here, no active transer if going on
-{
-    uint8_t *to = NULL;
-    int nb = _txRingBuffer.getReadPointer(&to);
-    xAssert(nb);
-    _inFlight = nb;
-    _txing = true;
-    LN_USART_Registers *d = (LN_USART_Registers *)_adr;
-    _txDma.endTransfer();   // clear the previous one (if any)
-    _txDma.beginTransfer(); // lock dma
-    ENTER_CRITICAL();
-    _txState = txTransmittingDMA;
-    _programTx();
-    d->STAT &= ~LN_USART_STAT_TC;
-    _txDma.attachCallback(_dmaCallback2, this);
-    EXIT_CRITICAL();
-
-    _txDma.doMemoryToPeripheralTransferNoLock(nb, (uint16_t *)to, (uint16_t *)&(d->DATA), false);
-}
 /*
  */
 
@@ -178,9 +86,8 @@ void lnSerialBpRxTxDma::_interrupt(void)
 }
 
 lnSerialBpRxTxDma::lnSerialBpRxTxDma(int instance, int bufferSize)
-    : lnSerialBpTxOnlyDma(instance), lnSerialRxTx(instance),
-      _rxDma(lnDMA::DMA_PERIPH_TO_MEMORY, M(dmaEngine), M(dmaRxChannel), 32, 8), _timer(this),
-      _txRingBuffer(bufferSize >> 1)
+    : lnSerialBpTxOnlyDma(instance, bufferSize >> 1), lnSerialRxTx(instance),
+      _rxDma(lnDMA::DMA_PERIPH_TO_MEMORY, M(dmaEngine), M(dmaRxChannel), 32, 8), _timer(this)
 {
     _rxBuffer = new uint8_t[bufferSize];
     _rxEnabled = false;

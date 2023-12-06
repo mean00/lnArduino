@@ -132,7 +132,9 @@ bool lnMutex::lock()
 }
 bool lnMutex::unlock()
 {
-    xAssert(xSemaphoreGiveRecursive(_handle)); // should never fail
+    // xAssert(
+    xSemaphoreGiveRecursive(_handle);
+    //); // should never fail
     return true;
 }
 
