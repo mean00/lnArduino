@@ -72,13 +72,13 @@ class lnRingBuffer
     int getReadPointer(uint8_t **to)
     {
         *to = _buffer + (_tail & _mask);
-        uint32_t h = _head & _mask;
-        uint32_t t = _tail & _mask;
+        volatile uint32_t h = _head;
+        volatile uint32_t t = _tail;
         if (h >= t)
         {
             return h - t;
         }
-        return _size - h;
+        return _size - (h & _mask);
     }
     bool put(int insize, const uint8_t *data)
     {

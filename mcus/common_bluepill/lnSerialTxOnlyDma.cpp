@@ -30,6 +30,7 @@ class lnSerialBpTxOnlyDma : public lnSerialBpCore, public lnSerialTxOnly
     {
         xAssert(0);
     }
+    bool transmitMe(int size, const uint8_t *buffer, lnDMA::doneCallback *c);
     virtual bool _programTx();
     void txDmaCb();
     static void _dmaCallback(void *c, lnDMA::DmaInterruptType it);
@@ -107,6 +108,19 @@ void lnSerialBpTxOnlyDma::_dmaCallback(void *c, lnDMA::DmaInterruptType it)
  */
 bool lnSerialBpTxOnlyDma::transmit(int size, const uint8_t *buffer)
 {
+    return transmitMe(size, buffer, _dmaCallback);
+}
+/**
+ * @brief
+ *
+ * @param size
+ * @param buffer
+ * @param c
+ * @return true
+ * @return false
+ */
+bool lnSerialBpTxOnlyDma::transmitMe(int size, const uint8_t *buffer, lnDMA::doneCallback *c) //_dmaCallback
+{
     // return true;
     LN_USART_Registers *d = (LN_USART_Registers *)_adr;
     _txMutex.lock();        // lock uart
@@ -115,7 +129,7 @@ bool lnSerialBpTxOnlyDma::transmit(int size, const uint8_t *buffer)
     _txState = txTransmittingDMA;
     _programTx();
     d->STAT &= ~LN_USART_STAT_TC;
-    _txDma.attachCallback(_dmaCallback, this);
+    _txDma.attachCallback(c, this);
     EXIT_CRITICAL();
 
     _txDma.doMemoryToPeripheralTransferNoLock(size, (uint16_t *)buffer, (uint16_t *)&(d->DATA), false);
