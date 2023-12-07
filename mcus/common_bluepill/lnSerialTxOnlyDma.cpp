@@ -32,7 +32,6 @@ class lnSerialBpTxOnlyDma : public lnSerialBpCore, public lnSerialTxOnly
     {
         xAssert(0);
     }
-    bool transmitMe(int size, const uint8_t *buffer, lnDMA::doneCallback *c);
     virtual bool _programTx();
     static void _dmaCallback2(void *c, lnDMA::DmaInterruptType it);
     void txDmaCb2(lnDMA::DmaInterruptType it);
@@ -79,44 +78,6 @@ lnSerialBpTxOnlyDma::lnSerialBpTxOnlyDma(int instance, int txBufferSize)
     : lnSerialTxOnly(instance), lnSerialBpCore(instance),
       _txDma(lnDMA::DMA_MEMORY_TO_PERIPH, M(dmaEngine), M(dmaTxChannel), 8, 32), _txRingBuffer(txBufferSize)
 {
-}
-
-/**
- * @brief
- *
- * @param size
- * @param buffer
- * @param c
- * @return true
- * @return false
- */
-bool lnSerialBpTxOnlyDma::transmitMe(int size, const uint8_t *buffer, lnDMA::doneCallback *c) //_dmaCallback
-{
-    // return true;
-    LN_USART_Registers *d = (LN_USART_Registers *)_adr;
-    _txMutex.lock();        // lock uart
-    _txDma.beginTransfer(); // lock dma
-    ENTER_CRITICAL();
-    _txState = txTransmittingDMA;
-    _programTx();
-    d->STAT &= ~LN_USART_STAT_TC;
-    _txDma.attachCallback(c, this);
-    EXIT_CRITICAL();
-
-    _txDma.doMemoryToPeripheralTransferNoLock(size, (uint16_t *)buffer, (uint16_t *)&(d->DATA), false);
-
-    _txDone.take();
-    _txDma.endTransfer();
-
-    // Wait busy bit to clear out
-    while (!(d->STAT & LN_USART_STAT_TC))
-    {
-        __asm__("nop" ::);
-    }
-    d->STAT &= ~(LN_USART_STAT_TC);
-
-    _txMutex.unlock();
-    return true;
 }
 
 /**
@@ -177,8 +138,8 @@ bool lnSerialBpTxOnlyDma::transmit(int size, const uint8_t *buffer)
         }
         if (nb > size)
             nb = size;
-        _txRingBuffer.put(nb, buffer);
-        buffer += nb, size -= nb;
+        int inc = _txRingBuffer.put(nb, buffer);
+        buffer += inc, size -= inc;
         EXIT_CRITICAL();
         if (!_txing)
             igniteTx();

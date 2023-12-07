@@ -8,13 +8,7 @@ class lnRingBuffer
     lnRingBuffer(int size)
     {
         int c = size;
-        while (c) // make sure it is a power of 2
-        {
-            if (c == 1)
-                break;
-            xAssert(!(c & 1));
-            c >>= 1;
-        }
+        xAssert(size == (size & ~(size - 1))); // make sure it is a power of 2
         _size = size;
         _mask = size - 1;
         _head = _tail = 0;
@@ -74,15 +68,20 @@ class lnRingBuffer
         *to = _buffer + (_tail & _mask);
         volatile uint32_t h = _head;
         volatile uint32_t t = _tail;
-        if (h >= t)
-        {
-            return h - t;
-        }
-        return _size - (h & _mask);
+        return h - t;
     }
-    bool put(int insize, const uint8_t *data)
+    /**
+     * @brief
+     *
+     * @param insize
+     * @param data
+     * @return true
+     * @return false
+     */
+    int put(int insize, const uint8_t *data)
     {
         int size = CMIN(insize, free());
+        int orgsize = size;
         // FIXME : optimize!
         int c;
         while (size)
@@ -102,12 +101,19 @@ class lnRingBuffer
             data += c;
             size -= c;
         }
-        // for(int i=0;i<size;i++)  _buffer[_head++ & _mask] = data[i];
-        return true;
+        return orgsize;
     }
+    /**
+     * @brief
+     *
+     * @param size
+     * @param data
+     * @return int
+     */
     int get(int size, uint8_t *data)
     {
         size = CMIN(size, count());
+        int orgsize = size;
         int c;
         while (size)
         {
@@ -121,7 +127,7 @@ class lnRingBuffer
             {
                 c = CMIN(_size - t, size);
             }
-            memcpy(_buffer + t, data, c);
+            memcpy(data, _buffer + t, c);
             _tail = _tail + c;
             data += c;
             size -= c;
@@ -129,7 +135,7 @@ class lnRingBuffer
         // for(int i=0;i<size;i++)            {                data[i]=_buffer[_tail & _mask];                _tail++;
         if (_tail == _head)
             flush();
-        return size;
+        return orgsize;
     }
     //----------------------------------
   protected:

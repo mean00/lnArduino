@@ -8,6 +8,10 @@
  *
  */
 class lnSerialBpRxTxDma;
+/**
+ * @brief
+ *
+ */
 class timerLink : public lnPeriodicTimer
 {
   public:
@@ -18,7 +22,10 @@ class timerLink : public lnPeriodicTimer
     lnSerialBpRxTxDma *_parent;
     void timerCallback();
 };
-
+/**
+ * @brief
+ *
+ */
 class lnSerialBpRxTxDma : public lnSerialBpTxOnlyDma, public lnSerialRxTx
 {
   public:
@@ -50,9 +57,6 @@ class lnSerialBpRxTxDma : public lnSerialBpTxOnlyDma, public lnSerialRxTx
     virtual int getReadPointer(uint8_t **to);
     virtual void consume(int n);
     //
-    static void _dmaCallback2(void *c, lnDMA::DmaInterruptType it);
-    void txDmaCb2(lnDMA::DmaInterruptType it);
-    void rxInterruptHandler(void);
     void enableRxDmaInterrupt();
     void disableRxDmaInterrupt();
     void startRxDma();
@@ -89,14 +93,13 @@ lnSerialBpRxTxDma::lnSerialBpRxTxDma(int instance, int bufferSize)
     : lnSerialBpTxOnlyDma(instance, bufferSize >> 1), lnSerialRxTx(instance),
       _rxDma(lnDMA::DMA_PERIPH_TO_MEMORY, M(dmaEngine), M(dmaRxChannel), 32, 8), _timer(this)
 {
-    _rxBuffer = new uint8_t[bufferSize];
-    _rxEnabled = false;
     _rxBufferSize = bufferSize;
+    _rxBuffer = new uint8_t[_rxBufferSize];
+    _rxEnabled = false;
     _rxDma.attachCallback(_rxDmaCb, this);
     _rxHead = _rxTail = 0;
     _rxMask = _rxBufferSize - 1;
     _timer.init("uart", 20);
-    _txing = false;
     xAssert((_rxBufferSize & (~_rxMask)) == _rxBufferSize); // must be a power of 2
 }
 /**
@@ -117,9 +120,15 @@ lnSerialBpRxTxDma::~lnSerialBpRxTxDma()
 int lnSerialBpRxTxDma::read(int max, uint8_t *to)
 {
     uint8_t *ptr;
+
+    ENTER_CRITICAL();
     int nb = getReadPointer(&ptr);
+    EXIT_CRITICAL();
     memcpy(to, ptr, nb);
+
+    ENTER_CRITICAL();
     consume(nb);
+    EXIT_CRITICAL();
     return nb;
 }
 /**
@@ -151,13 +160,14 @@ bool lnSerialBpRxTxDma::enableRx(bool enabled)
     d->CTL0 &= ~LN_USART_CTL0_UEN;
     if (enabled)
     {
-        disableRxDmaInterrupt();
+
         _rxDma.pause();
-        _rxEnabled = true;
+        ENTER_CRITICAL();
         d->CTL0 |= LN_USART_CTL0_RBNEIE;
         d->CTL0 |= LN_USART_CTL0_REN;
         d->CTL2 |= LN_USART_CTL2_DMA_RX;
-
+        _rxEnabled = true;
+        EXIT_CRITICAL();
         _timer.start();
         startRxDma();
     }
@@ -165,13 +175,17 @@ bool lnSerialBpRxTxDma::enableRx(bool enabled)
     {
         disableRxDmaInterrupt();
         _rxDma.pause();
+        ENTER_CRITICAL();
         _timer.stop();
         _rxEnabled = false;
         d->CTL0 &= ~LN_USART_CTL0_REN;
         d->CTL0 &= ~LN_USART_CTL0_RBNEIE;
         d->CTL2 &= ~LN_USART_CTL2_DMA_RX;
+        EXIT_CRITICAL();
     }
+    ENTER_CRITICAL();
     d->CTL0 |= LN_USART_CTL0_UEN;
+    EXIT_CRITICAL();
     return true;
 }
 /**
