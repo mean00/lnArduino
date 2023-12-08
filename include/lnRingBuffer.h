@@ -29,7 +29,7 @@ class lnRingBuffer
     }
     bool full()
     {
-        return (_head == (_tail + _size));
+        return (_head == (_tail + _size - 1));
     }
     int count()
     {
@@ -37,11 +37,11 @@ class lnRingBuffer
     }
     int free()
     {
-        return _size - (_head - _tail);
+        return _size - (_head - _tail) - 1;
     }
     int CMIN(int a, int b)
     {
-        if (a < b)
+        if (a <= b)
             return a;
         return b;
     }
@@ -65,10 +65,15 @@ class lnRingBuffer
     }
     int getReadPointer(uint8_t **to)
     {
-        *to = _buffer + (_tail & _mask);
-        volatile uint32_t h = _head;
-        volatile uint32_t t = _tail;
-        return h - t;
+        uint32_t h = _head & _mask;
+        uint32_t t = _tail & _mask;
+        *to = _buffer + t;
+        int nb;
+        if (h >= t)
+            nb = h - t;
+        else
+            nb = _size - t;
+        return nb;
     }
     /**
      * @brief
@@ -94,10 +99,10 @@ class lnRingBuffer
             }
             else
             {
-                c = CMIN(t - h, size);
+                c = CMIN(t - h - 1, size);
             }
             memcpy(_buffer + h, data, c);
-            _head = _head + c;
+            _head += c;
             data += c;
             size -= c;
         }
@@ -128,7 +133,7 @@ class lnRingBuffer
                 c = CMIN(_size - t, size);
             }
             memcpy(data, _buffer + t, c);
-            _tail = _tail + c;
+            _tail += c;
             data += c;
             size -= c;
         }
