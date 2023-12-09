@@ -26,7 +26,8 @@ static void uart0_irq_handler(void);
 static void uart1_irq_handler(void);
 
 static lnRpSerialTxOnly *rpSerialInstances[2] = {NULL, NULL};
-
+// We use 2 internal buffers in flip flop mode
+#define UART_RX_DMA_BUFFER 32
 // we should not be needing this, to be optimized later...
 #define DISABLE_INTERRUPTS() taskENTER_CRITICAL()
 #define ENABLE_INTERRUPTS() taskEXIT_CRITICAL()
@@ -84,7 +85,6 @@ static const lnUart_t uarts[2] = {{((const uart_inst_t *)uart0_hw), lnRpDMA::LN_
  * @brief
  *
  */
-
 class lnRpSerialTxOnly : public lnSerialTxOnly
 {
   public:
@@ -105,13 +105,13 @@ class lnRpSerialTxOnly : public lnSerialTxOnly
     virtual void irq_handler();
     bool transmitDma(int size, const uint8_t *buffer);
     void txDmaCb();
+    bool igniteTx();
 
     lnRpDMA *_txDma;
     lnRingBuffer _txRingBuffer;
     lnBinarySemaphore _txRingSem;
     bool _txing;
     int _inFlight;
-    bool igniteTx();
     // our
     void baseUartInit()
     {
@@ -302,7 +302,6 @@ class lnRpSerialRxTx : public lnRpSerialTxOnly, public lnSerialRxTx, public lnPe
     void timerCallback();
     lnRpDMA *_rxDma;
     void rxDmaCb();
-#define UART_RX_DMA_BUFFER 64
     uint8_t _rxDmaBuffer[2][UART_RX_DMA_BUFFER];
     int _rxCurrentBuffer;
     int _rxDmaLastIndex;
@@ -329,6 +328,7 @@ static void cbRxDma(void *cookie)
 lnRpSerialRxTx::lnRpSerialRxTx(int instance, int rxBufferSize)
     : lnRpSerialTxOnly(instance, rxBufferSize >> 1), _rxRingBuffer(rxBufferSize), lnSerialRxTx(instance)
 {
+    xAssert(rxBufferSize >= (UART_RX_DMA_BUFFER * 2));
     _rxCurrentBuffer = 0;
     lnPeriodicTimer::init("uart", 20);
 }
@@ -434,8 +434,8 @@ bool lnRpSerialRxTx::init()
  */
 void lnRpSerialRxTx::timerCallback()
 {
-    return;
-    // block DMA interrupts so the DMA does not come in
+    // return;
+    //  block DMA interrupts so the DMA does not come in
     _rxDma->disableInterrupt();
     uint32_t val = UART_RX_DMA_BUFFER - _rxDma->getCurrentCount(); // total # of received bytes
     //
@@ -457,6 +457,10 @@ void lnRpSerialRxTx::timerCallback()
  */
 void lnRpSerialRxTx::rxDmaCb()
 {
+    // start asap the other buffer...
+    _rxDma->continuePeripheralToMemoryTransferNoLock(UART_RX_DMA_BUFFER,
+                                                     (const uint32_t *)_rxDmaBuffer[!_rxCurrentBuffer]);
+
     // the timer is called from a task,  no need to block it
     uint32_t val = UART_RX_DMA_BUFFER; // total # of received bytes
     uint32_t toCopy = val - _rxDmaLastIndex;
@@ -464,14 +468,12 @@ void lnRpSerialRxTx::rxDmaCb()
     uint32_t copyFrom = _rxDmaLastIndex;
     _rxDmaLastIndex = 0;
     uart_inst_t *u = (uart_inst_t *)uarts[lnSerialTxOnly::_instance].hw;
-    _rxDma->continuePeripheralToMemoryTransferNoLock(UART_RX_DMA_BUFFER,
-                                                     (const uint32_t *)_rxDmaBuffer[!_rxCurrentBuffer]);
     if (toCopy) // we assume we'll be faster than the DMA
     {
         copyToBuffer(copyFrom, toCopy);
     }
+    // Officially swap the buffers
     _rxCurrentBuffer ^= 1;
-    BaseType_t wake = pdFALSE;
     // reset the timer, we just purged the buffer
     lnPeriodicTimer::restart();
     return;
@@ -487,7 +489,10 @@ void lnRpSerialRxTx::copyToBuffer(uint32_t startFrom, uint32_t count)
 {
     bool was_empty = _rxRingBuffer.empty();
     xParanoid(startFrom + count <= _rxRingBuffer.size());
-    _rxRingBuffer.put(count, _rxDmaBuffer[_rxCurrentBuffer] + startFrom);
+    // xAssert(startFrom==0);
+    int p = _rxRingBuffer.put(count, _rxDmaBuffer[_rxCurrentBuffer] + startFrom);
+    // xAssert(p==count); if not equal we have lost some bytes
+
     if (was_empty && count)
     {
         xAssert(_cb);
