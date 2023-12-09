@@ -6,7 +6,7 @@
 #include "lnArduino.h"
 #include "lnSerial.h"
 #include "stdarg.h"
-#define LOGGER_USE_DMA 1
+// #define LOGGER_USE_DMA 1
 
 extern lnSerialTxOnly *serial0 = NULL;
 volatile uint32_t lnScratchRegister;
