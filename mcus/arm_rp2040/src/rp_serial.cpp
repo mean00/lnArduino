@@ -277,7 +277,7 @@ void lnRpSerialTxOnly::irq_handler()
  * @brief
  *
  */
-class lnRpSerialRxTx : public lnRpSerialTxOnly, public lnSerialRxTx
+class lnRpSerialRxTx : public lnRpSerialTxOnly, public lnSerialRxTx, public lnPeriodicTimer
 {
   public:
     // public API
@@ -299,14 +299,14 @@ class lnRpSerialRxTx : public lnRpSerialTxOnly, public lnSerialRxTx
     void consume(int n);
 
     void copyToBuffer(uint32_t startFrom, uint32_t count);
-    void timer();
+    void timerCallback();
     lnRpDMA *_rxDma;
     void rxDmaCb();
 #define UART_RX_DMA_BUFFER 64
-    uint8_t _rxDmaBuffer[UART_RX_DMA_BUFFER];
+    uint8_t _rxDmaBuffer[2][UART_RX_DMA_BUFFER];
+    int _rxCurrentBuffer;
     int _rxDmaLastIndex;
-    TimerHandle_t _cleanupTimer;
-    lnRingBuffer _ring;
+    lnRingBuffer _rxRingBuffer;
 };
 
 /**
@@ -319,16 +319,6 @@ static void cbRxDma(void *cookie)
     lnRpSerialRxTx *serial = (lnRpSerialRxTx *)cookie;
     serial->rxDmaCb();
 }
-/**
- * @brief
- *
- * @param t
- */
-static void timerCleanupCallback(TimerHandle_t t)
-{
-    lnRpSerialRxTx *serial = (lnRpSerialRxTx *)pvTimerGetTimerID(t);
-    serial->timer();
-}
 
 /**
  * @brief Construct a new ln Rp Serial Rx Tx::ln Rp Serial Rx Tx object
@@ -337,22 +327,114 @@ static void timerCleanupCallback(TimerHandle_t t)
  * @param rxBufferSize
  */
 lnRpSerialRxTx::lnRpSerialRxTx(int instance, int rxBufferSize)
-    : lnRpSerialTxOnly(instance, rxBufferSize >> 1), _ring(rxBufferSize), lnSerialRxTx(instance)
+    : lnRpSerialTxOnly(instance, rxBufferSize >> 1), _rxRingBuffer(rxBufferSize), lnSerialRxTx(instance)
 {
-    _cleanupTimer = xTimerCreate(
-        "uart",
-        10, // the dma buffer is 64 bytes @ 115200, that means about 5ms to fill the buffer, we want something bigger
-            // if the speed is lower, it does not matter much, we'll just wait cycles a bit
-        true, this, timerCleanupCallback);
+    _rxCurrentBuffer = 0;
+    lnPeriodicTimer::init("uart", 20);
 }
+/**
+ * @brief
+ *
+ * @param enabled
+ * @return true
+ * @return false
+ */
+bool lnRpSerialRxTx::enableRx(bool enabled)
+{
+    if (enabled == false)
+    {
+        _rxDma->cancelTransfer();
+        lnPeriodicTimer::stop();
+    }
+    else
+    {
+        uart_inst_t *u = (uart_inst_t *)uarts[lnSerialTxOnly::_instance].hw;
+        _rxDmaLastIndex = 0;
+        _rxCurrentBuffer = 0;
+        _rxDma->doPeripheralToMemoryTransferNoLock(UART_RX_DMA_BUFFER, (const uint32_t *)&(uart_get_hw(u)->dr),
+                                                   (const uint32_t *)_rxDmaBuffer[0]);
+        _rxDma->beginTransfer();
+        lnPeriodicTimer::start();
+    }
+    return true;
+}
+/**
+ * @brief  Empty the Rx data in flight
+ *
+ */
+void lnRpSerialRxTx::purgeRx()
+{
+    uart_inst_t *u = (uart_inst_t *)uarts[lnSerialTxOnly::_instance].hw;
+    while (uart_is_readable(u))
+        uart_getc(u);
+    _rxRingBuffer.flush();
+}
+/**
+ * @brief
+ *
+ * @param max
+ * @param to
+ * @return int
+ */
+
+int lnRpSerialRxTx::read(int max, uint8_t *to)
+{
+    DISABLE_INTERRUPTS();
+    int r = _rxRingBuffer.get(max, to);
+    ENABLE_INTERRUPTS();
+    return r;
+}
+/**
+ * @brief
+ *
+ * @param to
+ * @return int
+ */
+int lnRpSerialRxTx::getReadPointer(uint8_t **to)
+{
+    DISABLE_INTERRUPTS();
+    int r = _rxRingBuffer.getReadPointer(to);
+    ENABLE_INTERRUPTS();
+    return r;
+}
+/**
+ * @brief
+ *
+ * @param n
+ */
+void lnRpSerialRxTx::consume(int n)
+{
+    DISABLE_INTERRUPTS();
+    _rxRingBuffer.consume(n);
+    ENABLE_INTERRUPTS();
+}
+
+/**
+ * @brief
+ *
+ * @return true
+ * @return false
+ */
+bool lnRpSerialRxTx::init()
+{
+    const lnUart_t *t = uarts + lnSerialTxOnly::_instance;
+    lnRpSerialTxOnly::init();
+    _rxDma = new lnRpDMA(lnRpDMA::DMA_PERIPH_TO_MEMORY, t->dreq_rx, 8);
+    _rxDma->attachCallback(cbRxDma, this);
+    _rxDmaLastIndex = 0;
+    _rxCurrentBuffer = 0;
+    return true;
+}
+
 /**
  * @brief the dma will trigger only when it has receive the full amount of data it needs
  *  we have a 1ms timer that from time to time will empty the buffer
  *  It works fine as long as the serial speed is above 1m vs 64 bytes , i.e. 15 us , below 500 kB/s
  *  This is called from within the timer task context, so we can be interrupted by any interrupt
  */
-void lnRpSerialRxTx::timer()
+void lnRpSerialRxTx::timerCallback()
 {
+    return;
     // block DMA interrupts so the DMA does not come in
     _rxDma->disableInterrupt();
     uint32_t val = UART_RX_DMA_BUFFER - _rxDma->getCurrentCount(); // total # of received bytes
@@ -382,16 +464,16 @@ void lnRpSerialRxTx::rxDmaCb()
     uint32_t copyFrom = _rxDmaLastIndex;
     _rxDmaLastIndex = 0;
     uart_inst_t *u = (uart_inst_t *)uarts[lnSerialTxOnly::_instance].hw;
-    _rxDma->continuePeripheralToMemoryTransferNoLock(UART_RX_DMA_BUFFER, (const uint32_t *)_rxDmaBuffer);
-    _rxDma->beginTransfer(); // next!
-
+    _rxDma->continuePeripheralToMemoryTransferNoLock(UART_RX_DMA_BUFFER,
+                                                     (const uint32_t *)_rxDmaBuffer[!_rxCurrentBuffer]);
     if (toCopy) // we assume we'll be faster than the DMA
     {
         copyToBuffer(copyFrom, toCopy);
     }
+    _rxCurrentBuffer ^= 1;
     BaseType_t wake = pdFALSE;
     // reset the timer, we just purged the buffer
-    xTimerResetFromISR(_cleanupTimer, &wake);
+    lnPeriodicTimer::restart();
     return;
 }
 
@@ -403,105 +485,14 @@ void lnRpSerialRxTx::rxDmaCb()
  */
 void lnRpSerialRxTx::copyToBuffer(uint32_t startFrom, uint32_t count)
 {
-    bool was_empty = _ring.empty();
-    xParanoid(startFrom + count <= _ring.size()) _ring.put(count, _rxDmaBuffer + startFrom);
+    bool was_empty = _rxRingBuffer.empty();
+    xParanoid(startFrom + count <= _rxRingBuffer.size());
+    _rxRingBuffer.put(count, _rxDmaBuffer[_rxCurrentBuffer] + startFrom);
     if (was_empty && count)
     {
         xAssert(_cb);
         _cb(_cbCookie, lnSerialCore::dataAvailable);
     }
-}
-
-/**
- * @brief
- *
- * @param enabled
- * @return true
- * @return false
- */
-bool lnRpSerialRxTx::enableRx(bool enabled)
-{
-    if (enabled == false)
-    {
-        _rxDma->cancelTransfer();
-        xTimerStop(_cleanupTimer, 1);
-    }
-    else
-    {
-        uart_inst_t *u = (uart_inst_t *)uarts[lnSerialTxOnly::_instance].hw;
-        _rxDmaLastIndex = 0;
-        _rxDma->doPeripheralToMemoryTransferNoLock(UART_RX_DMA_BUFFER, (const uint32_t *)&(uart_get_hw(u)->dr),
-                                                   (const uint32_t *)_rxDmaBuffer);
-        _rxDma->beginTransfer();
-        xTimerStart(_cleanupTimer, 1); // start the cleanup timer
-    }
-    return true;
-}
-/**
- * @brief  Empty the Rx data in flight
- *
- */
-void lnRpSerialRxTx::purgeRx()
-{
-    uart_inst_t *u = (uart_inst_t *)uarts[lnSerialTxOnly::_instance].hw;
-    while (uart_is_readable(u))
-        uart_getc(u);
-    _ring.flush();
-}
-/**
- * @brief
- *
- * @param max
- * @param to
- * @return int
- */
-
-int lnRpSerialRxTx::read(int max, uint8_t *to)
-{
-    DISABLE_INTERRUPTS();
-    int r = _ring.get(max, to);
-    ENABLE_INTERRUPTS();
-    return r;
-}
-/**
- * @brief
- *
- * @param to
- * @return int
- */
-int lnRpSerialRxTx::getReadPointer(uint8_t **to)
-{
-    DISABLE_INTERRUPTS();
-    int r = _ring.getReadPointer(to);
-    ENABLE_INTERRUPTS();
-    return r;
-}
-/**
- * @brief
- *
- * @param n
- */
-void lnRpSerialRxTx::consume(int n)
-{
-    DISABLE_INTERRUPTS();
-    _ring.consume(n);
-    ENABLE_INTERRUPTS();
-}
-
-/**
- * @brief
- *
- * @return true
- * @return false
- */
-bool lnRpSerialRxTx::init()
-{
-    const lnUart_t *t = uarts + lnSerialTxOnly::_instance;
-    lnRpSerialTxOnly::init();
-    _rxDma = new lnRpDMA(lnRpDMA::DMA_PERIPH_TO_MEMORY, t->dreq_rx, 8);
-    _rxDma->attachCallback(cbRxDma, this);
-    _rxDmaLastIndex = 0;
-    return true;
 }
 
 /**
