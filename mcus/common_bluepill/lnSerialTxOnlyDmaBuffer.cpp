@@ -13,7 +13,7 @@ class lnSerialBpTxOnlyBufferedDma : public lnSerialBpCore, public lnSerialTxOnly
 {
   public:
     lnSerialBpTxOnlyBufferedDma(int instance, int txBufferSize);
-
+    virtual ~lnSerialBpTxOnlyBufferedDma();
     bool init()
     {
         return lnSerialBpCore::init();
@@ -81,8 +81,16 @@ lnSerialBpTxOnlyBufferedDma::lnSerialBpTxOnlyBufferedDma(int instance, int txBuf
     : lnSerialTxOnly(instance), lnSerialBpCore(instance),
       _txDma(lnDMA::DMA_MEMORY_TO_PERIPH, M(dmaEngine), M(dmaTxChannel), 8, 32), _txRingBuffer(txBufferSize)
 {
+    _txDma.beginTransfer();
 }
-
+/**
+ * @brief Destroy the ln Serial Bp Tx Only Buffered Dma::ln Serial Bp Tx Only Buffered Dma object
+ *
+ */
+lnSerialBpTxOnlyBufferedDma::~lnSerialBpTxOnlyBufferedDma()
+{
+    _txDma.endTransfer();
+}
 /**
  * @brief
  *
@@ -162,8 +170,7 @@ void lnSerialBpTxOnlyBufferedDma::igniteTx() // if we get here, no active transe
     _inFlight = nb;
     _txing = true;
     LN_USART_Registers *d = (LN_USART_Registers *)_adr;
-    _txDma.endTransfer();   // clear the previous one (if any)
-    _txDma.beginTransfer(); // lock dma
+
     ENTER_CRITICAL();
     _txState = txTransmittingDMA;
     _programTx();
