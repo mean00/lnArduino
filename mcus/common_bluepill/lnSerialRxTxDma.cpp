@@ -26,7 +26,7 @@ class timerLink : public lnPeriodicTimer
  * @brief
  *
  */
-class lnSerialBpRxTxDma : public lnSerialBpTxOnlyDma, public lnSerialRxTx
+class lnSerialBpRxTxDma : public lnSerialBpTxOnlyBufferedDma, public lnSerialRxTx
 {
   public:
     lnSerialBpRxTxDma(int instance, int bufferSize);
@@ -46,7 +46,7 @@ class lnSerialBpRxTxDma : public lnSerialBpTxOnlyDma, public lnSerialRxTx
     }
     bool transmit(int size, const uint8_t *buffer)
     {
-        return lnSerialBpTxOnlyDma::transmit(size, buffer);
+        return lnSerialBpTxOnlyBufferedDma::transmit(size, buffer);
     }
     //----
     static void _rxDmaCb(void *me, lnDMA::DmaInterruptType type);
@@ -90,7 +90,7 @@ void lnSerialBpRxTxDma::_interrupt(void)
 }
 
 lnSerialBpRxTxDma::lnSerialBpRxTxDma(int instance, int bufferSize)
-    : lnSerialBpTxOnlyDma(instance, bufferSize >> 1), lnSerialRxTx(instance),
+    : lnSerialBpTxOnlyBufferedDma(instance, bufferSize >> 1), lnSerialRxTx(instance),
       _rxDma(lnDMA::DMA_PERIPH_TO_MEMORY, M(dmaEngine), M(dmaRxChannel), 32, 8), _timer(this)
 {
     _rxBufferSize = bufferSize;
@@ -157,7 +157,7 @@ void lnSerialBpRxTxDma::purgeRx()
 bool lnSerialBpRxTxDma::enableRx(bool enabled)
 {
     LN_USART_Registers *d = (LN_USART_Registers *)_adr;
-    d->CTL0 &= ~LN_USART_CTL0_UEN;
+
     if (enabled)
     {
 
@@ -183,9 +183,6 @@ bool lnSerialBpRxTxDma::enableRx(bool enabled)
         d->CTL2 &= ~LN_USART_CTL2_DMA_RX;
         EXIT_CRITICAL();
     }
-    ENTER_CRITICAL();
-    d->CTL0 |= LN_USART_CTL0_UEN;
-    EXIT_CRITICAL();
     return true;
 }
 /**

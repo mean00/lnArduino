@@ -5,6 +5,11 @@
 class lnRingBuffer
 {
   public:
+    /**
+     * @brief Construct a new ln Ring Buffer object
+     *
+     * @param size
+     */
     lnRingBuffer(int size)
     {
         int c = size;
@@ -14,41 +19,88 @@ class lnRingBuffer
         _head = _tail = 0;
         _buffer = new uint8_t[size];
     }
+    /**
+     * @brief Destroy the ln Ring Buffer object
+     *
+     */
     virtual ~lnRingBuffer()
     {
         delete _buffer;
         _buffer = NULL;
     }
+    /**
+     * @brief
+     *
+     * @return int
+     */
     int size()
     {
         return _size;
     }
+    /**
+     * @brief
+     *
+     * @return true
+     * @return false
+     */
     bool empty()
     {
         return (_head == _tail);
     }
+    /**
+     * @brief
+     *
+     * @return true
+     * @return false
+     */
     bool full()
     {
         return (_head == (_tail + _size - 1));
     }
+    /**
+     * @brief
+     *
+     * @return int
+     */
     int count()
     {
         return _head - _tail;
     }
+    /**
+     * @brief
+     *
+     * @return int
+     */
     int free()
     {
         return _size - (_head - _tail) - 1;
     }
-    int CMIN(int a, int b)
+    /**
+     * @brief
+     *
+     * @param a
+     * @param b
+     * @return int
+     */
+    static inline int CMIN(int a, int b)
     {
         if (a <= b)
             return a;
         return b;
     }
+    /**
+     * @brief
+     *
+     */
     void flush()
     {
         _tail = _head = 0;
     }
+    /**
+     * @brief
+     *
+     * @return uint8_t*
+     */
     uint8_t *ringBuffer()
     {
         return _buffer;
@@ -63,6 +115,12 @@ class lnRingBuffer
             flush();
         }
     }
+    /**
+     * @brief Get the Read Pointer object
+     *
+     * @param to
+     * @return int
+     */
     int getReadPointer(uint8_t **to)
     {
         uint32_t h = _head & _mask;

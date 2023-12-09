@@ -193,10 +193,11 @@ IRQHANDLER(1)
 IRQHANDLER(2)
 IRQHANDLER(3)
 
-#include "lnSerialTxOnly.cpp"
-#include "lnSerialTxOnlyDma.cpp"
 #include "lnSerialRxTx.cpp"
 #include "lnSerialRxTxDma.cpp"
+#include "lnSerialTxOnly.cpp"
+#include "lnSerialTxOnlyDma.cpp"
+#include "lnSerialTxOnlyDmaBuffer.cpp"
 
 /**
  * @brief Create a Ln Serial Tx Only object
@@ -205,10 +206,19 @@ IRQHANDLER(3)
  * @param dma
  * @return lnSerialTxOnly*
  */
-lnSerialTxOnly *createLnSerialTxOnly(int instance, bool dma)
+lnSerialTxOnly *createLnSerialTxOnly(int instance, bool dma, bool buffered)
 {
     if (dma)
-        return new lnSerialBpTxOnlyDma(instance, 256);
+    {
+        if (buffered)
+        {
+            return new lnSerialBpTxOnlyBufferedDma(instance, 256);
+        }
+        else
+        {
+            return new lnSerialBpTxOnlyDma(instance);
+        }
+    }
     return new lnSerialBpTxOnlyInterrupt(instance);
 }
 /**

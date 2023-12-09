@@ -10,7 +10,7 @@
 
 extern lnSerialTxOnly *serial0 = NULL;
 volatile uint32_t lnScratchRegister;
-
+static lnMutex *loggerMutex;
 extern "C" void Logger_crash(const char *st)
 {
     serial0->init();
@@ -57,7 +57,9 @@ void Logger(const char *fmt...)
 
     buffer[127] = 0;
     va_end(va);
+    loggerMutex->lock();
     Logger_chars(strlen(buffer), buffer);
+    loggerMutex->unlock();
 }
 /**
  *
@@ -72,7 +74,9 @@ void LoggerInit()
 #ifdef LOGGER_USE_DMA
     dma = true;
 #endif
-    serial0 = createLnSerialTxOnly(debugUart, dma);
+    loggerMutex = new lnMutex;
+    bool buffered = true;
+    serial0 = createLnSerialTxOnly(debugUart, dma, buffered);
     serial0->init();
     serial0->setSpeed(115200);
 }

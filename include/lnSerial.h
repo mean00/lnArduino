@@ -86,7 +86,7 @@ class lnSerialRxTx : public lnSerialCore
     void *_cbCookie;
 };
 
-lnSerialTxOnly *createLnSerialTxOnly(int instance, bool dma = true);
+lnSerialTxOnly *createLnSerialTxOnly(int instance, bool dma, bool buffered);
 lnSerialRxTx *createLnSerialRxTx(int instance, int rxBufferSize = 128, bool dma = true);
 
 // EOF
