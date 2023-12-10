@@ -151,7 +151,8 @@ void uart1_irq_handler()
 lnRpSerialTxOnly::lnRpSerialTxOnly(int instance, int bufferSize) : lnSerialTxOnly(instance), _txRingBuffer(bufferSize)
 {
     xAssert(instance < 2);
-    xAssert(!rpSerialInstances[instance]) _txDma = NULL;
+    xAssert(!rpSerialInstances[instance]);
+    _txDma = NULL;
     rpSerialInstances[instance] = this;
     _inFlight = 0;
 }
@@ -180,7 +181,6 @@ void lnRpSerialTxOnly::txDmaCb()
         _txDma->endTransfer();
         return;
     }
-    uart_inst_t *u = (uart_inst_t *)uarts[lnSerialTxOnly::_instance].hw;
     _inFlight = nb;
     _txDma->continueMemoryToPeripheralTransferNoLock(nb, (const uint32_t *)to);
 }
