@@ -55,7 +55,7 @@ ${PICO_SDK_PATH}/src/rp2_common/pico_standard_link/binary_info.c
 
 ${PICO_SDK_PATH}/src/rp2_common/pico_stdio/stdio.c
 ${PICO_SDK_PATH}/src/rp2_common/pico_stdio_uart/stdio_uart.c
-${PICO_SDK_PATH}/src/rp2_common/pico_standard_link/crt0.S
+#${PICO_SDK_PATH}/src/rp2_common/pico_standard_link/crt0.S
 
 ${PICO_SDK_PATH}/src/rp2_common/hardware_pio/pio.c
 
@@ -67,6 +67,7 @@ ${PICO_SDK_PATH}/src/rp2_common/pico_stdlib/stdlib.c
 
 ${CMAKE_CURRENT_SOURCE_DIR}/rp_serial.cpp
 ${CMAKE_CURRENT_SOURCE_DIR}/rp_irq.cpp
+${CMAKE_CURRENT_SOURCE_DIR}/crt0.S
 )
 
 add_library(rplib STATIC rp.cpp ${CMAKE_CURRENT_SOURCE_DIR}/../conf/bs2_default_padded_checksummed.S ${RP_LN_SOURCES} ${RP_SDK_SOURCES})

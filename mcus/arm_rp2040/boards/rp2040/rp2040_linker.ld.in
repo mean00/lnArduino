@@ -94,11 +94,13 @@ SECTIONS
      * it is used through LN_FAST_CODE attribute 
      */
     .ram_text : {
-        . = ALIGN(4);
+        __ram_text_start__ = .;
         *(SORT(.copy_to_ram.*))
+        __ram_text_end__ = .;
         . = ALIGN(4);
     } > RAM AT >FLASH
-
+    __ram_text_source__ = LOADADDR(.ram_text);
+ 
     .rodata : {
         *(EXCLUDE_FILE(*libgcc.a: *libc.a:*lib_a-mem*.o *libm.a:) .rodata*)
         . = ALIGN(4);
