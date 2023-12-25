@@ -57,6 +57,8 @@ ${PICO_SDK_PATH}/src/rp2_common/pico_stdio/stdio.c
 ${PICO_SDK_PATH}/src/rp2_common/pico_stdio_uart/stdio_uart.c
 ${PICO_SDK_PATH}/src/rp2_common/pico_standard_link/crt0.S
 
+${PICO_SDK_PATH}/src/rp2_common/hardware_pio/pio.c
+
 #${PICO_SDK_PATH}/src/rp2_common/pico_malloc/pico_malloc.c
 #${PICO_SDK_PATH}/src/rp2_common/pico_standard_link/new_delete.cpp
 #${PICO_SDK_PATH}/src/common/pico_time/time.c
@@ -78,7 +80,7 @@ target_include_directories(rplib PUBLIC
         ${PICO_SDK_PATH}/src/common/pico_stdlib/include  
         ${PICO_SDK_PATH}/src/common/pico_sync/include  
         ${PICO_SDK_PATH}/src/common/pico_time/include  
-        ${PICO_SDK_PATH}/src/common/pico_util/include  
+        ${PICO_SDK_PATH}/src/common/pico_util/include 
         ${PICO_SDK_PATH}/src/rp2040/hardware_regs/include  
         ${PICO_SDK_PATH}/src/rp2040/hardware_structs/include  
         ${PICO_SDK_PATH}/src/rp2_common/boot_stage2/include -g3   
@@ -97,6 +99,7 @@ target_include_directories(rplib PUBLIC
         ${PICO_SDK_PATH}/src/rp2_common/hardware_watchdog/include  
         ${PICO_SDK_PATH}/src/rp2_common/hardware_xosc/include          
         ${PICO_SDK_PATH}/src/rp2_common/hardware_dma/include       
+        ${PICO_SDK_PATH}/src/rp2_common/hardware_pio/include
         ${PICO_SDK_PATH}/src/rp2_common/pico_bootrom/include  
         ${PICO_SDK_PATH}/src/rp2_common/pico_double/include  
         ${PICO_SDK_PATH}/src/rp2_common/pico_float/include  

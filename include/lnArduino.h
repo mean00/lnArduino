@@ -67,3 +67,5 @@ extern "C" void *malloc(size_t size) _NOTHROW __attribute_malloc__;
 #endif // LN_LINUX
 
 extern volatile uint32_t lnScratchRegister; // used to prevent optimisation
+
+#include "lnPlatformDefines.h"

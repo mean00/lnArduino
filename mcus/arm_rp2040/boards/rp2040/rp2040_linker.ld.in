@@ -52,6 +52,8 @@ SECTIONS
     ASSERT(__boot2_end__ - __boot2_start__ == 256,
         "ERROR: Pico second stage bootloader must be 256 bytes in size")
 
+
+
     /* The second stage will always enter the image at the start of .text.
        The debugger will use the ELF entry point, which is the _entry_point
        symbol if present, otherwise defaults to start of .text.
@@ -87,6 +89,15 @@ SECTIONS
         *(.eh_frame*)
         . = ALIGN(4);
     } > FLASH
+    /*
+     * This code is copied to ram for speed / latency reason
+     * it is used through LN_FAST_CODE attribute 
+     */
+    .ram_text : {
+        . = ALIGN(4);
+        *(SORT(.copy_to_ram.*))
+        . = ALIGN(4);
+    } > RAM AT >FLASH
 
     .rodata : {
         *(EXCLUDE_FILE(*libgcc.a: *libc.a:*lib_a-mem*.o *libm.a:) .rodata*)
