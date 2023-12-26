@@ -120,7 +120,7 @@ SET(G32_DEBUG_FLAGS "-g3 ${LN_LTO}  -O0  -gdwarf-4" CACHE INTERNAL "")
 
 SET(GD32_LD_EXTRA "  -Wl,--unresolved-symbols=report-all -Wl,--warn-common  " CACHE INTERNAL "")
 #
-SET(GD32_C_FLAGS  "${GD32_SPECS}  ${PLATFORM_C_FLAGS} ${G32_DEBUG_FLAGS} -ffunction-sections -ggnu-pubnames --sysroot=${MINI_SYSROOT} -I${MINI_SYSROOT}/include --target=arm-none-eabi -DLN_ARCH=LN_ARCH_ARM   ${GD32_BOARD_FLAG}  ${GD32_MCU}" CACHE INTERNAL "")
+SET(GD32_C_FLAGS  "-DPICO_COPY_TO_RAM=1 ${GD32_SPECS}  ${PLATFORM_C_FLAGS} ${G32_DEBUG_FLAGS} -ffunction-sections -ggnu-pubnames --sysroot=${MINI_SYSROOT} -I${MINI_SYSROOT}/include --target=arm-none-eabi -DLN_ARCH=LN_ARCH_ARM   ${GD32_BOARD_FLAG}  ${GD32_MCU}" CACHE INTERNAL "")
 SET(CMAKE_C_FLAGS "${GD32_C_FLAGS}" CACHE INTERNAL "")
 SET(CMAKE_ASM_FLAGS "${GD32_C_FLAGS}" CACHE INTERNAL "")
 SET(CMAKE_CXX_FLAGS "${GD32_C_FLAGS} -std=gnu++11 -fno-rtti -fno-exceptions -fno-threadsafe-statics" CACHE INTERNAL "") 
@@ -134,6 +134,7 @@ SET(CLANG_LINKER_OPT "${MINI_SYSROOT}/lib/libclang_rt.builtins.a" CACHE INTERNAL
 #
 SET(SB2 ${CMAKE_BINARY_DIR}/lnArduino/mcus/arm_rp2040/src/CMakeFiles/rplib.dir/__/conf/bs2_default_padded_checksummed.S.obj)
 SET(CRT ${CMAKE_BINARY_DIR}/lnArduino/mcus/arm_rp2040/src/CMakeFiles/rplib.dir/crt0.S.obj)
+#SET(CRT ${CMAKE_BINARY_DIR}/lnArduino/mcus/arm_rp2040/src/CMakeFiles/rplib.dir/pico/pico-sdk/src/rp2_common/pico_standard_link/crt0.S.obj)
 #
 set(CMAKE_CXX_LINK_EXECUTABLE    "<CMAKE_LINKER>  <CMAKE_CXX_LINK_FLAGS>  <LINK_FLAGS> ${LN_LTO}    -Wl,--start-group ${CRT} ${SB2} <OBJECTS>  <LINK_LIBRARIES>  -Wl,--end-group  -Wl,-Map,<TARGET>.map   -o <TARGET> ${GD32_LD_FLAGS} ${GD32_LD_LIBS}  ${CLANG_LINKER_OPT}" CACHE INTERNAL "")
 SET(CMAKE_EXECUTABLE_SUFFIX_C .elf CACHE INTERNAL "")

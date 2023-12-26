@@ -89,17 +89,23 @@ SECTIONS
         *(.eh_frame*)
         . = ALIGN(4);
     } > FLASH
+
+    .ram_vector_table (NOLOAD): {
+        *(.ram_vector_table)
+    } > RAM
+
+
     /*
      * This code is copied to ram for speed / latency reason
      * it is used through LN_FAST_CODE attribute 
      */
     .ram_text : {
-        __ram_text_start__ = .;
-        *(SORT(.copy_to_ram.*))
-        __ram_text_end__ = .;
+        __ln_copy_ram_text_start__ = .;
+        *(SORT(.ln_copy_to_ram.*))
+        __ln_copy_ram_text_end__ = .;
         . = ALIGN(4);
     } > RAM AT >FLASH
-    __ram_text_source__ = LOADADDR(.ram_text);
+    __ln_copy_ram_text_source__ = LOADADDR(.ram_text);
  
     .rodata : {
         *(EXCLUDE_FILE(*libgcc.a: *libc.a:*lib_a-mem*.o *libm.a:) .rodata*)
@@ -131,10 +137,7 @@ SECTIONS
     __binary_info_end = .;
     . = ALIGN(4);
 
-   .ram_vector_table (NOLOAD): {
-        *(.ram_vector_table)
-    } > RAM
-
+ 
     .data : {
         __data_start__ = .;
         *(vtable)

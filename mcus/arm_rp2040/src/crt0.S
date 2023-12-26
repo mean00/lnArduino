@@ -2,6 +2,13 @@
  * Copyright (c) 2020 Raspberry Pi (Trading) Ltd.
  *
  * SPDX-License-Identifier: BSD-3-Clause
+
+NDEBUG
+COLLAPSE_IRQS
+PICO_NO_BINARY_INFO
+PICO_NO_FLASH             <= 
+PICO_ASSEMBLER_IS_CLANG   <= SET
+
  */
 
 #include "pico.h"
@@ -30,16 +37,16 @@ __vectors:
 .word _reset_handler
 .word isr_nmi
 .word isr_hardfault
-.word isr_invalid // Reserved, should never fire
-.word isr_invalid // Reserved, should never fire
-.word isr_invalid // Reserved, should never fire
-.word isr_invalid // Reserved, should never fire
-.word isr_invalid // Reserved, should never fire
-.word isr_invalid // Reserved, should never fire
-.word isr_invalid // Reserved, should never fire
+.word isr_invalid1 // Reserved, should never fire
+.word isr_invalid2 // Reserved, should never fire
+.word isr_invalid3 // Reserved, should never fire
+.word isr_invalid4 // Reserved, should never fire
+.word isr_invalid5 // Reserved, should never fire
+.word isr_invalid6 // Reserved, should never fire
+.word isr_invalid7 // Reserved, should never fire
 .word isr_svcall
-.word isr_invalid // Reserved, should never fire
-.word isr_invalid // Reserved, should never fire
+.word isr_invalid8 // Reserved, should never fire
+.word isr_invalid9 // Reserved, should never fire
 .word isr_pendsv
 .word isr_systick
 .word isr_irq0
@@ -93,7 +100,16 @@ __default_isrs_start:
 .endm
 
 // these are separated out for clarity
-decl_isr_bkpt isr_invalid
+decl_isr_bkpt isr_invalid1
+decl_isr_bkpt isr_invalid2
+decl_isr_bkpt isr_invalid3
+decl_isr_bkpt isr_invalid4
+decl_isr_bkpt isr_invalid5
+decl_isr_bkpt isr_invalid6
+decl_isr_bkpt isr_invalid7
+decl_isr_bkpt isr_invalid8
+decl_isr_bkpt isr_invalid9
+
 decl_isr_bkpt isr_nmi
 decl_isr_bkpt isr_hardfault
 decl_isr_bkpt isr_svcall
@@ -281,11 +297,11 @@ data_cpy:
 
 .align 2
 data_cpy_table:
-#if PICO_COPY_TO_RAM
-.word __ram_text_source__
-.word __ram_text_start__
-.word __ram_text_end__
-#endif
+
+.word __ln_copy_ram_text_source__
+.word __ln_copy_ram_text_start__
+.word __ln_copy_ram_text_end__
+
 .word __etext
 .word __data_start__
 .word __data_end__
@@ -293,12 +309,6 @@ data_cpy_table:
 .word __scratch_x_source__
 .word __scratch_x_start__
 .word __scratch_x_end__
-
-// Copy my code in RAM for speed latency LN_FAST
-.word __ram_text_source__
-.word __ram_text_start__
-.word __ram_text_end__
-
 
 .word __scratch_y_source__
 .word __scratch_y_start__
