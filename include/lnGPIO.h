@@ -24,6 +24,7 @@ enum lnGpioMode
     lnADC_MODE,
     lnDAC_MODE,
     lnUART,
+    lnSPI,
 };
 #define GpioMode lnGpioMode
 // typedef int lnPin;
@@ -72,7 +73,6 @@ class lnFastIO
     uint32_t *_onoff;
     uint32_t _onbit, _offbit;
 };
-
 
 #include "lnExti.h"
 // EOF

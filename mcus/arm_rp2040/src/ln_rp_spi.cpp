@@ -87,6 +87,7 @@ void rpSPI::begin()
     _spi->CR1 = _cr1;
     _spi->CPSR = _scaler;
     _spi->IMSC = 0;
+    _spi->CR1 |= LN_RP_SPI_CR1_ENABLE;
 }
 /**
  * @brief
@@ -94,6 +95,7 @@ void rpSPI::begin()
  */
 void rpSPI::end(void)
 {
+    _spi->CR1 &= ~LN_RP_SPI_CR1_ENABLE;
     _spi->DMACR = 0;
     _spi->IMSC = 0;
 }
@@ -110,12 +112,10 @@ bool rpSPI::write8(int nbBytes, const uint8_t *data)
     _current = data;
     _limit = _current + nbBytes;
     _spi->IMSC |= LN_RP_SPI_INT_TX;
+    _state = TxStateBody;
+    _txDone.tryTake();
     lnEnableInterrupt(spis[_instance].irq);
-    while (1)
-    {
-        __asm__("nop");
-    }
-    lnDisableInterrupt(spis[_instance].irq);
+    _txDone.take();
     return true;
 }
 /**
@@ -124,7 +124,34 @@ bool rpSPI::write8(int nbBytes, const uint8_t *data)
  */
 void rpSPI::irqHandler()
 {
-    xAssert(0);
+    switch (_state)
+    {
+    case TxStateBody: {
+        while (_current < _limit)
+        {
+            if (_spi->SR & LN_RP_SPI_SR_TFN)
+            {
+                _spi->DR = *_current;
+                _current++;
+            }
+            else
+            {
+                break;
+            }
+        }
+        if (_current == _limit)
+        {
+            _state = TxStateLast;
+            _spi->IMSC = 0;
+            lnDisableInterrupt(spis[_instance].irq);
+            _txDone.give();
+        }
+    }
+    break;
+    default:
+        xAssert(0);
+        break;
+    }
 }
 
 //--

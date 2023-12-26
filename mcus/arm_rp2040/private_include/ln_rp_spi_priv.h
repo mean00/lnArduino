@@ -35,7 +35,8 @@ typedef volatile LN_RP_SPIx LN_RP_SPI;
 #define LN_RP_SPI_CR0_FORMAT_NL (2 << 4)
 #define LN_RP_SPI_CR0_8_BITS (7 << 0)
 #define LN_RP_SPI_CR0_16_BITS (0xf << 0)
-
+//
+#define LN_RP_SPI_CR1_ENABLE (1 << 1)
 // Status
 #define LN_RP_SPI_SR_TFE (1 << 0) // Tx empty
 #define LN_RP_SPI_SR_TFN (1 << 1) // tx not full
@@ -71,6 +72,13 @@ typedef volatile LN_RP_SPIx LN_RP_SPI;
 class rpSPI
 {
   public:
+    enum spiTxState
+    {
+        TxStateBody,
+        TxStateLast
+    };
+
+  public:
     rpSPI(int instance, int pinCs = -1);
     virtual ~rpSPI();
     void begin();
@@ -94,4 +102,7 @@ class rpSPI
     lnPin _cs;
     LN_RP_SPI *_spi;
     const uint8_t *_current, *_limit;
+
+    lnBinarySemaphore _txDone;
+    spiTxState _state;
 };

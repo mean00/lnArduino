@@ -5,12 +5,16 @@
 /**
     \fn
 */
-void lnPinMode(const lnPin pin, const lnGpioMode mode, const int speedInMhz )
+void lnPinMode(const lnPin pin, const lnGpioMode mode, const int speedInMhz)
 {
     uint32_t fun = LN_RP_GPIO_CONTROL_FUNC(SIO);
     uint32_t pad, control;
     switch (mode)
     {
+    case lnSPI:
+        fun = LN_RP_GPIO_CONTROL_FUNC(SPI);
+        lnGpio->PINS[pin].control = fun + LN_RP_GPIO_CONTROL_OE(NORMAL);
+        return;
     case lnUART:
         fun = LN_RP_GPIO_CONTROL_FUNC(UART);
         lnGpio->PINS[pin].control = fun + LN_RP_GPIO_CONTROL_OE(NORMAL);
@@ -21,7 +25,7 @@ void lnPinMode(const lnPin pin, const lnGpioMode mode, const int speedInMhz )
         control = LN_RP_GPIO_CONTROL_OE_DISABLE;
         break;
     case lnINPUT_FLOATING:
-        pad = LN_RP_PADS_INPUT_ENABLE + LN_RP_PADS_OUTPUT_DISABLE ; //
+        pad = LN_RP_PADS_INPUT_ENABLE + LN_RP_PADS_OUTPUT_DISABLE; //
         control = LN_RP_GPIO_CONTROL_OE_DISABLE;
         break;
     case lnINPUT_PULLUP:
@@ -32,14 +36,14 @@ void lnPinMode(const lnPin pin, const lnGpioMode mode, const int speedInMhz )
         pad = LN_RP_PADS_INPUT_ENABLE + LN_RP_PADS_OUTPUT_DISABLE + LN_RP_PADS_PULLDOWN; //
         control = LN_RP_GPIO_CONTROL_OE_DISABLE;
         break;
-    case lnOUTPUT_OPEN_DRAIN:    
+    case lnOUTPUT_OPEN_DRAIN:
         pad = LN_RP_PADS_OUTPUT_DISABLE;
         control = LN_RP_GPIO_CONTROL_OE_DISABLE;
         break;
     case lnOUTPUT:
         pad = LN_RP_PADS_DRIVE(12MA);
         control = LN_RP_GPIO_CONTROL_OE(ENABLE); // 12 mA
-        break;        
+        break;
     default:
         xAssert(0);
         break;
@@ -56,27 +60,28 @@ void lnPinMode(const lnPin pin, const lnGpioMode mode, const int speedInMhz )
     */
 }
 /**
- * @brief 
- * 
+ * @brief
+ *
  */
 void lnOpenDrainClose(const lnPin pin, const bool close)
 {
     uint32_t fun = LN_RP_GPIO_CONTROL_FUNC(SIO);
     uint32_t pad, control;
 
-    if(close) //passing
+    if (close) // passing
     {
         lnSio->GPIO_OUT_CLR = 1 << pin;
         pad = LN_RP_PADS_DRIVE(12MA);
         control = LN_RP_GPIO_CONTROL_OE(ENABLE); // 12 mA
-    }else // hi z
+    }
+    else // hi z
     {
         pad = LN_RP_PADS_OUTPUT_DISABLE;
         control = LN_RP_GPIO_CONTROL_OE_DISABLE;
     }
     lnPads->PADS[pin] = pad;
-    lnGpio->PINS[pin].control = fun + control;   
-} 
+    lnGpio->PINS[pin].control = fun + control;
+}
 /**
     \fn
 */
