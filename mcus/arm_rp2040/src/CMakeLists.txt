@@ -9,6 +9,7 @@ add_custom_command(
 SET(RP_LN_SOURCES
         ln_rp_gpio.cpp
         ln_rp_dma.cpp
+        ln_rp_spi.cpp
 )
 SET(RP_SDK_SOURCES
 
@@ -67,6 +68,7 @@ ${PICO_SDK_PATH}/src/rp2_common/pico_stdlib/stdlib.c
 
 ${CMAKE_CURRENT_SOURCE_DIR}/rp_serial.cpp
 ${CMAKE_CURRENT_SOURCE_DIR}/rp_irq.cpp
+
 ${CMAKE_CURRENT_SOURCE_DIR}/crt0.S
 )
 
