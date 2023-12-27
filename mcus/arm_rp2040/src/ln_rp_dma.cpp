@@ -253,6 +253,17 @@ void lnRpDMA::beginTransfer()
     _dma->DMA_CONTROL |= LN_RP_DMA_CONTROL_ENABLE; // this reg is  a trigger, writing it starts DMA
     EXIT_CRITICAL();
 }
+
+/**
+ * @brief
+ * dma_channel_set_irq0_enabled
+ */
+void lnRpDMA::armTransfer()
+{
+    ENTER_CRITICAL();
+    dmactrl->INTE0 |= (1 << _channel);
+    EXIT_CRITICAL();
+}
 /**
  * @brief
  *

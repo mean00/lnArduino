@@ -12,6 +12,7 @@
 #include "lnArduino.h"
 #include "lnGPIO.h"
 #include "lnSPI.h"
+#include "ln_rp_dma.h"
 #include "ln_rp_memory_map.h"
 #include "ln_rp_spi_priv.h"
 extern "C"
@@ -20,16 +21,17 @@ extern "C"
     uint32_t clock_get_hz(enum clock_index clk_index);
 }
 class rpSPI;
-
+#define RP_SPI_USE_DMA 1
 typedef struct
 {
     LN_RP_SPI *spi;
     LnIRQ irq;
+    lnRpDMA::LN_RP_DMA_DREQ txDma;
 } SPI_DESC;
 
 const SPI_DESC spis[2] = {
-    {(LN_RP_SPI *)LN_RP_SPI0, (LnIRQ)18},
-    {(LN_RP_SPI *)LN_RP_SPI1, (LnIRQ)19},
+    {(LN_RP_SPI *)LN_RP_SPI0, (LnIRQ)18, lnRpDMA::LN_DMA_DREQ_SPI0_TX},
+    {(LN_RP_SPI *)LN_RP_SPI1, (LnIRQ)19, lnRpDMA::LN_DMA_DREQ_SPI1_TX},
 };
 
 typedef void lnSpiCallback(void *cookie);
@@ -41,7 +43,11 @@ static void spiHandler(int x)
     xAssert(s);
     s->irqHandler();
 }
-
+static void dmaCb(void *cookie)
+{
+    rpSPI *spi = (rpSPI *)cookie;
+    spi->dmaHandler();
+}
 static void spiHandler0()
 {
     spiHandler(0);
@@ -57,7 +63,7 @@ static void spiHandler1()
  * @param instance
  * @param pinCs
  */
-rpSPI::rpSPI(int instance, int pinCs)
+rpSPI::rpSPI(int instance, int pinCs) : _txDma(lnRpDMA::DMA_MEMORY_TO_PERIPH, spis[instance].txDma, 8)
 {
     xAssert(!instances[instance]);
     instances[instance] = this;
@@ -67,6 +73,7 @@ rpSPI::rpSPI(int instance, int pinCs)
     _cr0 = LN_RP_SPI_CR0_DIVIDER(25) + LN_RP_SPI_CR0_MODE(0) + LN_RP_SPI_CR0_FORMAT_MOTOROLA + LN_RP_SPI_CR0_8_BITS;
     _cr1 = 0;
     _prescaler = 250;
+    _txDma.attachCallback(dmaCb, this);
     if (!_instance)
         lnSetInterruptHandler(spis[instance].irq, spiHandler0);
     else
@@ -91,7 +98,12 @@ void rpSPI::begin()
     _spi->CR1 = _cr1;
     _spi->CPSR = _prescaler;
     _spi->IMSC = 0;
+    _spi->DMACR = LN_RP_SPI_DMACR_RX |
+                  LN_RP_SPI_DMACR_TX; // enable DMA, activating the correct DMA *or* IRQ will select DMA or not
+
     _spi->CR1 |= LN_RP_SPI_CR1_ENABLE;
+    _txDma.doMemoryToPeripheralTransferNoLock(1, (const uint32_t *)NULL, (const uint32_t *)&(_spi->DR));
+    _txDma.armTransfer();
 }
 /**
  * @brief
@@ -140,7 +152,11 @@ bool rpSPI::write8(int nbBytes, const uint8_t *data)
     _spi->IMSC |= LN_RP_SPI_INT_TX;
     _state = TxStateBody;
     _txDone.tryTake();
+#ifdef RP_SPI_USE_DMA
+    _txDma.continueMemoryToPeripheralTransferNoLock(nbBytes, (const uint32_t *)data);
+#else
     lnEnableInterrupt(spis[_instance].irq);
+#endif
     _txDone.take();
     return true;
 }
@@ -179,5 +195,13 @@ void rpSPI::irqHandler()
         break;
     }
 }
-
+/**
+ * @brief
+ *
+ */
+void rpSPI::dmaHandler()
+{
+    _spi->IMSC = 0;
+    _txDone.give();
+}
 //--

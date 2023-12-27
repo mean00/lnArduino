@@ -9,6 +9,7 @@
  *
  */
 #pragma once
+#include "ln_rp_dma.h"
 /**
  */
 typedef struct
@@ -95,6 +96,7 @@ class rpSPI
 
   public:
     void irqHandler();
+    void dmaHandler();
 
   protected:
     uint32_t _cr0, _cr1, _prescaler;
@@ -105,4 +107,5 @@ class rpSPI
 
     lnBinarySemaphore _txDone;
     spiTxState _state;
+    lnRpDMA _txDma;
 };

@@ -68,7 +68,7 @@ class lnRpDMA
     void beginTransfer();
     void endTransfer();
     void cancelTransfer();
-
+    void armTransfer();
     void disableInterrupt();
     void enableInterrupt();
 
