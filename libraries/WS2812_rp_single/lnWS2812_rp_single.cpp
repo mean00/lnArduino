@@ -1,3 +1,13 @@
+/**
+ * @file lnWS2812_rp_single.cpp
+ * @author MEAN00 (you@domain.com)
+ * @brief
+ * @version 0.1
+ * @date 2023-12-27
+ *
+ * @copyright Copyright (c) 2023
+ *
+ */
 #include "lnWS2812_rp_single.h"
 #include "../private_include/ln_rp_spi_priv.h"
 #include "lnArduino.h"
@@ -7,9 +17,12 @@
 #define P1 0xCU
 #define P0 0x8U
 
-#define XXX(a, b, c, d) (a + (b << 4) + (c << 8) + (d << 12))
+// The RP send data MSB first
+// #define XXX(a, b, c, d) (a + (b << 4) + (c << 8) + (d << 12))
+#define XXX(b, a, d, c) (a + (b << 4) + (c << 8) + (d << 12))
 
 // expand 4 bits to 16 (*4)
+
 const uint16_t lookupTable[16] = {
     XXX(P0, P0, P0, P0), // 0
     XXX(P0, P0, P0, P1), XXX(P0, P0, P1, P0), XXX(P0, P0, P1, P1),
