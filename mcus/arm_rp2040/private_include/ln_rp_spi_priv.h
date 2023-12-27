@@ -12,8 +12,9 @@
 #include "ln_rp_dma.h"
 /**
  */
-typedef struct
+class LN_RP_SPIx
 {
+  public:
     uint32_t CR0;   // 0x00
     uint32_t CR1;   // 0x04
     uint32_t DR;    // 0x08  data
@@ -24,7 +25,7 @@ typedef struct
     uint32_t MIS;   // 0x1C  masked status
     uint32_t ICR;   // 0x20  interrupt clear
     uint32_t DMACR; // 0x24
-} LN_RP_SPIx;
+};
 
 typedef volatile LN_RP_SPIx LN_RP_SPI;
 
@@ -65,47 +66,3 @@ typedef volatile LN_RP_SPIx LN_RP_SPI;
 #define LN_RP_SPI_DMACR_TX (1 << 1) //
 
 //----
-/**
- *
- * @param instance
- * @param pinCs
- */
-class rpSPI
-{
-  public:
-    enum spiTxState
-    {
-        TxStateBody,
-        TxStateLast
-    };
-
-  public:
-    rpSPI(int instance, int pinCs = -1);
-    virtual ~rpSPI();
-    void begin();
-    void end(void);
-
-    // void    setBitOrder(spiBitOrder order);
-    // void    setDataMode(spiDataMode mode);
-    void setSpeed(int speed);       // speed in b/s
-    void setDataSize(int dataSize); // 8 or 16
-
-    // bool    dmaWrite16(int nbBytes, const uint16_t *data);
-    // bool    dmaWrite8(int nbBytes, const uint8_t *data);
-    bool write8(int nbBytes, const uint8_t *data);
-
-  public:
-    void irqHandler();
-    void dmaHandler();
-
-  protected:
-    uint32_t _cr0, _cr1, _prescaler;
-    uint32_t _instance;
-    lnPin _cs;
-    LN_RP_SPI *_spi;
-    const uint8_t *_current, *_limit;
-
-    lnBinarySemaphore _txDone;
-    spiTxState _state;
-    lnRpDMA _txDma;
-};

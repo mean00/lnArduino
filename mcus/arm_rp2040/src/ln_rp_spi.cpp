@@ -9,6 +9,7 @@
  * @copyright Copyright (c) 2023
  *
  */
+#include "ln_rp_spi.h"
 #include "lnArduino.h"
 #include "lnGPIO.h"
 #include "lnSPI.h"
@@ -63,7 +64,7 @@ static void spiHandler1()
  * @param instance
  * @param pinCs
  */
-rpSPI::rpSPI(int instance, int pinCs) : _txDma(lnRpDMA::DMA_MEMORY_TO_PERIPH, spis[instance].txDma, 8)
+rpSPI::rpSPI(int instance, int pinCs)
 {
     xAssert(!instances[instance]);
     instances[instance] = this;
@@ -73,7 +74,8 @@ rpSPI::rpSPI(int instance, int pinCs) : _txDma(lnRpDMA::DMA_MEMORY_TO_PERIPH, sp
     _cr0 = LN_RP_SPI_CR0_DIVIDER(25) + LN_RP_SPI_CR0_MODE(0) + LN_RP_SPI_CR0_FORMAT_MOTOROLA + LN_RP_SPI_CR0_8_BITS;
     _cr1 = 0;
     _prescaler = 250;
-    _txDma.attachCallback(dmaCb, this);
+    _txDma = new lnRpDMA(lnRpDMA::DMA_MEMORY_TO_PERIPH, spis[instance].txDma, 8);
+    _txDma->attachCallback(dmaCb, this);
     if (!_instance)
         lnSetInterruptHandler(spis[instance].irq, spiHandler0);
     else
@@ -86,6 +88,8 @@ rpSPI::rpSPI(int instance, int pinCs) : _txDma(lnRpDMA::DMA_MEMORY_TO_PERIPH, sp
 rpSPI::~rpSPI()
 {
     end();
+    delete _txDma;
+    _txDma = NULL;
     instances[_instance] = NULL;
 }
 /**
@@ -102,8 +106,8 @@ void rpSPI::begin()
                   LN_RP_SPI_DMACR_TX; // enable DMA, activating the correct DMA *or* IRQ will select DMA or not
 
     _spi->CR1 |= LN_RP_SPI_CR1_ENABLE;
-    _txDma.doMemoryToPeripheralTransferNoLock(1, (const uint32_t *)NULL, (const uint32_t *)&(_spi->DR));
-    _txDma.armTransfer();
+    _txDma->doMemoryToPeripheralTransferNoLock(1, (const uint32_t *)NULL, (const uint32_t *)&(_spi->DR));
+    _txDma->armTransfer();
 }
 /**
  * @brief
@@ -153,7 +157,7 @@ bool rpSPI::write8(int nbBytes, const uint8_t *data)
     _state = TxStateBody;
     _txDone.tryTake();
 #ifdef RP_SPI_USE_DMA
-    _txDma.continueMemoryToPeripheralTransferNoLock(nbBytes, (const uint32_t *)data);
+    _txDma->continueMemoryToPeripheralTransferNoLock(nbBytes, (const uint32_t *)data);
 #else
     lnEnableInterrupt(spis[_instance].irq);
 #endif
