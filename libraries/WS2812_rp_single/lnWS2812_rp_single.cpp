@@ -19,7 +19,8 @@
 
 // The RP send data MSB first
 // #define XXX(a, b, c, d) (a + (b << 4) + (c << 8) + (d << 12))
-#define XXX(b, a, d, c) (a + (b << 4) + (c << 8) + (d << 12))
+// #define XXX(b, a, d, c) (a + (b << 4) + (c << 8) + (d << 12))
+#define XXX(d, c, b, a) (a + (b << 4) + (c << 8) + (d << 12))
 
 // expand 4 bits to 16 (*4)
 
@@ -52,6 +53,6 @@ void WS2812_rp2040_single::setColor(uint8_t r, uint8_t g, uint8_t b)
     _buffer[3] = lookupTable[r & 0xf];
     _buffer[4] = lookupTable[b >> 4];
     _buffer[5] = lookupTable[b & 0xf];
-    _spi->write8(12, (uint8_t *)_buffer);
+    _spi->write16(6, _buffer);
 }
 // EOF

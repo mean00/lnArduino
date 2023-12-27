@@ -15,7 +15,7 @@ class WS2812_rp2040_single
         _spi = new rpSPI(spi_instance);
         lnPinMode(pin, lnSPI);
         _spi->setSpeed(3470 * 1000); // 3.47 Meg; to=288 ns
-        _spi->begin();
+        _spi->begin(16);
     }
     virtual ~WS2812_rp2040_single()
     {
