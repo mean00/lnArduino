@@ -115,9 +115,11 @@ void rpSPI::setSpeed(int speed)
 
 #define RATIO 128
 
-    int div = (fq_in) / (speed * 2);
+    int div = (fq_in) / (speed);
     int org = (div / RATIO);
     _prescaler = org & ~1;
+    if (!_prescaler)
+        _prescaler = 2;
     int scaler = ((div + (_prescaler >> 1)) / _prescaler) - 1;
     _cr0 &= ~LN_RP_SPI_CR0_DIVIDER_MASK;
     _cr0 |= LN_RP_SPI_CR0_DIVIDER(scaler);
