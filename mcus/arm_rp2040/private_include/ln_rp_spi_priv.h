@@ -97,7 +97,7 @@ class rpSPI
     void irqHandler();
 
   protected:
-    uint32_t _cr0, _cr1, _scaler;
+    uint32_t _cr0, _cr1, _prescaler;
     uint32_t _instance;
     lnPin _cs;
     LN_RP_SPI *_spi;

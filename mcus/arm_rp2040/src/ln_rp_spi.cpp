@@ -14,7 +14,11 @@
 #include "lnSPI.h"
 #include "ln_rp_memory_map.h"
 #include "ln_rp_spi_priv.h"
-
+extern "C"
+{
+#include "hardware/structs/clocks.h"
+    uint32_t clock_get_hz(enum clock_index clk_index);
+}
 class rpSPI;
 
 typedef struct
@@ -60,9 +64,9 @@ rpSPI::rpSPI(int instance, int pinCs)
     _cs = (lnPin)pinCs;
     _instance = instance;
     _spi = (LN_RP_SPI *)spis[instance].spi;
-    _cr0 = LN_RP_SPI_CR0_DIVIDER(100) + LN_RP_SPI_CR0_MODE(0) + LN_RP_SPI_CR0_FORMAT_MOTOROLA + LN_RP_SPI_CR0_8_BITS;
+    _cr0 = LN_RP_SPI_CR0_DIVIDER(25) + LN_RP_SPI_CR0_MODE(0) + LN_RP_SPI_CR0_FORMAT_MOTOROLA + LN_RP_SPI_CR0_8_BITS;
     _cr1 = 0;
-    _scaler = 100;
+    _prescaler = 250;
     if (!_instance)
         lnSetInterruptHandler(spis[instance].irq, spiHandler0);
     else
@@ -85,7 +89,7 @@ void rpSPI::begin()
 {
     _spi->CR0 = _cr0;
     _spi->CR1 = _cr1;
-    _spi->CPSR = _scaler;
+    _spi->CPSR = _prescaler;
     _spi->IMSC = 0;
     _spi->CR1 |= LN_RP_SPI_CR1_ENABLE;
 }
@@ -99,6 +103,26 @@ void rpSPI::end(void)
     _spi->DMACR = 0;
     _spi->IMSC = 0;
 }
+/**
+ * @brief
+ *
+ * @param speed
+ */
+void rpSPI::setSpeed(int speed)
+{
+
+    uint32_t fq_in = clock_get_hz(clk_peri);
+
+#define RATIO 128
+
+    int div = (fq_in) / (speed * 2);
+    int org = (div / RATIO);
+    _prescaler = org & ~1;
+    int scaler = ((div + (_prescaler >> 1)) / _prescaler) - 1;
+    _cr0 &= ~LN_RP_SPI_CR0_DIVIDER_MASK;
+    _cr0 |= LN_RP_SPI_CR0_DIVIDER(scaler);
+}
+
 /**
  * @brief
  *
