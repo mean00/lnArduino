@@ -256,6 +256,8 @@ void lnRpDMA::beginTransfer()
 
 /**
  * @brief
+ *
+ *
  * dma_channel_set_irq0_enabled
  */
 void lnRpDMA::armTransfer()

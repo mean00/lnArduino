@@ -31,7 +31,7 @@ class rpSPI
   public:
     rpSPI(int instance, int pinCs = -1);
     virtual ~rpSPI();
-    void begin();
+    void begin(int wordsize = 8);
     void end(void);
 
     // void    setBitOrder(spiBitOrder order);
@@ -40,6 +40,7 @@ class rpSPI
     void setDataSize(int dataSize); // 8 or 16
 
     bool write8(int nbBytes, const uint8_t *data);
+    bool write16(int nbHalfWord, const uint16_t *data);
 
   public:
     void irqHandler();
@@ -48,6 +49,7 @@ class rpSPI
   protected:
     uint32_t _cr0, _cr1, _prescaler;
     uint32_t _instance;
+    int _wordSize; // 8 or 16
     lnPin _cs;
     LN_RP_SPI *_spi;
     const uint8_t *_current, *_limit;

@@ -71,15 +71,10 @@ rpSPI::rpSPI(int instance, int pinCs)
     _cs = (lnPin)pinCs;
     _instance = instance;
     _spi = (LN_RP_SPI *)spis[instance].spi;
-    _cr0 = LN_RP_SPI_CR0_DIVIDER(25) + LN_RP_SPI_CR0_MODE(0) + LN_RP_SPI_CR0_FORMAT_MOTOROLA + LN_RP_SPI_CR0_8_BITS;
+    _cr0 = LN_RP_SPI_CR0_DIVIDER(25) + LN_RP_SPI_CR0_MODE(0) + LN_RP_SPI_CR0_FORMAT_MOTOROLA;
     _cr1 = 0;
     _prescaler = 250;
-    _txDma = new lnRpDMA(lnRpDMA::DMA_MEMORY_TO_PERIPH, spis[instance].txDma, 8);
-    _txDma->attachCallback(dmaCb, this);
-    if (!_instance)
-        lnSetInterruptHandler(spis[instance].irq, spiHandler0);
-    else
-        lnSetInterruptHandler(spis[instance].irq, spiHandler1);
+    _txDma = NULL;
 }
 /**
  * @brief Destroy the rp S P I::rp S P I object
@@ -96,8 +91,24 @@ rpSPI::~rpSPI()
  * @brief
  *
  */
-void rpSPI::begin()
+void rpSPI::begin(int wordsize)
 {
+    _wordSize = wordsize;
+    xAssert(_wordSize == 8 || _wordSize == 16);
+    _cr0 &= ~LN_RP_SPI_CR0_BITS_MASK;
+    switch (_wordSize)
+    {
+    case 8:
+        _cr0 |= LN_RP_SPI_CR0_8_BITS;
+        break;
+    case 16:
+        _cr0 |= LN_RP_SPI_CR0_16_BITS;
+        break;
+    default:
+        xAssert(0);
+        break;
+    }
+
     _spi->CR0 = _cr0;
     _spi->CR1 = _cr1;
     _spi->CPSR = _prescaler;
@@ -106,6 +117,13 @@ void rpSPI::begin()
                   LN_RP_SPI_DMACR_TX; // enable DMA, activating the correct DMA *or* IRQ will select DMA or not
 
     _spi->CR1 |= LN_RP_SPI_CR1_ENABLE;
+
+    _txDma = new lnRpDMA(lnRpDMA::DMA_MEMORY_TO_PERIPH, spis[_instance].txDma, _wordSize);
+    _txDma->attachCallback(dmaCb, this);
+    if (!_instance)
+        lnSetInterruptHandler(spis[_instance].irq, spiHandler0);
+    else
+        lnSetInterruptHandler(spis[_instance].irq, spiHandler1);
     _txDma->doMemoryToPeripheralTransferNoLock(1, (const uint32_t *)NULL, (const uint32_t *)&(_spi->DR));
     _txDma->armTransfer();
 }
@@ -151,6 +169,7 @@ void rpSPI::setSpeed(int speed)
  */
 bool rpSPI::write8(int nbBytes, const uint8_t *data)
 {
+    xAssert(_wordSize == 8);
     _current = data;
     _limit = _current + nbBytes;
     _spi->IMSC |= LN_RP_SPI_INT_TX;
@@ -164,6 +183,31 @@ bool rpSPI::write8(int nbBytes, const uint8_t *data)
     _txDone.take();
     return true;
 }
+/**
+ * @brief
+ *
+ * @param nbHalfWord
+ * @param data
+ * @return true
+ * @return false
+ */
+bool rpSPI::write16(int nbHalfWord, const uint16_t *data)
+{
+    xAssert(_wordSize == 16);
+    _current = (const uint8_t *)data;
+    _limit = _current + nbHalfWord * 2;
+    _spi->IMSC |= LN_RP_SPI_INT_TX;
+    _state = TxStateBody;
+    _txDone.tryTake();
+#ifdef RP_SPI_USE_DMA
+    _txDma->continueMemoryToPeripheralTransferNoLock(nbHalfWord, (const uint32_t *)data);
+#else
+    lnEnableInterrupt(spis[_instance].irq);
+#endif
+    _txDone.take();
+    return true;
+}
+
 /**
  * @brief
  *

@@ -37,6 +37,7 @@ typedef volatile LN_RP_SPIx LN_RP_SPI;
 #define LN_RP_SPI_CR0_FORMAT_NL (2 << 4)
 #define LN_RP_SPI_CR0_8_BITS (7 << 0)
 #define LN_RP_SPI_CR0_16_BITS (0xf << 0)
+#define LN_RP_SPI_CR0_BITS_MASK (0xf)
 //
 #define LN_RP_SPI_CR1_ENABLE (1 << 1)
 // Status
