@@ -8,7 +8,7 @@
  * @copyright Copyright (c) 2023
  *
  */
-#include "lnWS2812_rp_single.h"
+#include "lnWS2812_rp_single_spi.h"
 #include "../private_include/ln_rp_spi_priv.h"
 #include "lnArduino.h"
 #include "lnGPIO.h"

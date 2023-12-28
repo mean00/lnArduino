@@ -1,24 +1,23 @@
 #include "lnArduino.h"
 #include "lnGPIO.h"
 #include "lnSerial.h"
-
+#include "lnWS2812_rp_single_pio.h"
 #define LED LN_SYSTEM_LED
-#include "lnWS2812_rp_single.h"
 
 #define STEP 8
 
 int pix = 0, inc = STEP;
 
-WS2812_rp2040_single *led;
-
 /**
  * @brief
  *
  */
+WS2812_rp2040_pio_single *pp;
+
 void setup()
 {
     Logger("Starting SPI Test\n");
-    led = new WS2812_rp2040_single(0, GPIO23);
+    pp = new WS2812_rp2040_pio_single(1, 0, GPIO23);
 }
 /**
  * @brief
@@ -37,7 +36,7 @@ const uint8_t xsin[181] = {
 
 void loop()
 {
-    led->setColor(0, 0, xsin[pix]);
+    pp->setColor(0, 0, xsin[pix]);
     pix += inc;
     if (inc == STEP)
     {
