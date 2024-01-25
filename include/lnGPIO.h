@@ -50,28 +50,28 @@ class lnFastIO
 {
   public:
     lnFastIO(lnPin p);
-    void on()
+    void on() volatile
     {
         *_onoff = _onbit;
     }
-    void off()
+    void off() volatile
     {
         *_onoff = _offbit;
     }
-    void pulseLow() __attribute__((always_inline))
+    void pulseLow() volatile __attribute__((always_inline))
     {
         *_onoff = _offbit;
         *_onoff = _onbit;
     }
-    void pulseHigh() __attribute__((always_inline))
+    void pulseHigh() volatile __attribute__((always_inline))
     {
         *_onoff = _onbit;
         *_onoff = _offbit;
     }
 
   protected:
-    uint32_t *_onoff;
-    uint32_t _onbit, _offbit;
+    volatile uint32_t *_onoff;
+    volatile uint32_t _onbit, _offbit;
 };
 
 #include "lnExti.h"
