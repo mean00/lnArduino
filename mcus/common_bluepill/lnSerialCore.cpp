@@ -196,8 +196,10 @@ IRQHANDLER(3)
 #include "lnSerialTxOnly.cpp"
 #include "lnSerialTxOnlyDma.cpp"
 #include "lnSerialTxOnlyDmaBuffer.cpp"
+#ifdef LN_ENABLE_UART
 #include "lnSerialRxTx.cpp"
 #include "lnSerialRxTxDma.cpp"
+#endif
 /**
  * @brief Create a Ln Serial Tx Only object
  *
@@ -228,12 +230,14 @@ lnSerialTxOnly *createLnSerialTxOnly(int instance, bool dma, bool buffered)
  * @param dma
  * @return lnSerialRxTx*
  */
+#ifdef LN_ENABLE_UART
 lnSerialRxTx *createLnSerialRxTx(int instance, int rxBufferSize, bool dma)
 {
     if (dma)
         return new lnSerialBpRxTxDma(instance, rxBufferSize);
     return new lnSerialBpRxTx(instance, rxBufferSize);
 }
+#endif
 /**
  * @brief
  *

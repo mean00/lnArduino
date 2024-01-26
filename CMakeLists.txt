@@ -19,6 +19,7 @@ IF(True) #NOT ARDUINO_GD32_FREERTOS)
         OPTION(LN_ENABLE_USBD "Enable USBD support" OFF)
         OPTION(LN_ENABLE_I2C  "Enable I2C support" ON)
         OPTION(LN_ENABLE_SPI  "Enable SPI support" ON)
+        OPTION(LN_ENABLE_UART "Enable Full uart support" OFF)
 
         OPTION(LN_ENABLE_RUST "Enable rust support" OFF)
 
