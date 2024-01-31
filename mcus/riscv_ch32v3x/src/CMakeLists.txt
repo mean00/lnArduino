@@ -26,6 +26,13 @@ IF(LN_ENABLE_SPI)
   target_compile_definitions(lnArduino_impl PRIVATE LN_ENABLE_SPI )
 ENDIF()
 
+IF(USE_CH32v3x_FAST_IRQ)
+  MESSAGE(STATUS "Use WCH fast IRQ")
+  target_compile_definitions(lnArduino_impl PRIVATE "-DUSE_CH32v3x_FAST_IRQ")
+ELSE()
+  MESSAGE(STATUS "Use WCH slow IRQ")  
+ENDIF()
+
 #IF(LN_ENABLE_I2C)
 #  LN_APPEND_FLAGS( ${S}/lnIRQ_riscv_ch32v3x.cpp -DLN_ENABLE_I2C)
 #ENDIF(LN_ENABLE_I2C)
