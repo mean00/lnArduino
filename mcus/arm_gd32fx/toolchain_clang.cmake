@@ -1,5 +1,6 @@
 #=============================================================================#
 # https://interrupt.memfault.com/blog/arm-cortexm-with-llvm-clang
+#=============================================================================#
 MESSAGE(STATUS "Setting up GD32/arm cmake environment")
 IF(NOT DEFINED LN_EXT)
 SET(LN_EXT arm_gd32fx CACHE INTERNAL "")
@@ -10,9 +11,7 @@ include(${AF_FOLDER}/../platformConfig.cmake)
 IF(NOT PLATFORM_TOOLCHAIN_PATH)
         MESSAGE(FATAL_ERROR "PLATFORM_TOOLCHAIN_PATH is not defined in platformConfig.cmake !!")
 ENDIF(NOT PLATFORM_TOOLCHAIN_PATH)
-#
-#SET(LN_LTO "-flto")
-#
+
 LIST(APPEND CMAKE_SYSTEM_PREFIX_PATH "${PLATFORM_TOOLCHAIN_PATH}")
 
 FUNCTION(FATAL_BANNER msg)
@@ -95,14 +94,10 @@ MESSAGE(STATUS "GD32 C++ compiler ${CMAKE_CXX_COMPILER}")
 IF( "${LN_MCU}" STREQUAL "M3")
     SET(GD32_MCU "  -mfloat-abi=soft --target=armv7m-none-eabi  ")
     SET(MINI_SYSROOT "${PLATFORM_CLANG_PATH}/../lib/clang-runtimes/arm-none-eabi/armv7m_soft_nofp/" CACHE INTERNAL "")
-    SET(GD32_LIBC "-L${MINI_SYSROOT}/lib " CACHE INTERNAL "")
-    #SET(GD32_LIBC " -L${PLATFORM_CLANG_PATH}/../lib/clang-runtimes/arm-none-eabi/armv7m_soft_nofp/lib" CACHE INTERNAL "")
-
+    SET(GD32_LIBC "-L${MINI_SYSROOT}/lib " CACHE INTERNAL "")    
 ELSE()
     IF( "${LN_MCU}" STREQUAL "M4")
         SET(MINI_SYSROOT "${PLATFORM_CLANG_PATH}/../lib/clang-runtimes/arm-none-eabi/armv7em_hard_fpv4_sp_d16/" CACHE INTERNAL "")
-        #SET(LN_CLANG_SYSROOT "${PLATFORM_CLANG_PATH}/../lib/clang-runtimes/armv7em_hard_fpv4_sp_d16/lib" CACHE INTERNAL "")
-        # SET(GD32_LIBC " " CACHE INTERNAL "")
         SET(GD32_LIBC "-L${MINI_SYSROOT}/lib " CACHE INTERNAL "")
         SET(GD32_MCU "-mcpu=cortex-m4 --target=armv7m-none-eabi   -mfloat-abi=hard -mfpu=fpv4-sp-d16  -DLN_USE_FPU=1")        
      ELSE()
@@ -113,11 +108,8 @@ ENDIF()
 #____________________________
 # CLANG LINK USING GCC LIBS
 #____________________________
-#SET(LN_CLANG_LIBC /home/fx/Arduino_stm32/arm-gcc-2020q4/bin/../lib/gcc/arm-none-eabi/10.2.1/thumb/v7-m/nofp/libgcc.a CACHE INTERNAL "")
-#SET(LN_CLANG_MULTILIB thumb/v7-m/nofp CACHE INTERNAL "")
 
 SET(G32_DEBUG_FLAGS "-g3 ${LN_LTO}  -Oz  -gdwarf-4" CACHE INTERNAL "")
-
 SET(GD32_LD_EXTRA "  -Wl,--unresolved-symbols=report-all -Wl,--warn-common  " CACHE INTERNAL "")
 #
 SET(GD32_C_FLAGS  "${GD32_SPECS}  ${PLATFORM_C_FLAGS} ${G32_DEBUG_FLAGS} -ffunction-sections -ggnu-pubnames --sysroot=${MINI_SYSROOT} -I${MINI_SYSROOT}/include --target=arm-none-eabi -DLN_ARCH=LN_ARCH_ARM   ${GD32_BOARD_FLAG}  ${GD32_MCU}" CACHE INTERNAL "")
@@ -130,7 +122,7 @@ SET(GD32_LD_LIBS "-lm -lc -Wl,--gc-sections -Wl,--gdb-index " CACHE INTERNAL "")
 #
 SET(CLANG_LINKER_OPT "${MINI_SYSROOT}/lib/libclang_rt.builtins.a")  
 #
-set(CMAKE_CXX_LINK_EXECUTABLE    "<CMAKE_LINKER>  <CMAKE_CXX_LINK_FLAGS>  <LINK_FLAGS> ${LN_LTO} --sysroot=${LN_CLANG_SYSROOT}  -Wl,--cref   -Wl,--start-group  <OBJECTS> <LINK_LIBRARIES> -Wl,--end-group  -Wl,-Map,<TARGET>.map   -o <TARGET> ${GD32_LD_FLAGS} ${GD32_LD_LIBS} ${CLANG_LINKER_OPT}" CACHE INTERNAL "")
+set(CMAKE_CXX_LINK_EXECUTABLE    "<CMAKE_LINKER>  <CMAKE_CXX_LINK_FLAGS>  <LINK_FLAGS> ${LN_LTO} --sysroot=${MINI_SYSROOT}  -Wl,--cref   -Wl,--start-group  <OBJECTS> <LINK_LIBRARIES> -Wl,--end-group  -Wl,-Map,<TARGET>.map   -o <TARGET> ${GD32_LD_FLAGS} ${GD32_LD_LIBS} ${CLANG_LINKER_OPT}" CACHE INTERNAL "")
 SET(CMAKE_EXECUTABLE_SUFFIX_C .elf CACHE INTERNAL "")
 SET(CMAKE_EXECUTABLE_SUFFIX_CXX .elf CACHE INTERNAL "")
 
@@ -144,5 +136,5 @@ MESSAGE(STATUS "MCU Speed        ${LN_MCU_SPEED}")
 MESSAGE(STATUS "MCU Flash Size   ${LN_MCU_FLASH_SIZE}")
 MESSAGE(STATUS "MCU Ram Size     ${LN_MCU_RAM_SIZE}")
 MESSAGE(STATUS "MCU Static RAM   ${LN_MCU_STATIC_RAM}")
-MESSAGE(STATUS "Runime           ${PLATFORM_CLANG_C_FLAGS}")
+MESSAGE(STATUS "RunTime          ${PLATFORM_CLANG_C_FLAGS}")
 ENDIF(NOT DEFINED LN_EXT)
