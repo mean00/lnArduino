@@ -29,13 +29,13 @@ MACRO(GENERATE_GD32_FIRMWARE target)
                    COMMENT "Memory summary"
     )
 
-    find_program ( elf2uf2      NAMES elf2uf2-rs)    
+    find_program ( elf2uf2      NAMES elf2uf2)    
     if( "x${elf2uf2}" STREQUAL "xelf2uf2-NOTFOUND")
-        MESSAGE(WARNING "elf2uf2-rs not found, install it trough cargo install elf2uf2-rs" )
+            MESSAGE(WARNING "elf2uf2 not found, it is part of the pico SDK")
     else()
      add_custom_command(TARGET ${target}
         POST_BUILD                
-        COMMAND elf2uf2-rs  $<TARGET_FILE:${target}> $<TARGET_FILE:${target}>.uf2
+        COMMAND elf2uf2  $<TARGET_FILE:${target}> $<TARGET_FILE:${target}>.uf2
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         COMMENT "Generating uf2 files"        
         )
