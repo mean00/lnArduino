@@ -86,7 +86,7 @@ target_include_directories(rplib PUBLIC
         ${PICO_SDK_PATH}/src/common/pico_util/include 
         ${PICO_SDK_PATH}/src/rp2040/hardware_regs/include  
         ${PICO_SDK_PATH}/src/rp2040/hardware_structs/include  
-        ${PICO_SDK_PATH}/src/rp2_common/boot_stage2/include -g3   
+        ${PICO_SDK_PATH}/src/rp2_common/boot_stage2/include        
         ${PICO_SDK_PATH}/src/rp2_common/hardware_base/include  
         ${PICO_SDK_PATH}/src/rp2_common/hardware_claim/include  
         ${PICO_SDK_PATH}/src/rp2_common/hardware_clocks/include  
