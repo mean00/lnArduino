@@ -40,6 +40,7 @@ _Heritage:_
 * The riscv freeRTOS port is from QQxiaming (see [1])
 * A couple of header file from arduino to offer a basic compatibility API
 * A couple of header from nucleisys to access n200 extra functions
+* TinyUsb for usb support
 * Everything else has been written from scratch, no licensing issue.
 
 
