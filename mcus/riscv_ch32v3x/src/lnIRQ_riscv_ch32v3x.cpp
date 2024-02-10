@@ -104,7 +104,7 @@ extern "C"
  * @brief 
  * 
  */
-extern "C" void Break_Point_Handler(void ) LN_INTERRUPT_TYPE
+extern "C" void LN_INTERRUPT_TYPE Break_Point_Handler(void ) 
 {
     deadEnd(5);
 }
