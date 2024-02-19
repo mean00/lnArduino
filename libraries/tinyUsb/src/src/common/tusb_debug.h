@@ -43,7 +43,7 @@
 #if CFG_TUSB_DEBUG
 
 // Enum to String for debugging purposes
-#if CFG_TUSB_DEBUG >= 2
+#if CFG_TUSB_DEBUG >= CFG_TUH_LOG_LEVEL || CFG_TUSB_DEBUG >= CFG_TUD_LOG_LEVEL
 extern char const* const tu_str_speed[];
 extern char const* const tu_str_std_request[];
 extern char const* const tu_str_xfer_result[];
@@ -52,7 +52,7 @@ extern char const* const tu_str_xfer_result[];
 void tu_print_mem(void const *buf, uint32_t count, uint8_t indent);
 
 #ifdef CFG_TUSB_DEBUG_PRINTF
-  extern void CFG_TUSB_DEBUG_PRINTF(const char *format, ...);
+  extern int CFG_TUSB_DEBUG_PRINTF(const char *format, ...);
   #define tu_printf    CFG_TUSB_DEBUG_PRINTF
 #else
   #define tu_printf    printf

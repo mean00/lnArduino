@@ -1,2 +1,6 @@
 	url = https://github.com/hathach/tinyusb.git
-    63cb3cdc74552f5b1a590e08c9c73bdef4feccc1
+b60d0ff1d4f1db0e3caeb26895e73e749206023a
+Merge: f918406a1 f600a8a0f
+Author: Ha Thach <thach@tinyusb.org>
+Date:   Tue Feb 6 16:34:02 2024 +0700
+
