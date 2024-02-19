@@ -2,6 +2,7 @@
   Minimalistic copy / paste of ch32 structure used
 */
 #pragma once
+#include "stdint.h"
 #define PERIPH_BASE ((uint32_t)0x40000000) /* Peripheral base address in the alias region */
 #define APB1PERIPH_BASE (PERIPH_BASE)
 #define APB2PERIPH_BASE (PERIPH_BASE + 0x10000)
