@@ -9,7 +9,7 @@ INCLUDE_DIRECTORIES(    ${CH32V3x_FOLDER}  )
 IF( USE_CH32v3x_USB_HS ) 
     SET(DRIVERS              
                     ${LNSRC}/lnUsbStack.cpp
-                    ${CH32V3x_FOLDER}/dcd_usbhs.cpp
+                    ${TINY_FOLDER}/dcd_ch32_usbhs.c
                     ${CH32V3x_FOLDER}/lnUsbStubs.cpp
                     ${CH32V3x_FOLDER}/dcd_usbhs_platform.cpp
             )
