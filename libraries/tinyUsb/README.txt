@@ -4,3 +4,5 @@ Merge: f918406a1 f600a8a0f
 Author: Ha Thach <thach@tinyusb.org>
 Date:   Tue Feb 6 16:34:02 2024 +0700
 
+Updated with WCH fs driver from https://github.com/dragonlock2/tinyusb.git
+
