@@ -5,4 +5,5 @@ Author: Ha Thach <thach@tinyusb.org>
 Date:   Tue Feb 6 16:34:02 2024 +0700
 
 Updated with WCH fs driver from https://github.com/dragonlock2/tinyusb.git
+Updated with WCH hs driver from https://github.com/Krasutski/tinyusb.git
 
