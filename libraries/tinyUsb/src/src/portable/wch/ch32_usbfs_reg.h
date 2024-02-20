@@ -4,7 +4,7 @@
 // MEANX #if (CFG_TUSB_MCU == OPT_MCU_CH32V20X)
 // MEANX #include <ch32v20x.h>
 // MEANX #endif
-#include "ch32_extra.h"
+//#include "ch32_extra.h"
 
 // CTRL
 #define USBFS_CTRL_DMA_EN    (1 << 0)
