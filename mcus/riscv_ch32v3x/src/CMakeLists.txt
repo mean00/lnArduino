@@ -9,7 +9,7 @@ target_sources( lnArduino_impl PRIVATE
     ${S}/lnCpuID_riscv_ch32v3x.cpp  
     ${S}/lnFMC_impl.cpp  
     ${S}/lnIRQ_riscv_ch32v3x.cpp  
-    ${S}/lnRCU_ch32v3x.cpp  
+    ${S}/lnRCU_ch32v3x_usb.cpp  
     ${S}/lnRCU_systemClock_riscv_ch32v3x.cpp  
     ${S}/lnRunTime_riscv_ch32v3x.cpp  
     ${S}/lnSystemTimer_riscv_ch32v3x.cpp  
