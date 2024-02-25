@@ -69,7 +69,7 @@ void __attribute__((noinline)) HardFault()
 
 #define DECLARE_INTERRUPT(x) void x() LN_INTERRUPT_TYPE;
 extern "C"
-{    
+{
     DECLARE_INTERRUPT(Break_Point_Handler)
     DECLARE_INTERRUPT(SysTick_Handler)
     DECLARE_INTERRUPT(Ecall_M_Mode_Handler)
@@ -101,10 +101,10 @@ extern "C"
     DECLARE_INTERRUPT(USART2_IRQHandler)
 }
 /**
- * @brief 
- * 
+ * @brief
+ *
  */
-extern "C" void LN_INTERRUPT_TYPE Break_Point_Handler(void ) 
+extern "C" void LN_INTERRUPT_TYPE Break_Point_Handler(void)
 {
     deadEnd(5);
 }
@@ -139,31 +139,29 @@ void i2cIrqHandler(int instance, bool error);
 I2C_IRQ(0)
 I2C_IRQ(1)
 
-#define unsupported_no_decl(x) static void unsupported_##x() {    deadEnd(x);}
+#define unsupported_no_decl(x)                                                                                         \
+    static void unsupported_##x()                                                                                      \
+    {                                                                                                                  \
+        deadEnd(x);                                                                                                    \
+    }
 #define unsupported_no(x) unsupported_##x
 
-unsupported_no_decl(1)
-unsupported_no_decl(2)
-unsupported_no_decl(3)
-unsupported_no_decl(4)
-unsupported_no_decl(5)
-unsupported_no_decl(6)
-unsupported_no_decl(7)
-unsupported_no_decl(8)
+unsupported_no_decl(1) unsupported_no_decl(2) unsupported_no_decl(3) unsupported_no_decl(4) unsupported_no_decl(5)
+    unsupported_no_decl(6) unsupported_no_decl(7) unsupported_no_decl(8)
 
 #define FAST_UNUSED 0xFF00
-uint16_t fastInterrupt[4] = {FAST_UNUSED, FAST_UNUSED, FAST_UNUSED, FAST_UNUSED};
+        uint16_t fastInterrupt[4] = {FAST_UNUSED, FAST_UNUSED, FAST_UNUSED, FAST_UNUSED};
 
 static const uint32_t vecTable[] __attribute__((aligned(32))) = {
     X(unsupported),              // 0 .word   RESET
-    X(unsupported_no(1)),   // 1 .word   0
-    X(unsupported_no(2)),   // 2 .word   NMI_Handler                /* NMI */
+    X(unsupported_no(1)),        // 1 .word   0
+    X(unsupported_no(2)),        // 2 .word   NMI_Handler                /* NMI */
     X(HardFault),                // 3 .word   HardFault_Handler          /* Hard Fault */
-    X(unsupported_no(4)),   // 4 .word   0
-    X(unsupported_no(5)),   // 5 .word   Ecall_M_Mode_Handler       /* Ecall M Mode */
-    X(unsupported_no(6)),   // 6 .word   0
-    X(unsupported_no(7)),   // 7 .word   0
-    X(unsupported_no(8)),   // 8 .word   Ecall_U_Mode_Handler       /* Ecall U Mode */
+    X(unsupported_no(4)),        // 4 .word   0
+    X(unsupported_no(5)),        // 5 .word   Ecall_M_Mode_Handler       /* Ecall M Mode */
+    X(unsupported_no(6)),        // 6 .word   0
+    X(unsupported_no(7)),        // 7 .word   0
+    X(unsupported_no(8)),        // 8 .word   Ecall_U_Mode_Handler       /* Ecall U Mode */
     X(Break_Point_Handler),      // 9 .word   Break_Point_Handler        /* Break Point */
     X(unsupported),              // 10 .word   0
     X(unsupported),              // 11 .word   0

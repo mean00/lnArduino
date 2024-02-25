@@ -116,7 +116,7 @@ void setPll(int inputClock, int multiplier, int predivider, bool external)
 
     // Set PLL multiplier
     c0 &= ~((0xf) << 18);
-    c0 |= ((pllMultiplier)&0x0f) << 18; // PLL Multiplier, ignore MSB
+    c0 |= ((pllMultiplier) & 0x0f) << 18; // PLL Multiplier, ignore MSB
 
     if (external)
         c0 |= LN_RCU_CFG0_PLLSEL;
