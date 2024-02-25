@@ -3,9 +3,9 @@
  * @author MEAN00 fixounet@free.fr
  * @brief  This deals with the clock tree (except usb)
  * @version 0.1
- * 
+ *
  * @copyright Copyright (c) 2021-2024
- * 
+ *
  */
 #include "lnArduino.h"
 #include "lnCpuID.h"
@@ -22,23 +22,20 @@ extern LN_RCU *arcu;
 #define LN_CLOCK_XTAL 16
 #define LN_CLOCK_PLL 24
 //
-#define CH32_CFG0_PLL_MASK (0xf<<18)
-#define CH32_CFG0_PLL_VALUE(x) ((x)<<18)
-#define CH32_CFG0_PLL_EXTERNAL (1<<16)
+#define CH32_CFG0_PLL_MASK (0xf << 18)
+#define CH32_CFG0_PLL_VALUE(x) ((x) << 18)
+#define CH32_CFG0_PLL_EXTERNAL (1 << 16)
 
-#define CH32_CFG0_AHB_MASK (0xf<<4)
-#define CH32_CFG0_AHB_DIVIDER(x) ((x)<<4)
+#define CH32_CFG0_AHB_MASK (0xf << 4)
+#define CH32_CFG0_AHB_DIVIDER(x) ((x) << 4)
 
-#define CH32_CFG0_APB1_MASK (7<<8)
-#define CH32_CFG0_APB1_DIVIDER(x) ((x)<<8)
+#define CH32_CFG0_APB1_MASK (7 << 8)
+#define CH32_CFG0_APB1_DIVIDER(x) ((x) << 8)
 
-#define CH32_CFG0_APB2_MASK (7<<11)
-#define CH32_CFG0_APB2_DIVIDER(x) ((x)<<11)
+#define CH32_CFG0_APB2_MASK (7 << 11)
+#define CH32_CFG0_APB2_DIVIDER(x) ((x) << 11)
 
-
-
-
-#define CH32_CFG0_SYSCLOCK_IN_USE(x) ((x>>2)&3)
+#define CH32_CFG0_SYSCLOCK_IN_USE(x) ((x >> 2) & 3)
 
 //
 uint32_t _rcuClockApb1 = 108000000 / 2;
@@ -92,9 +89,9 @@ static void waitControlBit(int mask)
     }
 }
 /**
- * @brief 
- * 
- * @param mask 
+ * @brief
+ *
+ * @param mask
  */
 static void waitCfg0Bit(int mask)
 {
@@ -127,7 +124,7 @@ static const uint8_t Multipliers[] = {
  * @param external using crystal (external=true) or internal oscillator (false)
  */
 void setPll(int multiplier, bool external)
-{    
+{
     arcu->CFG1 = 0;
     xAssert(multiplier < sizeof(Multipliers));
     int pllMultiplier = Multipliers[multiplier];
@@ -149,10 +146,10 @@ void setPll(int multiplier, bool external)
 }
 
 /**
- * @brief 
- * 
- * @param clock 
- * @param enabled 
+ * @brief
+ *
+ * @param clock
+ * @param enabled
  */
 static void enableDisableClock(int clock, bool enabled)
 {
@@ -169,8 +166,8 @@ static void enableDisableClock(int clock, bool enabled)
     }
 }
 /**
- * @brief 
- * 
+ * @brief
+ *
  */
 void lnInitSystemClock()
 {
@@ -184,10 +181,10 @@ void lnInitSystemClock()
     // Switch SYS clock to IRC8
     uint32_t sysClock = arcu->CFG0;
     sysClock &= ~LN_RCU_CFG0_SYSCLOCK_MASK; //  0 is IRC8
-    arcu->CFG0 = sysClock;  // set sysclock to IRC8
+    arcu->CFG0 = sysClock;                  // set sysclock to IRC8
     while (1)
     {
-        if (CH32_CFG0_SYSCLOCK_IN_USE(arcu->CFG0)==0) // 0 is IRC8
+        if (CH32_CFG0_SYSCLOCK_IN_USE(arcu->CFG0) == 0) // 0 is IRC8
             break;
     }
     // Ok now we can disable PLL and Xtal
@@ -196,36 +193,36 @@ void lnInitSystemClock()
 
     //________________________
     //
-    //________________________        
+    //________________________
     int inputClock;
     bool useExternalClock;
 
 #ifdef LN_USE_INTERNAL_CLOCK
     inputClock = 8 / 2; // HSI is divided by 2
     useExternalClock = false;
-#else    
+#else
     // start crystal...
-    arcu->CTL |= LN_RCU_CTL_HXTALEN; // start Xtal
+    arcu->CTL |= LN_RCU_CTL_HXTALEN;    // start Xtal
     waitControlBit(LN_RCU_CTL_HXTASTB); // Wait Xtal stable
     inputClock = CLOCK_XTAL_VALUE;
-    useExternalClock = true;    
+    useExternalClock = true;
 #endif
 
     int multiplier = CLOCK_TARGET_SYSCLOCK / inputClock;
     setPll(multiplier, useExternalClock); // Program PLL to get the value we want
 
-    SystemCoreClock = (inputClock * multiplier * 1000000) ; // update globals reflecting SysClk...
+    SystemCoreClock = (inputClock * multiplier * 1000000); // update globals reflecting SysClk...
     _rcuClockApb1 = SystemCoreClock / 2;
     _rcuClockApb2 = SystemCoreClock;
 
     // Setup AHB...
-    // AHB is sysclk:1    
+    // AHB is sysclk:1
     // APB1=AHB/2
     // APB2=AHB/1
 
     uint32_t clks = arcu->CFG0;
     clks &= CH32_CFG0_AHB_MASK;
-    clks |= CH32_CFG0_AHB_DIVIDER(0);  // 0-> 1:1
+    clks |= CH32_CFG0_AHB_DIVIDER(0); // 0-> 1:1
 
     clks &= CH32_CFG0_APB1_MASK;
     clks |= CH32_CFG0_APB1_DIVIDER(4); // 4-> 1:2
