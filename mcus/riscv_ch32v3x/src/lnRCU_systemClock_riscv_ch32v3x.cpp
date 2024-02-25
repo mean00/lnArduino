@@ -1,6 +1,11 @@
-/*
- *  (C) 2021 MEAN00 fixounet@free.fr
- *  See license file
+/**
+ * @file lnRCU_systemClock_riscv_ch32v3x.cpp
+ * @author MEAN00 fixounet@free.fr
+ * @brief  This deals with the clock tree (except usb)
+ * @version 0.1
+ * 
+ * @copyright Copyright (c) 2021-2024
+ * 
  */
 #include "lnArduino.h"
 #include "lnCpuID.h"
@@ -10,6 +15,19 @@
 extern LN_RCU *arcu;
 //
 
+#define CLOCK_XTAL_VALUE 8                                   // 8mhz quartz
+#define CLOCK_TARGET_SYSCLOCK (LN_MCU_SPEED / (1000 * 1000)) // 108 Mhz
+#define CLOCK_TARGET_PREDIV 1
+//
+#define LN_CLOCK_IRC8 0
+#define LN_CLOCK_XTAL 16
+#define LN_CLOCK_PLL 24
+//
+#define CH32_CFG0_PLL_MASK (0xf<<18)
+#define CH32_CFG0_PLL_VALUE(x) ((x)<<18)
+#define CH32_CFG0_PLL_EXTERNAL (1<<16)
+
+//
 uint32_t _rcuClockApb1 = 108000000 / 2;
 uint32_t _rcuClockApb2 = 108000000;
 extern "C" uint32_t SystemCoreClock;
@@ -60,7 +78,11 @@ static void waitControlBit(int mask)
         __asm__("nop");
     }
 }
-
+/**
+ * @brief 
+ * 
+ * @param mask 
+ */
 static void waitCfg0Bit(int mask)
 {
 
@@ -70,19 +92,12 @@ static void waitCfg0Bit(int mask)
     }
 }
 
-#define CLOCK_XTAL_VALUE 8                                   // 8mhz quartz
-#define CLOCK_TARGET_SYSCLOCK (LN_MCU_SPEED / (1000 * 1000)) // 108 Mhz
-#define CLOCK_TARGET_PREDIV 1
-
-//{CTL = 0x38683, CFG0 = 0x400, CIR = 0x0, APB2RSTR = 0x0, APB1RSTR = 0x0, AHBENR = 0x14, APB2ENR = 0x0, APB1ENR = 0x0,
-// BDCR = 0x18, CSR = 0x1c000000} {CTL = 0x38683, CFG0 = 0x1d0400, CIR = 0x0, APB2RSTR = 0x0, APB1RSTR = 0x0, AHBENR =
-// 0x14, APB2ENR = 0x0, APB1ENR = 0x0, BDCR = 0x18, CSR = 0x1c000000} {CTL = 0x3038683, CFG0 = 0x1d0400, CIR = 0x0,
-// APB2RSTR = 0x0, APB1RSTR = 0x0, AHBENR = 0x14, APB2ENR = 0x0, APB1ENR = 0x0, BDCR = 0x18, CSR = 0x1c000000}
-
 /**
  *
  * @param multiplier
  * @param predivider
+ * \briefs this translates the wanted value into value to put in
+ *  i.e. if you want x10, you use multipliers[10]
  */
 
 static const uint8_t Multipliers[] = {
@@ -100,13 +115,8 @@ static const uint8_t Multipliers[] = {
  * @param external
  */
 void setPll(int inputClock, int multiplier, int predivider, bool external)
-{
-    volatile uint32_t *control = &(arcu->CTL);
-    volatile uint32_t *cfg0 = &(arcu->CFG0);
-    volatile uint32_t *cfg1 = &(arcu->CFG1);
-
-    uint32_t c0 = *cfg0;
-    *cfg1 = 0;
+{    
+    arcu->CFG1 = 0;
     xAssert(multiplier < sizeof(Multipliers));
     int pllMultiplier = Multipliers[multiplier];
 
@@ -115,24 +125,27 @@ void setPll(int inputClock, int multiplier, int predivider, bool external)
     _rcuClockApb2 = SystemCoreClock;
 
     // Set PLL multiplier
-    c0 &= ~((0xf) << 18);
-    c0 |= ((pllMultiplier) & 0x0f) << 18; // PLL Multiplier, ignore MSB
+    uint32_t c0 = arcu->CFG0;
+    c0 &= CH32_CFG0_PLL_MASK;
+    c0 |= CH32_CFG0_PLL_VALUE(pllMultiplier); // PLL Multiplier, ignore MSB
 
     if (external)
-        c0 |= LN_RCU_CFG0_PLLSEL;
+        c0 |= CH32_CFG0_PLL_EXTERNAL;
     else
-        c0 &= ~LN_RCU_CFG0_PLLSEL;
-    *cfg0 = c0;
+        c0 &= ~CH32_CFG0_PLL_EXTERNAL;
+    arcu->CFG0 = c0;
 
     // start PLL...
-    *control |= LN_RCU_CTL_PLLEN;
+    arcu->CTL |= LN_RCU_CTL_PLLEN;
     waitControlBit(LN_RCU_CTL_PLLSTB); // Wait Xtal stable
 }
 
-//
-#define LN_CLOCK_IRC8 0
-#define LN_CLOCK_XTAL 16
-#define LN_CLOCK_PLL 24
+/**
+ * @brief 
+ * 
+ * @param clock 
+ * @param enabled 
+ */
 static void enableDisableClock(int clock, bool enabled)
 {
     int setBit = 1 << clock;
@@ -148,7 +161,8 @@ static void enableDisableClock(int clock, bool enabled)
     }
 }
 /**
- *
+ * @brief 
+ * 
  */
 void lnInitSystemClock()
 {
