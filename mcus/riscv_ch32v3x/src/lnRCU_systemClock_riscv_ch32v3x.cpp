@@ -225,7 +225,7 @@ void lnInitSystemClock()
     clks |= CH32_CFG0_AHB_DIVIDER(0); // 0-> 1:1
 
     clks &= CH32_CFG0_APB1_MASK;
-    clks |= CH32_CFG0_APB1_DIVIDER(4); // 4-> 1:2
+    clks |= CH32_CFG0_APB1_DIVIDER(0); // 0-> 1:1, 4-> 1:2
 
     clks &= CH32_CFG0_APB2_MASK;
     clks |= CH32_CFG0_APB2_DIVIDER(0); // 0-> 1:1
@@ -238,5 +238,10 @@ void lnInitSystemClock()
     arcu->CFG0 = clks;
 
 #warning DO WE NEED WAIT STATE FOR THE FLASH (CH32) ????
+#warning DO WE NEED WAIT STATE FOR THE FLASH (CH32) ????
+#warning DO WE NEED WAIT STATE FOR THE FLASH (CH32) ????
+#warning DO WE NEED WAIT STATE FOR THE FLASH (CH32) ????
+#warning DO WE NEED WAIT STATE FOR THE FLASH (CH32) ????
+
 
 } // EOF
