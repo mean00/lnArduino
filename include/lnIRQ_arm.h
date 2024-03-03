@@ -7,7 +7,7 @@
 #include "lnPeripherals.h"
 
 #define LN_IRQ_OFFSET 0
-#define LN_INTERRUPT_TYPE __attribute__((used)) __attribute__((interrupt("IRQ")));
+#define LN_INTERRUPT_TYPE __attribute__((used)) __attribute__((interrupt("IRQ")))
 #define underInterrupt xPortIsInsideInterrupt()
 
 enum LnIRQ

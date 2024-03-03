@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0)
-
+SET(LN_ENABLE_UART TRUE CACHE INTERNAL "")
 include(../common_CMakeLists.cmake)
 
 PROJECT(lnPwm C CXX ASM)

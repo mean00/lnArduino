@@ -1,6 +1,7 @@
 include(lnCmake)
 SET(S ${CMAKE_CURRENT_SOURCE_DIR})
 
+
 add_subdirectory(../../common_bluepill common_bp)
 
 target_include_directories(lnArduino_impl PRIVATE ${S} ${S}/../include)
@@ -26,9 +27,9 @@ IF(LN_ENABLE_SPI)
   target_compile_definitions(lnArduino_impl PRIVATE LN_ENABLE_SPI )
 ENDIF()
 
-IF(USE_CH32v3x_FAST_IRQ)
+IF(USE_CH32v3x_HW_IRQ_STACK)
   MESSAGE(STATUS "Use WCH fast IRQ")
-  target_compile_definitions(lnArduino_impl PRIVATE "-DUSE_CH32v3x_FAST_IRQ")
+  target_compile_definitions(lnArduino_impl PRIVATE "-DUSE_CH32v3x_HW_IRQ_STACK")
 ELSE()
   MESSAGE(STATUS "Use WCH slow IRQ")  
 ENDIF()

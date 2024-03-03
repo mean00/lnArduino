@@ -179,13 +179,9 @@ void lnSerialBpCore::interrupts(int instance)
 }
 
 #define IRQHANDLER(x)                                                                                                  \
-    extern "C"                                                                                                         \
+    extern "C" void LN_INTERRUPT_TYPE USART##x##_IRQHandler()                                                          \
     {                                                                                                                  \
-        void USART##x##_IRQHandler() LN_INTERRUPT_TYPE;                                                                \
-        void USART##x##_IRQHandler()                                                                                   \
-        {                                                                                                              \
-            lnSerialBpCore::interrupts(x);                                                                             \
-        }                                                                                                              \
+        lnSerialBpCore::interrupts(x);                                                                                 \
     }
 
 IRQHANDLER(0)
