@@ -6,6 +6,8 @@
  *
  */
 
+#define ISR_CODE __attribute__((section(".isr_code")))
+
 #ifdef USE_CH32v3x_HW_IRQ_STACK
 #define HANDLER_DESC(x)                                                                                                \
     extern "C" void x();                                                                                               \
@@ -28,13 +30,20 @@ extern "C" void unsupported_relay();
 #include "lnIRQ.h"
 #include "lnIRQ_riscv_priv_ch32v3x.h"
 #include "lnRCU.h"
+
+
+
 /**
  *
  */
 static void PromoteIrqToFast(const LnIRQ &irq, int no);
 void _enableDisable_direct(bool enableDisable, const int &irq_num);
 extern "C" void Logger_crash(const char *st);
+#define FAST_UNUSED 0xFF00
 
+extern const uint32_t vecTable[] __attribute__((aligned(32)));
+
+uint16_t fastInterrupt[4] = {FAST_UNUSED, FAST_UNUSED, FAST_UNUSED, FAST_UNUSED};
 CH32V3_INTERRUPT *pfic = (CH32V3_INTERRUPT *)LN_PFIC_ADR;
 
 // Attribute [LEVEL1:LEVEL0][SHV] :
@@ -47,7 +56,6 @@ CH32V3_INTERRUPT *pfic = (CH32V3_INTERRUPT *)LN_PFIC_ADR;
 //              1 vectored
 //
 
-LIST_OF_HANDLERS
 
 #ifdef LN_ENABLE_I2C
 void i2cIrqHandler(int instance, bool error);
@@ -56,39 +64,34 @@ void i2cIrqHandler(int instance, bool error);
 #endif
 
 //--
-void LOCAL_LN_INTERRUPT_TYPE I2C0_EV_IRQHandler(void)
+ISR_CODE extern "C"  void LOCAL_LN_INTERRUPT_TYPE I2C0_EV_IRQHandler(void)
 {
     i2cIrqHandler(0, false);
 }
-void LOCAL_LN_INTERRUPT_TYPE I2C0_ERR_IRQHandler(void)
+/**
+ * @brief 
+ * 
+ */
+ISR_CODE extern "C"  void LOCAL_LN_INTERRUPT_TYPE I2C0_ERR_IRQHandler(void)
 {
     i2cIrqHandler(0, true);
 }
-void LOCAL_LN_INTERRUPT_TYPE I2C1_EV_IRQHandler(void)
+/**
+ * @brief 
+ * 
+ */
+ISR_CODE extern "C"  void LOCAL_LN_INTERRUPT_TYPE I2C1_EV_IRQHandler(void)
 {
     i2cIrqHandler(1, false);
 }
-void LOCAL_LN_INTERRUPT_TYPE I2C1_ERR_IRQHandler(void)
+/**
+ * @brief 
+ * 
+ */
+ISR_CODE extern "C" void LOCAL_LN_INTERRUPT_TYPE I2C1_ERR_IRQHandler(void)
 {
     i2cIrqHandler(1, true);
 }
-
-#define FAST_UNUSED 0xFF00
-uint16_t fastInterrupt[4] = {FAST_UNUSED, FAST_UNUSED, FAST_UNUSED, FAST_UNUSED};
-
-//---------------------------------------------------------------------
-//---------------------------------------------------------------------
-/*- Create vector table -*/
-#undef INTERRUPT_DESC
-#ifdef USE_CH32v3x_HW_IRQ_STACK
-#define INTERRUPT_DESC(y) (uint32_t) y##_relay
-#else
-#define INTERRUPT_DESC(y) (uint32_t) y
-#endif
-#define UNSUPPORTED_NO(y) (uint32_t) unsupported_##y
-
-static const uint32_t vecTable[] __attribute__((aligned(32))) = {LIST_OF_INTERRUPTS};
-#undef INTERRUPT_DESC
 
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
@@ -114,9 +117,10 @@ extern "C" void NVIC_EnableIRQ(IRQn_Type IRQn)
 }
 
 /**
- *
+ * @brief 
+ * 
  */
-void lnIrqSysInit()
+ISR_CODE void lnIrqSysInit()
 {
     // Disable fast
     for (int i = 0; i < 4; i++)
@@ -160,7 +164,7 @@ void lnIrqSysInit()
 /**
 
 */
-bool xPortIsInsideInterrupt()
+ISR_CODE bool xPortIsInsideInterrupt()
 {
     uint32_t gisr = pfic->GISR;
     return (gisr >> 8) & 1; // under interrupt
@@ -168,7 +172,7 @@ bool xPortIsInsideInterrupt()
 
 /**
  */
-static int lookupIrq(int irq)
+ISR_CODE static int lookupIrq(int irq)
 {
     if (_irqs[irq].interrpt == irq)
         return _irqs[irq].irqNb;
@@ -184,7 +188,7 @@ static int lookupIrq(int irq)
 }
 /**
  */
-void _enableDisable_direct(bool enableDisable, const int &irq_num)
+ISR_CODE void _enableDisable_direct(bool enableDisable, const int &irq_num)
 {
     if (enableDisable)
     {
@@ -200,7 +204,7 @@ void _enableDisable_direct(bool enableDisable, const int &irq_num)
 
 
 */
-void _enableDisable(bool enableDisable, const LnIRQ &irq)
+ISR_CODE void _enableDisable(bool enableDisable, const LnIRQ &irq)
 {
     int irq_num = lookupIrq(irq); //_irqs[irq].irqNb;
     _enableDisable_direct(enableDisable, irq_num);
@@ -211,7 +215,7 @@ void _enableDisable(bool enableDisable, const LnIRQ &irq)
  * @param irq
  * @param no
  */
-void PromoteIrqToFast(const LnIRQ &irq, int no)
+ISR_CODE void PromoteIrqToFast(const LnIRQ &irq, int no)
 {
     if (no < 1 || no > 4)
     {
@@ -229,7 +233,7 @@ void PromoteIrqToFast(const LnIRQ &irq, int no)
  *
  * @param irq
  */
-void lnEnableInterrupt(const LnIRQ &irq)
+ISR_CODE void lnEnableInterrupt(const LnIRQ &irq)
 {
     _enableDisable(true, irq);
 }
@@ -239,7 +243,7 @@ void lnEnableInterrupt(const LnIRQ &irq)
  * @param irq_num
  * @param prio
  */
-void lnIrqSetPriority_direct(const int &irq_num, int prio)
+ISR_CODE void lnIrqSetPriority_direct(const int &irq_num, int prio)
 {
     int s = (irq_num & 3) * 8;
     int r = irq_num >> 2;
@@ -254,7 +258,7 @@ void lnIrqSetPriority_direct(const int &irq_num, int prio)
  * @param irq
  * @param prio
  */
-void lnIrqSetPriority(const LnIRQ &irq, int prio)
+ISR_CODE void lnIrqSetPriority(const LnIRQ &irq, int prio)
 {
     int irq_num = lookupIrq(irq); //_irqs[irq].irqNb;
     lnIrqSetPriority_direct(irq_num, prio);
@@ -264,14 +268,14 @@ void lnIrqSetPriority(const LnIRQ &irq, int prio)
  *
  * @param irq
  */
-void lnDisableInterrupt(const LnIRQ &irq)
+ISR_CODE void lnDisableInterrupt(const LnIRQ &irq)
 {
     _enableDisable(false, irq);
 }
 
 void dmaIrqHandler(int dma, int channel);
 #define DMA_IRQ(d, c)                                                                                                  \
-    void LOCAL_LN_INTERRUPT_TYPE DMA##d##_Channel##c##_IRQHandler(void)                                                \
+    ISR_CODE extern "C" void LOCAL_LN_INTERRUPT_TYPE DMA##d##_Channel##c##_IRQHandler(void)                                                \
     {                                                                                                                  \
         dmaIrqHandler(d, c);                                                                                           \
     }
@@ -314,25 +318,11 @@ extern "C" void __attribute__((noinline)) deadEnd(int code)
     }
 }
 
-#define WEAK_INTERRUPT(y)                                                                                              \
-    extern "C" void __attribute__((weak)) y()                                                                          \
-    {                                                                                                                  \
-        xAssert(0);                                                                                                    \
-    }
-
-WEAK_INTERRUPT(USB_WAKEUP_IRQHandler)
-WEAK_INTERRUPT(USB_TX_IRQHandler)
-WEAK_INTERRUPT(USB_RX_IRQHandler)
-WEAK_INTERRUPT(USBHS_IRQHandler)
-WEAK_INTERRUPT(USART1_IRQHandler)
-WEAK_INTERRUPT(USART2_IRQHandler)
-WEAK_INTERRUPT(OTG_FS_IRQHandler)
-
 /**
  * @brief
  *
  */
-void LN_INTERRUPT_TYPE Break_Point_Handler(void)
+extern "C" void LN_INTERRUPT_TYPE Break_Point_Handler(void)
 {
     deadEnd(5);
 }
@@ -365,7 +355,7 @@ extern "C"
      * @brief
      *
      */
-    void __attribute__((noreturn)) start_c()
+    ISR_CODE void __attribute__((noreturn)) start_c()
     {
 
         volatile uint32_t *src = (volatile uint32_t *)&_data_lma;
@@ -390,43 +380,5 @@ extern "C"
     }
 }
 
-#define RELAY_FUNC(x)                                                                                                  \
-    extern "C" void __attribute__((naked)) x##_relay()                                                                 \
-    {                                                                                                                  \
-        __asm__("call " #x "\n"                                                                                        \
-                "mret");                                                                                               \
-    }
-#define RELAY_DMA(d, c) RELAY_FUNC(DMA##d##_Channel##c##_IRQHandler)
 
-//---- Relay func
-#ifdef USE_CH32v3x_HW_IRQ_STACK
-RELAY_FUNC(USART0_IRQHandler)
-RELAY_FUNC(USART1_IRQHandler)
-RELAY_FUNC(USART2_IRQHandler)
-RELAY_FUNC(I2C1_EV_IRQHandler)
-RELAY_FUNC(I2C1_ERR_IRQHandler)
-RELAY_FUNC(I2C0_EV_IRQHandler)
-RELAY_FUNC(I2C0_ERR_IRQHandler)
-RELAY_FUNC(Break_Point_Handler)
-RELAY_FUNC(SysTick_Handler)
-RELAY_FUNC(SW_Handler)
-RELAY_FUNC(OTG_FS_IRQHandler)
-RELAY_FUNC(USBHS_IRQHandler)
-RELAY_FUNC(unsupported)
-RELAY_DMA(0, 0)
-RELAY_DMA(0, 1)
-RELAY_DMA(0, 2)
-RELAY_DMA(0, 3)
-RELAY_DMA(0, 4)
-RELAY_DMA(0, 5)
-RELAY_DMA(0, 6)
-RELAY_DMA(1, 0)
-RELAY_DMA(1, 1)
-RELAY_DMA(1, 2)
-RELAY_DMA(1, 3)
-RELAY_DMA(1, 4)
-RELAY_DMA(1, 5)
-RELAY_DMA(1, 6)
-
-#endif
 // EOF

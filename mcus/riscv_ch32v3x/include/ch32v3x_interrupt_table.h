@@ -181,39 +181,4 @@ typedef volatile CH32V3_INTERRUPTx CH32V3_INTERRUPT;
     HANDLER_DESC(I2C1_EV_IRQHandler)                                                                                   \
     HANDLER_DESC(I2C1_ERR_IRQHandler)
 
-/**
- * @brief
- *
- */
-extern "C" void __attribute__((noinline)) unsupported()
-{
-    deadEnd(11);
-}
-/**
- * @brief
- *
- */
-void LOCAL_LN_INTERRUPT_TYPE HardFault()
-{
-    deadEnd(12);
-}
-/**
- * @brief
- *
- */
-void LOCAL_LN_INTERRUPT_TYPE HardFault_relay()
-{
-    deadEnd(12);
-}
-
-#define unsupported_no_decl(y)                                                                                         \
-    static void unsupported_##y()                                                                                      \
-    {                                                                                                                  \
-        deadEnd(y);                                                                                                    \
-    }
-#define unsupported_no(y) unsupported_##y
-
-unsupported_no_decl(1) unsupported_no_decl(2) unsupported_no_decl(3) unsupported_no_decl(4) unsupported_no_decl(5)
-    unsupported_no_decl(6) unsupported_no_decl(7) unsupported_no_decl(8)
-
-    // EOF
+// EOF

@@ -89,6 +89,8 @@ SECTIONS
         __text_start__ = .;
         . = ALIGN(4);
         KEEP(*(.init))
+        KEEP(*(.vector_table))
+        KEEP(*(.isr_code))
 
         /*
          * Program code and vague linking
