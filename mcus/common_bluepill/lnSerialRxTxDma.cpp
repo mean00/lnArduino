@@ -1,7 +1,26 @@
+/*
+ *  (C) 2021 MEAN00 fixounet@free.fr
+ *  See license file
+ */
+
+#include "lnArduino.h"
+#include "lnPeripheral_priv.h"
+#include "lnSerial.h"
+#include "lnSerial_priv.h"
+#include "lnSerialTxOnly.h"
+#include "lnSerialTxOnlyDma.h"
+#include "lnSerialRxTx.h"
 /**
  * @brief
  *
  */
+extern const UsartMapping usartMapping[];
+/**
+ *
+ * @param instance
+ * @param irq
+ */
+#define M(x) usartMapping[instance].x
 
 /**
  * @brief This is to avoid non virtual thunk gdb does not like that
@@ -335,6 +354,22 @@ void lnSerialBpRxTxDma::rxDma(lnDMA::DmaInterruptType type)
 void timerLink::timerCallback()
 {
     _parent->timerCallback();
+}
+
+/**
+ * @brief Create a Ln Serial Rx Tx object
+ *
+ * @param instance
+ * @param rxBufferSize
+ * @param dma
+ * @return lnSerialRxTx*
+ */
+
+lnSerialRxTx *createLnSerialRxTx(int instance, int rxBufferSize, bool dma)
+{
+    if (dma)
+        return new lnSerialBpRxTxDma(instance, rxBufferSize);
+    return new lnSerialBpRxTx(instance, rxBufferSize);
 }
 
 // EOF
