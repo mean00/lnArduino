@@ -4,11 +4,11 @@
  */
 
 #include "lnArduino.h"
+#include "lnDma.h"
 #include "lnPeripheral_priv.h"
 #include "lnSerial.h"
-#include "lnSerial_priv.h"
-#include "lnDma.h"
 #include "lnSerialBpCore.h"
+#include "lnSerial_priv.h"
 
 #pragma clang diagnostic ignored "-Wextra"
 
@@ -33,7 +33,6 @@ const UsartMapping usartMapping[3] = {
  * @param irq
  */
 #define M(x) usartMapping[instance].x
-
 
 /**
  * @brief Construct a new ln Serial::ln Serial object

@@ -3,13 +3,16 @@
  *  See license file
  */
 
+
 #include "lnArduino.h"
-#include "lnPeripheral_priv.h"
 #include "lnSerial.h"
 #include "lnSerial_priv.h"
+#include "lnSerialRxTx.h"
+#include "lnPeripheral_priv.h"
+
 #include "lnSerialTxOnly.h"
 #include "lnSerialTxOnlyDma.h"
-#include "lnSerialRxTx.h"
+
 
 /**
  * @brief
@@ -218,6 +221,5 @@ void lnSerialBpRxTx::consume(int n)
     _rxHead = modulo(_rxHead + n);
     enableRxInterrupt();
 }
-
 
 // EOF

@@ -1,4 +1,6 @@
 #pragma once
+
+#include "lnSerial_priv.h"
 /**
  * @brief
  *
@@ -39,19 +41,19 @@ class lnSerialBpCore : public lnSerialCore
 };
 
 /**
- * @brief 
- * 
- * @param d 
- * @param count 
- * @param c 
- * @return true 
- * @return false 
+ * @brief
+ *
+ * @param d
+ * @param count
+ * @param c
+ * @return true
+ * @return false
  */
 bool ln_serial_rawWrite(LN_USART_Registers *d, int count, unsigned char const *c);
 
 /**
- * @brief 
- * 
+ * @brief
+ *
  */
 struct UsartMapping
 {

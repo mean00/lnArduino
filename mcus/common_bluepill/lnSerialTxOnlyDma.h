@@ -35,8 +35,8 @@ class lnSerialBpTxOnlyDma : public lnSerialBpCore, public lnSerialTxOnly
     lnDMA _txDma;
 };
 /**
- * @brief 
- * 
+ * @brief
+ *
  */
 class lnSerialBpTxOnlyBufferedDma : public lnSerialBpCore, public lnSerialTxOnly
 {
