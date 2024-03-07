@@ -27,6 +27,7 @@ extern "C" void unsupported_relay();
 #define HANDLER_DESC_C(y) extern "C" void y() LOCAL_LN_INTERRUPT_TYPE;
 #define WCH_HW_STACK 0
 #endif
+#define HANDLER_DESC_RAW(y) extern "C" void y() LOCAL_LN_INTERRUPT_TYPE;
 
 #include "ch32v3x_interrupt_table.h"
 /**
@@ -78,6 +79,7 @@ unsupported_no_decl(1) unsupported_no_decl(2) unsupported_no_decl(3) unsupported
 /*- Create vector table -*/
 #undef INTERRUPT_DESC
 //--
+#define INTERRUPT_DESC_RAW(y) (uint32_t) y
 #ifdef USE_CH32v3x_HW_IRQ_STACK
 #define INTERRUPT_DESC(y) (uint32_t) y##_relay
 #else
@@ -130,7 +132,6 @@ RELAY_FUNC(I2C0_EV_IRQHandler)
 RELAY_FUNC(I2C0_ERR_IRQHandler)
 RELAY_FUNC(Break_Point_Handler)
 RELAY_FUNC(SysTick_Handler)
-RELAY_FUNC(SW_Handler)
 RELAY_FUNC(OTG_FS_IRQHandler)
 RELAY_FUNC(USBHS_IRQHandler)
 RELAY_FUNC(unsupported)
