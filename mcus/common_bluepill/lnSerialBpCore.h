@@ -67,5 +67,6 @@ struct UsartMapping
     const lnPin rx;
     const Peripherals periph;
 };
+extern const UsartMapping usartMapping[];
 
 // EOF

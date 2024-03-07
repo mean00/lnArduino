@@ -10,91 +10,13 @@
 #include "lnSerialTxOnly.h"
 #include "lnSerialTxOnlyDma.h"
 #include "lnSerial_priv.h"
-/**
- * @brief
- *
- */
-extern const UsartMapping usartMapping[];
+#include "lnSerialRxTxDma.h"
 /**
  *
  * @param instance
  * @param irq
  */
 #define M(x) usartMapping[instance].x
-
-/**
- * @brief This is to avoid non virtual thunk gdb does not like that
- *
- */
-class lnSerialBpRxTxDma;
-/**
- * @brief
- *
- */
-class timerLink : public lnPeriodicTimer
-{
-  public:
-    timerLink(lnSerialBpRxTxDma *parent) : lnPeriodicTimer()
-    {
-        _parent = parent;
-    }
-    lnSerialBpRxTxDma *_parent;
-    void timerCallback();
-};
-/**
- * @brief
- *
- */
-class lnSerialBpRxTxDma : public lnSerialBpTxOnlyBufferedDma, public lnSerialRxTx
-{
-  public:
-    lnSerialBpRxTxDma(int instance, int bufferSize);
-    virtual ~lnSerialBpRxTxDma();
-    bool init()
-    {
-        return lnSerialBpCore::init();
-    }
-    bool setSpeed(int speed)
-    {
-        return lnSerialBpCore::setSpeed(speed);
-    }
-    virtual bool rawWrite(int count, const uint8_t *buffer)
-    {
-        LN_USART_Registers *d = (LN_USART_Registers *)_adr;
-        return ln_serial_rawWrite(d, count, buffer);
-    }
-    bool transmit(int size, const uint8_t *buffer)
-    {
-        return lnSerialBpTxOnlyBufferedDma::transmit(size, buffer);
-    }
-    //----
-    static void _rxDmaCb(void *me, lnDMA::DmaInterruptType type);
-    virtual bool enableRx(bool enabled);
-    virtual void purgeRx();
-    virtual int read(int max, uint8_t *to);
-    // no copy interface
-    virtual int getReadPointer(uint8_t **to);
-    virtual void consume(int n);
-    //
-    void enableRxDmaInterrupt();
-    void disableRxDmaInterrupt();
-    void startRxDma();
-    void timerCallback();
-    virtual void _interrupt(void);
-
-    //---
-    static void _RxdmaCallback(void *c, lnDMA::DmaInterruptType it);
-    void rxDma(lnDMA::DmaInterruptType type);
-
-    void checkForNewData();
-    timerLink _timer;
-    int _rxBufferSize;
-    int _rxMask = 0;
-    int _rxHead, _rxTail;
-    bool _rxEnabled;
-    lnDMA _rxDma;
-    uint8_t *_rxBuffer;
-};
 
 /*
  */
@@ -103,7 +25,7 @@ class lnSerialBpRxTxDma : public lnSerialBpTxOnlyBufferedDma, public lnSerialRxT
  * @brief
  *
  */
-void lnSerialBpRxTxDma::_interrupt(void)
+void lnSerialBpRxTxDma::_interrupt()
 {
     xAssert(0);
 }
@@ -128,6 +50,7 @@ lnSerialBpRxTxDma::lnSerialBpRxTxDma(int instance, int bufferSize)
 lnSerialBpRxTxDma::~lnSerialBpRxTxDma()
 {
     delete[] _rxBuffer;
+    _rxBuffer = NULL;
 }
 /**
  * @brief
@@ -143,6 +66,7 @@ int lnSerialBpRxTxDma::read(int max, uint8_t *to)
     ENTER_CRITICAL();
     int nb = getReadPointer(&ptr);
     EXIT_CRITICAL();
+    if(nb>max) nb=max;
     memcpy(to, ptr, nb);
 
     ENTER_CRITICAL();
@@ -157,14 +81,16 @@ int lnSerialBpRxTxDma::read(int max, uint8_t *to)
 void lnSerialBpRxTxDma::purgeRx()
 {
     LN_USART_Registers *d = (LN_USART_Registers *)_adr;
+    ENTER_CRITICAL();
     disableRxDmaInterrupt();
     _rxHead = _rxTail = 0;
     volatile uint32_t stat = d->STAT;
-    while (stat & (LN_USART_STAT_RBNE))
+    while (stat & LN_USART_STAT_RBNE)
     {
         lnScratchRegister = d->DATA;
         stat = d->STAT;
     }
+    EXIT_CRITICAL();
 }
 /**
  * @brief
@@ -186,9 +112,9 @@ bool lnSerialBpRxTxDma::enableRx(bool enabled)
         d->CTL0 |= LN_USART_CTL0_REN;
         d->CTL2 |= LN_USART_CTL2_DMA_RX;
         _rxEnabled = true;
-        EXIT_CRITICAL();
-        _timer.start();
+        EXIT_CRITICAL();        
         startRxDma();
+        _timer.start();
     }
     else
     {
@@ -302,7 +228,7 @@ void lnSerialBpRxTxDma::checkForNewData()
 {
     if (!_rxEnabled)
         return;
-    int count = _rxDma.getCurrentCount(); // between N and 1, 0 means transfer done
+    uint32_t count = _rxDma.getCurrentCount(); // between N and 1, 0 means transfer done
     count = _rxBufferSize - count;        // this is the # of bytes transfered already
     uint32_t maskedHead = _rxHead & _rxMask;
     if (count != maskedHead)
