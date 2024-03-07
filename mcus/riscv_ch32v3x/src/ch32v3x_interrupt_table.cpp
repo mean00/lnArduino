@@ -9,7 +9,7 @@
 #include "lnIRQ.h"
 #include "lnIRQ_riscv_priv_ch32v3x.h"
 #include "lnRCU.h"
-
+#include "ch32v30x_isr_helper.h"
 
 #ifdef USE_CH32v3x_HW_IRQ_STACK
 #define HANDLER_DESC(x)                                                                                                \
@@ -110,7 +110,6 @@ WEAK_INTERRUPT(USART1_IRQHandler)
 WEAK_INTERRUPT(USART2_IRQHandler)
 WEAK_INTERRUPT(OTG_FS_IRQHandler)
 
-#define ISR_CODE __attribute__((section(".isr_code")))
 
 #define RELAY_FUNC(x)                                                                                                  \
     ISR_CODE extern "C" void __attribute__((naked)) x##_relay()                                                                 \

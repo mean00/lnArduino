@@ -6,8 +6,6 @@
  *
  */
 
-#define ISR_CODE __attribute__((section(".isr_code")))
-
 #ifdef USE_CH32v3x_HW_IRQ_STACK
 #define HANDLER_DESC(x)                                                                                                \
     extern "C" void x();                                                                                               \
@@ -30,7 +28,7 @@ extern "C" void unsupported_relay();
 #include "lnIRQ.h"
 #include "lnIRQ_riscv_priv_ch32v3x.h"
 #include "lnRCU.h"
-
+#include "ch32v30x_isr_helper.h"
 
 
 /**
