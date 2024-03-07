@@ -36,6 +36,12 @@
 #include "task.h"
 /* Standard includes. */
 #include "string.h"
+// MEANX
+#ifdef USE_CH32v3x_HW_IRQ_STACK
+  #define LN_IRQ_FOS
+#else
+  #define LN_IRQ_FOS  __attribute__((interrupt))
+#endif
 
 #ifdef configCLINT_BASE_ADDRESS
 #warning The configCLINT_BASE_ADDRESS constant has been deprecated.  configMTIME_BASE_ADDRESS and configMTIMECMP_BASE_ADDRESS are currently being derived from the (possibly 0) configCLINT_BASE_ADDRESS setting.  Please update to define configMTIME_BASE_ADDRESS and configMTIMECMP_BASE_ADDRESS dirctly in place of configCLINT_BASE_ADDRESS.  See https://www.FreeRTOS.org/Using-FreeRTOS-on-RISC-V.html
@@ -218,7 +224,7 @@ void vPortEndScheduler(void)
         ;
 }
 /*-----------------------------------------------------------*/
-void SysTick_Handler(void) __attribute__((used)) __attribute__((interrupt));
+void SysTick_Handler(void) __attribute__((used)) LN_IRQ_FOS ;
 void SysTick_Handler(void)
 {
     GET_INT_SP();
