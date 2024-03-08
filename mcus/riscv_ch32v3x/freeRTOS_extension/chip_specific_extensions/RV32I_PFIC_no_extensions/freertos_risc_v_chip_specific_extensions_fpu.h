@@ -59,8 +59,8 @@
 
 .macro portasmSAVE_ADDITIONAL_REGISTERS
     csrr t0, mstatus
-    srli t0,t0, 13         /* Bit 14:13 are FS bits, 11 means dirty */
-    li   t1, 3
+    srli t0,t0, 14         /* Bit 14:13 are FS bits, 11 means dirty */
+    li   t1, 1
     and  t0,t0,t1
     bne  t0,t1,00f
 
@@ -102,8 +102,8 @@
 
 .macro portasmRESTORE_ADDITIONAL_REGISTERS
     csrr t0, mstatus
-    srli t0,t0, 13         /* Bit 14:13 are FS bits, 11 means dirty */
-    li   t1, 3
+    srli t0,t0, 14         /* Bit 14:13 are FS bits, 11 means dirty */
+    li   t1, 1
     and  t0,t0,t1
     bne  t0,t1,01f
 
