@@ -148,11 +148,14 @@ ISR_CODE void lnIrqSysInit()
     // WCH code puts 0x6088 in mstatus
     uint32_t syscr = WCH_HW_STACK | CH32_SYSCR_INESTEN | CH32_SYSCR_MPTCFG_2NESTED | CH32_SYSCR_HWSTKOVEN;
     uint32_t mstatus = LN_RISCV_FPU_MODE(ARCH_FPU)+LN_RISCV_MPP(0); // enable FPU if ARCH_FPU=1
+
+    
+
     asm volatile("mv t0, %1\n"      // load syscr
                  "csrw 0x804, t0\n" // INTSYSCR : hw stack etc...
 
                  "mv t0, %2\n"      
-                 "csrw mstatus, t0\n" // Enable floating point and interrupt
+                 "csrw mstatus, t0\n" // Enable floating point and disable interrupts
 
                  "mv t0, %0 \n"
                  "ori t0, t0, 3\n"   //      Use vectored mode + relocate vector table
@@ -160,8 +163,6 @@ ISR_CODE void lnIrqSysInit()
 
                  ::"r"(vecTable),
                  "r"(syscr),"r"(mstatus));
-
-    
 
 }
 /**

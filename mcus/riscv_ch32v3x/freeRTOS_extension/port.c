@@ -260,7 +260,8 @@ void vPortExitCritical(void)
 portUBASE_TYPE xPortSetInterruptMask(void)
 {
     portUBASE_TYPE uvalue = 0;
-    __asm volatile("csrrw %0, mstatus, %1" : "=r"(uvalue) : "r"(0x7800));
+    __asm volatile("csrr %0, mstatus" : "=r"(uvalue) );
+    __asm volatile("csrc mstatus, %0" :: "r"(0x88) );
     return uvalue;
 }
 

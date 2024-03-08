@@ -287,7 +287,7 @@ pxPortInitialiseStack:
 	store_x t0, 1 * portWORD_SIZE(a0)				/* Mstatus */
 	addi    a1, a0 ,0
 	addi a1, a1, portHEADER_SIZE 					/* Skip header */
-	addi a1, a1, portasmADDITIONAL_CONTEXT_SIZE  	/* PLACEHOLDER FOR FPU */		
+	//addi a1, a1, portasmADDITIONAL_CONTEXT_SIZE  	/* PLACEHOLDER FOR FPU */		 not needed
 	store_x a2, 6*portWORD_SIZE(a1)	 				/* param-> x10 */
 	ret
 	
