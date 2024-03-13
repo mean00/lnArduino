@@ -4,8 +4,10 @@
  */
 
 #include "lnArduino.h"
+#include "lnDma.h"
 #include "lnPeripheral_priv.h"
 #include "lnSerial.h"
+#include "lnSerialBpCore.h"
 #include "lnSerial_priv.h"
 
 #pragma clang diagnostic ignored "-Wextra"
@@ -14,25 +16,12 @@ class lnSerialBp;
 
 LN_USART_Registers *usart0 = (LN_USART_Registers *)LN_USART0_ADR;
 class lnSerialBpCore;
-static bool ln_serial_rawWrite(LN_USART_Registers *d, int count, unsigned char const *c);
 static lnSerialBpCore *SerialInstance[5] = {NULL, NULL, NULL, NULL, NULL};
 // 0   1    2    3
 
 /**
  */
-struct UsartMapping
-{
-    uint32_t usartEngine;
-    const uint8_t dmaEngine;
-    const uint8_t dmaTxChannel;
-    const uint8_t dmaRxChannel;
-    const uint8_t filler;
-    const LnIRQ irq;
-    const lnPin tx;
-    const lnPin rx;
-    const Peripherals periph;
-};
-static const UsartMapping usartMapping[3] = {
+const UsartMapping usartMapping[3] = {
     // Adr        DMA CH IRQ         TX   RX   periperal
     {LN_USART0_ADR, 0, 3, 4, 0, LN_IRQ_USART0, PA9, PA10, pUART0},
     {LN_USART1_ADR, 0, 6, 5, 0, LN_IRQ_USART1, PA2, PA3, pUART1},
@@ -45,47 +34,6 @@ static const UsartMapping usartMapping[3] = {
  */
 #define M(x) usartMapping[instance].x
 
-/**
- */
-#include "lnDma.h"
-/**
- * @brief
- *
- */
-class lnSerialBpCore : public lnSerialCore
-{
-  public:
-    enum txState
-    {
-        txTransmittingIdle,
-        txTransmittingInterrupt,
-        txTransmittingDMA,
-        txTransmittingLast
-    };
-
-    // public API
-    lnSerialBpCore(int instance);
-    bool init();
-    bool setSpeed(int speed);
-
-    // implementation
-    virtual void _interrupt(void) = 0;
-
-    static void interrupts(int instance);
-
-  protected:
-    virtual bool _programTx() = 0;
-    void disableInterrupt();
-    void enableInterrupt(bool tx, bool rx);
-    bool _enableTx(txState mode);
-    LnIRQ _irq;
-    uint32_t _adr;
-    // tx
-    volatile const uint8_t *_cur, *_tail;
-    txState _txState;
-    xBinarySemaphore _txDone;
-    xMutex _txMutex;
-};
 /**
  * @brief Construct a new ln Serial::ln Serial object
  *
@@ -179,13 +127,9 @@ void lnSerialBpCore::interrupts(int instance)
 }
 
 #define IRQHANDLER(x)                                                                                                  \
-    extern "C"                                                                                                         \
+    extern "C" void LN_INTERRUPT_TYPE USART##x##_IRQHandler()                                                          \
     {                                                                                                                  \
-        void USART##x##_IRQHandler() LN_INTERRUPT_TYPE;                                                                \
-        void USART##x##_IRQHandler()                                                                                   \
-        {                                                                                                              \
-            lnSerialBpCore::interrupts(x);                                                                             \
-        }                                                                                                              \
+        lnSerialBpCore::interrupts(x);                                                                                 \
     }
 
 IRQHANDLER(0)
@@ -196,10 +140,6 @@ IRQHANDLER(3)
 #include "lnSerialTxOnly.cpp"
 #include "lnSerialTxOnlyDma.cpp"
 #include "lnSerialTxOnlyDmaBuffer.cpp"
-#ifdef LN_ENABLE_UART
-#include "lnSerialRxTx.cpp"
-#include "lnSerialRxTxDma.cpp"
-#endif
 /**
  * @brief Create a Ln Serial Tx Only object
  *
@@ -222,22 +162,6 @@ lnSerialTxOnly *createLnSerialTxOnly(int instance, bool dma, bool buffered)
     }
     return new lnSerialBpTxOnlyInterrupt(instance);
 }
-/**
- * @brief Create a Ln Serial Rx Tx object
- *
- * @param instance
- * @param rxBufferSize
- * @param dma
- * @return lnSerialRxTx*
- */
-#ifdef LN_ENABLE_UART
-lnSerialRxTx *createLnSerialRxTx(int instance, int rxBufferSize, bool dma)
-{
-    if (dma)
-        return new lnSerialBpRxTxDma(instance, rxBufferSize);
-    return new lnSerialBpRxTx(instance, rxBufferSize);
-}
-#endif
 /**
  * @brief
  *

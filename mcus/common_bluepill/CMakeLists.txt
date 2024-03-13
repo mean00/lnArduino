@@ -4,7 +4,6 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/../../private_include)
 
 
 SET(OVERLAY_SRCS       
-                       lnSerial.cpp 
                        lnSerialCore.cpp 
                        lnGPIO.cpp                      
                        lnDma.cpp 
@@ -28,11 +27,13 @@ SET(OVERLAY_SRCS
 
 
 
+
 ADD_LIBRARY(lnArduino_impl STATIC  ${OVERLAY_SRCS} )
 TARGET_LINK_LIBRARIES(lnArduino_impl  lnArduinoInternal)
 TARGET_INCLUDE_DIRECTORIES(lnArduino_impl PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 IF(LN_ENABLE_UART)
+  target_sources( lnArduino_impl PRIVATE lnSerialRxTx.cpp lnSerialRxTxDma.cpp  )
   target_compile_options(lnArduino_impl PRIVATE "-DLN_ENABLE_UART=1")
 ENDIF()
 

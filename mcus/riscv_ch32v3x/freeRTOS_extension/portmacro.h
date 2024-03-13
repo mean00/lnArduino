@@ -113,8 +113,8 @@ not need to be guarded with a critical section. */
 
 #define portSET_INTERRUPT_MASK_FROM_ISR() xPortSetInterruptMask()
 #define portCLEAR_INTERRUPT_MASK_FROM_ISR(uxSavedStatusValue) vPortClearInterruptMask(uxSavedStatusValue)
-#define portDISABLE_INTERRUPTS() __asm volatile("csrw mstatus,%0" ::"r"(0x7800))
-#define portENABLE_INTERRUPTS() __asm volatile("csrw mstatus,%0" ::"r"(0x7888))
+#define portDISABLE_INTERRUPTS() __asm volatile("csrc mstatus,%0" ::"r"(0x88))
+#define portENABLE_INTERRUPTS() __asm volatile("csrs mstatus,%0" ::"r"(0x88))
 #define portENTER_CRITICAL() vPortEnterCritical()
 #define portEXIT_CRITICAL() vPortExitCritical()
     /*-----------------------------------------------------------*/

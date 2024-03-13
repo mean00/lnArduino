@@ -4,39 +4,7 @@
 
 /**
  */
-#include "lnDma.h"
-/**
- * @brief
- *
- */
-class lnSerialBpTxOnlyDma : public lnSerialBpCore, public lnSerialTxOnly
-{
-  public:
-    lnSerialBpTxOnlyDma(int instance);
-
-    bool init()
-    {
-        return lnSerialBpCore::init();
-    }
-    bool setSpeed(int speed)
-    {
-        return lnSerialBpCore::setSpeed(speed);
-    }
-    virtual bool rawWrite(int count, const uint8_t *buffer)
-    {
-        LN_USART_Registers *d = (LN_USART_Registers *)_adr;
-        return ln_serial_rawWrite(d, count, buffer);
-    }
-    virtual bool transmit(int size, const uint8_t *buffer);
-    virtual void _interrupt(void)
-    {
-        xAssert(0);
-    }
-    virtual bool _programTx();
-    static void _dmaCallback(void *c, lnDMA::DmaInterruptType it);
-    void txDmaCb(lnDMA::DmaInterruptType it);
-    lnDMA _txDma;
-};
+#include "lnSerialTxOnlyDma.h"
 /**
  * @brief
  *

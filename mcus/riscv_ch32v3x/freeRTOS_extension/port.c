@@ -36,6 +36,13 @@
 #include "task.h"
 /* Standard includes. */
 #include "string.h"
+#include "port_define.h"
+// MEANX
+#ifdef USE_CH32v3x_HW_IRQ_STACK
+  #define LN_IRQ_FOS
+#else
+  #define LN_IRQ_FOS  __attribute__((interrupt))
+#endif
 
 #ifdef configCLINT_BASE_ADDRESS
 #warning The configCLINT_BASE_ADDRESS constant has been deprecated.  configMTIME_BASE_ADDRESS and configMTIMECMP_BASE_ADDRESS are currently being derived from the (possibly 0) configCLINT_BASE_ADDRESS setting.  Please update to define configMTIME_BASE_ADDRESS and configMTIMECMP_BASE_ADDRESS dirctly in place of configCLINT_BASE_ADDRESS.  See https://www.FreeRTOS.org/Using-FreeRTOS-on-RISC-V.html
@@ -66,8 +73,9 @@ of the stack used by main.  Using the linker script method will repurpose the
 stack that was used by main before the scheduler was started for use as the
 interrupt stack after the scheduler has started. */
 #ifdef configISR_STACK_SIZE_WORDS
-static __attribute__((aligned(16))) StackType_t xISRStack[configISR_STACK_SIZE_WORDS] = {0};
-const StackType_t xISRStackTop = (StackType_t) & (xISRStack[configISR_STACK_SIZE_WORDS & ~portBYTE_ALIGNMENT_MASK]);
+#define ISR_ALIGN 16
+static __attribute__((aligned(ISR_ALIGN))) StackType_t xISRStack[configISR_STACK_SIZE_WORDS] = {0};
+const StackType_t xISRStackTop = (StackType_t) & (xISRStack[configISR_STACK_SIZE_WORDS & ~(ISR_ALIGN-1)]);
 
 /* Don't use 0xa5 as the stack fill bytes as that is used by the kernerl for
 the task stacks, and so will legitimately appear in many positions within
@@ -218,7 +226,7 @@ void vPortEndScheduler(void)
         ;
 }
 /*-----------------------------------------------------------*/
-void SysTick_Handler(void) __attribute__((used)) __attribute__((interrupt));
+void SysTick_Handler(void) __attribute__((used)) LN_IRQ_FOS ;
 void SysTick_Handler(void)
 {
     GET_INT_SP();
@@ -254,7 +262,8 @@ void vPortExitCritical(void)
 portUBASE_TYPE xPortSetInterruptMask(void)
 {
     portUBASE_TYPE uvalue = 0;
-    __asm volatile("csrrw %0, mstatus, %1" : "=r"(uvalue) : "r"(0x7800));
+    __asm volatile("csrr %0, mstatus" : "=r"(uvalue) );
+    __asm volatile("csrc mstatus, %0" :: "r"(0x88) );
     return uvalue;
 }
 
@@ -263,3 +272,33 @@ void vPortClearInterruptMask(portUBASE_TYPE uvalue)
 {
     __asm volatile("csrw  mstatus, %0" ::"r"(uvalue));
 }
+
+/*----*/
+
+/*
+ *
+ * As per the standard RISC-V ABI pxTopcOfStack is passed in in a0, pxCode in
+ * a1, and pvParameters in a2.  The new top of stack is passed out in a0.
+ *
+ *  The stack layout is (MEPC/MSTATUS) (FPU) (GPR)
+ *  In that task we start with a clean FPU so no need to save the FPU registers
+ */
+ #define RISCV_MIE 8
+ StackType_t *pxPortInitialiseStack( StackType_t *pxTopOfStack, TaskFunction_t pxCode, void *pvParameters )
+ {
+    uint32_t mstatus=0;
+    __asm__ volatile ( "csrr %0, mstatus" : "=r" ( mstatus ) );
+    mstatus &=~ RISCV_MIE;
+
+    int stack_usage = portCONTEXT_COUNT+portHEADER_COUNT;    
+
+    mstatus=0x3880; //
+    pxTopOfStack -=(stack_usage);
+    StackType_t *newStack = pxTopOfStack;
+    pxTopOfStack[0] = (StackType_t)pxCode; // fill in headers
+    pxTopOfStack[1] = mstatus;
+    pxTopOfStack+=portHEADER_COUNT; // jump to GPR registers    
+    pxTopOfStack[6] = (StackType_t) pvParameters; // 6 is x10=A0
+    return newStack;
+ }
+//--

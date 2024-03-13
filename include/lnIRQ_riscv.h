@@ -7,11 +7,12 @@
 #include "lnPeripherals.h"
 
 #if LN_MCU == LN_MCU_CH32V3x
+#ifdef USE_CH32v3x_HW_IRQ_STACK
+#define LN_INTERRUPT_TYPE //  __attribute__((naked)) // done manually in assembly
+                          //  __attribute__((interrupt("WCH-Interrupt-fast"))
+#else
 #define LN_INTERRUPT_TYPE __attribute__((used)) __attribute__((interrupt))
-#define LN_FAST_INTERRUPT_TYPE                                                                                         \
-    __attribute__((used))                                                                                              \
-    __attribute__((naked)) // done manually in assembly __attribute__((interrupt("WCH-Interrupt-fast"))
-// #define LN_FAST_INTERRUPT_TYPE __attribute__((used))  __attribute__((interrupt("WCH-Interrupt-fast"))
+#endif
 #else
 #define LN_INTERRUPT_TYPE __attribute__((used)) __attribute__((interrupt("IRQ")));
 #endif

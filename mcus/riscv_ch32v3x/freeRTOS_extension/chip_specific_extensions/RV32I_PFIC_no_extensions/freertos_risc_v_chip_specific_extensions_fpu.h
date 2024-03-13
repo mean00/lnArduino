@@ -54,92 +54,72 @@
 #ifndef __FREERTOS_RISC_V_EXTENSIONS_H__
 #define __FREERTOS_RISC_V_EXTENSIONS_H__
 
-#define portasmADDITIONAL_CONTEXT_REGISTERS 32
-#define portasmADDITIONAL_CONTEXT_SIZE (portasmADDITIONAL_CONTEXT_REGISTERS*portWORD_SIZE) /* Must be even number on 32-bit cores. */
+
+.altmacro
+
+.macro fread rg offset
+    	flw \rg, \offset * portWORD_SIZE( sp )
+.endm
+
+.macro fstore rg offset
+    	fsw \rg, \offset * portWORD_SIZE( sp )
+.endm
+
+
+.macro CH32_FPU_STACK action
+    \action f0, 1  
+    \action f1, 2  
+    \action f2, 3  
+    \action f3, 4  
+    \action f4, 5  
+    \action f5, 6  
+    \action f6, 7  
+    \action f7, 8  
+    \action f8, 9  
+    \action f9, 10  
+    \action f10, 11  
+    \action f11, 12  
+    \action f12, 13  
+    \action f13, 14  
+    \action f14, 15  
+    \action f15, 16  
+    \action f16, 17  
+    \action f17, 18  
+    \action f18, 19  
+    \action f19, 20  
+    \action f20, 21  
+    \action f21, 22  
+    \action f22, 23  
+    \action f23, 24  
+    \action f24, 25  
+    \action f25, 26  
+    \action f26, 27  
+    \action f27, 28  
+    \action f28, 29  
+    \action f29, 30  
+    \action f30, 31  
+    \action f31, 0 
+.endm
+
+
+.macro portCheck_FPU_Dirty branch
+    csrr t0, mstatus
+    srli t0,t0, 14         /* Bit 14:13 are FS bits, 1x means dirty */
+    andi t0, t0, 1
+    beq  t0,x0,\branch  /* If 0, means not dirty */
+.endm
 
 .macro portasmSAVE_ADDITIONAL_REGISTERS
-    csrr t0, mstatus
-    srli t0,t0, 13         /* Bit 14:13 are FS bits, 11 means dirty */
-    li   t1, 3
-    and  t0,t0,t1
-    bne  t0,t1,00f
-
-    addi sp, sp, -(portasmADDITIONAL_CONTEXT_SIZE) /* Only save FPU registers if FS bits are in dirty state*/
-    fsw f0, 1*portWORD_SIZE(sp)
-    fsw f1, 2*portWORD_SIZE(sp)
-    fsw f2, 3*portWORD_SIZE(sp)
-    fsw f3, 4*portWORD_SIZE(sp)
-    fsw f4, 5*portWORD_SIZE(sp)
-    fsw f5, 6*portWORD_SIZE(sp)
-    fsw f6, 7*portWORD_SIZE(sp)
-    fsw f7, 8*portWORD_SIZE(sp)
-    fsw f8, 9*portWORD_SIZE(sp)
-    fsw f9, 10*portWORD_SIZE(sp)
-    fsw f10, 11*portWORD_SIZE(sp)
-    fsw f11, 12*portWORD_SIZE(sp)
-    fsw f12, 13*portWORD_SIZE(sp)
-    fsw f13, 14*portWORD_SIZE(sp)
-    fsw f14, 15*portWORD_SIZE(sp)
-    fsw f15, 16*portWORD_SIZE(sp)
-    fsw f16, 17*portWORD_SIZE(sp)
-    fsw f17, 18*portWORD_SIZE(sp)
-    fsw f18, 19*portWORD_SIZE(sp)
-    fsw f19, 20*portWORD_SIZE(sp)
-    fsw f20, 21*portWORD_SIZE(sp)
-    fsw f21, 22*portWORD_SIZE(sp)
-    fsw f22, 23*portWORD_SIZE(sp)
-    fsw f23, 24*portWORD_SIZE(sp)
-    fsw f24, 25*portWORD_SIZE(sp)
-    fsw f25, 26*portWORD_SIZE(sp)
-    fsw f26, 27*portWORD_SIZE(sp)
-    fsw f27, 28*portWORD_SIZE(sp)
-    fsw f28, 29*portWORD_SIZE(sp)
-    fsw f29, 30*portWORD_SIZE(sp)
-    fsw f30, 31*portWORD_SIZE(sp)
-    fsw f31, 0*portWORD_SIZE(sp)
+    portCheck_FPU_Dirty 00f
+    addi sp, sp, -(portFPU_SIZE) /* Only save FPU registers if FS bits are in dirty state*/
+    CH32_FPU_STACK fstore
 00:    
 	.endm
 
 .macro portasmRESTORE_ADDITIONAL_REGISTERS
-    csrr t0, mstatus
-    srli t0,t0, 13         /* Bit 14:13 are FS bits, 11 means dirty */
-    li   t1, 3
-    and  t0,t0,t1
-    bne  t0,t1,01f
-
-    flw f0, 1*portWORD_SIZE(sp)
-    flw f1, 2*portWORD_SIZE(sp)
-    flw f2, 3*portWORD_SIZE(sp)
-    flw f3, 4*portWORD_SIZE(sp)
-    flw f4, 5*portWORD_SIZE(sp)
-    flw f5, 6*portWORD_SIZE(sp)
-    flw f6, 7*portWORD_SIZE(sp)
-    flw f7, 8*portWORD_SIZE(sp)
-    flw f8, 9*portWORD_SIZE(sp)
-    flw f9, 10*portWORD_SIZE(sp)
-    flw f10, 11*portWORD_SIZE(sp)
-    flw f11, 12*portWORD_SIZE(sp)
-    flw f12, 13*portWORD_SIZE(sp)
-    flw f13, 14*portWORD_SIZE(sp)
-    flw f14, 15*portWORD_SIZE(sp)
-    flw f15, 16*portWORD_SIZE(sp)
-    flw f16, 17*portWORD_SIZE(sp)
-    flw f17, 18*portWORD_SIZE(sp)
-    flw f18, 19*portWORD_SIZE(sp)
-    flw f19, 20*portWORD_SIZE(sp)
-    flw f20, 21*portWORD_SIZE(sp)
-    flw f21, 22*portWORD_SIZE(sp)
-    flw f22, 23*portWORD_SIZE(sp)
-    flw f23, 24*portWORD_SIZE(sp)
-    flw f24, 25*portWORD_SIZE(sp)
-    flw f25, 26*portWORD_SIZE(sp)
-    flw f26, 27*portWORD_SIZE(sp)
-    flw f27, 28*portWORD_SIZE(sp)
-    flw f28, 29*portWORD_SIZE(sp)
-    flw f29, 30*portWORD_SIZE(sp)
-    flw f30, 31*portWORD_SIZE(sp)
-    flw f31, 0*portWORD_SIZE(sp)
-    addi sp, sp, (portasmADDITIONAL_CONTEXT_SIZE)
+    portCheck_FPU_Dirty 01f
+    CH32_FPU_STACK fread
+    addi sp, sp, (portFPU_SIZE)
 01:    
 	.endm
 
