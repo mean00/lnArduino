@@ -1,11 +1,22 @@
+/*
+ *  (C) 2021/2024 MEAN00 fixounet@free.fr
+ *  See license file
+ */
+
+#include "lnArduino.h"
+#include "lnDma.h"
+#include "lnPeripheral_priv.h"
+#include "lnSerial.h"
+#include "lnSerialBpCore.h"
+#include "lnSerial_priv.h"
+#include "lnSerialTxOnlyDma.h"
+
 #include "lnRingBuffer.h"
 
 #define M(x) usartMapping[instance].x
 
 /**
- */
-#include "lnSerialTxOnlyDma.h"
-/**
+ *
  * @brief
  *
  * @return true
