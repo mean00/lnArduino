@@ -363,23 +363,32 @@ extern "C"
      */
     ISR_CODE void __attribute__((noreturn)) start_c()
     {
+        
+        __asm volatile(
+                    "  mv t0, %0 \n" // src
+                    "  mv t1, %1 \n" // dst
+                    "  mv t2, %2 \n" // end
+                    "lp0: \n"
+                    "  lw t3, 0(t0) \n"
+                    "  sw t3, 0(t1) \n"
+                    "  addi t0,t0,4 \n"
+                    "  addi t1,t1,4 \n"
+                    "  bgt  t2,t1,lp0 \n"
 
-        volatile uint32_t *src = (volatile uint32_t *)&_data_lma;
-        volatile uint32_t *dst = (volatile uint32_t *)&_data;
-        volatile uint32_t *end = (volatile uint32_t *)&_edata;
 
-        while (dst < end)
-        {
-            *dst++ = *src++;
-        }
+                    "  mv t0, %3 \n" // begin
+                    "  mv t1, %4 \n" // end
+                    "lp1: \n"
+                    "  sw x0, 0(t0) \n"
+                    "  addi t0,t0,4 \n"
+                    "  bgt  t1,t0,lp1 \n"
+        
+        ::  "r"((  uint32_t *)&_data_lma),   // 0 src
+            "r"((  uint32_t *)&_data),       // 1 data
+            "r"((  uint32_t *)&_edata),      // 2 end
+            "r"((  uint32_t *)&__bss_start), // 3 zstart
+            "r"((  uint32_t *)&_end) );      // 4 zend
 
-        /* Zero .bss. this will corrupt stack & locals on it*/
-        volatile uint32_t *zstart = (volatile uint32_t *)&__bss_start;
-        volatile uint32_t *zend = (volatile uint32_t *)&_end;
-        while (zstart < zend)
-        {
-            *zstart++ = 0;
-        }
         __libc_init_array(); // call ctor before jumping in the code
         main();
         xAssert(0);
