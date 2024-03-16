@@ -3,12 +3,9 @@
  *  See license file
  */
 
-#include "lnArduino.h"
-#include "lnDma.h"
-#include "lnPeripheral_priv.h"
-#include "lnSerial.h"
 #include "lnSerialBpCore.h"
-#include "lnSerial_priv.h"
+#include "lnSerialTxOnly.h"
+#include "lnSerialTxOnlyDma.h"
 
 #pragma clang diagnostic ignored "-Wextra"
 
@@ -137,9 +134,6 @@ IRQHANDLER(1)
 IRQHANDLER(2)
 IRQHANDLER(3)
 
-#include "lnSerialTxOnly.cpp"
-#include "lnSerialTxOnlyDma.cpp"
-#include "lnSerialTxOnlyDmaBuffer.cpp"
 /**
  * @brief Create a Ln Serial Tx Only object
  *

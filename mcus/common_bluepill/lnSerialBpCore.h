@@ -1,6 +1,12 @@
 #pragma once
 
+#include "lnArduino.h"
+#include "lnPeripheral_priv.h"
+#include "lnSerial.h"
 #include "lnSerial_priv.h"
+#include "lnDma.h"
+
+
 /**
  * @brief
  *
