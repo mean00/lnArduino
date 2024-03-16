@@ -3,7 +3,18 @@
  * @brief
  *
  */
+ /*
+ *  (C) 2021 MEAN00 fixounet@free.fr
+ *  See license file
+ */
+
+#include "lnArduino.h"
+#include "lnDma.h"
+#include "lnPeripheral_priv.h"
+#include "lnSerial.h"
 #include "lnSerialBpCore.h"
+#include "lnSerial_priv.h"
+
 class lnSerialBpTxOnlyInterrupt : public lnSerialBpCore, public lnSerialTxOnly
 {
   public:
