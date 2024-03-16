@@ -23,6 +23,16 @@
 	#error Assembler did not define __riscv_xlen
 #endif
 
+/* Some FPU related bits */
+#define CH32_FPU_OFF     0
+#define CH32_FPU_INITIAL 1
+#define CH32_FPU_CLEAN   2
+#define CH32_FPU_DIRTY   3
+
+#define CH32_FPU_STATE(yy) ((yy)<<13)
+#define CH32_FPU_MASK(x)  (~(3<<13))
+
+
 
 /* Only the standard core registers are stored by default.  Any additional
 registers must be saved by the portasmSAVE_ADDITIONAL_REGISTERS and
