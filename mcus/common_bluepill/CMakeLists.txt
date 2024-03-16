@@ -21,6 +21,11 @@ SET(OVERLAY_SRCS
                        lnADC_timing.cpp
                        lnFMC.cpp
                        lnStubs.cpp
+                       
+                        lnSerialTxOnly.cpp
+                        lnSerialTxOnlyDma.cpp
+                        lnSerialTxOnlyDmaBuffer.cpp
+
 #                       ${LN_MCU_FOLDER}/boards/${GD32_BOARD}/lnPinMapping.cpp
                        CACHE INTERNAL ""
                     )
