@@ -312,6 +312,7 @@ DMA_IRQ(1, 6)
 extern "C" void __attribute__((noinline)) deadEnd(int code)
 {
     // No interrrupt
+    __asm__("ebreak");
     ENTER_CRITICAL();
     Logger_crash("**** CRASH *****");
     Logger_crash("**** CRASH *****");
