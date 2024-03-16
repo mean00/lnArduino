@@ -283,16 +283,21 @@ void vPortClearInterruptMask(portUBASE_TYPE uvalue)
  *  The stack layout is (MEPC/MSTATUS) (FPU) (GPR)
  *  In that task we start with a clean FPU so no need to save the FPU registers
  */
- #define RISCV_MIE 8
+ #define RISCV_MIE (1<<3)
+ #define RISCV_MPIE (1<<7)
  StackType_t *pxPortInitialiseStack( StackType_t *pxTopOfStack, TaskFunction_t pxCode, void *pvParameters )
  {
     uint32_t mstatus=0;
-    __asm__ volatile ( "csrr %0, mstatus" : "=r" ( mstatus ) );
-    mstatus &=~ RISCV_MIE;
+    
+    mstatus |= RISCV_MPIE;
+    mstatus |= (2<<11); // MPP=2
 
+#if ARCH_FPU == 1    
+    mstatus |= CH32_FPU_STATE(CH32_FPU_INITIAL);  // Set FS bits to "initial"
+#endif
     int stack_usage = portCONTEXT_COUNT+portHEADER_COUNT;    
 
-    mstatus=0x3880; //
+    //mstatus=0x3880; //
     pxTopOfStack -=(stack_usage);
     StackType_t *newStack = pxTopOfStack;
     pxTopOfStack[0] = (StackType_t)pxCode; // fill in headers
