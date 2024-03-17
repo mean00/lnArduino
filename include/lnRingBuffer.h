@@ -2,6 +2,10 @@
 
 #pragma once
 #include "stdint.h"
+/**
+ * @brief 
+ * 
+ */
 class lnRingBuffer
 {
   public:
@@ -73,7 +77,7 @@ class lnRingBuffer
      */
     int free()
     {
-        return _size - (_head - _tail) - 1;
+        return _size - (_head - _tail);
     }
     /**
      * @brief
@@ -127,7 +131,14 @@ class lnRingBuffer
         uint32_t t = _tail & _mask;
         *to = _buffer + t;
         int nb;
-        if (h >= t)
+        if (h==t)
+        {
+            if(_head == _tail) 
+                nb = 0;
+            else
+                nb = _size;
+        }
+        else if (h > t)
             nb = h - t;
         else
             nb = _size - t;
@@ -157,7 +168,7 @@ class lnRingBuffer
             }
             else
             {
-                c = CMIN(t - h - 1, size);
+                c = CMIN(t - h , size);
             }
             memcpy(_buffer + h, data, c);
             _head += c;
