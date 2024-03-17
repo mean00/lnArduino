@@ -4,12 +4,7 @@
 /**
  */
  #include "lnArduino.h"
-#include "lnDma.h"
-#include "lnPeripheral_priv.h"
-#include "lnSerial.h"
 #include "lnSerialBpCore.h"
-#include "lnSerial_priv.h"
-#include "lnDma.h"
 #include "lnSerialTxOnlyDma.h"
 
 
