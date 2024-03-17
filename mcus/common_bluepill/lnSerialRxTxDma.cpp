@@ -4,12 +4,9 @@
  */
 
 #include "lnArduino.h"
-#include "lnPeripheral_priv.h"
-#include "lnSerial.h"
+#include "lnSerialBpCore.h"
 #include "lnSerialRxTx.h"
-#include "lnSerialTxOnly.h"
 #include "lnSerialTxOnlyDma.h"
-#include "lnSerial_priv.h"
 #include "lnSerialRxTxDma.h"
 /**
  *
@@ -17,7 +14,7 @@
  * @param irq
  */
 #define M(x) usartMapping[instance].x
-
+#define DEBUGME
 /*
  */
 
@@ -108,8 +105,7 @@ bool lnSerialBpRxTxDma::enableRx(bool enabled)
 
         _rxDma.pause();
         ENTER_CRITICAL();
-        d->CTL0 |= LN_USART_CTL0_RBNEIE;
-        d->CTL0 |= LN_USART_CTL0_REN;
+        d->CTL0 |= (LN_USART_CTL0_RBNEIE | LN_USART_CTL0_REN);
         d->CTL2 |= LN_USART_CTL2_DMA_RX;
         _rxEnabled = true;
         EXIT_CRITICAL();        
@@ -123,8 +119,7 @@ bool lnSerialBpRxTxDma::enableRx(bool enabled)
         ENTER_CRITICAL();
         _timer.stop();
         _rxEnabled = false;
-        d->CTL0 &= ~LN_USART_CTL0_REN;
-        d->CTL0 &= ~LN_USART_CTL0_RBNEIE;
+        d->CTL0 &= ~(LN_USART_CTL0_REN | LN_USART_CTL0_RBNEIE) ;
         d->CTL2 &= ~LN_USART_CTL2_DMA_RX;
         EXIT_CRITICAL();
     }
@@ -137,7 +132,9 @@ bool lnSerialBpRxTxDma::enableRx(bool enabled)
 void lnSerialBpRxTxDma::timerCallback()
 {
     ENTER_CRITICAL(); // we are in a task, need to block interrupt and other tasks
+#ifndef DEBUGME    
     checkForNewData();
+#endif    
     EXIT_CRITICAL();
 }
 /**
@@ -166,6 +163,7 @@ void lnSerialBpRxTxDma::disableRxDmaInterrupt()
  */
 void lnSerialBpRxTxDma::startRxDma()
 {
+    _rxHead = _rxTail = 0;
     LN_USART_Registers *d = (LN_USART_Registers *)_adr;
     _rxDma.attachCallback(_rxDmaCb, this);
     _rxDma.beginTransfer(); // lock dma
