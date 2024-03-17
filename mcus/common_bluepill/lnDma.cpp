@@ -19,7 +19,7 @@ static xMutex *dmaMutex[2][7];
 
 #define CLEAR_DMA_INTERRUPT()                                                                                          \
     {                                                                                                                  \
-        d->INTC |= 1 << (4 * _channelInt);                                                                             \
+        d->INTC = 1 << (4 * _channelInt);                                                                             \
     }
 
 struct lnDmaStats
@@ -31,10 +31,10 @@ static lnDmaStats dmaStats[2][7];
 
 /**
  */
-
-DMA_struct *adma0 = (DMA_struct *)LN_DMA0_ADR;
-DMA_struct *adma1 = (DMA_struct *)LN_DMA1_ADR;
-
+extern const DMA_struct *adma0, *adma1 , *dummy_dma;
+const DMA_struct *adma0 = (DMA_struct *)LN_DMA0_ADR;
+const DMA_struct *adma1 = (DMA_struct *)LN_DMA1_ADR;
+const DMA_struct *dummy_dma;
 /**
  *
  */
@@ -46,6 +46,7 @@ void lnDmaSysInit()
         dmaMutex[0][i] = new xMutex;
         dmaMutex[1][i] = new xMutex;
     }
+    dummy_dma = adma0;
 }
 
 /**
@@ -244,8 +245,10 @@ void lnDMA::beginTransfer()
         xAssert(0);
     _lnDmas[_dmaInt][_channelInt] = this;
 }
+
 /**
- *
+ * @brief 
+ * 
  */
 void lnDMA::cancelTransfer()
 {
@@ -263,6 +266,10 @@ void lnDMA::cancelTransfer()
     _lnDmas[_dmaInt][_channelInt] = NULL;
     interrupts();
 }
+/**
+ * @brief 
+ * 
+ */
 void lnDMA::endTransfer()
 {
     cancelTransfer();
@@ -318,7 +325,7 @@ bool lnDMA::doMemoryToPeripheralTransferNoLock(int count, const uint16_t *source
         if (bothInterrupts)
             control |= LN_DMA_CHAN_HTFIE;
     }
-    _interruptMask = control & _interruptMask;
+    _interruptMask = control & LN_DMA_CHAN_ALL_INTERRUPT_MASK;
     c->CTL = control | LN_DMA_CHAN_ENABLE; // GO!
     lnEnableInterrupt(_irq);
     return true;
@@ -369,7 +376,10 @@ void lnDMA::enableInterrupt()
 {
     DMA_struct *d = (DMA_struct *)_dma;
     DMA_channels *c = d->channels + _channelInt;
-    c->CTL |= _interruptMask;
+    uint32_t nw =  c->CTL;
+    nw &= ~LN_DMA_CHAN_ALL_INTERRUPT_MASK;
+    nw |=_interruptMask;
+    c->CTL = nw;
 }
 /**
  * @brief
@@ -432,7 +442,7 @@ bool lnDMA::doPeripheralToMemoryTransferNoLock(int count, const uint16_t *target
             control |= LN_DMA_CHAN_HTFIE;
     }
 #warning NOT ATOMIC
-    _interruptMask = control & _interruptMask;
+    _interruptMask = control & LN_DMA_CHAN_ALL_INTERRUPT_MASK;
     c->CTL = control | LN_DMA_CHAN_ENABLE; // GO!
     lnEnableInterrupt(_irq);
     return true;
@@ -450,7 +460,7 @@ bool lnDMA::setInterruptMask(bool full, bool half)
     DMA_channels *c = d->channels + _channelInt;
 
     uint32_t control = c->CTL;
-    control &= ~(7 << 1); // reset
+    control &= ~LN_DMA_CHAN_ALL_INTERRUPT_MASK; // reset
     control |= LN_DMA_CHAN_ERRIE;
     if (full)
         control |= LN_DMA_CHAN_TFTFIE;
@@ -459,15 +469,16 @@ bool lnDMA::setInterruptMask(bool full, bool half)
 
     // clear interrupts if any
     CLEAR_DMA_INTERRUPT();
-    _interruptMask = control & _interruptMask;
+    _interruptMask = control & LN_DMA_CHAN_ALL_INTERRUPT_MASK;
     c->CTL = control;
     return true;
 }
 
-/**
- *
- */
 
+/**
+ * @brief 
+ * 
+ */
 void lnDMA::invokeCallback()
 {
     DmaInterruptType typ;
@@ -524,20 +535,17 @@ void dmaIrqHandler(int dma, int channel)
 
     // Are we in circular mode ?
     if (d->channels[channel].CTL & LN_DMA_CHAN_CMEN)
-    { // ok, is it full or helf interrupt ?
-      // then call handler
-        lnDMA *l = _lnDmas[dma][channel];
-        xAssert(l);
-        l->invokeCallback();
-        return;
+    { 
+        // circular, nothing special to do
+    }
+    else
+    { // since it is one shot, disable DMA channel
+        d->channels[channel].CTL &= ~LN_DMA_CHAN_ENABLE;
+        // disable interrupt
+        lnDisableInterrupt(_dmaIrqs[dma][channel]);
     }
 
-    // single shot mode
-    // Disable DMA
-    d->channels[channel].CTL &= ~LN_DMA_CHAN_ENABLE;
-    // disable interrupt
-    lnDisableInterrupt(_dmaIrqs[dma][channel]);
-
+    // the interrupt itself will be acked in invokeCallback
     lnDMA *l = _lnDmas[dma][channel];
     xAssert(l);
     l->invokeCallback();
