@@ -288,7 +288,10 @@ void lnFastEventGroup::setEvents(uint32_t events)
         }
         BaseType_t awake;
         vTaskNotifyGiveIndexedFromISR(_waitingTask, EVENT_INDEX, &awake);
-        portYIELD_FROM_ISR(awake); // reschedule
+        if(awake)
+        {
+            portYIELD_FROM_ISR(awake); // reschedule
+        }
         return;
     }
 
@@ -323,9 +326,9 @@ uint32_t lnFastEventGroup::waitEvents(uint32_t maskint, int timeout)
         if (set)
         {
             _value &= ~set;
-            _mask = 0;
-            END_LOCK();
+            _mask = 0;            
             xTaskNotifyStateClearIndexed(xTaskGetCurrentTaskHandle(), EVENT_INDEX);
+            END_LOCK();
             return set;
         }
         _mask = maskint;
@@ -339,7 +342,8 @@ uint32_t lnFastEventGroup::waitEvents(uint32_t maskint, int timeout)
         // got it
         BEGIN_LOCK();
         set = maskint & _value;
-        // race can cause this to trigger ? xAssert(set);
+        // race can cause this to trigger ? 
+        xAssert(set);
         _value &= ~set;
         _mask = 0; // no need to clear waitintTask, it must be the same !
         END_LOCK();
