@@ -1,4 +1,5 @@
-
+#pragma once
+#include "stdint.h"
 /**
  * @brief This is to avoid non virtual thunk gdb does not like that
  *
@@ -53,11 +54,13 @@ class lnSerialBpRxTxDma : public lnSerialBpTxOnlyBufferedDma, public lnSerialRxT
     // no copy interface
     virtual int getReadPointer(uint8_t **to);
     virtual void consume(int n);
+    void timerCallback();
+protected:
     //
     void enableRxDmaInterrupt();
     void disableRxDmaInterrupt();
     void startRxDma();
-    void timerCallback();
+    
     virtual void _interrupt(void);
 
     //---
@@ -65,11 +68,11 @@ class lnSerialBpRxTxDma : public lnSerialBpTxOnlyBufferedDma, public lnSerialRxT
     void rxDma(lnDMA::DmaInterruptType type);
 
     void checkForNewData();
-    timerLink _timer;
-    uint32_t _rxBufferSize;
-    uint32_t _rxMask = 0;
-    uint32_t _rxHead, _rxTail;
-    bool _rxEnabled;
-    lnDMA _rxDma;
-    uint8_t *_rxBuffer;
+    timerLink   _timer;
+    uint32_t    _rxBufferSize;
+    uint32_t    _rxMask ;
+    uint32_t    _rxHead, _rxTail;
+    bool        _rxEnabled;
+    lnDMA       _rxDma;
+    uint8_t     *_rxBuffer;
 };
