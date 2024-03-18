@@ -79,8 +79,8 @@ class lnFastEventGroup
                         int timeout = -1); //  the events are cleared upon return from here ! returns  0 if timeout
     uint32_t readEvents(uint32_t maskInt); // it is also cleared automatically !
   protected:
-    volatile uint32_t _value;
-    volatile uint32_t _mask;
+    uint32_t _value;
+    uint32_t _mask;
     TaskHandle_t _waitingTask;
 };
 #define xFastEventGroup lnFastEventGroup
