@@ -102,7 +102,7 @@ bool lnSerialBpRxTxDma::enableRx(bool enabled)
 
     if (enabled)
     {
-
+        _rxHead=_rxTail=0;
         _rxDma.pause();
         ENTER_CRITICAL();
         d->CTL0 |= (LN_USART_CTL0_RBNEIE | LN_USART_CTL0_REN);
@@ -163,7 +163,6 @@ void lnSerialBpRxTxDma::disableRxDmaInterrupt()
  */
 void lnSerialBpRxTxDma::startRxDma()
 {
-    _rxHead = _rxTail = 0;
     LN_USART_Registers *d = (LN_USART_Registers *)_adr;
     _rxDma.attachCallback(_rxDmaCb, this);
     _rxDma.beginTransfer(); // lock dma
@@ -193,18 +192,20 @@ int lnSerialBpRxTxDma::getReadPointer(uint8_t **to)
     ENTER_CRITICAL();
     int h = _rxHead & _rxMask;
     int t = _rxTail & _rxMask;
-    EXIT_CRITICAL();
+    
 
     int nb;
     if (h >= t)
     {
-        nb = h - t;
+        nb = _rxHead - _rxTail;
+        xAssert(nb<= _rxBufferSize);
     }
     else
     {
-        nb = _rxBufferSize - (t);
+        nb = _rxBufferSize - t;
     }
     *to = _rxBuffer + t;
+    EXIT_CRITICAL();
     return nb;
 }
 /**
@@ -215,9 +216,13 @@ int lnSerialBpRxTxDma::getReadPointer(uint8_t **to)
 void lnSerialBpRxTxDma::consume(int n)
 {
     ENTER_CRITICAL();
-    _rxTail += n;
-    xAssert(_rxTail <= _rxBufferSize);
-    _rxTail &= _rxMask;
+     xAssert(n<= _rxBufferSize);
+    _rxTail += n;    
+    if(_rxTail>_rxBufferSize && _rxHead > _rxBufferSize)
+    {        
+        _rxTail-=_rxBufferSize;
+        _rxHead-=_rxBufferSize;
+    }
     EXIT_CRITICAL();
 }
 
@@ -243,22 +248,24 @@ void lnSerialBpRxTxDma::checkForNewData()
  */
 void lnSerialBpRxTxDma::rxDma(lnDMA::DmaInterruptType type)
 {
-    int current = _rxHead;
+    int current = _rxHead & _rxMask;
     bool newData = false;
     switch (type)
     {
     case lnDMA::DMA_INTERRUPT_HALF:
-        if (current != _rxBufferSize >> 1)
+//        if (current != _rxBufferSize >> 1)
         {
             newData = true;
-            _rxHead = _rxBufferSize >> 1;
+            _rxHead = _rxHead & ~_rxMask;
+            _rxHead+= _rxBufferSize >> 1;
         }
         break;
     case lnDMA::DMA_INTERRUPT_FULL:
-        if (current != 0)
+//        if (current != 0)
         {
             newData = true;
-            _rxHead = 0;
+            _rxHead = _rxHead & ~_rxMask;
+            _rxHead+= _rxBufferSize ;
         }
         break;
     default:
