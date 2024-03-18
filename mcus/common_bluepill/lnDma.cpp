@@ -308,22 +308,15 @@ bool lnDMA::doMemoryToPeripheralTransferNoLock(int count, const uint16_t *source
     if (circular)
     {
         control |= LN_DMA_CHAN_CMEN;  // replay the dma in a loop
-        control |= LN_DMA_CHAN_ERRIE; // error  interrupt
-        if (bothInterrupts)
-        {
-            control |= LN_DMA_CHAN_TFTFIE + LN_DMA_CHAN_HTFIE;
-        }
-        else
-        {
-            control &= ~LN_DMA_CHAN_TFTFIE;
-        }
     }
     else
     {
         control &= ~LN_DMA_CHAN_CMEN;
-        control |= LN_DMA_CHAN_ERRIE + LN_DMA_CHAN_TFTFIE; // error and transmit complete interrupt
-        if (bothInterrupts)
-            control |= LN_DMA_CHAN_HTFIE;
+    }
+    control |= LN_DMA_CHAN_ERRIE+LN_DMA_CHAN_TFTFIE; // error  interrupt + transfer complete
+    if (bothInterrupts)
+    {
+        control |= LN_DMA_CHAN_HTFIE; // half transfer
     }
     _interruptMask = control & LN_DMA_CHAN_ALL_INTERRUPT_MASK;
     c->CTL = control | LN_DMA_CHAN_ENABLE; // GO!
@@ -482,8 +475,8 @@ bool lnDMA::setInterruptMask(bool full, bool half)
 void lnDMA::invokeCallback()
 {
     DmaInterruptType typ;
-    DMA_struct *d = (DMA_struct *)_dmas[_dmaInt];
-    DMA_channels *c = d->channels + _channelInt;
+    volatile DMA_struct *d = (DMA_struct *)_dmas[_dmaInt];
+    volatile DMA_channels *c = d->channels + _channelInt;
 
     int pending = d->INTF;
     pending >>= (4 * _channelInt);
@@ -494,26 +487,22 @@ void lnDMA::invokeCallback()
 
     lnDmaStats *stats = &(dmaStats[_dmaInt][_channelInt]);
     stats->total++;
-    if (pending == 3)
+    switch(pending)
     {
-        stats->missed++;
+        case 0 : // no interrupt pending
+            stats->spurious++;                
+            return;
+            break;
+        case 1: // complete
+        case 3: // complete + half
+            typ = DMA_INTERRUPT_FULL;
+            stats->full++;
+            break;
+        case 2: // half
+            typ = DMA_INTERRUPT_HALF;
+            stats->half++;
+            break;
     }
-    if (pending & 1)
-    {
-        typ = DMA_INTERRUPT_FULL;
-        stats->full++;
-    }
-    else if (pending & 2)
-    {
-        typ = DMA_INTERRUPT_HALF;
-        stats->half++;
-    }
-    else
-    {
-        stats->spurious++;
-        return;
-    }
-
     xAssert(_cb);
     _cb(_cookie, typ);
 }
