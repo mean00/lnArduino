@@ -297,7 +297,7 @@ bool lnDMA::doMemoryToPeripheralTransferNoLock(int count, const uint16_t *source
 
     c->CTL = control; // also disable
 
-    control |= _control; // base configuration
+    control = _control; // base configuration
 
     c->PADDR = (uint32_t)target;
     c->MADDR = (uint32_t)source;
