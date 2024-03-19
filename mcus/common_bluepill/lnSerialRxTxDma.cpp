@@ -14,7 +14,7 @@
  * @param irq
  */
 #define M(x) usartMapping[instance].x
-#define DEBUGME
+//#define DEBUGME
 /*
  */
 
@@ -231,15 +231,25 @@ void lnSerialBpRxTxDma::checkForNewData()
 {
     if (!_rxEnabled)
         return;
-    uint32_t count = _rxDma.getCurrentCount(); // between N and 1, 0 means transfer done
+    ENTER_CRITICAL();
+    uint32_t count = _rxDma.getCurrentCount(); // transfer pending, between N and 1, 0 means transfer done
     count = _rxBufferSize - count;        // this is the # of bytes transfered already
     uint32_t maskedHead = _rxHead & _rxMask;
-    if (count != maskedHead)
+    if (count == maskedHead)
     {
-        _rxHead = count;
-        xAssert(_cb);
-        _cb(_cbCookie, lnSerialCore::dataAvailable);
+        EXIT_CRITICAL();
+        return;
     }
+    uint32_t t=_rxHead & _rxMask;
+    _rxHead = _rxHead & ~_rxMask;
+    
+    _rxHead+=count;
+    if(t>=count)
+        _rxHead+=_rxBufferSize;
+    xAssert(_cb);
+    EXIT_CRITICAL();
+    _cb(_cbCookie, lnSerialCore::dataAvailable);
+
 }
 /**
  * @brief
@@ -253,19 +263,19 @@ void lnSerialBpRxTxDma::rxDma(lnDMA::DmaInterruptType type)
     switch (type)
     {
     case lnDMA::DMA_INTERRUPT_HALF:
-//        if (current != _rxBufferSize >> 1)
+        if (current != _rxBufferSize >> 1)
         {
             newData = true;
             _rxHead = _rxHead & ~_rxMask;
-            _rxHead+= _rxBufferSize >> 1;
+            _rxHead+= _rxBufferSize >> 1;            
         }
         break;
     case lnDMA::DMA_INTERRUPT_FULL:
-//        if (current != 0)
+        if (current != 0)
         {
             newData = true;
             _rxHead = _rxHead & ~_rxMask;
-            _rxHead+= _rxBufferSize ;
+            _rxHead+= _rxBufferSize ;            
         }
         break;
     default:
