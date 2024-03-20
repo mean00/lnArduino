@@ -4,12 +4,9 @@
  */
 
 #include "lnArduino.h"
-#include "lnPeripheral_priv.h"
-#include "lnSerial.h"
+#include "lnSerialBpCore.h"
 #include "lnSerialRxTx.h"
-#include "lnSerialTxOnly.h"
 #include "lnSerialTxOnlyDma.h"
-#include "lnSerial_priv.h"
 #include "lnSerialRxTxDma.h"
 /**
  *
@@ -17,7 +14,7 @@
  * @param irq
  */
 #define M(x) usartMapping[instance].x
-
+//#define DEBUGME
 /*
  */
 
@@ -105,11 +102,10 @@ bool lnSerialBpRxTxDma::enableRx(bool enabled)
 
     if (enabled)
     {
-
+        _rxHead=_rxTail=0;
         _rxDma.pause();
         ENTER_CRITICAL();
-        d->CTL0 |= LN_USART_CTL0_RBNEIE;
-        d->CTL0 |= LN_USART_CTL0_REN;
+        d->CTL0 |= (LN_USART_CTL0_RBNEIE | LN_USART_CTL0_REN);
         d->CTL2 |= LN_USART_CTL2_DMA_RX;
         _rxEnabled = true;
         EXIT_CRITICAL();        
@@ -123,8 +119,7 @@ bool lnSerialBpRxTxDma::enableRx(bool enabled)
         ENTER_CRITICAL();
         _timer.stop();
         _rxEnabled = false;
-        d->CTL0 &= ~LN_USART_CTL0_REN;
-        d->CTL0 &= ~LN_USART_CTL0_RBNEIE;
+        d->CTL0 &= ~(LN_USART_CTL0_REN | LN_USART_CTL0_RBNEIE) ;
         d->CTL2 &= ~LN_USART_CTL2_DMA_RX;
         EXIT_CRITICAL();
     }
@@ -137,7 +132,9 @@ bool lnSerialBpRxTxDma::enableRx(bool enabled)
 void lnSerialBpRxTxDma::timerCallback()
 {
     ENTER_CRITICAL(); // we are in a task, need to block interrupt and other tasks
+#ifndef DEBUGME    
     checkForNewData();
+#endif    
     EXIT_CRITICAL();
 }
 /**
@@ -195,18 +192,20 @@ int lnSerialBpRxTxDma::getReadPointer(uint8_t **to)
     ENTER_CRITICAL();
     int h = _rxHead & _rxMask;
     int t = _rxTail & _rxMask;
-    EXIT_CRITICAL();
+    
 
     int nb;
     if (h >= t)
     {
-        nb = h - t;
+        nb = _rxHead - _rxTail;
+        xAssert(nb<= _rxBufferSize);
     }
     else
     {
-        nb = _rxBufferSize - (t);
+        nb = _rxBufferSize - t;
     }
     *to = _rxBuffer + t;
+    EXIT_CRITICAL();
     return nb;
 }
 /**
@@ -217,9 +216,13 @@ int lnSerialBpRxTxDma::getReadPointer(uint8_t **to)
 void lnSerialBpRxTxDma::consume(int n)
 {
     ENTER_CRITICAL();
-    _rxTail += n;
-    xAssert(_rxTail <= _rxBufferSize);
-    _rxTail &= _rxMask;
+     xAssert(n<= _rxBufferSize);
+    _rxTail += n;    
+    if(_rxTail>_rxBufferSize && _rxHead > _rxBufferSize)
+    {        
+        _rxTail-=_rxBufferSize;
+        _rxHead-=_rxBufferSize;
+    }
     EXIT_CRITICAL();
 }
 
@@ -228,15 +231,25 @@ void lnSerialBpRxTxDma::checkForNewData()
 {
     if (!_rxEnabled)
         return;
-    uint32_t count = _rxDma.getCurrentCount(); // between N and 1, 0 means transfer done
+    ENTER_CRITICAL();
+    uint32_t count = _rxDma.getCurrentCount(); // transfer pending, between N and 1, 0 means transfer done
     count = _rxBufferSize - count;        // this is the # of bytes transfered already
     uint32_t maskedHead = _rxHead & _rxMask;
-    if (count != maskedHead)
+    if (count == maskedHead)
     {
-        _rxHead = count;
-        xAssert(_cb);
-        _cb(_cbCookie, lnSerialCore::dataAvailable);
+        EXIT_CRITICAL();
+        return;
     }
+    uint32_t t=_rxHead & _rxMask;
+    _rxHead = _rxHead & ~_rxMask;
+    
+    _rxHead+=count;
+    if(t>=count)
+        _rxHead+=_rxBufferSize;
+    xAssert(_cb);
+    EXIT_CRITICAL();
+    _cb(_cbCookie, lnSerialCore::dataAvailable);
+
 }
 /**
  * @brief
@@ -245,7 +258,7 @@ void lnSerialBpRxTxDma::checkForNewData()
  */
 void lnSerialBpRxTxDma::rxDma(lnDMA::DmaInterruptType type)
 {
-    int current = _rxHead;
+    int current = _rxHead & _rxMask;
     bool newData = false;
     switch (type)
     {
@@ -253,14 +266,16 @@ void lnSerialBpRxTxDma::rxDma(lnDMA::DmaInterruptType type)
         if (current != _rxBufferSize >> 1)
         {
             newData = true;
-            _rxHead = _rxBufferSize >> 1;
+            _rxHead = _rxHead & ~_rxMask;
+            _rxHead+= _rxBufferSize >> 1;            
         }
         break;
     case lnDMA::DMA_INTERRUPT_FULL:
         if (current != 0)
         {
             newData = true;
-            _rxHead = 0;
+            _rxHead = _rxHead & ~_rxMask;
+            _rxHead+= _rxBufferSize ;            
         }
         break;
     default:

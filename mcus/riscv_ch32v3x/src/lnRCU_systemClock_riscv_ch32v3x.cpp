@@ -13,6 +13,10 @@
 #include "lnRCU_priv.h"
 
 extern LN_RCU *arcu;
+
+//
+#define CH32_APB1_DIVIDER 0  // If set to 1 APB1 is sysclock /2, if set to 0 APB1 is sysclock
+
 //
 
 #define CLOCK_XTAL_VALUE 8                                   // 8mhz quartz
@@ -212,7 +216,7 @@ void lnInitSystemClock()
     setPll(multiplier, useExternalClock); // Program PLL to get the value we want
 
     SystemCoreClock = (inputClock * multiplier * 1000000); // update globals reflecting SysClk...
-    _rcuClockApb1 = SystemCoreClock / 2;
+    _rcuClockApb1 = SystemCoreClock >> CH32_APB1_DIVIDER;
     _rcuClockApb2 = SystemCoreClock;
 
     // Setup AHB...
@@ -225,7 +229,7 @@ void lnInitSystemClock()
     clks |= CH32_CFG0_AHB_DIVIDER(0); // 0-> 1:1
 
     clks &= CH32_CFG0_APB1_MASK;
-    clks |= CH32_CFG0_APB1_DIVIDER(0); // 0-> 1:1, 4-> 1:2
+    clks |= CH32_CFG0_APB1_DIVIDER(CH32_APB1_DIVIDER * 4); // 0-> 1:1, 4-> 1:2
 
     clks &= CH32_CFG0_APB2_MASK;
     clks |= CH32_CFG0_APB2_DIVIDER(0); // 0-> 1:1

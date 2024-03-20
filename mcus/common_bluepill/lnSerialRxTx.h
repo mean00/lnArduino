@@ -1,4 +1,5 @@
 #pragma once
+#include "lnSerialBpCore.h"
 #include "lnSerialTxOnly.h"
 /**
  * @brief

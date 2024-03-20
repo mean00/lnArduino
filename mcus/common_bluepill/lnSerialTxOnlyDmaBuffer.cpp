@@ -1,10 +1,14 @@
 
-#define M(x) usartMapping[instance].x
+
 
 /**
  */
-#include "lnDma.h"
+ #include "lnArduino.h"
+#include "lnSerialBpCore.h"
 #include "lnSerialTxOnlyDma.h"
+
+
+#define M(x) usartMapping[instance].x
 /**
  * @brief
  *
