@@ -10,6 +10,7 @@ public:
       enum lnUsbCDCEvents
       {
         CDC_DATA_AVAILABLE,
+        CDC_WRITE_AVAILABLE,
         CDC_SESSION_START,
         CDC_SESSION_END,
         CDC_SET_SPEED

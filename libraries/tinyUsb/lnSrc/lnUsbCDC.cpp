@@ -98,18 +98,27 @@ void tud_cdc_line_coding_cb(uint8_t itf, cdc_line_coding_t const* p_line_coding)
 //---
 void tud_cdc_line_state_cb(uint8_t itf, bool dtr, bool rts)
 {
-  Logger("DTR=%d RTS=%d\n");
+  Logger("DTR=%d RTS=%d\n",dtr,rts);
   PREMABLE(itf);
   if(dtr)
     me->incomingEvent(lnUsbCDC::CDC_SESSION_START);
   else
     me->incomingEvent(lnUsbCDC::CDC_SESSION_END);
 }
-//---
+/**
 // Invoked when CDC interface received data from host
+*/
 void tud_cdc_rx_cb(uint8_t itf)
 {
   FORWARD_EVENT(itf,lnUsbCDC::CDC_DATA_AVAILABLE);
 }
-
+/**
+ * @brief 
+ * 
+ * @param itf 
+ */
+void tud_cdc_tx_complete_cb(uint8_t itf)
+{
+   FORWARD_EVENT(itf,lnUsbCDC::CDC_WRITE_AVAILABLE);
+}
 //EOF

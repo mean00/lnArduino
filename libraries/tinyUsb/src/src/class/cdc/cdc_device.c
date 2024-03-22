@@ -400,7 +400,7 @@ bool cdcd_control_xfer_cb(uint8_t rhport, uint8_t stage, tusb_control_request_t 
         TU_LOG_DRV("  Set Control Line State: DTR = %d, RTS = %d\r\n", dtr, rts);
 
         // Invoke callback
-        if ( tud_cdc_line_state_cb ) tud_cdc_line_state_cb(itf, dtr, rts);
+        if ( tud_cdc_line_state_cb ) tud_cdc_line_state_cb(itf,  tud_ready(), rts); // MEANX for detection, see PR 401
       }
     break;
     case CDC_REQUEST_SEND_BREAK:
