@@ -15,16 +15,13 @@
 class lnSerialCore
 {
   public:
+  
     enum Event
     {
         dataAvailable,
+        txDone,
     };
-    enum lnSerialMode
-    {
-        txOnly,
-        txRx,
-        txRxDma
-    };
+  
     lnSerialCore(int instance)
     {
         _instance = instance;
@@ -68,6 +65,7 @@ class lnSerialRxTx : public lnSerialCore
     {
     }
     virtual bool transmit(int size, const uint8_t *buffer) = 0;
+    virtual int  transmitNoBlock(int size, const uint8_t *buffer) = 0;
     virtual bool enableRx(bool enabled) = 0;
     virtual void purgeRx() = 0;
     virtual int read(int max, uint8_t *to) = 0;

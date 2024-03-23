@@ -42,6 +42,10 @@ class lnSerialBpRxTxDma : public lnSerialBpTxOnlyBufferedDma, public lnSerialRxT
         LN_USART_Registers *d = (LN_USART_Registers *)_adr;
         return ln_serial_rawWrite(d, count, buffer);
     }
+    int  transmitNoBlock(int size, const uint8_t *buffer)
+    {
+        return lnSerialBpTxOnlyBufferedDma::transmitNoBlock(size,buffer);
+    }
     bool transmit(int size, const uint8_t *buffer)
     {
         return lnSerialBpTxOnlyBufferedDma::transmit(size, buffer);
@@ -71,7 +75,7 @@ protected:
     timerLink   _timer;
     uint32_t    _rxBufferSize;
     uint32_t    _rxMask ;
-    uint32_t    _rxHead, _rxTail;
+    volatile uint32_t    _rxHead, _rxTail;
     bool        _rxEnabled;
     lnDMA       _rxDma;
     uint8_t     *_rxBuffer;

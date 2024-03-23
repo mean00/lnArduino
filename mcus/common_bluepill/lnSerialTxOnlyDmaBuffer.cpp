@@ -89,6 +89,9 @@ void lnSerialBpTxOnlyBufferedDma::txDmaCb2(lnDMA::DmaInterruptType it)
     int nb = _txRingBuffer.getReadPointer(&to);
     if (!nb) // done !
     {
+        // invoke callback
+        xAssert(_cb);    
+        _cb(_cbCookie, lnSerialCore::txDone);        
         _txing = false;
         return;
     }
@@ -97,6 +100,37 @@ void lnSerialBpTxOnlyBufferedDma::txDmaCb2(lnDMA::DmaInterruptType it)
     _inFlight = nb;
     _txDma.doMemoryToPeripheralTransferNoLock(nb, (uint16_t *)to, (uint16_t *)&(d->DATA), false);
 }
+/**
+ * @brief 
+ * 
+ * @param size 
+ * @param buffer 
+ * @return int 
+ */
+int  lnSerialBpTxOnlyBufferedDma::transmitNoBlock(int size, const uint8_t *buffer)
+{
+    int processed=0;
+    while (size!=0)
+    {
+        ENTER_CRITICAL();
+        int nb = _txRingBuffer.free();
+        if (nb==0)
+        {            
+            EXIT_CRITICAL(); 
+            return processed;
+        }
+        if (nb > size)
+            nb = size;
+        int inc = _txRingBuffer.put(nb, buffer);
+        buffer += inc, size -= inc;
+        processed+=inc;
+        if (!_txing)
+            igniteTx();
+        EXIT_CRITICAL();
+    }
+    return processed;
+}
+
 /**
  * @brief
  *
