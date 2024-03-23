@@ -8,7 +8,8 @@
 #include "stdarg.h"
 #define LOGGER_USE_DMA 1
 
-extern lnSerialTxOnly *serial0 = NULL;
+extern lnSerialTxOnly *serial0;
+lnSerialTxOnly *serial0 = NULL;
 volatile uint32_t lnScratchRegister;
 static lnMutex *loggerMutex;
 extern "C" void Logger_crash(const char *st)
@@ -18,7 +19,7 @@ extern "C" void Logger_crash(const char *st)
     serial0->rawWrite(strlen(st), (const uint8_t *)st);
 }
 
-extern "C" void Logger_C(const char *fmt, ...)
+extern "C" int Logger_C(const char *fmt, ...)
 {
     static char buffer[128];
 
@@ -29,6 +30,7 @@ extern "C" void Logger_C(const char *fmt, ...)
     buffer[127] = 0;
     va_end(va);
     Logger_chars(strlen(buffer), buffer);
+    return 0;
 }
 /**
 
