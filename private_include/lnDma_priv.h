@@ -35,12 +35,16 @@ typedef volatile DMA_structx DMA_struct;
 #define LN_DMA_CHAN_CMEN (1 << 5)       // circular
 #define LN_DMA_CHAN_PINCREASE (1 << 6)  // circular
 #define LN_DMA_CHAN_MINCREASE (1 << 7)  // circular
-#define LN_DMA_CHAN_PWIDTH_8 (0 << 8)   // circular
-#define LN_DMA_CHAN_PWIDTH_16 (1 << 8)  // circular
-#define LN_DMA_CHAN_PWIDTH_32 (2 << 8)  // circular
-#define LN_DMA_CHAN_MWIDTH_8 (0 << 10)  // circular
-#define LN_DMA_CHAN_MWIDTH_16 (1 << 10) // circular
-#define LN_DMA_CHAN_MWIDTH_32 (2 << 10) // circular
+
+#define PWIDTH_x(x) ((x)<<8)
+#define MWIDTH_x(x) ((x)<<10)
+
+#define LN_DMA_CHAN_PWIDTH_8    PWIDTH_x(0)
+#define LN_DMA_CHAN_PWIDTH_16   PWIDTH_x(1)
+#define LN_DMA_CHAN_PWIDTH_32   PWIDTH_x(2)
+#define LN_DMA_CHAN_MWIDTH_8    MWIDTH_x(0)
+#define LN_DMA_CHAN_MWIDTH_16   MWIDTH_x(1)
+#define LN_DMA_CHAN_MWIDTH_32   MWIDTH_x(2)
 
 #define LN_DMA_CHAN_PRIO_LOW (0 << 12)   // circular
 #define LN_DMA_CHAN_PRIO_MED (1 << 12)   // circular
@@ -51,5 +55,5 @@ typedef volatile DMA_structx DMA_struct;
 
 #define LN_DMA_CHAN_KEEP_MASK 0xffff8000U
 
-#define LN_DMA_CHAN_WIDTH_MASK (~((3 << 10) + (3 << 8)))
+#define LN_DMA_CHAN_WIDTH_MASK (~(PWIDTH_x(3) | MWIDTH_x(3)))
 #define LN_DMA_CHAN_ALL_INTERRUPT_MASK (LN_DMA_CHAN_TFTFIE + LN_DMA_CHAN_HTFIE + LN_DMA_CHAN_ERRIE)

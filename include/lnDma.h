@@ -19,6 +19,9 @@
 
  *
  */
+class DMA_structx;
+typedef volatile DMA_structx DMA_struct;
+
 class lnDMA
 {
   public:
@@ -59,14 +62,14 @@ class lnDMA
     void endTransfer();
     void cancelTransfer();
     void setWordSize(int sourceWordSize, int targetWordSize);
-    void invokeCallback();
+    void invokeCallback(uint32_t pending);
     void pause();
     void resume();
     void enableInterrupt();
     void disableInterrupt();
 
   protected:
-    uint32_t _dma;
+    DMA_struct *_dma;
     int _channelInt;
     int _dmaInt;
     DmaTransferType _type;
