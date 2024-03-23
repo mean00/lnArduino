@@ -40,6 +40,18 @@ int lnUsbCDC::read(uint8_t *buffer, int maxSize)
   return    tud_cdc_n_read(_instance,buffer, maxSize);
 }
 /**
+ * @brief 
+ * 
+ * @param buffer 
+ * @param maxSize 
+ * @return int 
+ */
+ int lnUsbCDC::writeNoBlock(const uint8_t *buffer, int size) const
+ {
+    return (int) tud_cdc_n_write(_instance,buffer, (uint32_t)size);
+ }
+
+/**
 */
 int lnUsbCDC::write(const uint8_t *buffer, int size)
 {

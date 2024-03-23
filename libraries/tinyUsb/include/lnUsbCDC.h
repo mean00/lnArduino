@@ -20,6 +20,7 @@ public:
               lnUsbCDC(int instance);
           int read(uint8_t *buffer, int maxSize);
           int write(const uint8_t *buffer, int maxSize);
+          int writeNoBlock(const uint8_t *buffer, int maxSize) const; // same as above but does not block
           void flush();
           void clear_input_buffers();
           void setEventHandler(lnUsbCDCEventsHandler *h, void *cookie)
