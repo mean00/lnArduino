@@ -420,23 +420,14 @@ bool lnDMA::doPeripheralToMemoryTransferNoLock(int count, const uint16_t *target
     if (circular)
     {
         control |= LN_DMA_CHAN_CMEN;  // replay the dma in a loop
-        control |= LN_DMA_CHAN_ERRIE; // error  interrupt
-        if (bothInterrupts)
-        {
-            control |= LN_DMA_CHAN_TFTFIE + LN_DMA_CHAN_HTFIE;
-        }
-        else
-        {
-            control &= ~LN_DMA_CHAN_TFTFIE;
-        }
     }
     else
     {
-        control &= ~LN_DMA_CHAN_CMEN;
-        control |= LN_DMA_CHAN_ERRIE + LN_DMA_CHAN_TFTFIE; // error and transmit complete interrupt
-        if (bothInterrupts)
-            control |= LN_DMA_CHAN_HTFIE;
+        control &= ~LN_DMA_CHAN_CMEN;        
     }
+    control |= LN_DMA_CHAN_ERRIE + LN_DMA_CHAN_TFTFIE; // error and transmit complete interrupt
+    if (bothInterrupts)
+            control |= LN_DMA_CHAN_HTFIE;
     _interruptMask = control & LN_DMA_CHAN_ALL_INTERRUPT_MASK;
     channel->CTL = control | LN_DMA_CHAN_ENABLE; // GO!
     lnEnableInterrupt(_irq);
