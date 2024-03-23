@@ -251,7 +251,7 @@ void cdcd_init(void)
     // Config TX fifo as overwritable at initialization and will be changed to non-overwritable
     // if terminal supports DTR bit. Without DTR we do not know if data is actually polled by terminal.
     // In this way, the most current data is prioritized.
-    tu_fifo_config(&p_cdc->tx_ff, p_cdc->tx_ff_buf, TU_ARRAY_SIZE(p_cdc->tx_ff_buf), 1, true);
+    tu_fifo_config(&p_cdc->tx_ff, p_cdc->tx_ff_buf, TU_ARRAY_SIZE(p_cdc->tx_ff_buf), 1, false); /* MEANX*/
 
     tu_fifo_config_mutex(&p_cdc->rx_ff, NULL, osal_mutex_create(&p_cdc->rx_ff_mutex));
     tu_fifo_config_mutex(&p_cdc->tx_ff, osal_mutex_create(&p_cdc->tx_ff_mutex), NULL);
@@ -269,7 +269,7 @@ void cdcd_reset(uint8_t rhport)
     tu_memclr(p_cdc, ITF_MEM_RESET_SIZE);
     tu_fifo_clear(&p_cdc->rx_ff);
     tu_fifo_clear(&p_cdc->tx_ff);
-    tu_fifo_set_overwritable(&p_cdc->tx_ff, true);
+    tu_fifo_set_overwritable(&p_cdc->tx_ff, false); // MEANX
   }
 }
 
@@ -395,7 +395,7 @@ bool cdcd_control_xfer_cb(uint8_t rhport, uint8_t stage, tusb_control_request_t 
         p_cdc->line_state = (uint8_t) request->wValue;
 
         // Disable fifo overwriting if DTR bit is set
-        tu_fifo_set_overwritable(&p_cdc->tx_ff, !dtr);
+        tu_fifo_set_overwritable(&p_cdc->tx_ff, false /*!dtr*/); // MEANX
 
         TU_LOG_DRV("  Set Control Line State: DTR = %d, RTS = %d\r\n", dtr, rts);
 
