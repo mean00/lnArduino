@@ -26,7 +26,12 @@ void lnSerialBpRxTxDma::_interrupt()
 {
     xAssert(0);
 }
-
+/**
+ * @brief Construct a new ln Serial Bp Rx Tx Dma::ln Serial Bp Rx Tx Dma object
+ * 
+ * @param instance 
+ * @param bufferSize 
+ */
 lnSerialBpRxTxDma::lnSerialBpRxTxDma(int instance, int bufferSize)
     : lnSerialBpTxOnlyBufferedDma(instance, bufferSize >> 1), lnSerialRxTx(instance),
       _rxDma(lnDMA::DMA_PERIPH_TO_MEMORY, M(dmaEngine), M(dmaRxChannel), 32, 8), _timer(this)
