@@ -29,6 +29,10 @@ class lnSerialBpRxTxDma : public lnSerialBpTxOnlyBufferedDma, public lnSerialRxT
   public:
     lnSerialBpRxTxDma(int instance, int bufferSize);
     virtual ~lnSerialBpRxTxDma();
+    void setCallback(lnSerialCallback *cb, void *cookie)
+    {
+        lnSerialBpCore::_setCallback(cb,cookie);
+    }
     bool init()
     {
         return lnSerialBpCore::init();

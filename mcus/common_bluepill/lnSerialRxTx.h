@@ -31,6 +31,10 @@ class lnSerialBpRxTx : public lnSerialBpTxOnlyInterrupt, public lnSerialRxTx
     {
         enableInterrupt(_txState == txTransmittingInterrupt || _txState == txTransmittingLast, true);
     }
+    void setCallback(lnSerialCallback *cb, void *cookie)
+    {
+        lnSerialBpCore::_setCallback(cb,cookie);
+    }
     //
     int modulo(int in)
     {

@@ -37,6 +37,18 @@ class lnSerialBpCore : public lnSerialCore
     void disableInterrupt();
     void enableInterrupt(bool tx, bool rx);
     bool _enableTx(txState mode);
+
+//--
+    void _setCallback(lnSerialCallback *cb, void *cookie)
+    {
+        _cb = cb;
+        _cbCookie = cookie;
+    }
+
+    lnSerialCallback *_cb;
+    void *_cbCookie;
+
+    
     LnIRQ _irq;
     uint32_t _adr;
     // tx

@@ -46,6 +46,8 @@ lnSerialBpCore::lnSerialBpCore(int instance) : lnSerialCore(instance)
     xAssert(SerialInstance[instance] == NULL);
     SerialInstance[instance] = this;
     _txState = txTransmittingIdle;
+    _cb = NULL;
+    _cbCookie = NULL;
 }
 
 void lnSerialBpCore::enableInterrupt(bool tx, bool rx)

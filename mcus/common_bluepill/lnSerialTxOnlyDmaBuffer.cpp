@@ -84,15 +84,15 @@ void lnSerialBpTxOnlyBufferedDma::txDmaCb2(lnDMA::DmaInterruptType it)
     uint8_t *to;
     _txRingBuffer.consume(_inFlight);
     _inFlight = 0;
-    _txRingSem.give(); // space freed, wake up thread
+    if(_cb==NULL)
+        _txRingSem.give(); // space freed, wake up thread
 
     int nb = _txRingBuffer.getReadPointer(&to);
     if (!nb) // done !
     {
-        // invoke callback
-        xAssert(_cb);    
-        _cb(_cbCookie, lnSerialCore::txDone);        
         _txing = false;
+        if(_cb!=NULL)
+            _cb(_cbCookie,lnSerialCore::txDone);
         return;
     }
     // send remainer
