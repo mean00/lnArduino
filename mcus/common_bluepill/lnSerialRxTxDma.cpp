@@ -14,7 +14,7 @@
  * @param irq
  */
 #define M(x) usartMapping[instance].x
-#define DISABLE_TIMER_COLLECTOR
+//#define DISABLE_TIMER_COLLECTOR
 #define CHECK_OVERFLOW() { xAssert( (_rxHead-_rxTail)<=_rxBufferSize);}
 /*
  */
