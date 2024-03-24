@@ -13,11 +13,9 @@ SET(LN_ENABLE_SPI  FALSE CACHE INTERNAL "")
 SET(LN_USB_NB_CDC 1) # 1 CDC interfaces
 SET(LN_USB_NB_HID 0) # No HID
 
-SET(AF_FOLDER  ${CMAKE_SOURCE_DIR}/lnArduino/)
-include(./mcuSelect.cmake)
-SET(CMAKE_TOOLCHAIN_FILE ${AF_FOLDER}/lnArduino.cmake)
+include(../common_CMakeLists.cmake)
 
-PROJECT(lnUsb NONE) # the NONE is very important !
+PROJECT(lnUsb_usbcdc NONE) # the NONE is very important !
 
 enable_language(C CXX ASM) # this is important too!
 
