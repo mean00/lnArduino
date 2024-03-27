@@ -22,10 +22,10 @@
 #include "timers.h"
 
 class lnRpSerialTxOnly;
-static void uart0_irq_handler(void);
-static void uart1_irq_handler(void);
+static void uart0_irq_handler();
+static void uart1_irq_handler();
 
-static lnRpSerialTxOnly *rpSerialInstances[2] = {NULL, NULL};
+static lnRpSerialTxOnly *rpSerialInstances[2] = {nullptr, nullptr};
 // We use 2 internal buffers in flip flop mode
 #define UART_RX_DMA_BUFFER 32
 // we should not be needing this, to be optimized later...
@@ -100,7 +100,7 @@ class lnRpSerialTxOnly : public lnSerialTxOnly
         uart_inst_t *u = (uart_inst_t *)uarts[lnSerialTxOnly::_instance].hw;
         return rp_uart_rawWrite(u, size, buffer);
     }
-
+    virtual int  transmitNoBlock(int size, const uint8_t *buffer);
     // custom
     virtual void irq_handler();
     bool transmitDma(int size, const uint8_t *buffer);
@@ -124,6 +124,15 @@ class lnRpSerialTxOnly : public lnSerialTxOnly
         irq_set_exclusive_handler(uarts[lnSerialTxOnly::_instance].irq, uarts[lnSerialTxOnly::_instance].irq_handler);
         uart_set_irq_enables(u, false, false); // disable Rx & Tx
     }
+    void _setCallback(lnSerialCallback *cb, void *cookie)
+    {
+        _cb = cb;
+        _cbCookie = cookie;
+    }
+
+    lnSerialCallback *_cb;
+    void *_cbCookie;
+
 };
 /**
  * @brief
@@ -151,15 +160,19 @@ void uart1_irq_handler()
 lnRpSerialTxOnly::lnRpSerialTxOnly(int instance, int bufferSize) : lnSerialTxOnly(instance), _txRingBuffer(bufferSize)
 {
     xAssert(instance < 2);
-    xAssert(!rpSerialInstances[instance]);
-    _txDma = NULL;
+    xAssert(nullptr==rpSerialInstances[instance]);
+    _txDma = nullptr;
     rpSerialInstances[instance] = this;
     _inFlight = 0;
+    _cb=nullptr;
+    _cbCookie=nullptr;
 }
-
+/**
+ *
+ */
 static void cbTxDma(void *cookie)
 {
-    lnRpSerialTxOnly *serial = (lnRpSerialTxOnly *)cookie;
+    auto *serial = (lnRpSerialTxOnly *)cookie;
     serial->txDmaCb();
 }
 /**
@@ -172,13 +185,18 @@ void lnRpSerialTxOnly::txDmaCb()
     xAssert(_inFlight);
     _txRingBuffer.consume(_inFlight);
     _inFlight = 0;
-    _txRingSem.give(); // space freed, wake up thread
+    if(!_cb)
+        _txRingSem.give(); // space freed, wake up thread
 
     int nb = _txRingBuffer.getReadPointer(&to);
-    if (!nb) // done !
+    if (nb == 0) // done !
     {
         _txing = false;
         _txDma->endTransfer();
+        if(_cb)
+        {
+            _cb(_cbCookie, lnSerialCore::txDone);
+        }
         return;
     }
     _inFlight = nb;
@@ -206,7 +224,7 @@ bool lnRpSerialTxOnly::init()
 */
 bool lnRpSerialTxOnly::setSpeed(int speed)
 {
-    uart_inst_t *u = (uart_inst_t *)uarts[lnSerialTxOnly::_instance].hw;
+    auto *u = (uart_inst_t *)uarts[lnSerialTxOnly::_instance].hw;
     uart_set_baudrate(u, speed);
     return true;
 }
@@ -216,13 +234,13 @@ bool lnRpSerialTxOnly::setSpeed(int speed)
 */
 bool lnRpSerialTxOnly::transmit(int size, const uint8_t *buffer)
 {
-    if (!size)
+    if (size == 0)
         return true;
-    while (size)
+    while (size != 0)
     {
         ENTER_CRITICAL();
         int nb = _txRingBuffer.free();
-        if (!nb)
+        if (nb == 0)
         {
             _txRingSem.tryTake(); // wait for a fresh sem post, not an old one
             EXIT_CRITICAL();
@@ -241,19 +259,52 @@ bool lnRpSerialTxOnly::transmit(int size, const uint8_t *buffer)
     return true;
 }
 /**
+ * @brief 
+ * 
+ * @param size 
+ * @param buffer 
+ * @return int 
+ */
+int  lnRpSerialTxOnly::transmitNoBlock(int size, const uint8_t *buffer)
+{
+    if (size == 0)
+        return 0;
+    int processed = 0;
+    while (size != 0)
+    {
+        ENTER_CRITICAL();
+        int nb = _txRingBuffer.free();
+        if (nb == 0)
+        {            
+            EXIT_CRITICAL();
+            break;
+        }
+        if (nb > size)
+            nb = size;
+        int inc = _txRingBuffer.put(nb, buffer);
+        buffer += inc, size -= inc, processed += inc;
+
+        if (!_txing)
+            igniteTx();
+        EXIT_CRITICAL();
+    }
+    return processed;
+}
+
+/**
  * @brief
  *
  */
 bool lnRpSerialTxOnly::igniteTx()
 {
-    uint8_t *to = NULL;
+    uint8_t *to = nullptr;
     int nb = _txRingBuffer.getReadPointer(&to);
     xAssert(nb);
     _inFlight = nb;
     _txing = true;
     xAssert(_txDma);
-    uart_inst_t *u = (uart_inst_t *)uarts[lnSerialTxOnly::_instance].hw;
-    _txDma->doMemoryToPeripheralTransferNoLock(nb, (const uint32_t *)to, (const uint32_t *)&(uart_get_hw(u)->dr));
+    auto *uart = (uart_inst_t *)uarts[lnSerialTxOnly::_instance].hw;
+    _txDma->doMemoryToPeripheralTransferNoLock(nb, (const uint32_t *)to, (const uint32_t *)&(uart_get_hw(uart)->dr));
     _txDma->beginTransfer();
     return true;
 }
@@ -291,6 +342,14 @@ class lnRpSerialRxTx : public lnRpSerialTxOnly, public lnSerialRxTx, public lnPe
     {
         return lnRpSerialTxOnly::transmit(size, buffer);
     }
+    int  transmitNoBlock(int size, const uint8_t *buffer)
+    {
+        return lnRpSerialTxOnly::transmitNoBlock(size,buffer);
+    }
+    void setCallback(lnSerialCallback *cb, void *cookie)
+    {
+            return lnRpSerialTxOnly::_setCallback(cb, cookie);
+    }
     bool enableRx(bool enabled);
     void purgeRx();
     int read(int max, uint8_t *to);
@@ -315,7 +374,7 @@ class lnRpSerialRxTx : public lnRpSerialTxOnly, public lnSerialRxTx, public lnPe
  */
 static void cbRxDma(void *cookie)
 {
-    lnRpSerialRxTx *serial = (lnRpSerialRxTx *)cookie;
+    auto *serial = (lnRpSerialRxTx *)cookie;
     serial->rxDmaCb();
 }
 
@@ -341,17 +400,17 @@ lnRpSerialRxTx::lnRpSerialRxTx(int instance, int rxBufferSize)
  */
 bool lnRpSerialRxTx::enableRx(bool enabled)
 {
-    if (enabled == false)
+    if (!enabled)
     {
         _rxDma->cancelTransfer();
         lnPeriodicTimer::stop();
     }
     else
     {
-        uart_inst_t *u = (uart_inst_t *)uarts[lnSerialTxOnly::_instance].hw;
+        auto *uart = (uart_inst_t *)uarts[lnSerialTxOnly::_instance].hw;
         _rxDmaLastIndex = 0;
         _rxCurrentBuffer = 0;
-        _rxDma->doPeripheralToMemoryTransferNoLock(UART_RX_DMA_BUFFER, (const uint32_t *)&(uart_get_hw(u)->dr),
+        _rxDma->doPeripheralToMemoryTransferNoLock(UART_RX_DMA_BUFFER, (const uint32_t *)&(uart_get_hw(uart)->dr),
                                                    (const uint32_t *)_rxDmaBuffer[0]);
         _rxDma->beginTransfer();
         lnPeriodicTimer::start();
@@ -364,9 +423,9 @@ bool lnRpSerialRxTx::enableRx(bool enabled)
  */
 void lnRpSerialRxTx::purgeRx()
 {
-    uart_inst_t *u = (uart_inst_t *)uarts[lnSerialTxOnly::_instance].hw;
-    while (uart_is_readable(u))
-        uart_getc(u);
+    auto *uart = (uart_inst_t *)uarts[lnSerialTxOnly::_instance].hw;
+    while (uart_is_readable(uart))
+        uart_getc(uart);
     _rxRingBuffer.flush();
 }
 /**
@@ -380,9 +439,9 @@ void lnRpSerialRxTx::purgeRx()
 int lnRpSerialRxTx::read(int max, uint8_t *to)
 {
     DISABLE_INTERRUPTS();
-    int r = _rxRingBuffer.get(max, to);
+    int ret = _rxRingBuffer.get(max, to);
     ENABLE_INTERRUPTS();
-    return r;
+    return ret;
 }
 /**
  * @brief
@@ -393,9 +452,9 @@ int lnRpSerialRxTx::read(int max, uint8_t *to)
 int lnRpSerialRxTx::getReadPointer(uint8_t **to)
 {
     DISABLE_INTERRUPTS();
-    int r = _rxRingBuffer.getReadPointer(to);
+    int ret = _rxRingBuffer.getReadPointer(to);
     ENABLE_INTERRUPTS();
-    return r;
+    return ret;
 }
 /**
  * @brief
@@ -417,9 +476,9 @@ void lnRpSerialRxTx::consume(int n)
  */
 bool lnRpSerialRxTx::init()
 {
-    const lnUart_t *t = uarts + lnSerialTxOnly::_instance;
+    const lnUart_t *uart = uarts + lnSerialTxOnly::_instance;
     lnRpSerialTxOnly::init();
-    _rxDma = new lnRpDMA(lnRpDMA::DMA_PERIPH_TO_MEMORY, t->dreq_rx, 8);
+    _rxDma = new lnRpDMA(lnRpDMA::DMA_PERIPH_TO_MEMORY, uart->dreq_rx, 8);
     _rxDma->attachCallback(cbRxDma, this);
     _rxDmaLastIndex = 0;
     _rxCurrentBuffer = 0;
@@ -439,15 +498,15 @@ void lnRpSerialRxTx::timerCallback()
     _rxDma->disableInterrupt();
     uint32_t val = UART_RX_DMA_BUFFER - _rxDma->getCurrentCount(); // total # of received bytes
     //
-    uint32_t toCopy = val - _rxDmaLastIndex;
-    if (!toCopy)
+    uint32_t to_copy = val - _rxDmaLastIndex;
+    if (to_copy == 0U)
     {
         _rxDma->enableInterrupt(); // nothing new...
         return;
     }
 
     // copy to buffer
-    copyToBuffer(_rxDmaLastIndex, toCopy);
+    copyToBuffer(_rxDmaLastIndex, to_copy);
     _rxDmaLastIndex = val;
     _rxDma->enableInterrupt();
 }
@@ -459,24 +518,23 @@ void lnRpSerialRxTx::rxDmaCb()
 {
     // start asap the other buffer...
     _rxDma->continuePeripheralToMemoryTransferNoLock(UART_RX_DMA_BUFFER,
-                                                     (const uint32_t *)_rxDmaBuffer[!_rxCurrentBuffer]);
+                                                     (const uint32_t *)_rxDmaBuffer[_rxCurrentBuffer == 0]);
 
     // the timer is called from a task,  no need to block it
     uint32_t val = UART_RX_DMA_BUFFER; // total # of received bytes
-    uint32_t toCopy = val - _rxDmaLastIndex;
+    uint32_t to_copy = val - _rxDmaLastIndex;
     // copy to copy
-    uint32_t copyFrom = _rxDmaLastIndex;
+    uint32_t copy_from = _rxDmaLastIndex;
     _rxDmaLastIndex = 0;
-    uart_inst_t *u = (uart_inst_t *)uarts[lnSerialTxOnly::_instance].hw;
-    if (toCopy) // we assume we'll be faster than the DMA
+    //uart_inst_t *u = (uart_inst_t *)uarts[lnSerialTxOnly::_instance].hw;
+    if (to_copy != 0U) // we assume we'll be faster than the DMA
     {
-        copyToBuffer(copyFrom, toCopy);
+        copyToBuffer(copy_from, to_copy);
     }
     // Officially swap the buffers
     _rxCurrentBuffer ^= 1;
     // reset the timer, we just purged the buffer
     lnPeriodicTimer::restart();
-    return;
 }
 
 /**
@@ -493,7 +551,7 @@ void lnRpSerialRxTx::copyToBuffer(uint32_t startFrom, uint32_t count)
     int p = _rxRingBuffer.put(count, _rxDmaBuffer[_rxCurrentBuffer] + startFrom);
     // xAssert(p==count); if not equal we have lost some bytes
 
-    if (was_empty && count)
+    if (was_empty && (count != 0u))
     {
         xAssert(_cb);
         _cb(_cbCookie, lnSerialCore::dataAvailable);
@@ -508,7 +566,7 @@ void lnRpSerialRxTx::copyToBuffer(uint32_t startFrom, uint32_t count)
  * @param buffered
  * @return lnSerialTxOnly*
  */
-lnSerialTxOnly *createLnSerialTxOnly(int instance, bool dma, bool buffered)
+lnSerialTxOnly *createLnSerialTxOnly(int instance, bool  /*dma*/, bool  /*buffered*/)
 {
     return new lnRpSerialTxOnly(instance, 128);
 }
