@@ -93,6 +93,11 @@ unsupported_no_decl(1) unsupported_no_decl(2) unsupported_no_decl(3) unsupported
 extern VECTOR_TABLE const uint32_t vecTable[]  __attribute__((aligned(32)));
 VECTOR_TABLE const uint32_t vecTable[]   __attribute__((aligned(32))) = {LIST_OF_INTERRUPTS};
 //--
+#define SIZE_OF_VEC_TABLE sizeof(vecTable)/sizeof(uint32_t)
+extern const uint32_t size_of_vec_table = SIZE_OF_VEC_TABLE;
+
+uint8_t vec_revert_table[SIZE_OF_VEC_TABLE];
+
 #undef INTERRUPT_DESC
 
 

@@ -41,7 +41,7 @@ extern "C" void Logger_crash(const char *st);
 #define FAST_UNUSED 0xFF00
 
 extern const uint32_t vecTable[] __attribute__((aligned(32)));
-
+extern uint8_t vec_revert_table[];
 uint16_t fastInterrupt[4] = {FAST_UNUSED, FAST_UNUSED, FAST_UNUSED, FAST_UNUSED};
 CH32V3_INTERRUPT *pfic = (CH32V3_INTERRUPT *)LN_PFIC_ADR;
 
@@ -116,6 +116,22 @@ extern "C" void NVIC_EnableIRQ(IRQn_Type IRQn)
 }
 
 /**
+ */
+ISR_CODE static int lookupIrq(int irq)
+{
+    if (_irqs[irq].interrpt == irq)
+        return _irqs[irq].irqNb;
+    // deep search
+    int n = sizeof(_irqs) / sizeof(_irqDesc);
+    for (int i = 0; i < n; i++)
+    {
+        if (_irqs[i].interrpt == irq)
+            return _irqs[i].irqNb;
+    }
+    return 0;
+}
+
+/**
  * @brief 
  * 
  */
@@ -136,6 +152,15 @@ ISR_CODE void lnIrqSysInit()
     {
         pfic->IPRIOIR[i] = prio32;
     }
+    //
+    extern const uint32_t size_of_vec_table;;
+    // Prepare invert able
+    for(int i=0;i<size_of_vec_table;i++)
+    {
+        int inverted = lookupIrq(i);
+        xAssert(inverted<256);
+        vec_revert_table[i]=inverted;
+    }
 
     // allow fast path for these 2 interrupts
     PromoteIrqToFast(LN_IRQ_SYSTICK, 1);
@@ -144,6 +169,7 @@ ISR_CODE void lnIrqSysInit()
     lnIrqSetPriority(LN_IRQ_SYSTICK, 6);
     lnIrqSetPriority(LN_IRQ_SW, 7);
 
+   
     // relocate vector table
     // Initialise WCH enhance interrutp controller,
     // WCH code puts 0x6088 in mstatus
@@ -152,6 +178,7 @@ ISR_CODE void lnIrqSysInit()
     uint32_t mstatus = LN_RISCV_FPU_MODE(ARCH_FPU)+LN_RISCV_MPP(0); // enable FPU if ARCH_FPU=1
 
     
+
 
     asm volatile("mv t0, %1\n"      // load syscr
                  "csrw 0x804, t0\n" // INTSYSCR : hw stack etc...
@@ -178,22 +205,6 @@ ISR_CODE bool xPortIsInsideInterrupt()
 
 /**
  */
-ISR_CODE static int lookupIrq(int irq)
-{
-    if (_irqs[irq].interrpt == irq)
-        return _irqs[irq].irqNb;
-    // deep search
-    int n = sizeof(_irqs) / sizeof(_irqDesc);
-    for (int i = 0; i < n; i++)
-    {
-        if (_irqs[i].interrpt == irq)
-            return _irqs[i].irqNb;
-    }
-    xAssert(0);
-    return 0;
-}
-/**
- */
 ISR_CODE void _enableDisable_direct(bool enableDisable, const int &irq_num)
 {
     if (enableDisable)
@@ -212,7 +223,8 @@ ISR_CODE void _enableDisable_direct(bool enableDisable, const int &irq_num)
 */
 ISR_CODE void _enableDisable(bool enableDisable, const LnIRQ &irq)
 {
-    int irq_num = lookupIrq(irq); //_irqs[irq].irqNb;
+    int irq_num = vec_revert_table[irq]; //_irqs[irq].irqNb;
+    xAssert(irq_num);
     _enableDisable_direct(enableDisable, irq_num);
 }
 /**
@@ -228,7 +240,8 @@ ISR_CODE void PromoteIrqToFast(const LnIRQ &irq, int no)
         xAssert(0);
     }
     no--; // between 0 and 3 now
-    int irq_num = lookupIrq(irq);
+    int irq_num = vec_revert_table[irq]; //_irqs[irq].irqNb;
+    xAssert(irq_num);
     uint32_t adr = vecTable[irq_num];
     fastInterrupt[no] = irq;
     pfic->VTFIDR[no] = irq_num;
@@ -266,7 +279,8 @@ ISR_CODE void lnIrqSetPriority_direct(const int &irq_num, int prio)
  */
 ISR_CODE void lnIrqSetPriority(const LnIRQ &irq, int prio)
 {
-    int irq_num = lookupIrq(irq); //_irqs[irq].irqNb;
+    int irq_num = vec_revert_table[irq]; //_irqs[irq].irqNb;
+    xAssert(irq_num);
     lnIrqSetPriority_direct(irq_num, prio);
 }
 /**
