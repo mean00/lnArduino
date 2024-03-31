@@ -8,7 +8,7 @@
 * SPDX-License-Identifier: Apache-2.0
 *******************************************************************************/
 
-	.section	.init,"ax",@progbits
+	.section	.init
 	.global	_start	    
 	.align	1
 	.extern start_c
@@ -20,15 +20,13 @@ _start:
 	.align  1
 _vector_base:
 	.option norvc;
-	.section	.text.handle_reset,"ax",@progbits	
 	.align	1
 handle_reset:
 .option push 
 .option	norelax 
 	la gp, __global_pointer$
+	la sp, _ram_end
 .option	pop 
-1:
-	la sp, _sp 
 2:
 	
 2:
