@@ -15,6 +15,7 @@ target_sources( lnArduino_impl PRIVATE
     ${S}/lnRCU_systemClock_riscv_ch32v3x.cpp  
     ${S}/lnRunTime_riscv_ch32v3x.cpp  
     ${S}/lnSystemTimer_riscv_ch32v3x.cpp  
+    ${S}/lnBoot_riscv_ch32.cpp
 )
 IF(LN_ENABLE_USBD)
         target_sources( lnArduino_impl PRIVATE ${S}/lnUSBD_ch32v3x.cpp)
