@@ -362,53 +362,5 @@ void lnSoftSystemReset()
     }
 }
 
-extern "C"
-{
-
-    extern const char _data, _edata;
-    extern const char __bss_start, _end;
-    extern const char _data_lma;
-
-    int main();
-    void __libc_init_array(void);
-
-    /**
-     * @brief
-     *
-     */
-    ISR_CODE void __attribute__((noreturn)) start_c()
-    {
-        
-        __asm volatile(
-                    "  mv t0, %0 \n" // src
-                    "  mv t1, %1 \n" // dst
-                    "  mv t2, %2 \n" // end
-                    "lp0: \n"
-                    "  lw t3, 0(t0) \n"
-                    "  sw t3, 0(t1) \n"
-                    "  addi t0,t0,4 \n"
-                    "  addi t1,t1,4 \n"
-                    "  bgt  t2,t1,lp0 \n"
-
-
-                    "  mv t0, %3 \n" // begin
-                    "  mv t1, %4 \n" // end
-                    "lp1: \n"
-                    "  sw x0, 0(t0) \n"
-                    "  addi t0,t0,4 \n"
-                    "  bgt  t1,t0,lp1 \n"
-        
-        ::  "r"((  uint32_t *)&_data_lma),   // 0 src
-            "r"((  uint32_t *)&_data),       // 1 data
-            "r"((  uint32_t *)&_edata),      // 2 end
-            "r"((  uint32_t *)&__bss_start), // 3 zstart
-            "r"((  uint32_t *)&_end) );      // 4 zend
-
-        __libc_init_array(); // call ctor before jumping in the code
-        main();
-        xAssert(0);
-    }
-}
-
 
 // EOF

@@ -21,7 +21,7 @@
  */
 MEMORY
 { 
-  ram (rwx) :       ORIGIN = 0x20000000, LENGTH = @LN_MCU_RAM_SIZE@K
+  ram (rwx) :       ORIGIN = 0x20000008, LENGTH = @LN_MCU_RAM_SIZE@K-8
   bootloader (rx):  ORIGIN = 0x00000000, LENGTH = @LN_BOOTLOADER_SIZE@K
   rom (rx)  :       ORIGIN = 0x00000000+@LN_BOOTLOADER_SIZE@K, LENGTH = @LN_MCU_FLASH_SIZE@K-@LN_MCU_EEPROM_SIZE@K-@LN_BOOTLOADER_SIZE@K
   e2prom (rx)  :    ORIGIN = 0x00000000+@LN_MCU_FLASH_SIZE@K-@LN_MCU_EEPROM_SIZE@K, LENGTH = @LN_MCU_EEPROM_SIZE@K
@@ -157,22 +157,25 @@ SECTIONS
      */                    
         .data :
           {
-            PROVIDE( _data= .); /* mark copy section start in ram */            
+            PROVIDE( _data_begin= .); /* mark copy section start in ram */            
+    	      PROVIDE( __global_pointer$ = . + 0x800); 
             . = ALIGN(4);
             . += 8; // marker
             
             *(.rdata)
    	        *(.data .data.*)
     	      . = ALIGN(4);
-    	      PROVIDE( __global_pointer$ = . + 0x800); 
     	      *(.sdata .sdata.*)
             *(.got.plt) *(.got)
             . = ALIGN(4);
-              __data_end__ = .;
-            PROVIDE( _edata= .); /* mark copy section start in ram */
-            PROVIDE( edata= .); /* mark copy section start in ram */
+            PROVIDE( _data_end= .); /* mark copy section start in ram */
           } > REGION_DATA AT> REGION_RODATA
-    	/*
+    	.tbss  :
+      {
+          . = ALIGN(4);
+	        *(.tbss*)
+      } > REGION_DATA
+/*
     .eeprom eeprom_begin :
       {
         . = ALIGN(4); 
@@ -183,11 +186,10 @@ SECTIONS
      * .bss
      */
 
-      .bss :
+      .bss (NOLOAD) :
       {
-          . = ALIGN(8);
-          __bss_start   = .;
-          __bss_start__ = .;
+          . = ALIGN(4);
+          _bss_begin = .;
 	        *(.sbss*)
           *(.bss .bss.* )
           *(COMMON)
@@ -195,10 +197,9 @@ SECTIONS
       .bss2 (NOLOAD) : 
       {
           *(.initial_heap)
-          . = ALIGN (8);
-          __bss_end__ = .;
-          _end = __bss_end__;
-          . = ALIGN (8);
+          . = ALIGN (4);
+          _bss_end = .;
+          . = ALIGN (4);
 	        _sp = .; 
       } > REGION_BSS
 
