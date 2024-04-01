@@ -157,7 +157,7 @@ SECTIONS
      */                    
         .data :
           {
-            PROVIDE( _data= .); /* mark copy section start in ram */            
+            PROVIDE( _data_begin= .); /* mark copy section start in ram */            
             . = ALIGN(4);
             . += 8; // marker
             
@@ -168,9 +168,7 @@ SECTIONS
     	      *(.sdata .sdata.*)
             *(.got.plt) *(.got)
             . = ALIGN(4);
-              __data_end__ = .;
-            PROVIDE( _edata= .); /* mark copy section start in ram */
-            PROVIDE( edata= .); /* mark copy section start in ram */
+            PROVIDE( _data_end= .); /* mark copy section start in ram */
           } > REGION_DATA AT> REGION_RODATA
     	/*
     .eeprom eeprom_begin :
@@ -186,8 +184,7 @@ SECTIONS
       .bss :
       {
           . = ALIGN(8);
-          __bss_start   = .;
-          __bss_start__ = .;
+          _bss_begin = .;
 	        *(.sbss*)
           *(.bss .bss.* )
           *(COMMON)
@@ -196,8 +193,7 @@ SECTIONS
       {
           *(.initial_heap)
           . = ALIGN (8);
-          __bss_end__ = .;
-          _end = __bss_end__;
+          _bss_end = .;
           . = ALIGN (8);
 	        _sp = .; 
       } > REGION_BSS

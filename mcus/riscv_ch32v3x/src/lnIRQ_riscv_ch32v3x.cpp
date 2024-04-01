@@ -365,8 +365,8 @@ void lnSoftSystemReset()
 extern "C"
 {
 
-    extern const char _data, _edata;
-    extern const char __bss_start, _end;
+    extern const char _data_begin, _data_end;
+    extern const char _bss_begin, _bss_end;
     extern const char _data_lma;
 
     int main();
@@ -399,10 +399,10 @@ extern "C"
                     "  bgt  t1,t0,lp1 \n"
         
         ::  "r"((  uint32_t *)&_data_lma),   // 0 src
-            "r"((  uint32_t *)&_data),       // 1 data
-            "r"((  uint32_t *)&_edata),      // 2 end
-            "r"((  uint32_t *)&__bss_start), // 3 zstart
-            "r"((  uint32_t *)&_end) );      // 4 zend
+            "r"((  uint32_t *)&_data_begin),       // 1 data
+            "r"((  uint32_t *)&_data_end),      // 2 end
+            "r"((  uint32_t *)&_bss_begin), // 3 zstart
+            "r"((  uint32_t *)&_bss_end) );      // 4 zend
 
         __libc_init_array(); // call ctor before jumping in the code
         main();
