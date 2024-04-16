@@ -29,14 +29,17 @@ class rpSPI : public lnSPI
     };
 
   public:
-    rpSPI(int instance, int pinCs = -1);
+            rpSPI(int instance, int pinCs = -1);
     virtual ~rpSPI();
+
+
+    virtual void setBitOrder(spiBitOrder order);
+    virtual void setDataMode(spiDataMode mode);
+
     void begin(int wordsize = 8);
     void begin();
     void end(void);
 
-    // void    setBitOrder(spiBitOrder order);
-    // void    setDataMode(spiDataMode mode);
     void setSpeed(int speed);       // speed in b/s
     void setDataSize(int dataSize); // 8 or 16
 
@@ -44,27 +47,23 @@ class rpSPI : public lnSPI
     bool write16(int nbHalfWord, const uint16_t *data);
     bool write16(int nbHalfWord, const uint16_t *data, bool repeat);
     bool write(int nbBytes, const uint8_t *data, bool repeat);
-    virtual bool write(int z);
-    virtual bool write16(int z);
-    virtual bool write16Repeat(int nb, const uint16_t pattern);
+    bool write(int z);
+    bool write16(int z);
+    bool write16Repeat(int nb, const uint16_t pattern);
 
-    lnPin misoPin() const;
-    lnPin mosiPin() const;
-    lnPin clkPin() const;
-     uint32_t getPeripheralClock();
 //-
     
-    virtual bool dmaWrite16(int nbBytes, const uint16_t *data);
-    virtual bool dmaWrite16Repeat(int nbBytes, const uint16_t data);
-    virtual bool dmaWrite(int nbBytes, const uint8_t *data);
+    bool dmaWrite16(int nbBytes, const uint16_t *data);
+    bool dmaWrite16Repeat(int nbBytes, const uint16_t data);
+    bool dmaWrite(int nbBytes, const uint8_t *data);
 
     // slow read/write
-    virtual bool transfer(int nbBytes, uint8_t *dataOut, uint8_t *dataIn);
+    bool transfer(int nbBytes, uint8_t *dataOut, uint8_t *dataIn);
 
     // wait for everything to be COMPLETELY done
-    virtual void waitForCompletion();
+    void waitForCompletion();
     // This reads over the MOSI pin, i.e. only when only 2 wires are used MOSI + CLK, no MISO
-    virtual bool read1wire(int nbRead, uint8_t *rd); // read, reuse MOSI
+    bool read1wire(int nbRead, uint8_t *rd); // read, reuse MOSI
   
 
     //
@@ -75,12 +74,12 @@ class rpSPI : public lnSPI
     virtual void beginSession(int bitSize);
     virtual void endSession();
 
-    virtual void setBitOrder(spiBitOrder order);
-    virtual void setDataMode(spiDataMode mode);
+    lnPin misoPin() const;
+    lnPin mosiPin() const;
+    lnPin clkPin() const;
+    uint32_t getPeripheralClock();
     
-    // DMA ones
-    
-
+protected:
     //-- AsyncDma
     // Do asyncDma
     //   and in the callback either call nextDma or finishAsyncDma
@@ -89,6 +88,9 @@ class rpSPI : public lnSPI
     virtual bool nextDmaWrite16(int nbBytes, const uint16_t *data, lnSpiCallback *cb, void *cookie, bool repeat = false);
     virtual bool finishAsyncDma();
     virtual bool waitForAsyncDmaDone();
+
+
+
 //-
 
 
@@ -97,14 +99,14 @@ class rpSPI : public lnSPI
     void dmaHandler();
 
   protected:
-    uint32_t _cr0, _cr1, _prescaler;
-    uint32_t _instance;
-    int _wordSize; // 8 or 16
-    lnPin _cs;
-    LN_RP_SPI *_spi;
+    uint32_t    _cr0, _cr1, _prescaler;
+    uint32_t    _instance;
+    int         _wordSize; // 8 or 16
+    lnPin       _cs;
+    LN_RP_SPI   *_spi;
     const uint8_t *_current, *_limit;
 
     lnBinarySemaphore _txDone;
-    spiTxState _state;
-    lnRpDMA *_txDma;
+    spiTxState  _state;
+    lnRpDMA     *_txDma;
 };

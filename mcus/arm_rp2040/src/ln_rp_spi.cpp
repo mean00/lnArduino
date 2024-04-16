@@ -91,6 +91,15 @@ rpSPI::~rpSPI()
  * @brief
  *
  */
+ void rpSPI::begin()
+ {
+    begin(8);
+ }
+ /**
+  * @brief 
+  * 
+  * @param wordsize 
+  */
 void rpSPI::begin(int wordsize)
 {
     _wordSize = wordsize;
@@ -264,5 +273,38 @@ void rpSPI::dmaHandler()
  {
     return new rpSPI(instance , pinCs);
  }
-
+//--- not implemented --- 
+bool rpSPI::transfer(int nbBytes, uint8_t *dataOut, uint8_t *dataIn)  {xAssert(0);return false;}
+//--- not implemented ---
+bool rpSPI::asyncDmaWrite16(int nbBytes, const uint16_t *data, lnSpiCallback *cb, void *cookie, bool repeat   ) {xAssert(0);return false;}
+bool rpSPI::nextDmaWrite16(int nbBytes, const uint16_t *data, lnSpiCallback *cb, void *cookie, bool repeat   ) {xAssert(0);return false;}
+bool rpSPI::finishAsyncDma() {xAssert(0);return false;}
+bool rpSPI::waitForAsyncDmaDone() {xAssert(0);return false;}
+//--- not implemented ---
+void rpSPI::waitForCompletion() {xAssert(0);}
+//--- not implemented ---
+void rpSPI::setDataSize(int dataSize)  {xAssert(0);} // 8 or 16
+void rpSPI::setBitOrder(spiBitOrder order) {xAssert(0);}
+void rpSPI::setDataMode(spiDataMode mode) {xAssert(0);}
+//--- not implemented ---
+lnPin rpSPI::misoPin() const { xAssert(0); return GPIO0;}
+lnPin rpSPI::mosiPin() const { xAssert(0); return GPIO0;}
+lnPin rpSPI::clkPin() const { xAssert(0); return GPIO0;}
+uint32_t rpSPI::getPeripheralClock() {xAssert(0);return 1;}
+//--- not implemented ---
+bool rpSPI::write16(int nbHalfWord, const uint16_t *data, bool repeat) {xAssert(0);return false;}
+bool rpSPI::write(int nbBytes, const uint8_t *data, bool repeat) {xAssert(0);return false;}
+bool rpSPI::write(int z) {xAssert(0);return false;}
+bool rpSPI::write16(int z) {xAssert(0);return false;}
+bool rpSPI::write16Repeat(int nb, const uint16_t pattern) {xAssert(0);return false;}
+bool rpSPI::dmaWrite16(int nbBytes, const uint16_t *data) {xAssert(0);return false;}
+bool rpSPI::dmaWrite16Repeat(int nbBytes, const uint16_t data) {xAssert(0);return false;}
+bool rpSPI::dmaWrite(int nbBytes, const uint8_t *data) {xAssert(0);return false;}
+// --- not implemented ---
+void rpSPI::beginTransaction(lnSPISettings &settings) {}
+void rpSPI::endTransaction() {}    
+void rpSPI::beginSession(int bitSize) {}
+void rpSPI::endSession() {}
+// --- not implemented ---
+bool rpSPI::read1wire(int nbRead, uint8_t *rd) {xAssert(0);return false;} // read, reuse MOSI
 //--

@@ -150,4 +150,12 @@ uint32_t lnReadPort(int port)
     xAssert(0);
     return 0;
 }
+/**
+ * @brief Construct a new ln Fast I O::ln Fast I O object
+ * 
+ */
+lnFastIO::lnFastIO(lnPin)
+{
+    xAssert(0);
+}
 // EOF
