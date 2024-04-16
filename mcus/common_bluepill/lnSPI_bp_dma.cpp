@@ -1,11 +1,12 @@
 /*
- *  (C) 2021 MEAN00 fixounet@free.fr
+ *  (C) 2021/2024 MEAN00 fixounet@free.fr
  *  See license file
  */
 
 #include "lnArduino.h"
 #include "lnDma.h"
 #include "lnSPI.h"
+#include "lnSPI_bp.h"
 #include "lnSPI_priv.h"
 /**
  *
@@ -16,16 +17,21 @@
  * @return
  */
 
-int nbReq = 0;
-int nbInterrupt = 0;
-int nbSkipped = 0;
+#define LN_SPI_TIMEOUT 100
+#define LN_SPI_LONG_TIMEOUT (1000)
 
+static int nbReq = 0;
+static int nbInterrupt = 0;
+static int nbSkipped = 0;
+/**
+ *
+ */
 bool hwlnSPIClass::dmaWriteInternal(int wordSize, int nbTransfer, const uint8_t *data, bool repeat)
 {
     bool r = true;
     if (!nbTransfer)
         return true;
-    LN_SPI_Registers *d = (LN_SPI_Registers *)_adr;
+    auto *d = (LN_SPI_Registers *)_adr;
 
     // that will clear errror
     updateMode(d, lnTxOnly); // tx only
@@ -52,7 +58,7 @@ bool hwlnSPIClass::dmaWriteInternal(int wordSize, int nbTransfer, const uint8_t 
     }
     csOn();
     senable();
-    if (false == _done.take(100)) // 100 ms should be plenty enough!
+    if (false == _done.take(LN_SPI_TIMEOUT)) // 100 ms should be plenty enough!
     {
         r = false;
     }
@@ -95,7 +101,7 @@ bool hwlnSPIClass::dmaWrite16Repeat(int nbWord, const uint16_t data)
 void hwlnSPIClass::exTxDone(void *c, lnDMA::DmaInterruptType it)
 {
     nbInterrupt++;
-    hwlnSPIClass *i = (hwlnSPIClass *)c;
+    auto *i = (hwlnSPIClass *)c;
     i->txDone();
 }
 
@@ -109,7 +115,7 @@ bool hwlnSPIClass::asyncDmaWrite16(int nbTransfer, const uint16_t *data, lnSpiCa
     _done.tryTake();
     if (!nbTransfer)
         return true;
-    LN_SPI_Registers *d = (LN_SPI_Registers *)_adr;
+    auto *d = (LN_SPI_Registers *)_adr;
 
     // that will clear errror
     updateMode(d, lnTxOnly); // tx only
@@ -132,9 +138,9 @@ bool hwlnSPIClass::finishAsyncDma()
  */
 bool hwlnSPIClass::waitForAsyncDmaDone()
 {
-    LN_SPI_Registers *d = (LN_SPI_Registers *)_adr;
+    auto *d = (LN_SPI_Registers *)_adr;
     bool r = true;
-    if (false == _done.take(60 * 1000)) // 100 ms should be plenty enough!
+    if (false == _done.take(LN_SPI_LONG_TIMEOUT )) // 100 ms should be plenty enough!
     {
         r = false;
     }
@@ -152,7 +158,7 @@ bool hwlnSPIClass::waitForAsyncDmaDone()
  */
 void asyncTrampoline(void *a, lnDMA::DmaInterruptType b)
 {
-    hwlnSPIClass *me = (hwlnSPIClass *)a;
+    auto me = (hwlnSPIClass *)a;
     me->invokeCallback();
 }
 /**
@@ -161,7 +167,7 @@ void asyncTrampoline(void *a, lnDMA::DmaInterruptType b)
 void hwlnSPIClass::invokeCallback()
 {
     lnSpiCallback *c = _callback;
-    _callback = NULL;
+    _callback = nullptr;
     xAssert(c);
     c(_callbackCookie);
 }
@@ -173,7 +179,7 @@ bool hwlnSPIClass::nextDmaWrite16(int nbTransfer, const uint16_t *data, lnSpiCal
     bool r;
     if (!nbTransfer)
         return false;
-    LN_SPI_Registers *d = (LN_SPI_Registers *)_adr;
+    auto *d = (LN_SPI_Registers *)_adr;
 
     _callback = cb;
     _callbackCookie = cookie;

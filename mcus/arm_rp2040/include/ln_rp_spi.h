@@ -10,7 +10,7 @@
  */
 #pragma once
 #include "lnArduino.h"
-
+#include "lnSPI.h"
 class lnRpDMA;
 class LN_RP_SPIx;
 typedef volatile LN_RP_SPIx LN_RP_SPI;
@@ -19,7 +19,7 @@ typedef volatile LN_RP_SPIx LN_RP_SPI;
  * @param instance
  * @param pinCs
  */
-class rpSPI
+class rpSPI : public lnSPI
 {
   public:
     enum spiTxState
@@ -32,6 +32,7 @@ class rpSPI
     rpSPI(int instance, int pinCs = -1);
     virtual ~rpSPI();
     void begin(int wordsize = 8);
+    void begin();
     void end(void);
 
     // void    setBitOrder(spiBitOrder order);
@@ -41,6 +42,55 @@ class rpSPI
 
     bool write8(int nbBytes, const uint8_t *data);
     bool write16(int nbHalfWord, const uint16_t *data);
+    bool write16(int nbHalfWord, const uint16_t *data, bool repeat);
+    bool write(int nbBytes, const uint8_t *data, bool repeat);
+    virtual bool write(int z);
+    virtual bool write16(int z);
+    virtual bool write16Repeat(int nb, const uint16_t pattern);
+
+    lnPin misoPin() const;
+    lnPin mosiPin() const;
+    lnPin clkPin() const;
+     uint32_t getPeripheralClock();
+//-
+    
+    virtual bool dmaWrite16(int nbBytes, const uint16_t *data);
+    virtual bool dmaWrite16Repeat(int nbBytes, const uint16_t data);
+    virtual bool dmaWrite(int nbBytes, const uint8_t *data);
+
+    // slow read/write
+    virtual bool transfer(int nbBytes, uint8_t *dataOut, uint8_t *dataIn);
+
+    // wait for everything to be COMPLETELY done
+    virtual void waitForCompletion();
+    // This reads over the MOSI pin, i.e. only when only 2 wires are used MOSI + CLK, no MISO
+    virtual bool read1wire(int nbRead, uint8_t *rd); // read, reuse MOSI
+  
+
+    //
+    virtual void beginTransaction(lnSPISettings &settings);
+    virtual void endTransaction();
+
+    // The settings structure must stay valid while the transaction is on !
+    virtual void beginSession(int bitSize);
+    virtual void endSession();
+
+    virtual void setBitOrder(spiBitOrder order);
+    virtual void setDataMode(spiDataMode mode);
+    
+    // DMA ones
+    
+
+    //-- AsyncDma
+    // Do asyncDma
+    //   and in the callback either call nextDma or finishAsyncDma
+    // The caller can call waitForAsyncDmadone to wait till all is done
+    virtual bool asyncDmaWrite16(int nbBytes, const uint16_t *data, lnSpiCallback *cb, void *cookie, bool repeat = false);
+    virtual bool nextDmaWrite16(int nbBytes, const uint16_t *data, lnSpiCallback *cb, void *cookie, bool repeat = false);
+    virtual bool finishAsyncDma();
+    virtual bool waitForAsyncDmaDone();
+//-
+
 
   public:
     void irqHandler();

@@ -68,7 +68,7 @@ IF(LN_ENABLE_I2C)
 ENDIF(LN_ENABLE_I2C)
 
 IF(LN_ENABLE_SPI)
-  target_sources(lnArduino_impl PRIVATE lnSPI.cpp lnSPI_dma.cpp  )
+  target_sources(lnArduino_impl PRIVATE lnSPI_bp.cpp lnSPI_bp_dma.cpp  )
 ENDIF(LN_ENABLE_SPI)
 
 

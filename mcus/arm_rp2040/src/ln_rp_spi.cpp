@@ -64,7 +64,7 @@ static void spiHandler1()
  * @param instance
  * @param pinCs
  */
-rpSPI::rpSPI(int instance, int pinCs)
+rpSPI::rpSPI(int instance, int pinCs) : lnSPI(instance,pinCs)
 {
     xAssert(!instances[instance]);
     instances[instance] = this;
@@ -252,4 +252,17 @@ void rpSPI::dmaHandler()
     _spi->IMSC = 0;
     _txDone.give();
 }
+
+/**
+ * @brief 
+ * 
+ * @param a 
+ * @param b 
+ * @return lnSPI* 
+ */
+ lnSPI *lnSPI::create(int instance, int pinCs)
+ {
+    return new rpSPI(instance , pinCs);
+ }
+
 //--

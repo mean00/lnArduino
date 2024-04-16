@@ -55,21 +55,18 @@ enum spiBitOrder
 class lnSPISettings
 {
   public:
-    lnSPISettings(uint32_t speed, spiBitOrder bitOrder, spiDataMode dataMode, int cs)
+    lnSPISettings(uint32_t ispeed, spiBitOrder bitOrder, spiDataMode dataMode, int cs)
     {
-        this->speed = speed;
+        speed = ispeed;
         bOrder = bitOrder;
         dMode = dataMode;
         pinCS = cs;
     }
 
-  private:
     int pinCS;          // CS pin associated to the configuration
     uint32_t speed;     // specifies the spi bus maximum clock speed
     spiBitOrder bOrder; // bit order (MSBFirst or LSBFirst)
     spiDataMode dMode;  // one of the data mode
-
-    friend class hwlnSPIClass;
 };
 
 typedef void lnSpiCallback(void *cookie);
@@ -79,101 +76,88 @@ typedef void lnSpiCallback(void *cookie);
  * @param instance
  * @param pinCs
  */
-class hwlnSPIClass
+class lnSPI
 {
   public:
-    hwlnSPIClass(int instance, int pinCs = -1);
-    virtual ~hwlnSPIClass();
+    static lnSPI *create(int instance, int pinCs = -1);
+  
+    virtual ~lnSPI() {}
 
     void setSSEL(int ssel)
     {
         _internalSettings.pinCS = (ssel);
     };
 
-    void begin();
-    void end(void);
+    virtual void begin()=0;
+    virtual void end(void)=0;
+  
 
     //
-    void beginTransaction(lnSPISettings &settings);
-    void endTransaction();
+    virtual void beginTransaction(lnSPISettings &settings)=0;
+    virtual void endTransaction()=0;
 
     // The settings structure must stay valid while the transaction is on !
-    void beginSession(int bitSize);
-    void endSession();
+    virtual void beginSession(int bitSize)=0;
+    virtual void endSession()=0;
 
-    void setBitOrder(spiBitOrder order);
-    void setDataMode(spiDataMode mode);
-    void setSpeed(int speed); // speed in b/s
+    virtual void setBitOrder(spiBitOrder order)=0;
+    virtual void setDataMode(spiDataMode mode)=0;
+    virtual void setSpeed(int speed)=0; // speed in b/s
     // DMA ones
-    void setDataSize(int dataSize); // 8 or 16
+    virtual void setDataSize(int dataSize)=0; // 8 or 16
 
     //-- AsyncDma
     // Do asyncDma
     //   and in the callback either call nextDma or finishAsyncDma
     // The caller can call waitForAsyncDmadone to wait till all is done
-    bool asyncDmaWrite16(int nbBytes, const uint16_t *data, lnSpiCallback *cb, void *cookie, bool repeat = false);
-    bool nextDmaWrite16(int nbBytes, const uint16_t *data, lnSpiCallback *cb, void *cookie, bool repeat = false);
-    bool finishAsyncDma();
-    bool waitForAsyncDmaDone();
+    virtual bool asyncDmaWrite16(int nbBytes, const uint16_t *data, lnSpiCallback *cb, void *cookie, bool repeat = false)=0;
+    virtual bool nextDmaWrite16(int nbBytes, const uint16_t *data, lnSpiCallback *cb, void *cookie, bool repeat = false)=0;
+    virtual bool finishAsyncDma()=0;
+    virtual bool waitForAsyncDmaDone()=0;
 
     // Helper Write functions, make sure you are under a session
-    bool write(int z);
-    bool write16(int z);
-    bool write16Repeat(int nb, const uint16_t pattern);
-    bool write(int nbBytes, const uint8_t *data, bool repeat = false);
-    bool write16(int nbWord, const uint16_t *data, bool repeat = false);
+    virtual bool write(int z)=0;
+    virtual bool write16(int z)=0;
+    virtual bool write16Repeat(int nb, const uint16_t pattern)=0;
+    virtual bool write(int nbBytes, const uint8_t *data, bool repeat = false)=0;
+    virtual bool write16(int nbWord, const uint16_t *data, bool repeat = false)=0;
 
-    bool dmaWrite16(int nbBytes, const uint16_t *data);
-    bool dmaWrite16Repeat(int nbBytes, const uint16_t data);
-    bool dmaWrite(int nbBytes, const uint8_t *data);
+    virtual bool dmaWrite16(int nbBytes, const uint16_t *data)=0;
+    virtual bool dmaWrite16Repeat(int nbBytes, const uint16_t data)=0;
+    virtual bool dmaWrite(int nbBytes, const uint8_t *data)=0;
 
     // slow read/write
-    bool transfer(int nbBytes, uint8_t *dataOut, uint8_t *dataIn);
+    virtual bool transfer(int nbBytes, uint8_t *dataOut, uint8_t *dataIn)=0;
 
     // wait for everything to be COMPLETELY done
-    void waitForCompletion();
+    virtual void waitForCompletion()=0;
     // This reads over the MOSI pin, i.e. only when only 2 wires are used MOSI + CLK, no MISO
-    bool read1wire(int nbRead, uint8_t *rd); // read, reuse MOSI
+    virtual bool read1wire(int nbRead, uint8_t *rd)=0; // read, reuse MOSI
     //
     int getInstance()
     {
         return _instance;
     }
-    int getPeripheralClock();
+    virtual uint32_t getPeripheralClock()=0;
 
-    lnPin misoPin() const;
-    lnPin mosiPin() const;
-    lnPin clkPin() const;
+    virtual lnPin misoPin() const=0;
+    virtual lnPin mosiPin() const=0;
+    virtual lnPin clkPin() const=0;
+protected:
+  int             _instance;    
+  lnSPISettings   _internalSettings;
+  lnSPISettings   _currentSetting;
+  lnSpiCallback   *_callback;
+  void            *_callbackCookie;
 
-  protected:
-    void setup();
-    void csOn();
-    void csOff();
+protected:
+    lnSPI(int instance, int pinCs = -1) :
+     _internalSettings(1000000, SPI_MSBFIRST, SPI_MODE0, -1), 
+     _currentSetting(1000000, SPI_MSBFIRST, SPI_MODE0, -1),
+     _callback(NULL), _callbackCookie(NULL)
+      {
+      }
 
-  protected:
-    lnSPISettings _internalSettings;
-    lnSPISettings _currentSetting;
-    lnSPISettings *_settings;
-    xMutex _mutex;
-    xBinarySemaphore _done;
-    bool _useDMA;
-    void *_cookie;
-    lnSpiCallback *_callback;
-    void *_callbackCookie;
-    int _instance;
-    uint32_t _adr;
-    LnIRQ _irq;
-    bool _inSession;
 
-    lnDMA txDma;
-    // callbacks
-    static void exTxDone(void *c, lnDMA::DmaInterruptType it);
-    bool writeInternal(int sz, int data);
-    bool writesInternal(int sz, int nbBytes, const uint8_t *data, bool repeat = false);
-    bool dmaWriteInternal(int wordSize, int nbBytes, const uint8_t *data, bool repeat);
-
-  public:
-    void txDone();
-    void invokeCallback();
 };
 // EOF

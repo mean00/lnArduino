@@ -7,6 +7,8 @@
 #include "lnArduino.h"
 #include "lnGPIO.h"
 #include "lnPeripheral_priv.h"
+#include "lnSPI.h"
+#include "lnSPI_bp.h"
 #include "lnSPI_priv.h"
 struct SpiDescriptor
 {
@@ -27,6 +29,21 @@ static const SpiDescriptor spiDescriptor[3] = {
 static LN_SPI_Registers *aspi0 = (LN_SPI_Registers *)LN_SPI0_ADR;
 static LN_SPI_Registers *aspi1 = (LN_SPI_Registers *)LN_SPI1_ADR;
 static LN_SPI_Registers *aspi2 = (LN_SPI_Registers *)LN_SPI2_ADR;
+
+
+/**
+ * @brief 
+ * 
+ * @param instance 
+ * @param pinCs 
+ * @return lnSPI* 
+ */
+
+lnSPI *lnSPI::create(int instance, int pinCs )
+{
+    return new hwlnSPIClass(instance,pinCs);
+}
+
 /**
  * switch between RX/TX and TX only : false is txRx,
  * @param adr
@@ -94,14 +111,12 @@ void updateDmaTX(LN_SPI_Registers *d, bool onoff)
 #define M(x) spiDescriptor[instance].x
 
 hwlnSPIClass::hwlnSPIClass(int instance, int pinCs)
-    : _internalSettings(1000000, SPI_MSBFIRST, SPI_MODE0, -1), _currentSetting(1000000, SPI_MSBFIRST, SPI_MODE0, -1),
-      txDma(lnDMA::DMA_MEMORY_TO_PERIPH, M(dmaEngine), M(dmaTxChannel), 16, 16)
+    : lnSPI(instance,pinCs), txDma(lnDMA::DMA_MEMORY_TO_PERIPH, M(dmaEngine), 
+      M(dmaTxChannel), 16, 16)
 {
     _useDMA = false;
-    _cookie = NULL;
-    _callback = NULL;
     _instance = instance;
-    _settings = NULL;
+    _settings = nullptr;
     lnPeripherals::enable((Peripherals)(pSPI0 + instance));
     xAssert(instance < 3);
     const SpiDescriptor *s = spiDescriptor + instance;
@@ -121,7 +136,7 @@ hwlnSPIClass::hwlnSPIClass(int instance, int pinCs)
         lnPinMode((lnPin)pinCs, lnOUTPUT);
         lnDigitalWrite((lnPin)pinCs, true);
     }
-    LN_SPI_Registers *d = (LN_SPI_Registers *)_adr;
+    auto *d = (LN_SPI_Registers *)_adr;
     _settings = &_internalSettings;
     sdisable();
 }
@@ -131,7 +146,7 @@ hwlnSPIClass::hwlnSPIClass(int instance, int pinCs)
  */
 lnPin hwlnSPIClass::misoPin() const
 {
-    const SpiDescriptor *s = spiDescriptor + _instance;
+    const auto *s = spiDescriptor + _instance;
     return s->miso;
 }
 
@@ -141,7 +156,7 @@ lnPin hwlnSPIClass::misoPin() const
  */
 lnPin hwlnSPIClass::mosiPin() const
 {
-    const SpiDescriptor *s = spiDescriptor + _instance;
+    const auto *s = spiDescriptor + _instance;
     return s->mosi;
 }
 
@@ -151,7 +166,7 @@ lnPin hwlnSPIClass::mosiPin() const
  */
 lnPin hwlnSPIClass::clkPin() const
 {
-    const SpiDescriptor *s = spiDescriptor + _instance;
+    const auto *s = spiDescriptor + _instance;
     return s->clk;
 }
 /**
@@ -172,9 +187,9 @@ void hwlnSPIClass::begin()
 /**
  *
  */
-void hwlnSPIClass::end(void)
+void hwlnSPIClass::end()
 {
-    LN_SPI_Registers *d = (LN_SPI_Registers *)_adr;
+    auto *d = (LN_SPI_Registers *)_adr;
     sdisable();
 }
 
@@ -182,7 +197,7 @@ void hwlnSPIClass::beginSession(int bitSize)
 {
     _inSession = true;
     setup();
-    LN_SPI_Registers *d = (LN_SPI_Registers *)_adr;
+    auto *d = (LN_SPI_Registers *)_adr;
     updateMode(d, lnTxOnly);
     updateDataSize(d, bitSize);
     senable();
@@ -209,7 +224,7 @@ void hwlnSPIClass::endTransaction()
  */
 void hwlnSPIClass::endSession()
 {
-    LN_SPI_Registers *d = (LN_SPI_Registers *)_adr;
+    auto *d = (LN_SPI_Registers *)_adr;
     _inSession = false;
     csOff();
     sdisable();
@@ -222,7 +237,7 @@ void hwlnSPIClass::endSession()
  */
 bool hwlnSPIClass::writeInternal(int sz, int data)
 {
-    LN_SPI_Registers *d = (LN_SPI_Registers *)_adr;
+    auto *d = (LN_SPI_Registers *)_adr;
     xAssert(_inSession);
     if (d->STAT & LN_SPI_STAT_CONFERR)
     {
@@ -243,7 +258,7 @@ bool hwlnSPIClass::writeInternal(int sz, int data)
  */
 bool hwlnSPIClass::writesInternal(int sz, int nb, const uint8_t *data, bool repeat)
 {
-    LN_SPI_Registers *d = (LN_SPI_Registers *)_adr;
+    auto *d = (LN_SPI_Registers *)_adr;
     switch (sz)
     {
     default:
@@ -344,7 +359,7 @@ void hwlnSPIClass::csOff()
  */
 void hwlnSPIClass::waitForCompletion()
 {
-    LN_SPI_Registers *d = (LN_SPI_Registers *)_adr;
+    auto *d = (LN_SPI_Registers *)_adr;
     int dir = d->CTL0 >> 14;
     switch (dir)
     {
@@ -375,7 +390,7 @@ void hwlnSPIClass::waitForCompletion()
  */
 bool hwlnSPIClass::read1wire(int nbRead, uint8_t *rd)
 {
-    LN_SPI_Registers *d = (LN_SPI_Registers *)_adr;
+    auto *d = (LN_SPI_Registers *)_adr;
     updateMode(d, lnRxOnly); // 1 Wire RX
 
     // clear stuff (not sure it is useful)
@@ -395,7 +410,7 @@ bool hwlnSPIClass::read1wire(int nbRead, uint8_t *rd)
  */
 bool hwlnSPIClass::transfer(int nbBytes, uint8_t *dataOut, uint8_t *dataIn)
 {
-    LN_SPI_Registers *d = (LN_SPI_Registers *)_adr;
+    auto *d = (LN_SPI_Registers *)_adr;
     xAssert(_inSession);
     for (size_t i = 0; i < nbBytes; i++)
     {
@@ -425,7 +440,7 @@ void hwlnSPIClass::txDone()
  */
 void hwlnSPIClass::setup()
 {
-    LN_SPI_Registers *d = (LN_SPI_Registers *)_adr;
+    auto *d = (LN_SPI_Registers *)_adr;
     xAssert(_settings);
     sdisable();
     d->STAT &= LN_SPI_STAT_MASK;
@@ -473,11 +488,11 @@ void hwlnSPIClass::setup()
     }
     ctl0 |= s;
     d->CTL0 = ctl0;
-    uint32_t prescale = 0, speed = _settings->speed, apb;
+    uint32_t prescale = 0, speed = _settings->speed;
     xAssert(speed);
 
     Peripherals periph = (Peripherals)((int)pSPI0 + _instance);
-    apb = lnPeripherals::getClock(periph);
+    uint32_t apb = lnPeripherals::getClock(periph);
     prescale = (apb + speed / 2) / speed;
     // prescale can only go from 2 to 256, and prescale=2^(psc+1) actually
 
@@ -508,27 +523,33 @@ void hwlnSPIClass::setup()
  */
 void hwlnSPIClass::setDataSize(int dataSize)
 {
-    LN_SPI_Registers *d = (LN_SPI_Registers *)_adr;
+    auto *d = (LN_SPI_Registers *)_adr;
     updateDataSize(d, dataSize);
 }
-
+/**
+ */
 void hwlnSPIClass::setBitOrder(spiBitOrder order)
 {
     _internalSettings.bOrder = order;
     setup();
 }
+/**
+ */
 void hwlnSPIClass::setDataMode(spiDataMode mode)
 {
     _internalSettings.dMode = mode;
     setup();
 }
+/**
+ */
 void hwlnSPIClass::setSpeed(int speed)
 {
     _internalSettings.speed = speed;
     setup();
 }
-
-int hwlnSPIClass::getPeripheralClock()
+/**
+*/
+uint32_t hwlnSPIClass::getPeripheralClock()
 {
     Peripherals p = (Peripherals)(pSPI0 + _instance);
     return lnPeripherals::getClock(p);
