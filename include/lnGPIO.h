@@ -42,37 +42,7 @@ uint32_t lnReadPort(int port);
 
 void lnRemapTimerPin(int timer);
 
-/**
- *
- * @param p
- */
-class lnFastIO
-{
-  public:
-    lnFastIO(lnPin p);
-    void on() volatile
-    {
-        *_onoff = _onbit;
-    }
-    void off() volatile
-    {
-        *_onoff = _offbit;
-    }
-    void pulseLow() volatile __attribute__((always_inline))
-    {
-        *_onoff = _offbit;
-        *_onoff = _onbit;
-    }
-    void pulseHigh() volatile __attribute__((always_inline))
-    {
-        *_onoff = _onbit;
-        *_onoff = _offbit;
-    }
-
-  protected:
-    volatile uint32_t *_onoff;
-    volatile uint32_t _onbit, _offbit;
-};
+#include "lnFastGpio.h"
 
 #include "lnExti.h"
 // EOF

@@ -154,8 +154,11 @@ uint32_t lnReadPort(int port)
  * @brief Construct a new ln Fast I O::ln Fast I O object
  * 
  */
-lnFastIO::lnFastIO(lnPin)
+lnFastIO::lnFastIO(lnPin pin)
 {
-    xAssert(0);
+    lnPinMode(pin, lnOUTPUT);
+    _on = &(lnSio->GPIO_OUT_SET);
+    _off= &(lnSio->GPIO_OUT_CLR);
+    _bit = 1<< pin;
 }
 // EOF
