@@ -52,7 +52,12 @@ class rpSPI : public lnSPI
     bool write16Repeat(int nb, const uint16_t pattern);
 
 //-
+    bool dmaWrite8(int nbBytes, const uint8_t *data);
+    bool dmaWrite8Repeat(int nbBytes, const uint8_t data);
     
+
+//
+
     bool dmaWrite16(int nbBytes, const uint16_t *data);
     bool dmaWrite16Repeat(int nbBytes, const uint16_t data);
     bool dmaWrite(int nbBytes, const uint8_t *data);

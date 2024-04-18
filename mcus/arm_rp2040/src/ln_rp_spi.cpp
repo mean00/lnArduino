@@ -292,19 +292,102 @@ lnPin rpSPI::mosiPin() const { xAssert(0); return GPIO0;}
 lnPin rpSPI::clkPin() const { xAssert(0); return GPIO0;}
 uint32_t rpSPI::getPeripheralClock() {xAssert(0);return 1;}
 //--- not implemented ---
-bool rpSPI::write16(int nbHalfWord, const uint16_t *data, bool repeat) {xAssert(0);return false;}
-bool rpSPI::write(int nbBytes, const uint8_t *data, bool repeat) {xAssert(0);return false;}
-bool rpSPI::write(int z) {xAssert(0);return false;}
-bool rpSPI::write16(int z) {xAssert(0);return false;}
-bool rpSPI::write16Repeat(int nb, const uint16_t pattern) {xAssert(0);return false;}
+/**
+ * @brief 
+ * 
+ * @param nbHalfWord 
+ * @param data 
+ * @param repeat 
+ * @return true 
+ * @return false 
+ */
+bool rpSPI::write16(int nbHalfWord, const uint16_t *data, bool repeat)
+{
+    if(repeat)
+        return dmaWrite16Repeat(nbHalfWord*2, *data);
+    else
+        return dmaWrite16(nbHalfWord*2, data);
+}
+/**
+ * @brief 
+ * 
+ * @param z 
+ * @return true 
+ * @return false 
+ */
+bool rpSPI::write(int z)
+{
+    uint8_t a=(uint8_t)z;
+    return write8(1,&a);
+} 
+/**
+ * @brief 
+ * 
+ * @param nbBytes 
+ * @param data 
+ * @param repeat 
+ * @return true 
+ * @return false 
+ */
+bool rpSPI::write(int nbBytes, const uint8_t *data, bool repeat)
+{
+    if(repeat)
+        return dmaWrite8Repeat(nbBytes, *data);
+    else
+        return dmaWrite8(nbBytes, data);
+}
+/**
+ * @brief 
+ * 
+ * @param nb 
+ * @param pattern 
+ * @return true 
+ * @return false 
+ */
+bool rpSPI::write16Repeat(int nb, const uint16_t pattern)
+{
+     return dmaWrite16Repeat(nb, pattern);
+}
+
 bool rpSPI::dmaWrite16(int nbBytes, const uint16_t *data) {xAssert(0);return false;}
 bool rpSPI::dmaWrite16Repeat(int nbBytes, const uint16_t data) {xAssert(0);return false;}
 bool rpSPI::dmaWrite(int nbBytes, const uint8_t *data) {xAssert(0);return false;}
+/**
+ * @brief 
+ * 
+ * @param settings 
+ */
+void rpSPI::beginTransaction(lnSPISettings &settings) 
+{    
+    setBitOrder(settings.bOrder);
+    setDataMode(settings.dMode);
+    setSpeed((int)settings.speed);
+}
+/**
+ * @brief 
+ * 
+ */
+void rpSPI::endTransaction() 
+{
+
+}
+/**
+ * @brief 
+ * 
+ * @param bitSize 
+ */
+void rpSPI::beginSession(int bitSize) 
+{
+    setDataSize(bitSize);
+}
+/**
+ * @brief 
+ * 
+ */
+void rpSPI::endSession() 
+{
+
+}
 // --- not implemented ---
-void rpSPI::beginTransaction(lnSPISettings &settings) {}
-void rpSPI::endTransaction() {}    
-void rpSPI::beginSession(int bitSize) {}
-void rpSPI::endSession() {}
-// --- not implemented ---
-bool rpSPI::read1wire(int nbRead, uint8_t *rd) {xAssert(0);return false;} // read, reuse MOSI
+bool rpSPI::read1wire(int nbRead, uint8_t *rd) {return false;} // read, reuse MOSI
 //--
