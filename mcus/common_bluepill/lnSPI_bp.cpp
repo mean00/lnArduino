@@ -25,9 +25,9 @@ static const SpiDescriptor spiDescriptor[3] = {
     {LN_SPI0_ADR, LN_IRQ_SPI0, 0, 2, pSPI0, PA7, PA6, PA5},
     {LN_SPI1_ADR, LN_IRQ_SPI1, 0, 4, pSPI1, PB15, PB14, PB13},
     {LN_SPI2_ADR, LN_IRQ_SPI2, 1, 1, pSPI2, PB5, PB4, PB3}};
-static LN_SPI_Registers *aspi0 = (LN_SPI_Registers *)LN_SPI0_ADR;
-static LN_SPI_Registers *aspi1 = (LN_SPI_Registers *)LN_SPI1_ADR;
-static LN_SPI_Registers *aspi2 = (LN_SPI_Registers *)LN_SPI2_ADR;
+LN_SPI_Registers *aspi0 = (LN_SPI_Registers *)LN_SPI0_ADR;
+LN_SPI_Registers *aspi1 = (LN_SPI_Registers *)LN_SPI1_ADR;
+LN_SPI_Registers *aspi2 = (LN_SPI_Registers *)LN_SPI2_ADR;
 
 /**
  * @brief
