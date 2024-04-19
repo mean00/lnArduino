@@ -96,7 +96,7 @@ class lnSPI
     virtual bool asyncWrite16(int nbWords, const uint16_t *data, lnSpiCallback *cb, void *cookie, bool repeat = false)=0;
     virtual bool nextWrite16(int nbWords, const uint16_t *data, lnSpiCallback *cb, void *cookie, bool repeat = false)=0;
     virtual bool finishAsyncDma()=0;
-    virtual bool waitForAsyncDmaDone()=0;
+    virtual bool waitForAsync()=0;
 
     // Helper Write functions, make sure you are under a session
     virtual bool write8(uint8_t z)=0;
@@ -106,7 +106,7 @@ class lnSPI
     virtual bool write16Repeat(int nbWord, const uint16_t data)=0;
     virtual bool write8(int nbBytes, const uint8_t *data)=0;
     virtual bool write8Repeat(int nbBytes, const uint8_t data)=0;
-    
+    virtual void waitForCompletion() const=0;
     // slow read/write
     virtual bool transfer(int nbBytes, uint8_t *dataOut, uint8_t *dataIn)=0;
 

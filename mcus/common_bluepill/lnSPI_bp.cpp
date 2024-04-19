@@ -129,7 +129,6 @@ lnSPI_bp::lnSPI_bp(int instance, int pinCs)
     lnPinMode(s->mosi, lnALTERNATE_PP);
     lnPinMode(s->miso, lnFLOATING);
     lnPinMode(s->clk, lnALTERNATE_PP);
-    _inSession = false;
 
     if (pinCs != -1)
     {
@@ -188,7 +187,7 @@ void lnSPI_bp::endSession()
 bool lnSPI_bp::writeInternal(int sz, int data)
 {
     auto *d = (LN_SPI_Registers *)_adr;
-    xAssert(_inSession);
+    
     if (d->STAT & LN_SPI_STAT_CONFERR)
     {
         Logger("Conf Error\n");
@@ -363,7 +362,7 @@ bool lnSPI_bp::read1wire(int nbRead, uint8_t *rd)
 bool lnSPI_bp::transfer(int nbBytes, uint8_t *dataOut, uint8_t *dataIn)
 {
     auto *d = (LN_SPI_Registers *)_adr;
-    xAssert(_inSession);
+    
     for (size_t i = 0; i < nbBytes; i++)
     {
         while (!(d->STAT & LN_SPI_STAT_TBE))

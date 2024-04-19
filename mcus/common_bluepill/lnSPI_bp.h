@@ -53,7 +53,7 @@ class lnSPI_bp : public lnSPI
     virtual bool asyncWrite16(int nbWords, const uint16_t *data, lnSpiCallback *cb, void *cookie, bool repeat = false);
     virtual bool nextWrite16(int nbWords, const uint16_t *data, lnSpiCallback *cb, void *cookie, bool repeat = false);
     virtual bool finishAsyncDma();
-    virtual bool waitForAsyncDmaDone();
+    virtual bool waitForAsync();
 
     // Helper Write functions, make sure you are under a session
     virtual bool write8(const uint8_t z);
@@ -64,7 +64,7 @@ class lnSPI_bp : public lnSPI
 
     virtual bool write16(int nbBytes, const uint16_t *data);
     virtual bool write16Repeat(int nbBytes, const uint16_t data);
-    
+    virtual void waitForCompletion() const;
     // slow read/write
     virtual bool transfer(int nbBytes, uint8_t *dataOut, uint8_t *dataIn);
 
@@ -87,8 +87,7 @@ class lnSPI_bp : public lnSPI
     void *_cookie;
     
     uint32_t _adr;
-    LnIRQ _irq;
-    bool _inSession;
+    LnIRQ _irq;    
 
     lnDMA txDma;
     // callbacks
@@ -99,7 +98,6 @@ class lnSPI_bp : public lnSPI
 
   public:
     void txDone();
-    void invokeCallback();
-    void waitForCompletion() const;
+    void invokeCallback();    
 };
 // EOF

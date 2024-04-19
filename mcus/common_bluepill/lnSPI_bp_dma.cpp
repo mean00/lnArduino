@@ -175,6 +175,36 @@ bool lnSPI_bp::asyncWrite16(int nbWord, const uint16_t *data, lnSpiCallback *cb,
     updateDataSize(d, wordSize); // 16 bits at a time
     return nextWrite16(nbWord, data, cb, cookie, repeat);
 }
+
+/**
+ * @brief 
+ * 
+ * @param nbWord 
+ * @param data 
+ * @param cb 
+ * @param cookie 
+ * @param repeat 
+ * @return true 
+ * @return false 
+ */
+bool lnSPI_bp::asyncWrite8(int nbWord, const uint8_t *data, lnSpiCallback *cb, void *cookie, bool repeat)
+{
+    int wordSize = 8;
+    bool r = true;
+    _done.tryTake();
+    if (!nbWord)
+        return true;
+    auto *d = (LN_SPI_Registers *)_adr;
+
+    // that will clear errror
+    updateMode(d, lnTxOnly); // tx only
+
+    // 1- Configure DMA
+    txDma.beginTransfer();
+    txDma.setWordSize(wordSize, wordSize);
+    updateDataSize(d, wordSize); // 16 bits at a time
+    return nextWrite8(nbWord, data, cb, cookie, repeat);
+}
 /**
  * @brief 
  * 
@@ -192,7 +222,7 @@ bool lnSPI_bp::finishAsyncDma()
  * @return true 
  * @return false 
  */
-bool lnSPI_bp::waitForAsyncDmaDone()
+bool lnSPI_bp::waitForAsync()
 {
     auto *d = (LN_SPI_Registers *)_adr;
     bool r = true;
@@ -244,6 +274,36 @@ void lnSPI_bp::invokeCallback()
  * @return false 
  */
 bool lnSPI_bp::nextWrite16(int nbTransfer, const uint16_t *data, lnSpiCallback *cb, void *cookie, bool repeat)
+{
+    bool r;
+    if (!nbTransfer)
+        return false;
+    auto *d = (LN_SPI_Registers *)_adr;
+
+    _callback = cb;
+    _callbackCookie = cookie;
+
+    txDma.attachCallback(asyncTrampoline, this);
+    txDma.doMemoryToPeripheralTransferNoLock(nbTransfer, (uint16_t *)data, (uint16_t *)&d->DATA, repeat);
+
+    // 2- Configure SPI
+    updateMode(d, lnTxOnly); // tx only
+    updateDmaTX(d, true);    // activate DMA
+    d->CTL0 |= LN_SPI_CTL0_SPIEN;
+    return true;
+}
+/**
+ * @brief 
+ * 
+ * @param nbTransfer 
+ * @param data 
+ * @param cb 
+ * @param cookie 
+ * @param repeat 
+ * @return true 
+ * @return false 
+ */
+bool lnSPI_bp::nextWrite8(int nbTransfer, const uint8_t *data, lnSpiCallback *cb, void *cookie, bool repeat )
 {
     bool r;
     if (!nbTransfer)
