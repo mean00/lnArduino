@@ -30,6 +30,7 @@
 #include "lnArduino.h"
 #include "lnDma.h"
 #include "lnSPI.h"
+#include "lnSPI_priv.h"
 
 /**
  *
@@ -82,8 +83,7 @@ class lnSPI_bp : public lnSPI
   protected:
     
     xBinarySemaphore _done;        
-    
-    uint32_t _adr;
+    LN_SPI_Registers *_regs;    
     LnIRQ _irq;    
 
     lnDMA txDma;

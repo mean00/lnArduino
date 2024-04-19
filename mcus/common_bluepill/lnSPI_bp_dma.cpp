@@ -39,26 +39,26 @@ bool lnSPI_bp::dmaWriteInternal(int wordSize, int nbTransfer, const uint8_t *dat
     bool r = true;
     if (!nbTransfer)
         return true;
-    auto *d = (LN_SPI_Registers *)_adr;
+    
 
     // that will clear errror
-    updateMode(d, lnTxOnly); // tx only
+    updateMode(_regs, lnTxOnly); // tx only
 
     // 1- Configure DMA
     txDma.beginTransfer();
     txDma.attachCallback(exTxDone, this);
     txDma.setWordSize(wordSize, wordSize);
-    txDma.doMemoryToPeripheralTransferNoLock(nbTransfer, (uint16_t *)data, (uint16_t *)&d->DATA, repeat);
+    txDma.doMemoryToPeripheralTransferNoLock(nbTransfer, (uint16_t *)data, (uint16_t *)&(_regs->DATA), repeat);
 
     // 2- Configure SPI
-    updateMode(d, lnTxOnly);     // tx only
-    updateDataSize(d, wordSize); // 16 bits at a time
-    updateDmaTX(d, true);        // activate DMA
+    updateMode(_regs, lnTxOnly);     // tx only
+    updateDataSize(_regs, wordSize); // 16 bits at a time
+    updateDmaTX(_regs, true);        // activate DMA
 
     // 3- Go!
 
     nbReq++;
-    if (d->STAT & LN_SPI_STAT_CONFERR)
+    if (_regs->STAT & LN_SPI_STAT_CONFERR)
     {
         txDma.endTransfer();
         Logger("Conf Error\n");
@@ -77,7 +77,7 @@ bool lnSPI_bp::dmaWriteInternal(int wordSize, int nbTransfer, const uint8_t *dat
     txDma.endTransfer();
     csOff();
     sdisable();
-    updateDmaTX(d, false);
+    updateDmaTX(_regs, false);
     return r;
 }
 
@@ -164,15 +164,15 @@ bool lnSPI_bp::asyncWrite16(int nbWord, const uint16_t *data, lnSpiCallback *cb,
     _done.tryTake();
     if (!nbWord)
         return true;
-    auto *d = (LN_SPI_Registers *)_adr;
+    
 
     // that will clear errror
-    updateMode(d, lnTxOnly); // tx only
+    updateMode(_regs, lnTxOnly); // tx only
 
     // 1- Configure DMA
     txDma.beginTransfer();
     txDma.setWordSize(wordSize, wordSize);
-    updateDataSize(d, wordSize); // 16 bits at a time
+    updateDataSize(_regs, wordSize); // 16 bits at a time
     return nextWrite16(nbWord, data, cb, cookie, repeat);
 }
 
@@ -194,15 +194,13 @@ bool lnSPI_bp::asyncWrite8(int nbWord, const uint8_t *data, lnSpiCallback *cb, v
     _done.tryTake();
     if (!nbWord)
         return true;
-    auto *d = (LN_SPI_Registers *)_adr;
-
     // that will clear errror
-    updateMode(d, lnTxOnly); // tx only
+    updateMode(_regs, lnTxOnly); // tx only
 
     // 1- Configure DMA
     txDma.beginTransfer();
     txDma.setWordSize(wordSize, wordSize);
-    updateDataSize(d, wordSize); // 16 bits at a time
+    updateDataSize(_regs, wordSize); // 16 bits at a time
     return nextWrite8(nbWord, data, cb, cookie, repeat);
 }
 /**
@@ -223,8 +221,7 @@ bool lnSPI_bp::finishAsyncDma()
  * @return false 
  */
 bool lnSPI_bp::waitForAsync()
-{
-    auto *d = (LN_SPI_Registers *)_adr;
+{    
     bool r = true;
     if (false == _done.take(LN_SPI_LONG_TIMEOUT )) // 100 ms should be plenty enough!
     {
@@ -237,7 +234,7 @@ bool lnSPI_bp::waitForAsync()
     txDma.endTransfer();
     csOff();
     sdisable();
-    updateDmaTX(d, false);
+    updateDmaTX(_regs, false);
     return r;
 }
 /**
@@ -277,19 +274,18 @@ bool lnSPI_bp::nextWrite16(int nbTransfer, const uint16_t *data, lnSpiCallback *
 {
     bool r;
     if (!nbTransfer)
-        return false;
-    auto *d = (LN_SPI_Registers *)_adr;
+        return false;    
 
     _callback = cb;
     _callbackCookie = cookie;
 
     txDma.attachCallback(asyncTrampoline, this);
-    txDma.doMemoryToPeripheralTransferNoLock(nbTransfer, (uint16_t *)data, (uint16_t *)&d->DATA, repeat);
+    txDma.doMemoryToPeripheralTransferNoLock(nbTransfer, (uint16_t *)data, (uint16_t *)&_regs->DATA, repeat);
 
     // 2- Configure SPI
-    updateMode(d, lnTxOnly); // tx only
-    updateDmaTX(d, true);    // activate DMA
-    d->CTL0 |= LN_SPI_CTL0_SPIEN;
+    updateMode(_regs, lnTxOnly); // tx only
+    updateDmaTX(_regs, true);    // activate DMA
+    _regs->CTL0 |= LN_SPI_CTL0_SPIEN;
     return true;
 }
 /**
@@ -307,19 +303,18 @@ bool lnSPI_bp::nextWrite8(int nbTransfer, const uint8_t *data, lnSpiCallback *cb
 {
     bool r;
     if (!nbTransfer)
-        return false;
-    auto *d = (LN_SPI_Registers *)_adr;
+        return false;    
 
     _callback = cb;
     _callbackCookie = cookie;
 
     txDma.attachCallback(asyncTrampoline, this);
-    txDma.doMemoryToPeripheralTransferNoLock(nbTransfer, (uint16_t *)data, (uint16_t *)&d->DATA, repeat);
+    txDma.doMemoryToPeripheralTransferNoLock(nbTransfer, (uint16_t *)data, (uint16_t *)&(_regs->DATA), repeat);
 
     // 2- Configure SPI
-    updateMode(d, lnTxOnly); // tx only
-    updateDmaTX(d, true);    // activate DMA
-    d->CTL0 |= LN_SPI_CTL0_SPIEN;
+    updateMode(_regs, lnTxOnly); // tx only
+    updateDmaTX(_regs, true);    // activate DMA
+    _regs->CTL0 |= LN_SPI_CTL0_SPIEN;
     return true;
 }
 // EOF

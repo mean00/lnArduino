@@ -9,7 +9,7 @@
 #include "lnPeripheral_priv.h"
 #include "lnSPI.h"
 #include "lnSPI_bp.h"
-#include "lnSPI_priv.h"
+
 struct SpiDescriptor
 {
     uint32_t spiAddress;
@@ -122,7 +122,7 @@ lnSPI_bp::lnSPI_bp(int instance, int pinCs)
 
     _irq = s->spiIrq;
     lnEnableInterrupt(_irq);
-    _adr = s->spiAddress;
+    _regs = (LN_SPI_Registers *)s->spiAddress;
     lnPeripherals::enable(s->rcu);
     // setup miso/mosi & clk
     lnPinMode(s->mosi, lnALTERNATE_PP);
@@ -134,16 +134,13 @@ lnSPI_bp::lnSPI_bp(int instance, int pinCs)
         lnPinMode((lnPin)pinCs, lnOUTPUT);
         lnDigitalWrite((lnPin)pinCs, true);
     }
-    auto *d = (LN_SPI_Registers *)_adr;
-    
     sdisable();
 }
 /**
  *
  */
 lnSPI_bp::~lnSPI_bp()
-{
-    auto *d = (LN_SPI_Registers *)_adr;
+{    
     sdisable();
 }
 /**
@@ -184,10 +181,8 @@ void lnSPI_bp::endSession()
  * @return
  */
 bool lnSPI_bp::writeInternal(int sz, int data)
-{
-    auto *d = (LN_SPI_Registers *)_adr;
-    
-    if (d->STAT & LN_SPI_STAT_CONFERR)
+{       
+    if (_regs->STAT & LN_SPI_STAT_CONFERR)
     {
         Logger("Conf Error\n");
         return false;
@@ -196,8 +191,7 @@ bool lnSPI_bp::writeInternal(int sz, int data)
     while (sbusy())
     {
     }
-    d->DATA = data;
-
+    _regs->DATA = data;
     waitForCompletion();
     return true;
 }
@@ -213,8 +207,7 @@ bool lnSPI_bp::writeInternal(int sz, int data)
  * @return false 
  */
 bool lnSPI_bp::writesInternal(int sz, int nb, const uint8_t *data, bool repeat)
-{
-    auto *d = (LN_SPI_Registers *)_adr;
+{    
     switch (sz)
     {
     default:
@@ -228,7 +221,7 @@ bool lnSPI_bp::writesInternal(int sz, int nb, const uint8_t *data, bool repeat)
             while (sbusy())
             {
             }
-            d->DATA = *p;
+            _regs->DATA = *p;
             p += inc;
         }
         break;
@@ -241,7 +234,7 @@ bool lnSPI_bp::writesInternal(int sz, int nb, const uint8_t *data, bool repeat)
             while (sbusy())
             {
             }
-            d->DATA = *p;
+            _regs->DATA = *p;
             p += inc;
         }
         break;
@@ -296,9 +289,8 @@ void lnSPI_bp::csOff()
  *  This is needed to be able to toggle the CS when all is done
  */
 void lnSPI_bp::waitForCompletion() const
-{
-    auto *d = (LN_SPI_Registers *)_adr;
-    int dir = d->CTL0 >> 14;
+{    
+    int dir = _regs->CTL0 >> 14;
     switch (dir)
     {
     case 0:
@@ -332,18 +324,17 @@ void lnSPI_bp::waitForCompletion() const
  * @return false 
  */
 bool lnSPI_bp::read1wire(int nbRead, uint8_t *rd)
-{
-    auto *d = (LN_SPI_Registers *)_adr;
-    updateMode(d, lnRxOnly); // 1 Wire RX
+{    
+    updateMode(_regs, lnRxOnly); // 1 Wire RX
 
     // clear stuff (not sure it is useful)
     for (int i = 0; i < nbRead; i++)
     {
-        while (!(d->STAT & LN_SPI_STAT_RBNE))
+        while (!(_regs->STAT & LN_SPI_STAT_RBNE))
         {
             __asm__("nop");
         }
-        rd[i] = d->DATA;
+        rd[i] = _regs->DATA;
     }
     waitForCompletion();
     return true;
@@ -359,20 +350,18 @@ bool lnSPI_bp::read1wire(int nbRead, uint8_t *rd)
  * @return false 
  */
 bool lnSPI_bp::transfer(int nbBytes, uint8_t *dataOut, uint8_t *dataIn)
-{
-    auto *d = (LN_SPI_Registers *)_adr;
-    
+{        
     for (size_t i = 0; i < nbBytes; i++)
     {
-        while (!(d->STAT & LN_SPI_STAT_TBE))
+        while (!(_regs->STAT & LN_SPI_STAT_TBE))
         {
         }
-        d->DATA = dataOut[i];
+        _regs->DATA = dataOut[i];
 
-        while (!(d->STAT & LN_SPI_STAT_RBNE))
+        while (!(_regs->STAT & LN_SPI_STAT_RBNE))
         {
         }
-        dataIn[i] = d->DATA;
+        dataIn[i] = _regs->DATA;
     }
     waitForCompletion();
     return true;
@@ -390,14 +379,12 @@ void lnSPI_bp::txDone()
  */
 void lnSPI_bp::setup()
 {
-    auto *d = (LN_SPI_Registers *)_adr;
-    
     sdisable();
-    d->STAT &= LN_SPI_STAT_MASK;
-    d->CTL0 &= LN_SPI_CTL0_MASK;
-    d->CTL1 &= LN_SPI_CTL1_MASK;
+    _regs->STAT &= LN_SPI_STAT_MASK;
+    _regs->CTL0 &= LN_SPI_CTL0_MASK;
+    _regs->CTL1 &= LN_SPI_CTL1_MASK;
 
-    uint32_t ctl0 = d->CTL0;
+    uint32_t ctl0 = _regs->CTL0;
     ctl0 |= LN_SPI_CTL0_MSTMODE;
     // Drive the NSS by sw, pull it up
     // there does not seem to be a way to completely disconnect NSS management
@@ -437,7 +424,7 @@ void lnSPI_bp::setup()
         break;
     }
     ctl0 |= set;
-    d->CTL0 = ctl0;
+    _regs->CTL0 = ctl0;
     uint32_t prescale = 0;
     uint32_t speed = _internalSettings.speed;
     xAssert(speed);
@@ -462,11 +449,11 @@ void lnSPI_bp::setup()
             psc++;
         }
     }
-    uint32_t sp = d->CTL0;
+    uint32_t sp = _regs->CTL0;
     sp &= ~(7 << 3);
     sp |= psc << 3;
-    d->CTL0 = sp;
-    updateMode(d, lnTxOnly); // Tx only by default
+    _regs->CTL0 = sp;
+    updateMode(_regs, lnTxOnly); // Tx only by default
 }
 
 /**

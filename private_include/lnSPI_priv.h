@@ -67,14 +67,14 @@ typedef volatile LN_SPI_Registersx LN_SPI_Registers;
 
 #define senable()                                                                                                      \
     {                                                                                                                  \
-        if (d->CTL0 & LN_SPI_CTL0_SPIEN)                                                                               \
+        if (_regs->CTL0 & LN_SPI_CTL0_SPIEN)                                                                               \
             xAssert(0);                                                                                                \
-        (d->CTL0 |= LN_SPI_CTL0_SPIEN);                                                                                \
+        (_regs->CTL0 |= LN_SPI_CTL0_SPIEN);                                                                                \
     }
-#define txbusy() (!(d->STAT & LN_SPI_STAT_TBE))
+#define txbusy() (!(_regs->STAT & LN_SPI_STAT_TBE))
 
-#define sdisable() (d->CTL0 &= ~LN_SPI_CTL0_SPIEN)
-#define sbusy() (d->STAT & LN_SPI_STAT_TRANS)
+#define sdisable() (_regs->CTL0 &= ~LN_SPI_CTL0_SPIEN)
+#define sbusy() (_regs->STAT & LN_SPI_STAT_TRANS)
 
 enum lnSpiDirection
 {
