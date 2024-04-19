@@ -3,12 +3,11 @@
  *  See license file
  */
 
-#include "lnSPI.h"
+#include "lnSPI_bp.h"
 #include "lnArduino.h"
 #include "lnGPIO.h"
 #include "lnPeripheral_priv.h"
 #include "lnSPI.h"
-#include "lnSPI_bp.h"
 
 struct SpiDescriptor
 {
@@ -30,18 +29,17 @@ static LN_SPI_Registers *aspi0 = (LN_SPI_Registers *)LN_SPI0_ADR;
 static LN_SPI_Registers *aspi1 = (LN_SPI_Registers *)LN_SPI1_ADR;
 static LN_SPI_Registers *aspi2 = (LN_SPI_Registers *)LN_SPI2_ADR;
 
-
 /**
- * @brief 
- * 
- * @param instance 
- * @param pinCs 
- * @return lnSPI* 
+ * @brief
+ *
+ * @param instance
+ * @param pinCs
+ * @return lnSPI*
  */
 
-lnSPI *lnSPI::create(int instance, int pinCs )
+lnSPI *lnSPI::create(int instance, int pinCs)
 {
-    return new lnSPI_bp(instance,pinCs);
+    return new lnSPI_bp(instance, pinCs);
 }
 
 /**
@@ -111,11 +109,10 @@ void updateDmaTX(LN_SPI_Registers *d, bool onoff)
 #define M(x) spiDescriptor[instance].x
 
 lnSPI_bp::lnSPI_bp(int instance, int pinCs)
-    : lnSPI(instance,pinCs), txDma(lnDMA::DMA_MEMORY_TO_PERIPH, M(dmaEngine), 
-      M(dmaTxChannel), 16, 16)
+    : lnSPI(instance, pinCs), txDma(lnDMA::DMA_MEMORY_TO_PERIPH, M(dmaEngine), M(dmaTxChannel), 16, 16)
 {
     _instance = instance;
-    
+
     lnPeripherals::enable((Peripherals)(pSPI0 + instance));
     xAssert(instance < 3);
     const SpiDescriptor *s = spiDescriptor + instance;
@@ -140,16 +137,16 @@ lnSPI_bp::lnSPI_bp(int instance, int pinCs)
  *
  */
 lnSPI_bp::~lnSPI_bp()
-{    
+{
     sdisable();
 }
 /**
- * @brief 
- * 
+ * @brief
+ *
  */
 void lnSPI_bp::begin()
 {
-    
+
     setup();
 }
 #if 0
@@ -181,7 +178,7 @@ void lnSPI_bp::endSession()
  * @return
  */
 bool lnSPI_bp::writeInternal(int sz, int data)
-{       
+{
     if (_regs->STAT & LN_SPI_STAT_CONFERR)
     {
         Logger("Conf Error\n");
@@ -197,17 +194,17 @@ bool lnSPI_bp::writeInternal(int sz, int data)
 }
 
 /**
- * @brief 
- * 
- * @param sz 
- * @param nb 
- * @param data 
- * @param repeat 
- * @return true 
- * @return false 
+ * @brief
+ *
+ * @param sz
+ * @param nb
+ * @param data
+ * @param repeat
+ * @return true
+ * @return false
  */
 bool lnSPI_bp::writesInternal(int sz, int nb, const uint8_t *data, bool repeat)
-{    
+{
     switch (sz)
     {
     default:
@@ -264,8 +261,8 @@ bool lnSPI_bp::write16(uint16_t z)
 }
 
 /**
- * @brief 
- * 
+ * @brief
+ *
  */
 void lnSPI_bp::csOn()
 {
@@ -275,8 +272,8 @@ void lnSPI_bp::csOn()
     }
 }
 /**
- * @brief 
- * 
+ * @brief
+ *
  */
 void lnSPI_bp::csOff()
 {
@@ -289,7 +286,7 @@ void lnSPI_bp::csOff()
  *  This is needed to be able to toggle the CS when all is done
  */
 void lnSPI_bp::waitForCompletion() const
-{    
+{
     int dir = _regs->CTL0 >> 14;
     switch (dir)
     {
@@ -316,15 +313,15 @@ void lnSPI_bp::waitForCompletion() const
     }
 }
 /**
- * @brief 
- * 
- * @param nbRead 
- * @param rd 
- * @return true 
- * @return false 
+ * @brief
+ *
+ * @param nbRead
+ * @param rd
+ * @return true
+ * @return false
  */
 bool lnSPI_bp::read1wire(int nbRead, uint8_t *rd)
-{    
+{
     updateMode(_regs, lnRxOnly); // 1 Wire RX
 
     // clear stuff (not sure it is useful)
@@ -341,16 +338,16 @@ bool lnSPI_bp::read1wire(int nbRead, uint8_t *rd)
 }
 
 /**
- * @brief 
- * 
- * @param nbBytes 
- * @param dataOut 
- * @param dataIn 
- * @return true 
- * @return false 
+ * @brief
+ *
+ * @param nbBytes
+ * @param dataOut
+ * @param dataIn
+ * @return true
+ * @return false
  */
 bool lnSPI_bp::transfer(int nbBytes, uint8_t *dataOut, uint8_t *dataIn)
-{        
+{
     for (size_t i = 0; i < nbBytes; i++)
     {
         while (!(_regs->STAT & LN_SPI_STAT_TBE))
@@ -367,8 +364,8 @@ bool lnSPI_bp::transfer(int nbBytes, uint8_t *dataOut, uint8_t *dataIn)
     return true;
 }
 /**
- * @brief 
- * 
+ * @brief
+ *
  */
 void lnSPI_bp::txDone()
 {
@@ -408,15 +405,15 @@ void lnSPI_bp::setup()
     {
     // https://en.wikipedia.org/wiki/Serial_Peripheral_Interface
     case SPI_MODE0: // Pol0, Phase 0/Edge 1
-        set = 0;      // Low 1 edge
+        set = 0;    // Low 1 edge
         break;
-    case SPI_MODE1:           // Pol 0 Phase 1 Edge 0
+    case SPI_MODE1:             // Pol 0 Phase 1 Edge 0
         set = LN_SPI_CTL0_CKPH; // Low 2 edge
         break;
-    case SPI_MODE2:           // POL 1 PHA 0 Edge 1
+    case SPI_MODE2:             // POL 1 PHA 0 Edge 1
         set = LN_SPI_CTL0_CKPL; // high , 1 edge
         break;
-    case SPI_MODE3:                              // POL 1 PHA 1 Edge 0
+    case SPI_MODE3:                                // POL 1 PHA 1 Edge 0
         set = LN_SPI_CTL0_CKPL | LN_SPI_CTL0_CKPH; // high , 2 edge
         break;
     default:
@@ -429,7 +426,7 @@ void lnSPI_bp::setup()
     uint32_t speed = _internalSettings.speed;
     xAssert(speed);
 
-    auto periph = (Peripherals)((int )pSPI0 + _instance);
+    auto periph = (Peripherals)((int)pSPI0 + _instance);
     uint32_t apb = lnPeripherals::getClock(periph);
     prescale = (apb + speed / 2) / speed;
     // prescale can only go from 2 to 256, and prescale=2^(psc+1) actually
@@ -457,9 +454,9 @@ void lnSPI_bp::setup()
 }
 
 /**
- * @brief 
- * 
- * @param order 
+ * @brief
+ *
+ * @param order
  */
 void lnSPI_bp::setBitOrder(spiBitOrder order)
 {
@@ -467,9 +464,9 @@ void lnSPI_bp::setBitOrder(spiBitOrder order)
     setup();
 }
 /**
- * @brief 
- * 
- * @param mode 
+ * @brief
+ *
+ * @param mode
  */
 void lnSPI_bp::setDataMode(spiDataMode mode)
 {
@@ -477,9 +474,9 @@ void lnSPI_bp::setDataMode(spiDataMode mode)
     setup();
 }
 /**
- * @brief 
- * 
- * @param speed 
+ * @brief
+ *
+ * @param speed
  */
 void lnSPI_bp::setSpeed(int speed)
 {
