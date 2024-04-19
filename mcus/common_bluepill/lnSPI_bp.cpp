@@ -114,9 +114,8 @@ lnSPI_bp::lnSPI_bp(int instance, int pinCs)
     : lnSPI(instance,pinCs), txDma(lnDMA::DMA_MEMORY_TO_PERIPH, M(dmaEngine), 
       M(dmaTxChannel), 16, 16)
 {
-    _useDMA = false;
     _instance = instance;
-    _settings = nullptr;
+    
     lnPeripherals::enable((Peripherals)(pSPI0 + instance));
     xAssert(instance < 3);
     const SpiDescriptor *s = spiDescriptor + instance;
@@ -136,7 +135,7 @@ lnSPI_bp::lnSPI_bp(int instance, int pinCs)
         lnDigitalWrite((lnPin)pinCs, true);
     }
     auto *d = (LN_SPI_Registers *)_adr;
-    _settings = &_internalSettings;
+    
     sdisable();
 }
 /**
@@ -153,7 +152,7 @@ lnSPI_bp::~lnSPI_bp()
  */
 void lnSPI_bp::begin()
 {
-    _settings = &_internalSettings;
+    
     setup();
 }
 #if 0
@@ -277,9 +276,9 @@ bool lnSPI_bp::write16(uint16_t z)
  */
 void lnSPI_bp::csOn()
 {
-    if (_settings->pinCS != -1)
+    if (_internalSettings.pinCS != -1)
     {
-        lnDigitalWrite((lnPin)_settings->pinCS, false);
+        lnDigitalWrite((lnPin)_internalSettings.pinCS, false);
     }
 }
 /**
@@ -288,9 +287,9 @@ void lnSPI_bp::csOn()
  */
 void lnSPI_bp::csOff()
 {
-    if (_settings->pinCS != -1)
+    if (_internalSettings.pinCS != -1)
     {
-        lnDigitalWrite((lnPin)_settings->pinCS, true);
+        lnDigitalWrite((lnPin)_internalSettings.pinCS, true);
     }
 }
 /**
@@ -392,7 +391,7 @@ void lnSPI_bp::txDone()
 void lnSPI_bp::setup()
 {
     auto *d = (LN_SPI_Registers *)_adr;
-    xAssert(_settings);
+    
     sdisable();
     d->STAT &= LN_SPI_STAT_MASK;
     d->CTL0 &= LN_SPI_CTL0_MASK;
@@ -405,7 +404,7 @@ void lnSPI_bp::setup()
     ctl0 |= LN_SPI_CTL0_SWNSS;
     ctl0 |= LN_SPI_CTL0_SWNSSEN;
 
-    switch (_settings->bOrder)
+    switch (_internalSettings.bOrder)
     {
     case SPI_LSBFIRST:
         ctl0 |= LN_SPI_CTL0_LSB;
@@ -418,7 +417,7 @@ void lnSPI_bp::setup()
         break;
     }
     uint32_t set = 0;
-    switch (_settings->dMode)
+    switch (_internalSettings.dMode)
     {
     // https://en.wikipedia.org/wiki/Serial_Peripheral_Interface
     case SPI_MODE0: // Pol0, Phase 0/Edge 1
@@ -440,7 +439,7 @@ void lnSPI_bp::setup()
     ctl0 |= set;
     d->CTL0 = ctl0;
     uint32_t prescale = 0;
-    uint32_t speed = _settings->speed;
+    uint32_t speed = _internalSettings.speed;
     xAssert(speed);
 
     auto periph = (Peripherals)((int )pSPI0 + _instance);

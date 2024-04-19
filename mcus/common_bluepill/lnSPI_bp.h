@@ -80,11 +80,8 @@ class lnSPI_bp : public lnSPI
     void csOff();
 
   protected:
-    lnSPISettings *_settings;
-    xMutex _mutex;
-    xBinarySemaphore _done;
-    bool _useDMA;
-    void *_cookie;
+    
+    xBinarySemaphore _done;        
     
     uint32_t _adr;
     LnIRQ _irq;    

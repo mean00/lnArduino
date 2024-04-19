@@ -86,6 +86,13 @@ class lnSPI
     
 
     virtual void begin()=0;    
+    void set(const lnSPISettings &st)
+    {
+        setSSEL(st.pinCS);
+        setSpeed(st.speed);
+        setBitOrder(st.bOrder);
+        setDataMode(st.dMode);
+    }
     virtual void setBitOrder(spiBitOrder order)=0;
     virtual void setDataMode(spiDataMode mode)=0;
     virtual void setSpeed(int speed)=0; // speed in b/s
@@ -122,15 +129,13 @@ class lnSPI
     
 protected:
   int             _instance;    
-  lnSPISettings   _internalSettings;
-  lnSPISettings   _currentSetting;
+  lnSPISettings   _internalSettings;  
   lnSpiCallback   *_callback;
   void            *_callbackCookie;
 
 protected:
     lnSPI(int instance, int pinCs = -1) :
-     _internalSettings(1000000, SPI_MSBFIRST, SPI_MODE0, -1), 
-     _currentSetting(1000000, SPI_MSBFIRST, SPI_MODE0, -1),
+     _internalSettings(1000000, SPI_MSBFIRST, SPI_MODE0, -1),      
      _callback(NULL), _callbackCookie(NULL)
       {
       }
