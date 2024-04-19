@@ -23,10 +23,18 @@
 static int nbReq = 0;
 static int nbInterrupt = 0;
 static int nbSkipped = 0;
+
 /**
- *
+ * @brief 
+ * 
+ * @param wordSize 
+ * @param nbTransfer 
+ * @param data 
+ * @param repeat 
+ * @return true 
+ * @return false 
  */
-bool hwlnSPIClass::dmaWriteInternal(int wordSize, int nbTransfer, const uint8_t *data, bool repeat)
+bool lnSPI_bp::dmaWriteInternal(int wordSize, int nbTransfer, const uint8_t *data, bool repeat)
 {
     bool r = true;
     if (!nbTransfer)
@@ -74,46 +82,87 @@ bool hwlnSPIClass::dmaWriteInternal(int wordSize, int nbTransfer, const uint8_t 
 }
 
 /**
+ * @brief 
+ * 
+ * @param nbBytes 
+ * @param data 
+ * @return true 
+ * @return false 
  */
-bool hwlnSPIClass::dmaWrite(int nbBytes, const uint8_t *data)
+bool lnSPI_bp::write8(int nbBytes, const uint8_t *data)
 {
     return dmaWriteInternal(8, nbBytes, data, false);
 }
 
 /**
+ * @brief 
+ * 
+ * @param nbBytes 
+ * @param data 
+ * @return true 
+ * @return false 
  */
-bool hwlnSPIClass::dmaWrite16(int nbWord, const uint16_t *data)
+bool lnSPI_bp::write8Repeat(int nbBytes, const uint8_t data)
+{
+    return dmaWriteInternal(8, nbBytes, (uint8_t *)&data, true);
+}
+
+/**
+ * @brief 
+ * 
+ * @param nbWord 
+ * @param data 
+ * @return true 
+ * @return false 
+ */
+bool lnSPI_bp::write16(int nbWord, const uint16_t *data)
 {
     return dmaWriteInternal(16, nbWord, (uint8_t *)data, false);
 }
 
 /**
+ * @brief 
+ * 
+ * @param nbWord 
+ * @param data 
+ * @return true 
+ * @return false 
  */
-bool hwlnSPIClass::dmaWrite16Repeat(int nbWord, const uint16_t data)
+bool lnSPI_bp::write16Repeat(int nbWord, const uint16_t data)
 {
     return dmaWriteInternal(16, nbWord, (uint8_t *)&data, true);
 }
 
 /**
- *
- * @param c
+ * @brief 
+ * 
+ * @param c 
+ * @param it 
  */
-void hwlnSPIClass::exTxDone(void *c, lnDMA::DmaInterruptType it)
+void lnSPI_bp::exTxDone(void *c, lnDMA::DmaInterruptType it)
 {
     nbInterrupt++;
-    auto *i = (hwlnSPIClass *)c;
+    auto *i = (lnSPI_bp *)c;
     i->txDone();
 }
 
 /**
- *
+ * @brief 
+ * 
+ * @param nbWord 
+ * @param data 
+ * @param cb 
+ * @param cookie 
+ * @param repeat 
+ * @return true 
+ * @return false 
  */
-bool hwlnSPIClass::asyncDmaWrite16(int nbTransfer, const uint16_t *data, lnSpiCallback *cb, void *cookie, bool repeat)
+bool lnSPI_bp::asyncWrite16(int nbWord, const uint16_t *data, lnSpiCallback *cb, void *cookie, bool repeat)
 {
     int wordSize = 16;
     bool r = true;
     _done.tryTake();
-    if (!nbTransfer)
+    if (!nbWord)
         return true;
     auto *d = (LN_SPI_Registers *)_adr;
 
@@ -124,19 +173,26 @@ bool hwlnSPIClass::asyncDmaWrite16(int nbTransfer, const uint16_t *data, lnSpiCa
     txDma.beginTransfer();
     txDma.setWordSize(wordSize, wordSize);
     updateDataSize(d, wordSize); // 16 bits at a time
-    return nextDmaWrite16(nbTransfer, data, cb, cookie, repeat);
+    return nextWrite16(nbWord, data, cb, cookie, repeat);
 }
 /**
- *
+ * @brief 
+ * 
+ * @return true 
+ * @return false 
  */
-bool hwlnSPIClass::finishAsyncDma()
+bool lnSPI_bp::finishAsyncDma()
 {
     txDone();
     return true;
 }
 /**
+ * @brief 
+ * 
+ * @return true 
+ * @return false 
  */
-bool hwlnSPIClass::waitForAsyncDmaDone()
+bool lnSPI_bp::waitForAsyncDmaDone()
 {
     auto *d = (LN_SPI_Registers *)_adr;
     bool r = true;
@@ -155,26 +211,39 @@ bool hwlnSPIClass::waitForAsyncDmaDone()
     return r;
 }
 /**
+ * @brief 
+ * 
+ * @param a 
+ * @param b 
  */
 void asyncTrampoline(void *a, lnDMA::DmaInterruptType b)
 {
-    auto me = (hwlnSPIClass *)a;
+    auto *me = (lnSPI_bp *)a;
     me->invokeCallback();
 }
 /**
- *
+ * @brief 
+ * 
  */
-void hwlnSPIClass::invokeCallback()
+void lnSPI_bp::invokeCallback()
 {
-    lnSpiCallback *c = _callback;
+    lnSpiCallback *cb = _callback;
     _callback = nullptr;
-    xAssert(c);
-    c(_callbackCookie);
+    xAssert(cb);
+    cb(_callbackCookie);
 }
 /**
- *
+ * @brief 
+ * 
+ * @param nbTransfer 
+ * @param data 
+ * @param cb 
+ * @param cookie 
+ * @param repeat 
+ * @return true 
+ * @return false 
  */
-bool hwlnSPIClass::nextDmaWrite16(int nbTransfer, const uint16_t *data, lnSpiCallback *cb, void *cookie, bool repeat)
+bool lnSPI_bp::nextWrite16(int nbTransfer, const uint16_t *data, lnSpiCallback *cb, void *cookie, bool repeat)
 {
     bool r;
     if (!nbTransfer)

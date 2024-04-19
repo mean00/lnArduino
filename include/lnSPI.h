@@ -83,66 +83,43 @@ class lnSPI
   
     virtual ~lnSPI() {}
 
-    void setSSEL(int ssel)
-    {
-        _internalSettings.pinCS = (ssel);
-    };
+    
 
-    virtual void begin()=0;
-    virtual void end(void)=0;
-  
-
-    //
-    virtual void beginTransaction(lnSPISettings &settings)=0;
-    virtual void endTransaction()=0;
-
-    // The settings structure must stay valid while the transaction is on !
-    virtual void beginSession(int bitSize)=0;
-    virtual void endSession()=0;
-
+    virtual void begin()=0;    
     virtual void setBitOrder(spiBitOrder order)=0;
     virtual void setDataMode(spiDataMode mode)=0;
     virtual void setSpeed(int speed)=0; // speed in b/s
-    // DMA ones
-    virtual void setDataSize(int dataSize)=0; // 8 or 16
-
-    //-- AsyncDma
-    // Do asyncDma
-    //   and in the callback either call nextDma or finishAsyncDma
-    // The caller can call waitForAsyncDmadone to wait till all is done
-    virtual bool asyncDmaWrite16(int nbBytes, const uint16_t *data, lnSpiCallback *cb, void *cookie, bool repeat = false)=0;
-    virtual bool nextDmaWrite16(int nbBytes, const uint16_t *data, lnSpiCallback *cb, void *cookie, bool repeat = false)=0;
+            void setSSEL(int ssel)    {        _internalSettings.pinCS = (ssel);    };
+    // async API
+    virtual bool asyncWrite8(int nbBytes, const uint8_t *data, lnSpiCallback *cb, void *cookie, bool repeat = false)=0;
+    virtual bool nextWrite8(int nbBytes, const uint8_t *data, lnSpiCallback *cb, void *cookie, bool repeat = false)=0;
+    virtual bool asyncWrite16(int nbWords, const uint16_t *data, lnSpiCallback *cb, void *cookie, bool repeat = false)=0;
+    virtual bool nextWrite16(int nbWords, const uint16_t *data, lnSpiCallback *cb, void *cookie, bool repeat = false)=0;
     virtual bool finishAsyncDma()=0;
     virtual bool waitForAsyncDmaDone()=0;
 
     // Helper Write functions, make sure you are under a session
-    virtual bool write(int z)=0;
-    virtual bool write16(int z)=0;
-    virtual bool write16Repeat(int nb, const uint16_t pattern)=0;
-    virtual bool write(int nbBytes, const uint8_t *data, bool repeat = false)=0;
-    virtual bool write16(int nbWord, const uint16_t *data, bool repeat = false)=0;
+    virtual bool write8(uint8_t z)=0;
+    virtual bool write16(uint16_t z)=0;
 
-    virtual bool dmaWrite16(int nbBytes, const uint16_t *data)=0;
-    virtual bool dmaWrite16Repeat(int nbBytes, const uint16_t data)=0;
-    virtual bool dmaWrite(int nbBytes, const uint8_t *data)=0;
-
+    virtual bool write16(int nbWord, const uint16_t *data)=0;
+    virtual bool write16Repeat(int nbWord, const uint16_t data)=0;
+    virtual bool write8(int nbBytes, const uint8_t *data)=0;
+    virtual bool write8Repeat(int nbBytes, const uint8_t data)=0;
+    
     // slow read/write
     virtual bool transfer(int nbBytes, uint8_t *dataOut, uint8_t *dataIn)=0;
 
     // wait for everything to be COMPLETELY done
-    virtual void waitForCompletion()=0;
+    //virtual void waitForCompletion()=0;
     // This reads over the MOSI pin, i.e. only when only 2 wires are used MOSI + CLK, no MISO
     virtual bool read1wire(int nbRead, uint8_t *rd)=0; // read, reuse MOSI
     //
     int getInstance()
     {
         return _instance;
-    }
-    virtual uint32_t getPeripheralClock()=0;
-
-    virtual lnPin misoPin() const=0;
-    virtual lnPin mosiPin() const=0;
-    virtual lnPin clkPin() const=0;
+    }    
+    
 protected:
   int             _instance;    
   lnSPISettings   _internalSettings;
@@ -157,7 +134,5 @@ protected:
      _callback(NULL), _callbackCookie(NULL)
       {
       }
-
-
 };
 // EOF

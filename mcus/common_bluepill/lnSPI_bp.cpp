@@ -1,5 +1,5 @@
 /*
- *  (C) 2021 MEAN00 fixounet@free.fr
+ *  (C) 2021/2024 MEAN00 fixounet@free.fr
  *  See license file
  */
 
@@ -41,7 +41,7 @@ static LN_SPI_Registers *aspi2 = (LN_SPI_Registers *)LN_SPI2_ADR;
 
 lnSPI *lnSPI::create(int instance, int pinCs )
 {
-    return new hwlnSPIClass(instance,pinCs);
+    return new lnSPI_bp(instance,pinCs);
 }
 
 /**
@@ -110,7 +110,7 @@ void updateDmaTX(LN_SPI_Registers *d, bool onoff)
  */
 #define M(x) spiDescriptor[instance].x
 
-hwlnSPIClass::hwlnSPIClass(int instance, int pinCs)
+lnSPI_bp::lnSPI_bp(int instance, int pinCs)
     : lnSPI(instance,pinCs), txDma(lnDMA::DMA_MEMORY_TO_PERIPH, M(dmaEngine), 
       M(dmaTxChannel), 16, 16)
 {
@@ -142,58 +142,23 @@ hwlnSPIClass::hwlnSPIClass(int instance, int pinCs)
 }
 /**
  *
- * @return
  */
-lnPin hwlnSPIClass::misoPin() const
-{
-    const auto *s = spiDescriptor + _instance;
-    return s->miso;
-}
-
-/**
- *
- * @return
- */
-lnPin hwlnSPIClass::mosiPin() const
-{
-    const auto *s = spiDescriptor + _instance;
-    return s->mosi;
-}
-
-/**
- *
- * @return
- */
-lnPin hwlnSPIClass::clkPin() const
-{
-    const auto *s = spiDescriptor + _instance;
-    return s->clk;
-}
-/**
- *
- */
-hwlnSPIClass::~hwlnSPIClass()
-{
-    end();
-}
-/**
- *
- */
-void hwlnSPIClass::begin()
-{
-    _settings = &_internalSettings;
-    setup();
-}
-/**
- *
- */
-void hwlnSPIClass::end()
+lnSPI_bp::~lnSPI_bp()
 {
     auto *d = (LN_SPI_Registers *)_adr;
     sdisable();
 }
-
-void hwlnSPIClass::beginSession(int bitSize)
+/**
+ * @brief 
+ * 
+ */
+void lnSPI_bp::begin()
+{
+    _settings = &_internalSettings;
+    setup();
+}
+#if 0
+void lnSPI_bp::beginSession(int bitSize)
 {
     _inSession = true;
     setup();
@@ -203,39 +168,24 @@ void hwlnSPIClass::beginSession(int bitSize)
     senable();
     csOn();
 }
-/**
- *
- */
-void hwlnSPIClass::beginTransaction(lnSPISettings &settings)
-{
-    _mutex.lock();
-    _currentSetting = settings;
-    _settings = &_currentSetting;
-    setup();
-}
-void hwlnSPIClass::endTransaction()
-{
-    _settings = &_internalSettings;
-    setup(); // restore settings
-    _mutex.unlock();
-}
 
 /**
  */
-void hwlnSPIClass::endSession()
+void lnSPI_bp::endSession()
 {
     auto *d = (LN_SPI_Registers *)_adr;
     _inSession = false;
     csOff();
     sdisable();
 }
+#endif
 /**
  *
  * @param sz
  * @param data
  * @return
  */
-bool hwlnSPIClass::writeInternal(int sz, int data)
+bool lnSPI_bp::writeInternal(int sz, int data)
 {
     auto *d = (LN_SPI_Registers *)_adr;
     xAssert(_inSession);
@@ -255,8 +205,16 @@ bool hwlnSPIClass::writeInternal(int sz, int data)
 }
 
 /**
+ * @brief 
+ * 
+ * @param sz 
+ * @param nb 
+ * @param data 
+ * @param repeat 
+ * @return true 
+ * @return false 
  */
-bool hwlnSPIClass::writesInternal(int sz, int nb, const uint8_t *data, bool repeat)
+bool lnSPI_bp::writesInternal(int sz, int nb, const uint8_t *data, bool repeat)
 {
     auto *d = (LN_SPI_Registers *)_adr;
     switch (sz)
@@ -278,7 +236,7 @@ bool hwlnSPIClass::writesInternal(int sz, int nb, const uint8_t *data, bool repe
         break;
     }
     case 16: {
-        const uint16_t *p = (const uint16_t *)data;
+        auto *p = (const uint16_t *)data;
         int inc = !repeat;
         for (size_t i = 0; i < nb; i++)
         {
@@ -300,7 +258,7 @@ bool hwlnSPIClass::writesInternal(int sz, int nb, const uint8_t *data, bool repe
  * @param z
  * @return
  */
-bool hwlnSPIClass::write(int z)
+bool lnSPI_bp::write8(uint8_t z)
 {
     return writeInternal(8, z);
 }
@@ -309,35 +267,16 @@ bool hwlnSPIClass::write(int z)
  * @param z
  * @return
  */
-bool hwlnSPIClass::write16(int z)
+bool lnSPI_bp::write16(uint16_t z)
 {
     return writeInternal(16, z);
 }
 
 /**
- *
+ * @brief 
+ * 
  */
-bool hwlnSPIClass::write16Repeat(int nb, const uint16_t pattern)
-{
-    return writesInternal(16, nb, (const uint8_t *)&pattern, true);
-}
-/**
- */
-bool hwlnSPIClass::write(int nbBytes, const uint8_t *data, bool repeat)
-{
-    return writesInternal(8, nbBytes, data, repeat);
-}
-/**
- */
-bool hwlnSPIClass::write16(int nbWord, const uint16_t *data, bool repeat)
-{
-    return writesInternal(16, nbWord, (const uint8_t *)data, repeat);
-}
-
-/**
- *
- */
-void hwlnSPIClass::csOn()
+void lnSPI_bp::csOn()
 {
     if (_settings->pinCS != -1)
     {
@@ -345,9 +284,10 @@ void hwlnSPIClass::csOn()
     }
 }
 /**
- *
+ * @brief 
+ * 
  */
-void hwlnSPIClass::csOff()
+void lnSPI_bp::csOff()
 {
     if (_settings->pinCS != -1)
     {
@@ -357,7 +297,7 @@ void hwlnSPIClass::csOff()
 /**
  *  This is needed to be able to toggle the CS when all is done
  */
-void hwlnSPIClass::waitForCompletion()
+void lnSPI_bp::waitForCompletion() const
 {
     auto *d = (LN_SPI_Registers *)_adr;
     int dir = d->CTL0 >> 14;
@@ -386,9 +326,14 @@ void hwlnSPIClass::waitForCompletion()
     }
 }
 /**
- *
+ * @brief 
+ * 
+ * @param nbRead 
+ * @param rd 
+ * @return true 
+ * @return false 
  */
-bool hwlnSPIClass::read1wire(int nbRead, uint8_t *rd)
+bool lnSPI_bp::read1wire(int nbRead, uint8_t *rd)
 {
     auto *d = (LN_SPI_Registers *)_adr;
     updateMode(d, lnRxOnly); // 1 Wire RX
@@ -407,8 +352,15 @@ bool hwlnSPIClass::read1wire(int nbRead, uint8_t *rd)
 }
 
 /**
+ * @brief 
+ * 
+ * @param nbBytes 
+ * @param dataOut 
+ * @param dataIn 
+ * @return true 
+ * @return false 
  */
-bool hwlnSPIClass::transfer(int nbBytes, uint8_t *dataOut, uint8_t *dataIn)
+bool lnSPI_bp::transfer(int nbBytes, uint8_t *dataOut, uint8_t *dataIn)
 {
     auto *d = (LN_SPI_Registers *)_adr;
     xAssert(_inSession);
@@ -428,17 +380,17 @@ bool hwlnSPIClass::transfer(int nbBytes, uint8_t *dataOut, uint8_t *dataIn)
     return true;
 }
 /**
- *
- * @return
+ * @brief 
+ * 
  */
-void hwlnSPIClass::txDone()
+void lnSPI_bp::txDone()
 {
     _done.give();
 }
 /**
  * \brief program the peripheral with the current settings
  */
-void hwlnSPIClass::setup()
+void lnSPI_bp::setup()
 {
     auto *d = (LN_SPI_Registers *)_adr;
     xAssert(_settings);
@@ -466,32 +418,33 @@ void hwlnSPIClass::setup()
         xAssert(0);
         break;
     }
-    uint32_t s = 0;
+    uint32_t set = 0;
     switch (_settings->dMode)
     {
     // https://en.wikipedia.org/wiki/Serial_Peripheral_Interface
     case SPI_MODE0: // Pol0, Phase 0/Edge 1
-        s = 0;      // Low 1 edge
+        set = 0;      // Low 1 edge
         break;
     case SPI_MODE1:           // Pol 0 Phase 1 Edge 0
-        s = LN_SPI_CTL0_CKPH; // Low 2 edge
+        set = LN_SPI_CTL0_CKPH; // Low 2 edge
         break;
     case SPI_MODE2:           // POL 1 PHA 0 Edge 1
-        s = LN_SPI_CTL0_CKPL; // high , 1 edge
+        set = LN_SPI_CTL0_CKPL; // high , 1 edge
         break;
     case SPI_MODE3:                              // POL 1 PHA 1 Edge 0
-        s = LN_SPI_CTL0_CKPL | LN_SPI_CTL0_CKPH; // high , 2 edge
+        set = LN_SPI_CTL0_CKPL | LN_SPI_CTL0_CKPH; // high , 2 edge
         break;
     default:
         xAssert(0);
         break;
     }
-    ctl0 |= s;
+    ctl0 |= set;
     d->CTL0 = ctl0;
-    uint32_t prescale = 0, speed = _settings->speed;
+    uint32_t prescale = 0;
+    uint32_t speed = _settings->speed;
     xAssert(speed);
 
-    Peripherals periph = (Peripherals)((int)pSPI0 + _instance);
+    auto periph = (Peripherals)((int )pSPI0 + _instance);
     uint32_t apb = lnPeripherals::getClock(periph);
     prescale = (apb + speed / 2) / speed;
     // prescale can only go from 2 to 256, and prescale=2^(psc+1) actually
@@ -517,42 +470,35 @@ void hwlnSPIClass::setup()
     d->CTL0 = sp;
     updateMode(d, lnTxOnly); // Tx only by default
 }
+
 /**
- *
- * @param dataSize
+ * @brief 
+ * 
+ * @param order 
  */
-void hwlnSPIClass::setDataSize(int dataSize)
-{
-    auto *d = (LN_SPI_Registers *)_adr;
-    updateDataSize(d, dataSize);
-}
-/**
- */
-void hwlnSPIClass::setBitOrder(spiBitOrder order)
+void lnSPI_bp::setBitOrder(spiBitOrder order)
 {
     _internalSettings.bOrder = order;
     setup();
 }
 /**
+ * @brief 
+ * 
+ * @param mode 
  */
-void hwlnSPIClass::setDataMode(spiDataMode mode)
+void lnSPI_bp::setDataMode(spiDataMode mode)
 {
     _internalSettings.dMode = mode;
     setup();
 }
 /**
+ * @brief 
+ * 
+ * @param speed 
  */
-void hwlnSPIClass::setSpeed(int speed)
+void lnSPI_bp::setSpeed(int speed)
 {
     _internalSettings.speed = speed;
     setup();
 }
-/**
-*/
-uint32_t hwlnSPIClass::getPeripheralClock()
-{
-    Peripherals p = (Peripherals)(pSPI0 + _instance);
-    return lnPeripherals::getClock(p);
-}
-
 // EOF
