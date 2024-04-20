@@ -84,6 +84,8 @@ class lnSPI_bp : public lnSPI
                                                      //
 
   protected:
+    bool asyncWrite(int wordSize, int nbWord, const uint8_t *data, lnSpiCallback *cb, void *cookie, bool repeat);
+    bool nextWrite(int nbBytes, const uint8_t *data, lnSpiCallback *cb, void *cookie, bool repeat = false);
     void setup();
     void csOn();
     void csOff();

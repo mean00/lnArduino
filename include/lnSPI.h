@@ -122,10 +122,8 @@ class lnSPI
     // write
     // ....
     // end
-    virtual bool write8(uint8_t z) = 0;
-    virtual bool write16(uint16_t z) = 0;
-    virtual bool write16(int nbWord, const uint16_t *data) = 0;
-    virtual bool write8(int nbBytes, const uint8_t *data) = 0;
+    virtual bool write8(const uint8_t data) = 0;
+    virtual bool write16(const uint16_t data) = 0;
 
     // block write
     // same thing
