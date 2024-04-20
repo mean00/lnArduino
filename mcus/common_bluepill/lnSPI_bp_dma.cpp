@@ -84,58 +84,6 @@ bool lnSPI_bp::dmaWriteInternal(int wordSize, int nbTransfer, const uint8_t *dat
 /**
  * @brief
  *
- * @param nbBytes
- * @param data
- * @return true
- * @return false
- */
-bool lnSPI_bp::blockWrite8(int nbBytes, const uint8_t *data)
-{
-    return dmaWriteInternal(8, nbBytes, data, false);
-}
-
-/**
- * @brief
- *
- * @param nbBytes
- * @param data
- * @return true
- * @return false
- */
-bool lnSPI_bp::blockWrite8Repeat(int nbBytes, const uint8_t data)
-{
-    return dmaWriteInternal(8, nbBytes, (uint8_t *)&data, true);
-}
-
-/**
- * @brief
- *
- * @param nbWord
- * @param data
- * @return true
- * @return false
- */
-bool lnSPI_bp::blockWrite16(int nbWord, const uint16_t *data)
-{
-    return dmaWriteInternal(16, nbWord, (uint8_t *)data, false);
-}
-
-/**
- * @brief
- *
- * @param nbWord
- * @param data
- * @return true
- * @return false
- */
-bool lnSPI_bp::blockWrite16Repeat(int nbWord, const uint16_t data)
-{
-    return dmaWriteInternal(16, nbWord, (uint8_t *)&data, true);
-}
-
-/**
- * @brief
- *
  * @param c
  * @param it
  */
@@ -182,37 +130,7 @@ bool lnSPI_bp::asyncWrite(int wordSize, int nbWord, const uint8_t *data, lnSpiCa
         break;
     }
 }
-/**
- * @brief
- *
- * @param nbWord
- * @param data
- * @param cb
- * @param cookie
- * @param repeat
- * @return true
- * @return false
- */
-bool lnSPI_bp::asyncWrite16(int nbWord, const uint16_t *data, lnSpiCallback *cb, void *cookie, bool repeat)
-{
-    return asyncWrite(16, nbWord, (const uint8_t *)data, cb, cookie, repeat);
-}
 
-/**
- * @brief
- *
- * @param nbWord
- * @param data
- * @param cb
- * @param cookie
- * @param repeat
- * @return true
- * @return false
- */
-bool lnSPI_bp::asyncWrite8(int nbWord, const uint8_t *data, lnSpiCallback *cb, void *cookie, bool repeat)
-{
-    return asyncWrite(8, nbWord, data, cb, cookie, repeat);
-}
 /**
  * @brief
  *
@@ -299,34 +217,4 @@ bool lnSPI_bp::nextWrite(int nbTransfer, const uint8_t *data, lnSpiCallback *cb,
     return true;
 }
 
-/**
- * @brief
- *
- * @param nbTransfer
- * @param data
- * @param cb
- * @param cookie
- * @param repeat
- * @return true
- * @return false
- */
-bool lnSPI_bp::nextWrite16(int nbTransfer, const uint16_t *data, lnSpiCallback *cb, void *cookie, bool repeat)
-{
-    return nextWrite(nbTransfer, (const uint8_t *)data, cb, cookie, repeat);
-}
-/**
- * @brief
- *
- * @param nbTransfer
- * @param data
- * @param cb
- * @param cookie
- * @param repeat
- * @return true
- * @return false
- */
-bool lnSPI_bp::nextWrite8(int nbTransfer, const uint8_t *data, lnSpiCallback *cb, void *cookie, bool repeat)
-{
-    return nextWrite(nbTransfer, data, cb, cookie, repeat);
-}
 // EOF

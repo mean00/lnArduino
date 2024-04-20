@@ -53,10 +53,22 @@ class lnSPI_bp : public lnSPI
         _internalSettings.pinCS = (ssel);
     };
     // async API
-    virtual bool asyncWrite8(int nbBytes, const uint8_t *data, lnSpiCallback *cb, void *cookie, bool repeat = false);
-    virtual bool nextWrite8(int nbBytes, const uint8_t *data, lnSpiCallback *cb, void *cookie, bool repeat = false);
-    virtual bool asyncWrite16(int nbWords, const uint16_t *data, lnSpiCallback *cb, void *cookie, bool repeat = false);
-    virtual bool nextWrite16(int nbWords, const uint16_t *data, lnSpiCallback *cb, void *cookie, bool repeat = false);
+    virtual bool asyncWrite8(int nbBytes, const uint8_t *data, lnSpiCallback *cb, void *cookie, bool repeat = false)
+    {
+        return asyncWrite(8, nbBytes, data, cb, cookie, repeat);
+    }
+    virtual bool nextWrite8(int nbTransfer, const uint8_t *data, lnSpiCallback *cb, void *cookie, bool repeat = false)
+    {
+        return nextWrite(nbTransfer, data, cb, cookie, repeat);
+    }
+    virtual bool asyncWrite16(int nbWords, const uint16_t *data, lnSpiCallback *cb, void *cookie, bool repeat = false)
+    {
+        return asyncWrite(16, nbWords, (const uint8_t *)data, cb, cookie, repeat);
+    }
+    virtual bool nextWrite16(int nbWords, const uint16_t *data, lnSpiCallback *cb, void *cookie, bool repeat = false)
+    {
+        return nextWrite(nbWords, (const uint8_t *)data, cb, cookie, repeat);
+    }
     virtual bool finishAsyncDma();
     virtual bool waitForAsync();
 
@@ -69,10 +81,22 @@ class lnSPI_bp : public lnSPI
 
     // block write
     // just block write, no need for begin() end()
-    virtual bool blockWrite16(int nbWord, const uint16_t *data);
-    virtual bool blockWrite16Repeat(int nbWord, const uint16_t data);
-    virtual bool blockWrite8(int nbBytes, const uint8_t *data);
-    virtual bool blockWrite8Repeat(int nbBytes, const uint8_t data);
+    virtual bool blockWrite16(int nbWord, const uint16_t *data)
+    {
+        return dmaWriteInternal(16, nbWord, (uint8_t *)data, false);
+    }
+    virtual bool blockWrite16Repeat(int nbWord, const uint16_t data)
+    {
+        return dmaWriteInternal(16, nbWord, (uint8_t *)&data, true);
+    }
+    virtual bool blockWrite8(int nbBytes, const uint8_t *data)
+    {
+        return dmaWriteInternal(8, nbBytes, data, false);
+    }
+    virtual bool blockWrite8Repeat(int nbBytes, const uint8_t data)
+    {
+        return dmaWriteInternal(8, nbBytes, (uint8_t *)&data, true);
+    }
     virtual void waitForCompletion() const;
     // slow read/write
     virtual bool transfer(int nbBytes, uint8_t *dataOut, uint8_t *dataIn);
