@@ -144,33 +144,24 @@ lnSPI_bp::~lnSPI_bp()
  * @brief
  *
  */
-void lnSPI_bp::begin()
-{
 
-    setup();
-}
-#if 0
-void lnSPI_bp::beginSession(int bitSize)
+void lnSPI_bp::begin(int bitSize)
 {
-    _inSession = true;
     setup();
-    auto *d = (LN_SPI_Registers *)_adr;
-    updateMode(d, lnTxOnly);
-    updateDataSize(d, bitSize);
+    updateMode(_regs, lnTxOnly);
+    updateDataSize(_regs, bitSize);
     senable();
     csOn();
 }
 
 /**
  */
-void lnSPI_bp::endSession()
+void lnSPI_bp::end()
 {
-    auto *d = (LN_SPI_Registers *)_adr;
-    _inSession = false;
     csOff();
     sdisable();
 }
-#endif
+
 /**
  *
  * @param sz
@@ -241,6 +232,35 @@ bool lnSPI_bp::writesInternal(int sz, int nb, const uint8_t *data, bool repeat)
     waitForCompletion();
     return true;
 }
+/**
+ * @brief
+ *
+ * @param nbWord
+ * @param data
+ * @return true
+ * @return false
+ */
+bool lnSPI_bp::write16(int nbWord, const uint16_t *data)
+{
+    for (int i = 0; i < nbWord; i++)
+        write16(data[i]);
+    return true;
+}
+/**
+ * @brief
+ *
+ * @param nbBytes
+ * @param data
+ * @return true
+ * @return false
+ */
+bool lnSPI_bp::write8(int nbBytes, const uint8_t *data)
+{
+    for (int i = 0; i < nbBytes; i++)
+        write8(data[i]);
+    return true;
+}
+
 /**
  *
  * @param z

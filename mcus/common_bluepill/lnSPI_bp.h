@@ -43,11 +43,15 @@ class lnSPI_bp : public lnSPI
     lnSPI_bp(int instance, int pinCs = -1);
     virtual ~lnSPI_bp();
 
-    virtual void begin();    
+    virtual void begin(int dataSize);
+    virtual void end();
     virtual void setBitOrder(spiBitOrder order);
     virtual void setDataMode(spiDataMode mode);
     virtual void setSpeed(int speed); // speed in b/s
-            void setSSEL(int ssel)    {        _internalSettings.pinCS = (ssel);    };
+    void setSSEL(int ssel)
+    {
+        _internalSettings.pinCS = (ssel);
+    };
     // async API
     virtual bool asyncWrite8(int nbBytes, const uint8_t *data, lnSpiCallback *cb, void *cookie, bool repeat = false);
     virtual bool nextWrite8(int nbBytes, const uint8_t *data, lnSpiCallback *cb, void *cookie, bool repeat = false);
@@ -61,19 +65,23 @@ class lnSPI_bp : public lnSPI
     virtual bool write16(const uint16_t z);
 
     virtual bool write8(int nbBytes, const uint8_t *data);
-    virtual bool write8Repeat(int nbBytes, const uint8_t data);
-
     virtual bool write16(int nbBytes, const uint16_t *data);
-    virtual bool write16Repeat(int nbBytes, const uint16_t data);
+
+    // block write
+    // just block write, no need for begin() end()
+    virtual bool blockWrite16(int nbWord, const uint16_t *data);
+    virtual bool blockWrite16Repeat(int nbWord, const uint16_t data);
+    virtual bool blockWrite8(int nbBytes, const uint8_t *data);
+    virtual bool blockWrite8Repeat(int nbBytes, const uint8_t data);
     virtual void waitForCompletion() const;
     // slow read/write
     virtual bool transfer(int nbBytes, uint8_t *dataOut, uint8_t *dataIn);
 
     // wait for everything to be COMPLETELY done
-    //virtual void waitForCompletion()=0;
+    // virtual void waitForCompletion()=0;
     // This reads over the MOSI pin, i.e. only when only 2 wires are used MOSI + CLK, no MISO
     virtual bool read1wire(int nbRead, uint8_t *rd); // read, reuse MOSI
-    //
+                                                     //
 
   protected:
     void setup();
@@ -81,10 +89,9 @@ class lnSPI_bp : public lnSPI
     void csOff();
 
   protected:
-    
-    xBinarySemaphore _done;        
-    LN_SPI_Registers *_regs;    
-    LnIRQ _irq;    
+    xBinarySemaphore _done;
+    LN_SPI_Registers *_regs;
+    LnIRQ _irq;
 
     lnDMA txDma;
     // callbacks
@@ -95,6 +102,6 @@ class lnSPI_bp : public lnSPI
 
   public:
     void txDone();
-    void invokeCallback();    
+    void invokeCallback();
 };
 // EOF

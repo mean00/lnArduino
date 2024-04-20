@@ -25,21 +25,21 @@ static int nbInterrupt = 0;
 static int nbSkipped = 0;
 
 /**
- * @brief 
- * 
- * @param wordSize 
- * @param nbTransfer 
- * @param data 
- * @param repeat 
- * @return true 
- * @return false 
+ * @brief
+ *
+ * @param wordSize
+ * @param nbTransfer
+ * @param data
+ * @param repeat
+ * @return true
+ * @return false
  */
 bool lnSPI_bp::dmaWriteInternal(int wordSize, int nbTransfer, const uint8_t *data, bool repeat)
 {
     bool r = true;
+    sdisable();
     if (!nbTransfer)
         return true;
-    
 
     // that will clear errror
     updateMode(_regs, lnTxOnly); // tx only
@@ -76,68 +76,68 @@ bool lnSPI_bp::dmaWriteInternal(int wordSize, int nbTransfer, const uint8_t *dat
     }
     txDma.endTransfer();
     csOff();
-    sdisable();
+    // sdisable();
     updateDmaTX(_regs, false);
     return r;
 }
 
 /**
- * @brief 
- * 
- * @param nbBytes 
- * @param data 
- * @return true 
- * @return false 
+ * @brief
+ *
+ * @param nbBytes
+ * @param data
+ * @return true
+ * @return false
  */
-bool lnSPI_bp::write8(int nbBytes, const uint8_t *data)
+bool lnSPI_bp::blockWrite8(int nbBytes, const uint8_t *data)
 {
     return dmaWriteInternal(8, nbBytes, data, false);
 }
 
 /**
- * @brief 
- * 
- * @param nbBytes 
- * @param data 
- * @return true 
- * @return false 
+ * @brief
+ *
+ * @param nbBytes
+ * @param data
+ * @return true
+ * @return false
  */
-bool lnSPI_bp::write8Repeat(int nbBytes, const uint8_t data)
+bool lnSPI_bp::blockWrite8Repeat(int nbBytes, const uint8_t data)
 {
     return dmaWriteInternal(8, nbBytes, (uint8_t *)&data, true);
 }
 
 /**
- * @brief 
- * 
- * @param nbWord 
- * @param data 
- * @return true 
- * @return false 
+ * @brief
+ *
+ * @param nbWord
+ * @param data
+ * @return true
+ * @return false
  */
-bool lnSPI_bp::write16(int nbWord, const uint16_t *data)
+bool lnSPI_bp::blockWrite16(int nbWord, const uint16_t *data)
 {
     return dmaWriteInternal(16, nbWord, (uint8_t *)data, false);
 }
 
 /**
- * @brief 
- * 
- * @param nbWord 
- * @param data 
- * @return true 
- * @return false 
+ * @brief
+ *
+ * @param nbWord
+ * @param data
+ * @return true
+ * @return false
  */
-bool lnSPI_bp::write16Repeat(int nbWord, const uint16_t data)
+bool lnSPI_bp::blockWrite16Repeat(int nbWord, const uint16_t data)
 {
     return dmaWriteInternal(16, nbWord, (uint8_t *)&data, true);
 }
 
 /**
- * @brief 
- * 
- * @param c 
- * @param it 
+ * @brief
+ *
+ * @param c
+ * @param it
  */
 void lnSPI_bp::exTxDone(void *c, lnDMA::DmaInterruptType it)
 {
@@ -147,15 +147,15 @@ void lnSPI_bp::exTxDone(void *c, lnDMA::DmaInterruptType it)
 }
 
 /**
- * @brief 
- * 
- * @param nbWord 
- * @param data 
- * @param cb 
- * @param cookie 
- * @param repeat 
- * @return true 
- * @return false 
+ * @brief
+ *
+ * @param nbWord
+ * @param data
+ * @param cb
+ * @param cookie
+ * @param repeat
+ * @return true
+ * @return false
  */
 bool lnSPI_bp::asyncWrite16(int nbWord, const uint16_t *data, lnSpiCallback *cb, void *cookie, bool repeat)
 {
@@ -164,7 +164,6 @@ bool lnSPI_bp::asyncWrite16(int nbWord, const uint16_t *data, lnSpiCallback *cb,
     _done.tryTake();
     if (!nbWord)
         return true;
-    
 
     // that will clear errror
     updateMode(_regs, lnTxOnly); // tx only
@@ -177,15 +176,15 @@ bool lnSPI_bp::asyncWrite16(int nbWord, const uint16_t *data, lnSpiCallback *cb,
 }
 
 /**
- * @brief 
- * 
- * @param nbWord 
- * @param data 
- * @param cb 
- * @param cookie 
- * @param repeat 
- * @return true 
- * @return false 
+ * @brief
+ *
+ * @param nbWord
+ * @param data
+ * @param cb
+ * @param cookie
+ * @param repeat
+ * @return true
+ * @return false
  */
 bool lnSPI_bp::asyncWrite8(int nbWord, const uint8_t *data, lnSpiCallback *cb, void *cookie, bool repeat)
 {
@@ -204,10 +203,10 @@ bool lnSPI_bp::asyncWrite8(int nbWord, const uint8_t *data, lnSpiCallback *cb, v
     return nextWrite8(nbWord, data, cb, cookie, repeat);
 }
 /**
- * @brief 
- * 
- * @return true 
- * @return false 
+ * @brief
+ *
+ * @return true
+ * @return false
  */
 bool lnSPI_bp::finishAsyncDma()
 {
@@ -215,15 +214,15 @@ bool lnSPI_bp::finishAsyncDma()
     return true;
 }
 /**
- * @brief 
- * 
- * @return true 
- * @return false 
+ * @brief
+ *
+ * @return true
+ * @return false
  */
 bool lnSPI_bp::waitForAsync()
-{    
+{
     bool r = true;
-    if (false == _done.take(LN_SPI_LONG_TIMEOUT )) // 100 ms should be plenty enough!
+    if (false == _done.take(LN_SPI_LONG_TIMEOUT)) // 100 ms should be plenty enough!
     {
         r = false;
     }
@@ -238,10 +237,10 @@ bool lnSPI_bp::waitForAsync()
     return r;
 }
 /**
- * @brief 
- * 
- * @param a 
- * @param b 
+ * @brief
+ *
+ * @param a
+ * @param b
  */
 void asyncTrampoline(void *a, lnDMA::DmaInterruptType b)
 {
@@ -249,8 +248,8 @@ void asyncTrampoline(void *a, lnDMA::DmaInterruptType b)
     me->invokeCallback();
 }
 /**
- * @brief 
- * 
+ * @brief
+ *
  */
 void lnSPI_bp::invokeCallback()
 {
@@ -260,21 +259,21 @@ void lnSPI_bp::invokeCallback()
     cb(_callbackCookie);
 }
 /**
- * @brief 
- * 
- * @param nbTransfer 
- * @param data 
- * @param cb 
- * @param cookie 
- * @param repeat 
- * @return true 
- * @return false 
+ * @brief
+ *
+ * @param nbTransfer
+ * @param data
+ * @param cb
+ * @param cookie
+ * @param repeat
+ * @return true
+ * @return false
  */
 bool lnSPI_bp::nextWrite16(int nbTransfer, const uint16_t *data, lnSpiCallback *cb, void *cookie, bool repeat)
 {
     bool r;
     if (!nbTransfer)
-        return false;    
+        return false;
 
     _callback = cb;
     _callbackCookie = cookie;
@@ -289,21 +288,21 @@ bool lnSPI_bp::nextWrite16(int nbTransfer, const uint16_t *data, lnSpiCallback *
     return true;
 }
 /**
- * @brief 
- * 
- * @param nbTransfer 
- * @param data 
- * @param cb 
- * @param cookie 
- * @param repeat 
- * @return true 
- * @return false 
+ * @brief
+ *
+ * @param nbTransfer
+ * @param data
+ * @param cb
+ * @param cookie
+ * @param repeat
+ * @return true
+ * @return false
  */
-bool lnSPI_bp::nextWrite8(int nbTransfer, const uint8_t *data, lnSpiCallback *cb, void *cookie, bool repeat )
+bool lnSPI_bp::nextWrite8(int nbTransfer, const uint8_t *data, lnSpiCallback *cb, void *cookie, bool repeat)
 {
     bool r;
     if (!nbTransfer)
-        return false;    
+        return false;
 
     _callback = cb;
     _callbackCookie = cookie;

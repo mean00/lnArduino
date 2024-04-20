@@ -80,12 +80,13 @@ class lnSPI
 {
   public:
     static lnSPI *create(int instance, int pinCs = -1);
-  
-    virtual ~lnSPI() {}
 
-    
+    virtual ~lnSPI()
+    {
+    }
 
-    virtual void begin()=0;    
+    virtual void begin(int dataSize = 8) = 0;
+    virtual void end() = 0;
     void set(const lnSPISettings &st)
     {
         setSSEL(st.pinCS);
@@ -93,51 +94,74 @@ class lnSPI
         setBitOrder(st.bOrder);
         setDataMode(st.dMode);
     }
-    virtual void setBitOrder(spiBitOrder order)=0;
-    virtual void setDataMode(spiDataMode mode)=0;
-    virtual void setSpeed(int speed)=0; // speed in b/s
-            void setSSEL(int ssel)    {        _internalSettings.pinCS = (ssel);    };
+    virtual void setBitOrder(spiBitOrder order) = 0;
+    virtual void setDataMode(spiDataMode mode) = 0;
+    virtual void setSpeed(int speed) = 0; // speed in b/s
+    void setSSEL(int ssel)
+    {
+        _internalSettings.pinCS = (ssel);
+    };
     // async API
-    virtual bool asyncWrite8(int nbBytes, const uint8_t *data, lnSpiCallback *cb, void *cookie, bool repeat = false)=0;
-    virtual bool nextWrite8(int nbBytes, const uint8_t *data, lnSpiCallback *cb, void *cookie, bool repeat = false)=0;
-    virtual bool asyncWrite16(int nbWords, const uint16_t *data, lnSpiCallback *cb, void *cookie, bool repeat = false)=0;
-    virtual bool nextWrite16(int nbWords, const uint16_t *data, lnSpiCallback *cb, void *cookie, bool repeat = false)=0;
-    virtual bool finishAsyncDma()=0;
-    virtual bool waitForAsync()=0;
+    // begin()
+    // async write
+    // async next
+    // finish
+    // end()
+    virtual bool asyncWrite8(int nbBytes, const uint8_t *data, lnSpiCallback *cb, void *cookie,
+                             bool repeat = false) = 0;
+    virtual bool nextWrite8(int nbBytes, const uint8_t *data, lnSpiCallback *cb, void *cookie, bool repeat = false) = 0;
+    virtual bool asyncWrite16(int nbWords, const uint16_t *data, lnSpiCallback *cb, void *cookie,
+                              bool repeat = false) = 0;
+    virtual bool nextWrite16(int nbWords, const uint16_t *data, lnSpiCallback *cb, void *cookie,
+                             bool repeat = false) = 0;
+    virtual bool finishAsyncDma() = 0;
+    virtual bool waitForAsync() = 0;
 
-    // Helper Write functions, make sure you are under a session
-    virtual bool write8(uint8_t z)=0;
-    virtual bool write16(uint16_t z)=0;
+    // simple writes,  you need to do
+    // begin
+    // write
+    // ....
+    // end
+    virtual bool write8(uint8_t z) = 0;
+    virtual bool write16(uint16_t z) = 0;
+    virtual bool write16(int nbWord, const uint16_t *data) = 0;
+    virtual bool write8(int nbBytes, const uint8_t *data) = 0;
 
-    virtual bool write16(int nbWord, const uint16_t *data)=0;
-    virtual bool write16Repeat(int nbWord, const uint16_t data)=0;
-    virtual bool write8(int nbBytes, const uint8_t *data)=0;
-    virtual bool write8Repeat(int nbBytes, const uint8_t data)=0;
-    virtual void waitForCompletion() const=0;
+    // block write
+    // same thing
+    // begin
+    // blockWrite
+    // ...
+    // end
+    virtual bool blockWrite16(int nbWord, const uint16_t *data) = 0;
+    virtual bool blockWrite16Repeat(int nbWord, const uint16_t data) = 0;
+    virtual bool blockWrite8(int nbBytes, const uint8_t *data) = 0;
+    virtual bool blockWrite8Repeat(int nbBytes, const uint8_t data) = 0;
+    virtual void waitForCompletion() const = 0;
+
     // slow read/write
-    virtual bool transfer(int nbBytes, uint8_t *dataOut, uint8_t *dataIn)=0;
+    virtual bool transfer(int nbBytes, uint8_t *dataOut, uint8_t *dataIn) = 0;
 
     // wait for everything to be COMPLETELY done
-    //virtual void waitForCompletion()=0;
+    // virtual void waitForCompletion()=0;
     // This reads over the MOSI pin, i.e. only when only 2 wires are used MOSI + CLK, no MISO
-    virtual bool read1wire(int nbRead, uint8_t *rd)=0; // read, reuse MOSI
+    virtual bool read1wire(int nbRead, uint8_t *rd) = 0; // read, reuse MOSI
     //
     int getInstance()
     {
         return _instance;
-    }    
-    
-protected:
-  int             _instance;    
-  lnSPISettings   _internalSettings;  
-  lnSpiCallback   *_callback;
-  void            *_callbackCookie;
+    }
 
-protected:
-    lnSPI(int instance, int pinCs = -1) :
-     _internalSettings(1000000, SPI_MSBFIRST, SPI_MODE0, -1),      
-     _callback(NULL), _callbackCookie(NULL)
-      {
-      }
+  protected:
+    int _instance;
+    lnSPISettings _internalSettings;
+    lnSpiCallback *_callback;
+    void *_callbackCookie;
+
+  protected:
+    lnSPI(int instance, int pinCs = -1)
+        : _internalSettings(1000000, SPI_MSBFIRST, SPI_MODE0, -1), _callback(NULL), _callbackCookie(NULL)
+    {
+    }
 };
 // EOF
