@@ -64,7 +64,7 @@ static void spiHandler1()
  * @param instance
  * @param pinCs
  */
-rpSPI::rpSPI(int instance, int pinCs) : lnSPI(instance,pinCs)
+rpSPI::rpSPI(int instance, int pinCs) : lnSPI(instance, pinCs)
 {
     xAssert(!instances[instance]);
     instances[instance] = this;
@@ -90,16 +90,8 @@ rpSPI::~rpSPI()
 /**
  * @brief
  *
+ * @param wordsize
  */
- void rpSPI::begin()
- {
-    begin(8);
- }
- /**
-  * @brief 
-  * 
-  * @param wordsize 
-  */
 void rpSPI::begin(int wordsize)
 {
     _wordSize = wordsize;
@@ -167,7 +159,14 @@ void rpSPI::setSpeed(int speed)
     _cr0 &= ~LN_RP_SPI_CR0_DIVIDER_MASK;
     _cr0 |= LN_RP_SPI_CR0_DIVIDER(scaler);
 }
-
+/**
+ * @brief
+ *
+ */
+void rpSPI::waitForCompletion() const
+{
+    xAssert(0);
+}
 /**
  * @brief
  *
@@ -176,7 +175,7 @@ void rpSPI::setSpeed(int speed)
  * @return true
  * @return false
  */
-bool rpSPI::write8(int nbBytes, const uint8_t *data)
+bool rpSPI::blockWrite8(int nbBytes, const uint8_t *data)
 {
     xAssert(_wordSize == 8);
     _current = data;
@@ -200,7 +199,7 @@ bool rpSPI::write8(int nbBytes, const uint8_t *data)
  * @return true
  * @return false
  */
-bool rpSPI::write16(int nbHalfWord, const uint16_t *data)
+bool rpSPI::blockWrite16(int nbHalfWord, const uint16_t *data)
 {
     xAssert(_wordSize == 16);
     _current = (const uint8_t *)data;
@@ -263,131 +262,137 @@ void rpSPI::dmaHandler()
 }
 
 /**
- * @brief 
- * 
- * @param a 
- * @param b 
- * @return lnSPI* 
+ * @brief
+ *
+ * @param a
+ * @param b
+ * @return lnSPI*
  */
- lnSPI *lnSPI::create(int instance, int pinCs)
- {
-    return new rpSPI(instance , pinCs);
- }
-//--- not implemented --- 
-bool rpSPI::transfer(int nbBytes, uint8_t *dataOut, uint8_t *dataIn)  {xAssert(0);return false;}
+lnSPI *lnSPI::create(int instance, int pinCs)
+{
+    return new rpSPI(instance, pinCs);
+}
 //--- not implemented ---
-bool rpSPI::asyncDmaWrite16(int nbBytes, const uint16_t *data, lnSpiCallback *cb, void *cookie, bool repeat   ) {xAssert(0);return false;}
-bool rpSPI::nextDmaWrite16(int nbBytes, const uint16_t *data, lnSpiCallback *cb, void *cookie, bool repeat   ) {xAssert(0);return false;}
-bool rpSPI::finishAsyncDma() {xAssert(0);return false;}
-bool rpSPI::waitForAsyncDmaDone() {xAssert(0);return false;}
+bool rpSPI::transfer(int nbBytes, uint8_t *dataOut, uint8_t *dataIn)
+{
+    xAssert(0);
+    return false;
+}
 //--- not implemented ---
-void rpSPI::waitForCompletion() {xAssert(0);}
+bool rpSPI::asyncWrite16(int nbBytes, const uint16_t *data, lnSpiCallback *cb, void *cookie, bool repeat)
+{
+    xAssert(0);
+    return false;
+}
+bool rpSPI::nextWrite16(int nbBytes, const uint16_t *data, lnSpiCallback *cb, void *cookie, bool repeat)
+{
+    xAssert(0);
+    return false;
+}
+bool rpSPI::finishAsyncDma()
+{
+    xAssert(0);
+    return false;
+}
+bool rpSPI::asyncWrite8(int nbBytes, const uint8_t *data, lnSpiCallback *cb, void *cookie, bool repeat)
+{
+    xAssert(0);
+    return false;
+}
+bool rpSPI::nextWrite8(int nbBytes, const uint8_t *data, lnSpiCallback *cb, void *cookie, bool repeat)
+{
+    xAssert(0);
+    return false;
+}
 //--- not implemented ---
-void rpSPI::setDataSize(int dataSize)  {xAssert(0);} // 8 or 16
-void rpSPI::setBitOrder(spiBitOrder order) {xAssert(0);}
-void rpSPI::setDataMode(spiDataMode mode) {xAssert(0);}
+
 //--- not implemented ---
-lnPin rpSPI::misoPin() const { xAssert(0); return GPIO0;}
-lnPin rpSPI::mosiPin() const { xAssert(0); return GPIO0;}
-lnPin rpSPI::clkPin() const { xAssert(0); return GPIO0;}
-uint32_t rpSPI::getPeripheralClock() {xAssert(0);return 1;}
+void rpSPI::setDataSize(int dataSize)
+{
+    xAssert(0);
+} // 8 or 16
+void rpSPI::setBitOrder(spiBitOrder order)
+{
+    xAssert(0);
+}
+void rpSPI::setDataMode(spiDataMode mode)
+{
+    xAssert(0);
+}
 //--- not implemented ---
 /**
- * @brief 
- * 
- * @param nbHalfWord 
- * @param data 
- * @param repeat 
- * @return true 
- * @return false 
+ * @brief
+ *
+ * @param nbHalfWord
+ * @param data
+ * @param repeat
+ * @return true
+ * @return false
  */
-bool rpSPI::write16(int nbHalfWord, const uint16_t *data, bool repeat)
+bool rpSPI::blockWrite16Repeat(int nbHalfWord, const uint16_t data)
 {
-    if(repeat)
-        return dmaWrite16Repeat(nbHalfWord*2, *data);
-    else
-        return dmaWrite16(nbHalfWord*2, data);
+    xAssert(0);
+    return true;
 }
 /**
- * @brief 
- * 
- * @param z 
- * @return true 
- * @return false 
+ * @brief
+ *
+ * @param z
+ * @return true
+ * @return false
  */
-bool rpSPI::write(int z)
+bool rpSPI::write8(const uint8_t data)
 {
-    uint8_t a=(uint8_t)z;
-    return write8(1,&a);
-} 
-/**
- * @brief 
- * 
- * @param nbBytes 
- * @param data 
- * @param repeat 
- * @return true 
- * @return false 
- */
-bool rpSPI::write(int nbBytes, const uint8_t *data, bool repeat)
-{
-    if(repeat)
-        return dmaWrite8Repeat(nbBytes, *data);
-    else
-        return dmaWrite8(nbBytes, data);
+    return blockWrite8(1, &data);
 }
 /**
- * @brief 
- * 
- * @param nb 
- * @param pattern 
- * @return true 
- * @return false 
+ * @brief
+ *
+ * @param data
+ * @return true
+ * @return false
  */
-bool rpSPI::write16Repeat(int nb, const uint16_t pattern)
+bool rpSPI::write16(const uint16_t data)
 {
-     return dmaWrite16Repeat(nb, pattern);
+    return blockWrite16(1, &data);
 }
 
-bool rpSPI::dmaWrite16(int nbBytes, const uint16_t *data) {xAssert(0);return false;}
-bool rpSPI::dmaWrite16Repeat(int nbBytes, const uint16_t data) {xAssert(0);return false;}
-bool rpSPI::dmaWrite(int nbBytes, const uint8_t *data) {xAssert(0);return false;}
 /**
- * @brief 
- * 
- * @param settings 
+ * @brief
+ *
+ * @param nbBytes
+ * @param data
+ * @return true
+ * @return false
  */
-void rpSPI::beginTransaction(lnSPISettings &settings) 
-{    
+bool rpSPI::blockWrite8Repeat(int nbBytes, const uint8_t data)
+{
+    xAssert(0);
+    return true;
+}
+
+/**
+ * @brief
+ *
+ * @param settings
+ */
+void rpSPI::set(lnSPISettings &settings)
+{
     setBitOrder(settings.bOrder);
     setDataMode(settings.dMode);
     setSpeed((int)settings.speed);
 }
-/**
- * @brief 
- * 
- */
-void rpSPI::endTransaction() 
-{
-
-}
-/**
- * @brief 
- * 
- * @param bitSize 
- */
-void rpSPI::beginSession(int bitSize) 
-{
-    setDataSize(bitSize);
-}
-/**
- * @brief 
- * 
- */
-void rpSPI::endSession() 
-{
-
-}
 // --- not implemented ---
-bool rpSPI::read1wire(int nbRead, uint8_t *rd) {return false;} // read, reuse MOSI
+bool rpSPI::read1wire(int nbRead, uint8_t *rd)
+{
+    return false;
+} // read, reuse MOSI
+
+// -- not implemented --
+bool rpSPI::waitForAsync()
+{
+    xAssert(0);
+    return false;
+}
+
 //--
