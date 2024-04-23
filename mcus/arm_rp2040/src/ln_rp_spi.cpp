@@ -249,7 +249,6 @@ void rpSPI::waitForCompletion() const
             return;
         }
     }
-    return;
 }
 /**
  * @brief
@@ -268,6 +267,7 @@ bool rpSPI::blockWrite8(int nbBytes, const uint8_t *data)
     _spi->IMSC |= LN_RP_SPI_INT_TX;
     _state = TxStateBody;
     _txDone.tryTake();
+    _txDma->setTransferSize(8);
 #ifdef RP_SPI_USE_DMA
     _txDma->continueMemoryToPeripheralTransferNoLock(nbBytes, (const uint32_t *)data);
 #else
@@ -293,6 +293,7 @@ bool rpSPI::blockWrite16(int nbHalfWord, const uint16_t *data)
     _spi->DMACR = LN_RP_SPI_DMACR_RX | LN_RP_SPI_DMACR_TX;
     _state = TxStateBody;
     _txDone.tryTake();
+    _txDma->setTransferSize(16);
 #ifdef RP_SPI_USE_DMA
     _txDma->continueMemoryToPeripheralTransferNoLock(nbHalfWord, (const uint32_t *)data);
 #else

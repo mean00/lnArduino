@@ -70,24 +70,16 @@ void lnRpDmaSysInit()
     irq_set_exclusive_handler(DMA_IRQ_0, dma_irq0_handler);
     irq_set_enabled(DMA_IRQ_0, true);
 }
-
 /**
- * @brief Construct a new ln Rp D M A::ln Rp D M A object
+ * @brief
  *
- * @param type
- * @param dmaChannel
- * @param sourceWith
- * @param targetWidth
+ * @param size
  */
-lnRpDMA::lnRpDMA(DmaTransferType type, LN_RP_DMA_DREQ req, int transferWidth, DmaPriority prio)
+void lnRpDMA::setTransferSize(int size)
 {
-    _control = 0;
-    _channel = lookupFreeChannel();
-    _type = type;
-    _transferWidth = transferWidth;
-    _priority = prio;
-    _req = req;
     // now build up default control we'll re use later
+    _transferWidth = size;
+    _control &= ~LN_RP_DMA_CONTROL_SET_DATA_SIZE_MASK;
     switch (_transferWidth)
     {
     case 8:
@@ -103,6 +95,25 @@ lnRpDMA::lnRpDMA(DmaTransferType type, LN_RP_DMA_DREQ req, int transferWidth, Dm
         xAssert(0);
         break;
     }
+}
+
+/**
+ * @brief Construct a new ln Rp D M A::ln Rp D M A object
+ *
+ * @param type
+ * @param dmaChannel
+ * @param sourceWith
+ * @param targetWidth
+ */
+lnRpDMA::lnRpDMA(DmaTransferType type, LN_RP_DMA_DREQ req, int transferWidth, DmaPriority prio)
+{
+    _control = 0;
+    _channel = lookupFreeChannel();
+    _type = type;
+    _priority = prio;
+    _req = req;
+    // now build up default control we'll re use later
+    setTransferSize(transferWidth);
     switch (_type)
     {
     case DMA_MEMORY_TO_PERIPH:
