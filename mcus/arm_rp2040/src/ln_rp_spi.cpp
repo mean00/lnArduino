@@ -74,7 +74,16 @@ rpSPI::rpSPI(int instance, int pinCs) : lnSPI(instance, pinCs)
     _cr0 = LN_RP_SPI_CR0_DIVIDER(25) + LN_RP_SPI_CR0_MODE(0) + LN_RP_SPI_CR0_FORMAT_MOTOROLA;
     _cr1 = 0;
     _prescaler = 250;
-    _txDma = NULL;
+    _wordSize = 8;
+
+    _txDma = new lnRpDMA(lnRpDMA::DMA_MEMORY_TO_PERIPH, spis[_instance].txDma, _wordSize);
+    _txDma->attachCallback(dmaCb, this);
+    if (!_instance)
+        lnSetInterruptHandler(spis[_instance].irq, spiHandler0);
+    else
+        lnSetInterruptHandler(spis[_instance].irq, spiHandler1);
+    _txDma->doMemoryToPeripheralTransferNoLock(1, (const uint32_t *)NULL, (const uint32_t *)&(_spi->DR));
+    _txDma->armTransfer();
 }
 /**
  * @brief Destroy the rp S P I::rp S P I object
@@ -114,19 +123,10 @@ void rpSPI::begin(int wordsize)
     _spi->CR1 = _cr1;
     _spi->CPSR = _prescaler;
     _spi->IMSC = 0;
-    _spi->DMACR = LN_RP_SPI_DMACR_RX |
-                  LN_RP_SPI_DMACR_TX; // enable DMA, activating the correct DMA *or* IRQ will select DMA or not
+    _spi->DMACR = 0; /*LN_RP_SPI_DMACR_RX |  LN_RP_SPI_DMACR_TX */
+    ;                // enable DMA, activating the correct DMA *or* IRQ will select DMA or not
 
     _spi->CR1 |= LN_RP_SPI_CR1_ENABLE;
-
-    _txDma = new lnRpDMA(lnRpDMA::DMA_MEMORY_TO_PERIPH, spis[_instance].txDma, _wordSize);
-    _txDma->attachCallback(dmaCb, this);
-    if (!_instance)
-        lnSetInterruptHandler(spis[_instance].irq, spiHandler0);
-    else
-        lnSetInterruptHandler(spis[_instance].irq, spiHandler1);
-    _txDma->doMemoryToPeripheralTransferNoLock(1, (const uint32_t *)NULL, (const uint32_t *)&(_spi->DR));
-    _txDma->armTransfer();
 }
 /**
  * @brief
@@ -159,13 +159,97 @@ void rpSPI::setSpeed(int speed)
     _cr0 &= ~LN_RP_SPI_CR0_DIVIDER_MASK;
     _cr0 |= LN_RP_SPI_CR0_DIVIDER(scaler);
 }
+
+/**
+ * @brief
+ *
+ * @param order
+ */
+void rpSPI::setBitOrder(spiBitOrder order)
+{
+    switch (order)
+    {
+    case SPI_LSBFIRST:
+        xAssert(0);
+        break;
+    case SPI_MSBFIRST:
+        break;
+    default:
+        xAssert(0);
+        break;
+    }
+}
+
+/**
+ * @brief
+ *
+ * @param dataSize
+ */
+void rpSPI::setDataSize(int dataSize)
+{
+    _cr0 &= ~LN_RP_SPI_CR0_BITS_MASK;
+    switch (dataSize)
+    {
+    case 8:
+        _cr0 |= LN_RP_SPI_CR0_8_BITS;
+        break;
+    case 16:
+        _cr0 |= LN_RP_SPI_CR0_16_BITS;
+        break;
+    default:
+        xAssert(0);
+        break;
+    }
+    _spi->CR0 = _cr0;
+}
+
+/**
+ * @brief
+ *
+ * @param mode
+ */
+void rpSPI::setDataMode(spiDataMode mode)
+{
+    _cr0 &= ~LN_RP_SPI_CR0_MODE(3);
+    uint32_t r = 0;
+    switch (mode)
+    {
+    case SPI_MODE0:
+        r = 0;
+        break;
+    case SPI_MODE1:
+        r = 2;
+        break;
+    case SPI_MODE2:
+        r = 1;
+        break;
+    case SPI_MODE3:
+        r = 3;
+        break;
+    default:
+        xAssert(0);
+        break;
+    }
+    _cr0 |= LN_RP_SPI_CR0_MODE(r);
+    _spi->CR0 = _cr0;
+}
 /**
  * @brief
  *
  */
 void rpSPI::waitForCompletion() const
 {
-    xAssert(0);
+    int countdown = 10 * 1000 * 1000; // 100M/90k =>
+    while ((_spi->SR & LN_RP_SPI_SR_BSY))
+    {
+        __asm__("nop");
+        if (--countdown == 0)
+        {
+            Logger("SPI Timeout !\n");
+            return;
+        }
+    }
+    return;
 }
 /**
  * @brief
@@ -180,6 +264,7 @@ bool rpSPI::blockWrite8(int nbBytes, const uint8_t *data)
     xAssert(_wordSize == 8);
     _current = data;
     _limit = _current + nbBytes;
+    _spi->DMACR = LN_RP_SPI_DMACR_RX | LN_RP_SPI_DMACR_TX;
     _spi->IMSC |= LN_RP_SPI_INT_TX;
     _state = TxStateBody;
     _txDone.tryTake();
@@ -205,6 +290,7 @@ bool rpSPI::blockWrite16(int nbHalfWord, const uint16_t *data)
     _current = (const uint8_t *)data;
     _limit = _current + nbHalfWord * 2;
     _spi->IMSC |= LN_RP_SPI_INT_TX;
+    _spi->DMACR = LN_RP_SPI_DMACR_RX | LN_RP_SPI_DMACR_TX;
     _state = TxStateBody;
     _txDone.tryTake();
 #ifdef RP_SPI_USE_DMA
@@ -259,8 +345,20 @@ void rpSPI::dmaHandler()
 {
     _spi->IMSC = 0;
     _txDone.give();
+    _txDma->endTransfer();
 }
 
+/**
+ * @brief
+ *
+ * @param settings
+ */
+void rpSPI::set(lnSPISettings &settings)
+{
+    setBitOrder(settings.bOrder);
+    setDataMode(settings.dMode);
+    setSpeed((int)settings.speed);
+}
 /**
  * @brief
  *
@@ -278,47 +376,94 @@ bool rpSPI::transfer(int nbBytes, uint8_t *dataOut, uint8_t *dataIn)
     xAssert(0);
     return false;
 }
-//--- not implemented ---
-bool rpSPI::asyncWrite16(int nbBytes, const uint16_t *data, lnSpiCallback *cb, void *cookie, bool repeat)
+/**
+ * @brief
+ *
+ * @param nbWord
+ * @param data
+ * @param cb
+ * @param cookie
+ * @param repeat
+ * @return true
+ * @return false
+ */
+bool rpSPI::asyncWrite16(int nbWord, const uint16_t *data, lnSpiCallback *cb, void *cookie, bool repeat)
 {
-    xAssert(0);
-    return false;
+    this->_callback = cb;
+    this->_callbackCookie = cookie;
+    // source targer
+    _txDma->doPeripheralToMemoryTransferNoLock(nbWord, (const uint32_t *)data, (const uint32_t *)&(_spi->DR), repeat);
+    _txDma->beginTransfer();
+    return true;
 }
+/**
+ * @brief
+ *
+ * @param nbBytes
+ * @param data
+ * @param cb
+ * @param cookie
+ * @param repeat
+ * @return true
+ * @return false
+ */
 bool rpSPI::nextWrite16(int nbBytes, const uint16_t *data, lnSpiCallback *cb, void *cookie, bool repeat)
 {
-    xAssert(0);
-    return false;
+    this->_callback = cb;
+    this->_callbackCookie = cookie;
+    return _txDma->continueMemoryToPeripheralTransferNoLock(nbBytes, (const uint32_t *)data);
 }
+/**
+ * @brief
+ *
+ * @return true
+ * @return false
+ */
 bool rpSPI::finishAsyncDma()
 {
-    xAssert(0);
-    return false;
+    _txDma->endTransfer();
+    return true;
 }
+/**
+ * @brief
+ *
+ * @param nbBytes
+ * @param data
+ * @param cb
+ * @param cookie
+ * @param repeat
+ * @return true
+ * @return false
+ */
 bool rpSPI::asyncWrite8(int nbBytes, const uint8_t *data, lnSpiCallback *cb, void *cookie, bool repeat)
 {
-    xAssert(0);
-    return false;
+    this->_callback = cb;
+    this->_callbackCookie = cookie;
+    // source targer
+    _txDma->doPeripheralToMemoryTransferNoLock(nbBytes, (const uint32_t *)data, (const uint32_t *)&(_spi->DR), repeat);
+    _txDma->beginTransfer();
+    return true;
 }
+/**
+ * @brief
+ *
+ * @param nbBytes
+ * @param data
+ * @param cb
+ * @param cookie
+ * @param repeat
+ * @return true
+ * @return false
+ */
 bool rpSPI::nextWrite8(int nbBytes, const uint8_t *data, lnSpiCallback *cb, void *cookie, bool repeat)
 {
-    xAssert(0);
-    return false;
+    this->_callback = cb;
+    this->_callbackCookie = cookie;
+    return _txDma->continueMemoryToPeripheralTransferNoLock(nbBytes, (const uint32_t *)data);
 }
 //--- not implemented ---
 
 //--- not implemented ---
-void rpSPI::setDataSize(int dataSize)
-{
-    xAssert(0);
-} // 8 or 16
-void rpSPI::setBitOrder(spiBitOrder order)
-{
-    xAssert(0);
-}
-void rpSPI::setDataMode(spiDataMode mode)
-{
-    xAssert(0);
-}
 //--- not implemented ---
 /**
  * @brief
@@ -343,7 +488,7 @@ bool rpSPI::blockWrite16Repeat(int nbHalfWord, const uint16_t data)
  */
 bool rpSPI::write8(const uint8_t data)
 {
-    return blockWrite8(1, &data);
+    return write16(data);
 }
 /**
  * @brief
@@ -354,7 +499,17 @@ bool rpSPI::write8(const uint8_t data)
  */
 bool rpSPI::write16(const uint16_t data)
 {
-    return blockWrite16(1, &data);
+    int countdown = 1 * 1000 * 1000; // 100M/90k =>
+    while (!(_spi->SR & LN_RP_SPI_SR_TFE))
+    {
+        __asm__("nop");
+        if (--countdown == 0)
+        {
+            return false;
+        }
+    }
+    _spi->DR = data;
+    return true;
 }
 
 /**
@@ -371,17 +526,6 @@ bool rpSPI::blockWrite8Repeat(int nbBytes, const uint8_t data)
     return true;
 }
 
-/**
- * @brief
- *
- * @param settings
- */
-void rpSPI::set(lnSPISettings &settings)
-{
-    setBitOrder(settings.bOrder);
-    setDataMode(settings.dMode);
-    setSpeed((int)settings.speed);
-}
 // --- not implemented ---
 bool rpSPI::read1wire(int nbRead, uint8_t *rd)
 {

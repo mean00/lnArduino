@@ -29,9 +29,9 @@ class LN_RP_SPIx
 
 typedef volatile LN_RP_SPIx LN_RP_SPI;
 
-#define LN_RP_SPI_CR0_DIVIDER(x) (x << 8)
+#define LN_RP_SPI_CR0_DIVIDER(x) ((uint32_t)x << 8U)
 #define LN_RP_SPI_CR0_DIVIDER_MASK (0xf << 8)
-#define LN_RP_SPI_CR0_MODE(x) (x << 6) // PHASE  / POLARITY, motoroal only
+#define LN_RP_SPI_CR0_MODE(x) ((uint32_t)x << 6U) // PHASE  / POLARITY, motoroal only
 #define LN_RP_SPI_CR0_FORMAT_MOTOROLA (0 << 4)
 #define LN_RP_SPI_CR0_FORMAT_TI (1 << 4)
 #define LN_RP_SPI_CR0_FORMAT_NL (2 << 4)
@@ -41,11 +41,11 @@ typedef volatile LN_RP_SPIx LN_RP_SPI;
 //
 #define LN_RP_SPI_CR1_ENABLE (1 << 1)
 // Status
-#define LN_RP_SPI_SR_TFE (1 << 0) // Tx empty
-#define LN_RP_SPI_SR_TFN (1 << 1) // tx not full
-#define LN_RP_SPI_SR_RNE (1 << 2) // rx not empty
-#define LN_RP_SPI_SR_RFF (1 << 3) // rx full
-#define LN_RP_SPI_SR_BSY (1 << 4) // busy
+#define LN_RP_SPI_SR_TFE (1U << 0U) // Tx empty
+#define LN_RP_SPI_SR_TFN (1U << 1U) // tx not full
+#define LN_RP_SPI_SR_RNE (1U << 2U) // rx not empty
+#define LN_RP_SPI_SR_RFF (1U << 3U) // rx full
+#define LN_RP_SPI_SR_BSY (1U << 4U) // busy
 
 // interrupt mask set
 #define LN_RP_SPI_INT_OVR (1 << 0) // overrun RORIM

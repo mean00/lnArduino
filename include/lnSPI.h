@@ -117,7 +117,7 @@ class lnSPI
     virtual bool finishAsyncDma() = 0;
     virtual bool waitForAsync() = 0;
 
-    // simple writes,  you need to do
+    // simple writes, it is slow,   you need to do
     // begin
     // write
     // ....
