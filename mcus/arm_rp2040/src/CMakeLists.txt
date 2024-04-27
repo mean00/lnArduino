@@ -1,5 +1,7 @@
 configure_file( ${PICO_SDK_PATH}/src/common/pico_base/include/pico/version.h.in ${CMAKE_BINARY_DIR}/pico/version.h)
-
+IF(RP2040_NO_FLASH)
+  ADD_DEFINITIONS("-DPICO_NO_FLASH=1")
+ENDIF()
 add_custom_command(
   OUTPUT ${CMAKE_BINARY_DIR}/bs2_default_padded_checksummed.S
   COMMAND python ${PICO_SDK_PATH}/src/rp2_common/boot_stage2/pad_checksum -s 0xffffffff ${PICO_SDK_PATH}/src/rp2_common/boot_stage2/bs2_default.bin ${CMAKE_BINARY_DIR}/bs2_default_padded_checksummed.S
