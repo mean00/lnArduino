@@ -268,12 +268,10 @@ bool rpSPI::blockWrite8(int nbBytes, const uint8_t *data)
     _state = TxStateBody;
     _txDone.tryTake();
     _txDma->setTransferSize(8);
-#ifdef RP_SPI_USE_DMA
-    _txDma->continueMemoryToPeripheralTransferNoLock(nbBytes, (const uint32_t *)data);
-#else
-    lnEnableInterrupt(spis[_instance].irq);
-#endif
+    _txDma->doMemoryToPeripheralTransferNoLock(nbBytes, (const uint32_t *)data, (const uint32_t *)&(_spi->DR), false);
+    _txDma->beginTransfer();
     _txDone.take();
+    waitForCompletion();
     return true;
 }
 /**
@@ -294,12 +292,10 @@ bool rpSPI::blockWrite16(int nbHalfWord, const uint16_t *data)
     _state = TxStateBody;
     _txDone.tryTake();
     _txDma->setTransferSize(16);
-#ifdef RP_SPI_USE_DMA
-    _txDma->continueMemoryToPeripheralTransferNoLock(nbHalfWord, (const uint32_t *)data);
-#else
-    lnEnableInterrupt(spis[_instance].irq);
-#endif
+    _txDma->doMemoryToPeripheralTransferNoLock(nbHalfWord, (const uint32_t *)data, (const uint32_t *)&(_spi->DR),
+                                               false);
     _txDone.take();
+    waitForCompletion();
     return true;
 }
 
@@ -477,7 +473,17 @@ bool rpSPI::nextWrite8(int nbBytes, const uint8_t *data, lnSpiCallback *cb, void
  */
 bool rpSPI::blockWrite16Repeat(int nbHalfWord, const uint16_t data)
 {
-    xAssert(0);
+    xAssert(_wordSize == 16);
+    //_current = data;
+    //_limit = _current + nbHalfWord;
+    _spi->DMACR = LN_RP_SPI_DMACR_RX | LN_RP_SPI_DMACR_TX;
+    _spi->IMSC |= LN_RP_SPI_INT_TX;
+    _state = TxStateBody;
+    _txDone.tryTake();
+    _txDma->setTransferSize(8);
+    _txDma->doMemoryToPeripheralTransferNoLock(nbHalfWord, (const uint32_t *)data, (const uint32_t *)&(_spi->DR), true);
+    _txDma->beginTransfer();
+    _txDone.take();
     return true;
 }
 /**
@@ -536,7 +542,7 @@ bool rpSPI::read1wire(int nbRead, uint8_t *rd)
 // -- not implemented --
 bool rpSPI::waitForAsync()
 {
-    xAssert(0);
+    // xAssert(0);
     return false;
 }
 

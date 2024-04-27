@@ -188,7 +188,7 @@ bool lnRpDMA::doMemoryToPeripheralTransferNoLock(int count, const uint32_t *sour
     _dma->DMA_COUNT = count;
     _dma->DMA_READ = (uint32_t)source;
     _dma->DMA_WRITE = (uint32_t)target;
-    uint32_t control = _dma->DMA_CONTROL;
+    uint32_t control = _control;
     control &= ~(LN_RP_DMA_CONTROL_INCR_READ + LN_RP_DMA_CONTROL_INCR_WRITE);
     if (!repeat)
     {
@@ -207,7 +207,7 @@ bool lnRpDMA::doMemoryToPeripheralTransferNoLock(int count, const uint32_t *sour
  */
 bool lnRpDMA::continueMemoryToPeripheralTransferNoLock(int count, const uint32_t *source)
 {
-    uint32_t control = _dma->DMA_CONTROL & ~LN_RP_DMA_CONTROL_ENABLE;
+    uint32_t control = _control & ~LN_RP_DMA_CONTROL_ENABLE;
     _dma->DMA_CONTROL = control;
     _dma->DMA_COUNT = count;
     _dma->DMA_READ = (uint32_t)source;
@@ -229,7 +229,7 @@ bool lnRpDMA::doPeripheralToMemoryTransferNoLock(int count, const uint32_t *sour
     _dma->DMA_COUNT = count;
     _dma->DMA_READ = (uint32_t)source;
     _dma->DMA_WRITE = (uint32_t)target;
-    uint32_t control = _dma->DMA_CONTROL;
+    uint32_t control = _control;
     control &= ~(LN_RP_DMA_CONTROL_INCR_READ + LN_RP_DMA_CONTROL_INCR_WRITE);
     control |= LN_RP_DMA_CONTROL_INCR_WRITE;
     _dma->DMA_CONTROL = control;
