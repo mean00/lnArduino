@@ -33,7 +33,8 @@ void dma_irq0_handler()
         int bit = 1 << i;
         if (copy & bit)
         {
-            xAssert(dmaInstances[i]) dmaInstances[i]->invokeCallback();
+            xAssert(dmaInstances[i]);
+            dmaInstances[i]->invokeCallback();
         }
         copy &= ~bit;
     }
