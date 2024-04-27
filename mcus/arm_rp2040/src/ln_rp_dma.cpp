@@ -268,18 +268,6 @@ void lnRpDMA::beginTransfer()
 /**
  * @brief
  *
- *
- * dma_channel_set_irq0_enabled
- */
-void lnRpDMA::armTransfer()
-{
-    ENTER_CRITICAL();
-    dmactrl->INTE0 |= (1 << _channel);
-    EXIT_CRITICAL();
-}
-/**
- * @brief
- *
  * @return uint32_t
  */
 uint32_t lnRpDMA::getCurrentCount()
