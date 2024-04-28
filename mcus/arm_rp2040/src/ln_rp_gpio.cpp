@@ -48,7 +48,7 @@ void lnPinMode(const lnPin pin, const lnGpioMode mode, const int speedInMhz)
         xAssert(0);
         break;
     }
-    lnPads->PADS[pin] = pad;
+    lnPads->PADS[pin] = pad | LN_RP_PADS_SLEW_FAST;
     lnGpio->PINS[pin].control = fun + control;
     /*
     lnOUTPUT_OPEN_DRAIN = 4,
@@ -152,13 +152,13 @@ uint32_t lnReadPort(int port)
 }
 /**
  * @brief Construct a new ln Fast I O::ln Fast I O object
- * 
+ *
  */
 lnFastIO::lnFastIO(lnPin pin)
 {
     lnPinMode(pin, lnOUTPUT);
     _on = &(lnSio->GPIO_OUT_SET);
-    _off= &(lnSio->GPIO_OUT_CLR);
-    _bit = 1<< pin;
+    _off = &(lnSio->GPIO_OUT_CLR);
+    _bit = 1 << pin;
 }
 // EOF
