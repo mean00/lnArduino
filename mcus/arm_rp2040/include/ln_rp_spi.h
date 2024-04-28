@@ -82,6 +82,7 @@ class rpSPI : public lnSPI
     void dmaHandler();
 
   protected:
+    bool blockWrite_all(int wordSize, int nbExchange, const uint32_t *data, bool repeat);
     uint32_t _cr0, _cr1, _prescaler;
     uint32_t _instance;
     int _wordSize; // 8 or 16
