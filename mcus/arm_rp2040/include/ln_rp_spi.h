@@ -22,13 +22,6 @@ typedef volatile LN_RP_SPIx LN_RP_SPI;
 class rpSPI : public lnSPI
 {
   public:
-    enum spiTxState
-    {
-        TxStateBody,
-        TxStateLast
-    };
-
-  public:
     rpSPI(int instance, int pinCs = -1);
     virtual ~rpSPI();
 
@@ -94,9 +87,7 @@ class rpSPI : public lnSPI
     int _wordSize; // 8 or 16
     lnPin _cs;
     LN_RP_SPI *_spi;
-    const uint8_t *_current, *_limit;
 
     lnBinarySemaphore _txDone;
-    spiTxState _state;
     lnRpDMA *_txDma;
 };
