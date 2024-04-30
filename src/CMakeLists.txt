@@ -1,10 +1,9 @@
 #
 SET(LN_SOURCE_UTILS       
-                       MapleFreeRTOS1000_pp.cpp 
+                       lnFreeRTOS_pp.cpp 
                        systemAlloc.cpp 
                        lnDebug.cpp
                        lnStopWatch.cpp
-                       lnFreeRTOSDebug.cpp
                        systemHelper.cpp
                     )
 
