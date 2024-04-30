@@ -1,11 +1,10 @@
 #pragma once
 
 #include "lnArduino.h"
+#include "lnDma.h"
 #include "lnPeripheral_priv.h"
 #include "lnSerial.h"
 #include "lnSerial_priv.h"
-#include "lnDma.h"
-
 
 /**
  * @brief
@@ -38,7 +37,7 @@ class lnSerialBpCore : public lnSerialCore
     void enableInterrupt(bool tx, bool rx);
     bool _enableTx(txState mode);
 
-//--
+    //--
     void _setCallback(lnSerialCallback *cb, void *cookie)
     {
         _cb = cb;
@@ -48,14 +47,13 @@ class lnSerialBpCore : public lnSerialCore
     lnSerialCallback *_cb;
     void *_cbCookie;
 
-    
     LnIRQ _irq;
     uint32_t _adr;
     // tx
     volatile const uint8_t *_cur, *_tail;
     txState _txState;
-    xBinarySemaphore _txDone;
-    xMutex _txMutex;
+    lnBinarySemaphore _txDone;
+    lnMutex _txMutex;
 };
 
 /**

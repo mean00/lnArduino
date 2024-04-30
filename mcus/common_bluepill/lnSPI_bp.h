@@ -115,7 +115,7 @@ class lnSPI_bp : public lnSPI
     void csOff();
 
   protected:
-    xBinarySemaphore _done;
+    lnBinarySemaphore _done;
     LN_SPI_Registers *_regs;
     LnIRQ _irq;
 

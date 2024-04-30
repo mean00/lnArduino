@@ -1,6 +1,6 @@
 #include "Arduino.h"
-#include "MapleFreeRTOS1000_pp.h"
 #include "lnCpuID.h"
+#include "lnFreeRTOS_pp.h"
 
 static lnCpuID::LN_MCU _mcu;
 static lnCpuID::LN_VENDOR _vendor;
