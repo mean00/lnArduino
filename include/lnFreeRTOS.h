@@ -34,6 +34,8 @@ extern "C"
 #include "event_groups.h"
 #include "queue.h"
 #include "semphr.h"
+#include "stdbool.h"
+#include "stdint.h"
 #include "task.h"
 
     bool lnCreateTask(TaskFunction_t pxTaskCode,

@@ -28,15 +28,16 @@ bool lnspi_block_write8_repeat(ln_spi_c *instance, unsigned int nbByte, const ui
 bool lnspi_block_write16(ln_spi_c *instance, unsigned int nbWord, const uint16_t *data);
 bool lnspi_block_write8(ln_spi_c *instance, unsigned int nbByte, const uint8_t *data);
 
-bool lnspi_asyncWrite8(ln_spi_c *instance, int nbBytes, const uint8_t *data, lnSpiCallback *cb, void *cookie,
+bool lnspi_asyncWrite8(ln_spi_c *instance, unsigned int nbBytes, const uint8_t *data, lnSpiCallback *cb, void *cookie,
                        bool repeat);
-bool lnspi_nextWrite8(ln_spi_c *instance, int nbBytes, const uint8_t *data, lnSpiCallback *cb, void *cookie,
+bool lnspi_nextWrite8(ln_spi_c *instance, unsigned int nbBytes, const uint8_t *data, lnSpiCallback *cb, void *cookie,
                       bool repeat);
-bool lnspi_asyncWrite16(ln_spi_c *instance, int nbWords, const uint16_t *data, lnSpiCallback *cb, void *cookie,
+bool lnspi_asyncWrite16(ln_spi_c *instance, unsigned int nbWords, const uint16_t *data, lnSpiCallback *cb, void *cookie,
                         bool repeat);
-bool lnspi_nextWrite16(ln_spi_c *instance, int nbWords, const uint16_t *data, lnSpiCallback *cb, void *cookie,
+bool lnspi_nextWrite16(ln_spi_c *instance, unsigned int nbWords, const uint16_t *data, lnSpiCallback *cb, void *cookie,
                        bool repeat);
 bool lnspi_finishAsyncDma(ln_spi_c *instance);
 bool lnspi_waitForAsync(ln_spi_c *instance);
+bool lnspi_transfer8(ln_spi_c *instance, unsigned int nb, const uint8_t *tx, uint8_t *rx);
 
 // EOF

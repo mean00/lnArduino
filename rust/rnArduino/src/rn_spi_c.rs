@@ -162,10 +162,10 @@ extern "C" {
     ) -> bool;
 }
 extern "C" {
-    #[link_name = "\u{1}_Z17lnspi_asyncWrite8P8ln_spi_ciPKhPFvPvES3_b"]
+    #[link_name = "\u{1}_Z17lnspi_asyncWrite8P8ln_spi_cjPKhPFvPvES3_b"]
     pub fn lnspi_asyncWrite8(
         instance: *mut ln_spi_c,
-        nbBytes: cty::c_int,
+        nbBytes: cty::c_uint,
         data: *const u8,
         cb: lnSpiCallback,
         cookie: *mut cty::c_void,
@@ -173,10 +173,10 @@ extern "C" {
     ) -> bool;
 }
 extern "C" {
-    #[link_name = "\u{1}_Z16lnspi_nextWrite8P8ln_spi_ciPKhPFvPvES3_b"]
+    #[link_name = "\u{1}_Z16lnspi_nextWrite8P8ln_spi_cjPKhPFvPvES3_b"]
     pub fn lnspi_nextWrite8(
         instance: *mut ln_spi_c,
-        nbBytes: cty::c_int,
+        nbBytes: cty::c_uint,
         data: *const u8,
         cb: lnSpiCallback,
         cookie: *mut cty::c_void,
@@ -184,10 +184,10 @@ extern "C" {
     ) -> bool;
 }
 extern "C" {
-    #[link_name = "\u{1}_Z18lnspi_asyncWrite16P8ln_spi_ciPKtPFvPvES3_b"]
+    #[link_name = "\u{1}_Z18lnspi_asyncWrite16P8ln_spi_cjPKtPFvPvES3_b"]
     pub fn lnspi_asyncWrite16(
         instance: *mut ln_spi_c,
-        nbWords: cty::c_int,
+        nbWords: cty::c_uint,
         data: *const u16,
         cb: lnSpiCallback,
         cookie: *mut cty::c_void,
@@ -195,10 +195,10 @@ extern "C" {
     ) -> bool;
 }
 extern "C" {
-    #[link_name = "\u{1}_Z17lnspi_nextWrite16P8ln_spi_ciPKtPFvPvES3_b"]
+    #[link_name = "\u{1}_Z17lnspi_nextWrite16P8ln_spi_cjPKtPFvPvES3_b"]
     pub fn lnspi_nextWrite16(
         instance: *mut ln_spi_c,
-        nbWords: cty::c_int,
+        nbWords: cty::c_uint,
         data: *const u16,
         cb: lnSpiCallback,
         cookie: *mut cty::c_void,
@@ -212,6 +212,15 @@ extern "C" {
 extern "C" {
     #[link_name = "\u{1}_Z18lnspi_waitForAsyncP8ln_spi_c"]
     pub fn lnspi_waitForAsync(instance: *mut ln_spi_c) -> bool;
+}
+extern "C" {
+    #[link_name = "\u{1}_Z15lnspi_transfer8P8ln_spi_cjPKhPh"]
+    pub fn lnspi_transfer8(
+        instance: *mut ln_spi_c,
+        nb: cty::c_uint,
+        tx: *const u8,
+        rx: *mut u8,
+    ) -> bool;
 }
 pub type __uint8_t = cty::c_uchar;
 pub type __uint16_t = cty::c_ushort;

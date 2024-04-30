@@ -1,5 +1,4 @@
 #![allow(dead_code)]
-use alloc::boxed::Box;
 
 use crate::rnarduino as rn;
 use crate::rn_spi_c as rc;
@@ -69,6 +68,13 @@ impl rnSPI
         }
 
     }
+    pub fn set(&mut self,  st: &rnSPISettings)
+    {
+        unsafe {
+            rc::lnspi_set(self.ln, &rnSPI::rn2ln(st))
+            }
+
+    }
     pub fn begin(&mut self, sz: usize)
     {
         unsafe {
@@ -106,6 +112,36 @@ impl rnSPI
     {
         unsafe {
                 rc::lnspi_write16(self.ln,data)
+        }
+    }
+    pub fn block_write16( &mut self,  data : &[u16]  ) -> bool
+    {
+        unsafe {
+                rc::lnspi_block_write16(self.ln,data.len() as u32, data.as_ptr())
+        }
+    }
+    pub fn block_write8( &mut self,  data : &[u8]  ) -> bool
+    {
+        unsafe {
+                rc::lnspi_block_write8(self.ln,data.len() as u32, data.as_ptr())
+        }
+    }
+    pub fn block_write16_repeat( &mut self,  nb: usize, data : u16  ) -> bool
+    {
+        unsafe {
+                rc::lnspi_block_write16_repeat(self.ln,nb as u32, data)
+        }
+    }
+    pub fn block_write8_repeat( &mut self,  nb: usize, data : u8  ) -> bool
+    {
+        unsafe {
+                rc::lnspi_block_write8_repeat(self.ln,nb as u32, data)
+        }
+    }
+    pub fn transfer8( &mut self, tx: &[u8], rx: &mut [u8] ) -> bool
+    {
+        unsafe {
+                rc::lnspi_transfer8(self.ln, tx.len() as u32, tx.as_ptr(), rx.as_mut_ptr())
         }
     }
 }
