@@ -1,5 +1,5 @@
 #!/bin/bash
-#set -x
+set -x
 #
 if [ "$#" -ne 2 ]; then
     echo "rustgen.sh xxx.h xxx.rs"
@@ -19,7 +19,7 @@ fi
 echo " bindgen is $BINDGEN ."
 export LN=`realpath $ME/..` 
 
-export PLATFORM_TOOLCHAIN_PATH=`cmake -DHOME=$LN -P $ME/toolchain_env.cmake 2>& 1`
+export PLATFORM_TOOLCHAIN_PATH=`cmake -DUSE_CLANG=1 -DHOME=$LN -P $ME/toolchain_env.cmake 2>& 1`
 #export PLATFORM_TOOLCHAIN_PATH=/home/fx/Arduino_stm32/arm-gcc-2021q4/bin
 
 export PATH=$PLATFORM_TOOLCHAIN_PATH:$PATH
@@ -48,6 +48,7 @@ $BINDGEN      --use-core --no-doc-comments \
     -I$LN/FreeRTOS/include/  \
     -I$LN/mcus/arm_gd32fx/boards/bluepill/ \
     -I$LN/mcus/arm_gd32fx/include/ \
+    -I$LN/mcus/common_bluepill/ \
     -I$LN/legacy/boards/bluepill/ \
     -I$LN/FreeRTOS/portable/GCC/ARM_CM3/ \
     -target "thumbv7m-none-eabi"  \
