@@ -4,7 +4,7 @@ extern "C"
 {
 #include "lnFast_EventGroup_c.h"
 }
-
+#include "lnFreeRTOS_pp.h"
 #define WRAPME(x) ((lnFastEventGroup *)x)
 
 lnfast_event_group_c *lnfast_event_group_create()

@@ -2,9 +2,10 @@
 
 use crate::rnarduino as rn;
 use cty::{c_void};
-use crate::rnarduino::{UBaseType_t,TaskHandle_t};
+//use crate::rnarduino::{UBaseType_t,TaskHandle_t};
 use alloc::vec::Vec;
 use alloc::boxed::Box;
+use crate::rn_freertos_c::{lnCreateTask,UBaseType_t};
 //--
 pub fn delay_ms(to : u32)
 {
@@ -54,7 +55,7 @@ extern "C" fn trampoline( p : *mut cty::c_void)
 
 }
 
-pub fn rn_create_task(function_entry : &'static rnTaskEntry, name: &str, priority : usize, taskSize : u32, param : *mut c_void )
+pub fn rn_create_task(function_entry : &'static rnTaskEntry, name: &str, priority : usize, stackSize : u32, param : *mut c_void )
 {
     let task_param : TrampolineStruct = TrampolineStruct
     {
@@ -65,13 +66,12 @@ pub fn rn_create_task(function_entry : &'static rnTaskEntry, name: &str, priorit
     let name_as_vec :  Vec<char> = name.chars().collect();
 
     unsafe {
-        rn::xTaskCreate( 
+        lnCreateTask( 
             Some(trampoline), //Some(entry) as TaskFunction_t,
-            name_as_vec.as_ptr() as *const cty::c_char, 
-            taskSize as u16, 
+            name_as_vec.as_ptr() as *const i8,
+            stackSize as i32, 
             Box::<TrampolineStruct>::into_raw(param_box) as *mut c_void ,
-            priority as UBaseType_t, 
-            0 as *mut TaskHandle_t
+            priority as UBaseType_t
         );
     }
 }

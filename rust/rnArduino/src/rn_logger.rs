@@ -1,9 +1,10 @@
 #![allow(dead_code)]
 
-use crate::rnarduino as rn;
-use cty::{c_char};
+use crate::rn_freertos_c::Logger_chars;
+
+use cty::c_schar;
 use ufmt::uWrite;
-use core::{convert::Infallible};
+use core::convert::Infallible;
 
 
 pub struct W;
@@ -13,7 +14,7 @@ impl uWrite for W {
 
     fn write_str(&mut self, s: &str) -> Result<(), Infallible> {
         unsafe {
-            rn::Logger_chars(s.len() as i32, s.as_ptr() as *const c_char);
+            Logger_chars(s.len() as i32, s.as_ptr() as *const c_schar);
         }
         Ok(())
     }
