@@ -27,7 +27,7 @@
  */
 
 #pragma once
-
+#include "stdint.h"
 // Mode          Clock Polarity (CPOL)   Clock Phase (CPHA)
 // SPI_MODE0             0                     0
 // SPI_MODE1             0                     1
