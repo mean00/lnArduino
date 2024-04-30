@@ -102,7 +102,7 @@ class lnTwoWire
     int _targetAddress;
     int _speed;
     const LN_I2C_DESCRIPTOR *_d;
-    xBinarySemaphore _sem;
+    lnBinarySemaphore _sem;
     bool _result;
     _I2C_TX _txState;
     lnI2CSession *_session;
