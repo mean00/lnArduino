@@ -35,7 +35,7 @@ pub struct rnSPI
      setting        :      rnSPISettings,
 }
 
-/**
+/*
  * 
  * 
  */

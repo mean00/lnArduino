@@ -36,40 +36,40 @@ impl rnFastEventGroup
     }
    
         
-    ///
-    /// 
-    /// 
+    //
+    // 
+    // 
     pub fn take_ownership(&mut self)
     {
         unsafe {
             lnfast_event_group_takeOwnership(self.ln);
         }
     }
-    ///
-    /// 
-    /// 
+    //
+    // 
+    // 
     pub fn set_events(&self, event : u32)
     {
         unsafe {
             lnfast_event_group_set_events(self.ln,event);
         }
     }
-    ///
-    /// 
-    /// 
+    //
+    // 
+    // 
     pub fn wait_events(&self, maskint : u32, timeout : i32) -> u32
     {
         unsafe {
-            return lnfast_event_group_wait_events(self.ln, maskint, timeout);
+            lnfast_event_group_wait_events(self.ln, maskint, timeout)
         }
     } 
-    ///
-    /// 
-    /// 
+    //
+    // 
+    // 
     pub fn read_events(&self, msk : u32) -> u32
     {
         unsafe {
-            return lnfast_event_group_read_events(self.ln, msk);
+            lnfast_event_group_read_events(self.ln, msk)
         }
     } 
 }

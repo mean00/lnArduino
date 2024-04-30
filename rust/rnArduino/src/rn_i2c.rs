@@ -11,7 +11,7 @@ pub struct rnI2C
 {
      ln : *mut ln_i2c_c,
 }
-/**
+/*
  * 
  * 
  */
@@ -49,13 +49,13 @@ impl rnI2C
     pub fn write( &mut self, data : &[u8]  ) -> bool
     {
         unsafe {
-                lni2c_write(self.ln, data.len() as uint, data.as_ptr() as *const u8)
+                lni2c_write(self.ln, data.len() as uint, data.as_ptr() )
             }
     }
     pub fn write_to( &mut self, target: u8, data : &[u8]  ) -> bool
     {
         unsafe {
-                lni2c_write_to(self.ln, target as cint, data.len() as uint, data.as_ptr() as *const u8)
+                lni2c_write_to(self.ln, target as cint, data.len() as uint, data.as_ptr() )
             }
     }
     pub fn read( &mut self,  data : &mut [u8]  ) -> bool
