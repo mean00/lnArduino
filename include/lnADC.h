@@ -85,7 +85,7 @@ class lnTimingAdc : public lnBaseAdc
     void dmaDone();
     int _timer, _channel, _fq;
     lnDMA _dma;
-    xBinarySemaphore _dmaSem;
+    lnBinarySemaphore _dmaSem;
     lnAdcTimer *_adcTimer;
     int _nbPins;
 };

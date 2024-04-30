@@ -30,46 +30,7 @@
 #include "lnArduino.h"
 #include "lnDma.h"
 
-// Mode          Clock Polarity (CPOL)   Clock Phase (CPHA)
-// SPI_MODE0             0                     0
-// SPI_MODE1             0                     1
-// SPI_MODE2             1                     0
-// SPI_MODE3             1                     1
-enum spiDataMode
-{
-    SPI_MODE0 = 0,
-    SPI_MODE1 = 1,
-    SPI_MODE2 = 2,
-    SPI_MODE3 = 3
-};
-/**
- */
-enum spiBitOrder
-{
-    SPI_LSBFIRST = 0,
-    SPI_MSBFIRST = 1
-};
-/**
- * This is not really used
- */
-class lnSPISettings
-{
-  public:
-    lnSPISettings(uint32_t ispeed, spiBitOrder bitOrder, spiDataMode dataMode, int cs)
-    {
-        speed = ispeed;
-        bOrder = bitOrder;
-        dMode = dataMode;
-        pinCS = cs;
-    }
-
-    int pinCS;          // CS pin associated to the configuration
-    uint32_t speed;     // specifies the spi bus maximum clock speed
-    spiBitOrder bOrder; // bit order (MSBFirst or LSBFirst)
-    spiDataMode dMode;  // one of the data mode
-};
-
-typedef void lnSpiCallback(void *cookie);
+#include "lnSPI_defines.h"
 
 /**
  *

@@ -19,6 +19,7 @@
  */
 
 #pragma once
+#include "lnArduino.h"
 #include "lnDma.h"
 class lnBasicTimer;
 /**
@@ -51,5 +52,5 @@ class lnDAC
     int _instance;
     lnDMA _dma;
     lnBasicTimer *_timer;
-    xBinarySemaphore _dmaSem;
+    lnBinarySemaphore _dmaSem;
 };

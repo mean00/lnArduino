@@ -48,6 +48,7 @@ extern "C"
 
 #include "lnDebug.h"
 #include "lnFreeRTOS.h"
+#include "lnFreeRTOS_pp.h"
 #include "lnGPIO.h"
 #include "lnIRQ.h"
 #include "lnPeripherals.h"
