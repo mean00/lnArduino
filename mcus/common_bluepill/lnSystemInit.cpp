@@ -106,7 +106,6 @@ int main()
 #endif                             //
     lnCreateTask(initTask, "entryTask", LN_INITIAL_STACK_SIZE, NULL, LN_INITIAL_TASK_PRIORITY);
     vTaskStartScheduler();
-    lnGetFreeRTOSDebug();
     deadEnd(25);
 }
 // EOF
