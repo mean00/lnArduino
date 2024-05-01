@@ -3,10 +3,10 @@
  *  See license file
  */
 #include "lnArduino.h"
+#include "lnDma.h"
 #include "lnPinMapping.h"
 #include "lnTimer.h"
 #include "lnTimer_priv.h"
-
 extern LN_Timers_Registers *abTimers[5];
 #define aTimer(x) abTimers[x]
 /**

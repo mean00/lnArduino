@@ -9,7 +9,7 @@
     P##a##11, P##a##12, P##a##13, P##a##14, P##a##15,
 /**
  */
-enum lnPin
+enum lnPin : int
 {
     PPINS(A, 0) PPINS(B, 16) PPINS(C, 32) PPINS(D, 48) PPINS(E, 64) NoPin = -1
 };

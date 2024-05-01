@@ -8,7 +8,7 @@
 #define LN_SYSTEM_LED GPIO25
 /**
  */
-enum lnPin
+enum lnPin : int
 {
     PPINS(0)
     PPINS(1) PPINS(2) PPINS(3) PPINS(4) PPINS(5) PPINS(6) PPINS(7) PPINS(8) PPINS(9) PPINS(10) PPINS(11) PPINS(12)
