@@ -5,6 +5,7 @@
  */
 #include "Arduino.h"
 #include "lnArduino.h"
+#include "lnExti.h"
 extern "C" uint32_t xTickCount;
 extern "C" uint64_t get_timer_value();
 extern "C" uint32_t SystemCoreClock;
