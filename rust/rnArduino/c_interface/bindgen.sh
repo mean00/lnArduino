@@ -3,13 +3,13 @@
 gen_cpp()
 {
 echo "__________________cpp:${1}_________________________"
-bash ../../../cmake/rustgen.sh  ${1}   ${2}
+bash ../../../cmake/rustgen.sh  ${1}   ${2} $PWD
 }
 
 gen_c()
 {
 echo "__________________c:${1}_________________________"
-bash ../../../cmake/rustgen_c.sh  ${1}   ${2}
+bash ../../../cmake/rustgen_c.sh  ${1}   ${2} $PWD
 }
 
 
