@@ -10,7 +10,7 @@
 #define LN_INTERRUPT_TYPE __attribute__((used)) __attribute__((interrupt("IRQ")))
 #define underInterrupt xPortIsInsideInterrupt()
 
-enum LnIRQ
+enum LnIRQ : int
 {
     // These are exception, not really IRQS
     // but it"s simpler to manage the vector table

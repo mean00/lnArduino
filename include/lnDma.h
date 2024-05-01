@@ -3,7 +3,10 @@
  *  See license file
  */
 #pragma once
-#include "lnArduino.h"
+// #include "lnArduino.h"
+#include "stdint.h"
+enum lnPin : int;
+enum LnIRQ : int;
 /**
  *
  * \brief If you do a dma transfer

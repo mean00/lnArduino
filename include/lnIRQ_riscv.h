@@ -17,7 +17,7 @@
 #define LN_INTERRUPT_TYPE __attribute__((used)) __attribute__((interrupt("IRQ")));
 #endif
 
-enum LnIRQ
+enum LnIRQ : int
 {
     LN_IRQ_NONE = 0,
     LN_IRQ_WWDGT,          /*!< window watchDog timer interrupt                          */

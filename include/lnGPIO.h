@@ -3,7 +3,8 @@
  *  See license file
  */
 #pragma once
-#include "lnArduino.h"
+// #include "lnArduino.h"
+#include "stdint.h"
 
 /**
  */
@@ -44,5 +45,5 @@ void lnRemapTimerPin(int timer);
 
 #include "lnFastGpio.h"
 
-#include "lnExti.h"
-// EOF
+// #include "lnExti.h"
+//  EOF

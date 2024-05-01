@@ -1,8 +1,9 @@
 #pragma once
-#include "lnDma.h"
-
+// #include "lnDma.h"
+#include "stdint.h"
+class lnDMA;
 typedef void(lnTimerIrq)(void *cookie);
-
+enum lnPin : int;
 enum lnTimerMode
 {
     lnTimerModePwm0,

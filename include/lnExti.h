@@ -4,8 +4,8 @@
  */
 
 #pragma once
-#include "lnGPIO.h"
 
+enum lnPin : int;
 enum lnEdge
 {
     LN_EDGE_NONE = 0,

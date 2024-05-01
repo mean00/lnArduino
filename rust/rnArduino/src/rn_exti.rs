@@ -3,16 +3,14 @@
 use crate::rn_exti_c as exti;
 use crate::rn_gpio as gpio;
 pub use gpio::rnPin;
-pub use gpio::rnEdge as rnEdge;
+pub use exti::lnEdge as rnEdge;
 
 //
 fn rnPin2extiPin( _pin : gpio::rnPin) -> exti::lnPin {
     panic!();
-    exti::lnPin::PA0
 }
 fn rnEdge2extiEdge( _pin : gpio::rnEdge) -> exti::lnEdge {
     panic!( );
-    exti::lnEdge::LN_EDGE_NONE
 }
 //
 //
