@@ -13,6 +13,8 @@ use core::panic::PanicInfo;
 mod rn_i2c_c;
 mod rn_spi_c;
 mod rn_gpio_c;
+mod rn_exti_c;
+mod rn_timer_c;
 mod rn_fast_event_c;
 pub mod rnarduino;
 // internal API
@@ -22,9 +24,14 @@ pub mod rn_freertos_c;
 pub mod rn_os_helper;
 pub mod rn_exti;
 pub mod rn_fast_event_group;
-pub mod rn_adc_timer;
+//pub mod rn_adc_timer;
 pub mod rn_spi;
 pub mod rn_logger;
+//mod rn_timer_c;
+//pub use rn_timer_c::lnGetUs;
+//pub use rn_timer_c::lnGetMs;
+//pub use rn_timer_c::lnDelay;
+//pub use rn_timer_c::lnDelayUs;
 //
 //pub use crate::rn_gpio::rnPin as  rnPin;
 // embedded hal

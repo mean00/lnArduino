@@ -2,6 +2,7 @@
 
 use crate::rn_gpio_c as gpio;
 pub use gpio::lnPin as  rnPin;
+pub use gpio::lnEdge as  rnEdge;
 pub use gpio::lnGpioMode as rnGpioMode;
 pub use gpio::lnGetGpioToggleRegister;
 

@@ -1,21 +1,30 @@
 #![allow(dead_code)]
 
-use crate::rnarduino as rn;
-pub use rn::lnPin as  rnPin;
-pub use rn::lnGpioMode as rnGpioMode;
-pub use rn::lnEdge as rnEdge;
+use crate::rn_exti_c as exti;
+use crate::rn_gpio as gpio;
+pub use gpio::rnPin;
+pub use gpio::rnEdge as rnEdge;
 
+//
+fn rnPin2extiPin( _pin : gpio::rnPin) -> exti::lnPin {
+    assert!(false, "not implemented");
+    exti::lnPin::PA0
+}
+fn rnEdge2extiEdge( _pin : gpio::rnEdge) -> exti::lnEdge {
+    assert!(false, "not implemented");
+    exti::lnEdge::LN_EDGE_NONE
+}
 //
 //
 //
 pub fn attach_interrupt(
-        pin: rn::lnPin,
-        edge: rn::lnEdge,
-        cb: rn::lnExtiCallback,
+        pin: gpio::rnPin,
+        edge: gpio::rnEdge,
+        cb: exti::lnExtiCallback,
         cookie: *mut cty::c_void)
 {
   unsafe {
-        rn::lnExtiAttachInterrupt(pin,edge,cb,cookie);
+        exti::lnExtiAttachInterrupt( rnPin2extiPin(pin) ,rnEdge2extiEdge(edge),cb,cookie);
     }
 }
 //
@@ -24,7 +33,7 @@ pub fn attach_interrupt(
 pub fn detach_interrupt(pin: rnPin)
 {
     unsafe {
-        rn::lnExtiDetachInterrupt(pin);
+        exti::lnExtiDetachInterrupt(rnPin2extiPin(pin));
     }
 }
 //
@@ -33,7 +42,7 @@ pub fn detach_interrupt(pin: rnPin)
 pub fn enable_interrupt(pin: rnPin)
 {
   unsafe {
-        rn::lnExtiEnableInterrupt(pin);
+        exti::lnExtiEnableInterrupt(rnPin2extiPin(pin));
     }
 }
 //
@@ -42,7 +51,7 @@ pub fn enable_interrupt(pin: rnPin)
 pub fn disable_interrupt(pin: rnPin)
 {
   unsafe {
-        rn::lnExtiDisableInterrupt(pin);
+        exti::lnExtiDisableInterrupt(rnPin2extiPin(pin));
     }
 }
 // EOF

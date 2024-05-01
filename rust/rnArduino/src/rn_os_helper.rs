@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 
-use crate::rnarduino as rn;
+use crate::rn_timer_c as rt;
 use cty::{c_void};
 //use crate::rnarduino::{UBaseType_t,TaskHandle_t};
 use alloc::vec::Vec;
@@ -10,27 +10,27 @@ use crate::rn_freertos_c::{lnCreateTask,UBaseType_t};
 pub fn delay_ms(to : u32)
 {
     unsafe {
-        rn::lnDelay(to);
+        rt::lnDelay(to);
     }
 }
 pub fn delay_us(to : u32)
 {
     unsafe {
-        rn::lnDelayUs(to);
+        rt::lnDelayUs(to);
     }
 }
 
 pub fn  get_time_ms() -> u32
 {
     unsafe {
-        rn::lnGetMs()
+        rt::lnGetMs()
     }
 }
 
 pub fn  get_time_us() -> u32
 {
     unsafe {
-         rn::lnGetUs()
+         rt::lnGetUs()
     }
 }
 

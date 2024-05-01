@@ -1,8 +1,8 @@
 #![allow(dead_code)]
-use crate::rnarduino as rn;
+use crate::rn_gpio as gpio;
+pub use gpio::rnPin;
 use crate::rn_i2c_c::*;
 
-pub use rn::lnGpioMode as rnGpioMode;
 
 type cint = cty::c_int;
 type uint = cty::c_uint;
