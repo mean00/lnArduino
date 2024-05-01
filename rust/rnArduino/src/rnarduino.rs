@@ -323,6 +323,7 @@ pub const tskMPU_REGION_DEVICE_MEMORY: u32 = 16;
 pub const tskMPU_READ_PERMISSION: u32 = 1;
 pub const tskMPU_WRITE_PERMISSION: u32 = 2;
 pub const tskDEFAULT_INDEX_TO_NOTIFY: u32 = 0;
+pub const __bool_true_false_are_defined: u32 = 1;
 pub const LN_IRQ_OFFSET: u32 = 0;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]

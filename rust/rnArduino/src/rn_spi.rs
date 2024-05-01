@@ -1,13 +1,13 @@
 #![allow(dead_code)]
 
-use crate::rnarduino as rn;
+use crate::rn_gpio as gpio;
 use crate::rn_spi_c as rc;
 use rc::*;
+pub use gpio::rnPin;
 //use rc::{spiBitOrder,spiDataMode,lnSPISettings,ln_spi_c};
 //use crate::rnPin;
-pub use rn::lnPin as  rnPin;
 pub use rc::ln_spi_c as  lnSPI;
-pub use rn::lnGpioMode as rnGpioMode;
+//pub use gpio::lnGpioMode as rnGpioMode;
 
 type cint = cty::c_int;
 type uint = cty::c_uint;

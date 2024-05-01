@@ -1,9 +1,9 @@
 #![allow(dead_code)]
 
-use crate::rnarduino as rn;
-pub use rn::lnPin as  rnPin;
-pub use rn::lnGpioMode as rnGpioMode;
-use crate::rnarduino::lnGetGpioToggleRegister;
+use crate::rn_gpio_c as gpio;
+pub use gpio::lnPin as  rnPin;
+pub use gpio::lnGpioMode as rnGpioMode;
+pub use gpio::lnGetGpioToggleRegister;
 
 pub struct rnFastIO
 {
@@ -50,66 +50,66 @@ impl rnFastIO
 pub fn digitalWrite( pin: rnPin, value: bool)
 {
     unsafe {
-            rn::lnDigitalWrite(pin,value);
+            gpio::lnDigitalWrite(pin,value);
     }
 }
 pub fn digitalToggle( pin: rnPin)
 {
     unsafe {
-            rn::lnDigitalToggle(pin);
+            gpio::lnDigitalToggle(pin);
     }
 }
 pub fn digitalRead( pin: rnPin) -> bool
 {
     unsafe {
-            rn::lnDigitalRead(pin)
+            gpio::lnDigitalRead(pin)
     }
 }
 
 pub fn pinMode( pin : rnPin, mode: rnGpioMode)
 {
     unsafe {
-            rn::lnPinMode(pin,mode,0);
+            gpio::lnPinMode(pin,mode,0);
     }
 }
 
 pub fn pinModeSpeed( pin : rnPin, mode: rnGpioMode,speed: i32)
 {
     unsafe {
-            rn::lnPinMode(pin,mode,speed);
+            gpio::lnPinMode(pin,mode,speed);
     }
 }
 
 pub fn digital_write( pin: rnPin, value: bool)
 {
     unsafe {
-            rn::lnDigitalWrite(pin,value);
+            gpio::lnDigitalWrite(pin,value);
     }
 }
 pub fn digital_toggle( pin: rnPin)
 {
     unsafe {
-            rn::lnDigitalToggle(pin);
+            gpio::lnDigitalToggle(pin);
     }
 }
 pub fn digital_read( pin: rnPin) -> bool
 {
     unsafe {
-            rn::lnDigitalRead(pin)
+            gpio::lnDigitalRead(pin)
     }
 }
 
 pub fn pin_mode( pin : rnPin, mode: rnGpioMode)
 {
     unsafe {
-            rn::lnPinMode(pin,mode,0);
+            gpio::lnPinMode(pin,mode,0);
     }
 }
 
 pub fn pin_mode_speed( pin : rnPin, mode: rnGpioMode, speed: i32)
 {
     unsafe {
-            rn::lnPinMode(pin,mode,speed);
+            gpio::lnPinMode(pin,mode,speed);
     }
 }
 

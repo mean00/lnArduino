@@ -12,6 +12,7 @@ use core::panic::PanicInfo;
 // C api -> bindgen
 mod rn_i2c_c;
 mod rn_spi_c;
+mod rn_gpio_c;
 mod rn_fast_event_c;
 pub mod rnarduino;
 // internal API
@@ -24,6 +25,8 @@ pub mod rn_fast_event_group;
 pub mod rn_adc_timer;
 pub mod rn_spi;
 pub mod rn_logger;
+//
+//pub use crate::rn_gpio::rnPin as  rnPin;
 // embedded hal
 //pub mod rn_hal_gpio;
 
