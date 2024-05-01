@@ -952,38 +952,126 @@ extern "C" {
 extern "C" {
     pub static mut lnScratchRegister: cty::c_uint;
 }
+impl lnPin {
+    pub const PA0: lnPin = lnPin::GPIO0;
+}
+impl lnPin {
+    pub const PA1: lnPin = lnPin::GPIO1;
+}
+impl lnPin {
+    pub const PA2: lnPin = lnPin::GPIO2;
+}
+impl lnPin {
+    pub const PA3: lnPin = lnPin::GPIO3;
+}
+impl lnPin {
+    pub const PA4: lnPin = lnPin::GPIO4;
+}
+impl lnPin {
+    pub const PA5: lnPin = lnPin::GPIO5;
+}
+impl lnPin {
+    pub const PA6: lnPin = lnPin::GPIO6;
+}
+impl lnPin {
+    pub const PA7: lnPin = lnPin::GPIO7;
+}
+impl lnPin {
+    pub const PA8: lnPin = lnPin::GPIO8;
+}
+impl lnPin {
+    pub const PA9: lnPin = lnPin::GPIO9;
+}
+impl lnPin {
+    pub const PA10: lnPin = lnPin::GPIO10;
+}
+impl lnPin {
+    pub const PA11: lnPin = lnPin::GPIO11;
+}
+impl lnPin {
+    pub const PA12: lnPin = lnPin::GPIO12;
+}
+impl lnPin {
+    pub const PA13: lnPin = lnPin::GPIO13;
+}
+impl lnPin {
+    pub const PA14: lnPin = lnPin::GPIO14;
+}
+impl lnPin {
+    pub const PA15: lnPin = lnPin::GPIO15;
+}
+impl lnPin {
+    pub const PB0: lnPin = lnPin::GPIO16;
+}
+impl lnPin {
+    pub const PB1: lnPin = lnPin::GPIO17;
+}
+impl lnPin {
+    pub const PB2: lnPin = lnPin::GPIO18;
+}
+impl lnPin {
+    pub const PB3: lnPin = lnPin::GPIO19;
+}
+impl lnPin {
+    pub const PB4: lnPin = lnPin::GPIO20;
+}
+impl lnPin {
+    pub const PB5: lnPin = lnPin::GPIO21;
+}
+impl lnPin {
+    pub const PB6: lnPin = lnPin::GPIO22;
+}
+impl lnPin {
+    pub const PB7: lnPin = lnPin::GPIO23;
+}
+impl lnPin {
+    pub const PB8: lnPin = lnPin::GPIO24;
+}
+impl lnPin {
+    pub const PB9: lnPin = lnPin::GPIO25;
+}
+impl lnPin {
+    pub const PB10: lnPin = lnPin::GPIO26;
+}
+impl lnPin {
+    pub const PB11: lnPin = lnPin::GPIO27;
+}
+impl lnPin {
+    pub const PB12: lnPin = lnPin::GPIO28;
+}
 #[repr(i32)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub enum lnPin {
-    PA0 = 0,
-    PA1 = 1,
-    PA2 = 2,
-    PA3 = 3,
-    PA4 = 4,
-    PA5 = 5,
-    PA6 = 6,
-    PA7 = 7,
-    PA8 = 8,
-    PA9 = 9,
-    PA10 = 10,
-    PA11 = 11,
-    PA12 = 12,
-    PA13 = 13,
-    PA14 = 14,
-    PA15 = 15,
-    PB0 = 16,
-    PB1 = 17,
-    PB2 = 18,
-    PB3 = 19,
-    PB4 = 20,
-    PB5 = 21,
-    PB6 = 22,
-    PB7 = 23,
-    PB8 = 24,
-    PB9 = 25,
-    PB10 = 26,
-    PB11 = 27,
-    PB12 = 28,
+    GPIO0 = 0,
+    GPIO1 = 1,
+    GPIO2 = 2,
+    GPIO3 = 3,
+    GPIO4 = 4,
+    GPIO5 = 5,
+    GPIO6 = 6,
+    GPIO7 = 7,
+    GPIO8 = 8,
+    GPIO9 = 9,
+    GPIO10 = 10,
+    GPIO11 = 11,
+    GPIO12 = 12,
+    GPIO13 = 13,
+    GPIO14 = 14,
+    GPIO15 = 15,
+    GPIO16 = 16,
+    GPIO17 = 17,
+    GPIO18 = 18,
+    GPIO19 = 19,
+    GPIO20 = 20,
+    GPIO21 = 21,
+    GPIO22 = 22,
+    GPIO23 = 23,
+    GPIO24 = 24,
+    GPIO25 = 25,
+    GPIO26 = 26,
+    GPIO27 = 27,
+    GPIO28 = 28,
+    GPIO99 = 99,
     PB13 = 29,
     PB14 = 30,
     PB15 = 31,

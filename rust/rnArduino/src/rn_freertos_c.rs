@@ -225,33 +225,33 @@ pub const tskDEFAULT_INDEX_TO_NOTIFY: u32 = 0;
 pub const __bool_true_false_are_defined: u32 = 1;
 pub const true_: u32 = 1;
 pub const false_: u32 = 0;
-pub type wchar_t = core::ffi::c_uint;
+pub type wchar_t = cty::c_uint;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct max_align_t {
-    pub __clang_max_align_nonce1: core::ffi::c_longlong,
+    pub __clang_max_align_nonce1: cty::c_longlong,
     pub __clang_max_align_nonce2: f64,
 }
-pub type __int8_t = core::ffi::c_schar;
-pub type __uint8_t = core::ffi::c_uchar;
-pub type __int16_t = core::ffi::c_short;
-pub type __uint16_t = core::ffi::c_ushort;
-pub type __int32_t = core::ffi::c_int;
-pub type __uint32_t = core::ffi::c_uint;
-pub type __int64_t = core::ffi::c_longlong;
-pub type __uint64_t = core::ffi::c_ulonglong;
-pub type __int_least8_t = core::ffi::c_schar;
-pub type __uint_least8_t = core::ffi::c_uchar;
-pub type __int_least16_t = core::ffi::c_short;
-pub type __uint_least16_t = core::ffi::c_ushort;
-pub type __int_least32_t = core::ffi::c_int;
-pub type __uint_least32_t = core::ffi::c_uint;
-pub type __int_least64_t = core::ffi::c_longlong;
-pub type __uint_least64_t = core::ffi::c_ulonglong;
-pub type __intmax_t = core::ffi::c_longlong;
-pub type __uintmax_t = core::ffi::c_ulonglong;
-pub type __intptr_t = core::ffi::c_int;
-pub type __uintptr_t = core::ffi::c_uint;
+pub type __int8_t = cty::c_schar;
+pub type __uint8_t = cty::c_uchar;
+pub type __int16_t = cty::c_short;
+pub type __uint16_t = cty::c_ushort;
+pub type __int32_t = cty::c_int;
+pub type __uint32_t = cty::c_uint;
+pub type __int64_t = cty::c_longlong;
+pub type __uint64_t = cty::c_ulonglong;
+pub type __int_least8_t = cty::c_schar;
+pub type __uint_least8_t = cty::c_uchar;
+pub type __int_least16_t = cty::c_short;
+pub type __uint_least16_t = cty::c_ushort;
+pub type __int_least32_t = cty::c_int;
+pub type __uint_least32_t = cty::c_uint;
+pub type __int_least64_t = cty::c_longlong;
+pub type __uint_least64_t = cty::c_ulonglong;
+pub type __intmax_t = cty::c_longlong;
+pub type __uintmax_t = cty::c_ulonglong;
+pub type __intptr_t = cty::c_int;
+pub type __uintptr_t = cty::c_uint;
 pub type intmax_t = __intmax_t;
 pub type uintmax_t = __uintmax_t;
 pub type int_least8_t = __int_least8_t;
@@ -262,25 +262,25 @@ pub type int_least32_t = __int_least32_t;
 pub type uint_least32_t = __uint_least32_t;
 pub type int_least64_t = __int_least64_t;
 pub type uint_least64_t = __uint_least64_t;
-pub type int_fast8_t = core::ffi::c_schar;
-pub type uint_fast8_t = core::ffi::c_uchar;
-pub type int_fast16_t = core::ffi::c_short;
-pub type uint_fast16_t = core::ffi::c_ushort;
-pub type int_fast32_t = core::ffi::c_int;
-pub type uint_fast32_t = core::ffi::c_uint;
-pub type int_fast64_t = core::ffi::c_longlong;
-pub type uint_fast64_t = core::ffi::c_ulonglong;
+pub type int_fast8_t = cty::c_schar;
+pub type uint_fast8_t = cty::c_uchar;
+pub type int_fast16_t = cty::c_short;
+pub type uint_fast16_t = cty::c_ushort;
+pub type int_fast32_t = cty::c_int;
+pub type uint_fast32_t = cty::c_uint;
+pub type int_fast64_t = cty::c_longlong;
+pub type uint_fast64_t = cty::c_ulonglong;
 extern "C" {
-    pub static mut SystemCoreClock: core::ffi::c_uint;
+    pub static mut SystemCoreClock: cty::c_uint;
 }
 extern "C" {
-    pub fn do_assert(a: *const core::ffi::c_char);
+    pub fn do_assert(a: *const cty::c_char);
 }
-pub type TaskFunction_t = ::core::option::Option<unsafe extern "C" fn(arg: *mut core::ffi::c_void)>;
-pub type StackType_t = core::ffi::c_uint;
-pub type BaseType_t = core::ffi::c_long;
-pub type UBaseType_t = core::ffi::c_ulong;
-pub type TickType_t = core::ffi::c_uint;
+pub type TaskFunction_t = ::core::option::Option<unsafe extern "C" fn(arg: *mut cty::c_void)>;
+pub type StackType_t = cty::c_uint;
+pub type BaseType_t = cty::c_long;
+pub type UBaseType_t = cty::c_ulong;
+pub type TickType_t = cty::c_uint;
 extern "C" {
     pub fn vPortEnterCritical();
 }
@@ -297,7 +297,7 @@ extern "C" {
     pub fn pxPortInitialiseStack(
         pxTopOfStack: *mut StackType_t,
         pxCode: TaskFunction_t,
-        pvParameters: *mut core::ffi::c_void,
+        pvParameters: *mut cty::c_void,
     ) -> *mut StackType_t;
 }
 #[repr(C)]
@@ -326,13 +326,13 @@ extern "C" {
     pub fn vPortGetHeapStats(pxHeapStats: *mut HeapStats_t);
 }
 extern "C" {
-    pub fn pvPortMalloc(xSize: usize) -> *mut core::ffi::c_void;
+    pub fn pvPortMalloc(xSize: usize) -> *mut cty::c_void;
 }
 extern "C" {
-    pub fn pvPortCalloc(xNum: usize, xSize: usize) -> *mut core::ffi::c_void;
+    pub fn pvPortCalloc(xNum: usize, xSize: usize) -> *mut cty::c_void;
 }
 extern "C" {
-    pub fn vPortFree(pv: *mut core::ffi::c_void);
+    pub fn vPortFree(pv: *mut cty::c_void);
 }
 extern "C" {
     pub fn vPortInitialiseBlocks();
@@ -356,42 +356,42 @@ extern "C" {
 #[derive(Debug, Copy, Clone)]
 pub struct xSTATIC_LIST_ITEM {
     pub xDummy2: TickType_t,
-    pub pvDummy3: [*mut core::ffi::c_void; 4usize],
+    pub pvDummy3: [*mut cty::c_void; 4usize],
 }
 pub type StaticListItem_t = xSTATIC_LIST_ITEM;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct xSTATIC_MINI_LIST_ITEM {
     pub xDummy2: TickType_t,
-    pub pvDummy3: [*mut core::ffi::c_void; 2usize],
+    pub pvDummy3: [*mut cty::c_void; 2usize],
 }
 pub type StaticMiniListItem_t = xSTATIC_MINI_LIST_ITEM;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct xSTATIC_LIST {
     pub uxDummy2: UBaseType_t,
-    pub pvDummy3: *mut core::ffi::c_void,
+    pub pvDummy3: *mut cty::c_void,
     pub xDummy4: StaticMiniListItem_t,
 }
 pub type StaticList_t = xSTATIC_LIST;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct xSTATIC_TCB {
-    pub pxDummy1: *mut core::ffi::c_void,
+    pub pxDummy1: *mut cty::c_void,
     pub xDummy3: [StaticListItem_t; 2usize],
     pub uxDummy5: UBaseType_t,
-    pub pxDummy6: *mut core::ffi::c_void,
+    pub pxDummy6: *mut cty::c_void,
     pub ucDummy7: [u8; 16usize],
     pub uxDummy10: [UBaseType_t; 2usize],
     pub uxDummy12: [UBaseType_t; 2usize],
-    pub ulDummy18: [core::ffi::c_uint; 5usize],
+    pub ulDummy18: [cty::c_uint; 5usize],
     pub ucDummy19: [u8; 5usize],
 }
 pub type StaticTask_t = xSTATIC_TCB;
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct xSTATIC_QUEUE {
-    pub pvDummy1: [*mut core::ffi::c_void; 3usize],
+    pub pvDummy1: [*mut cty::c_void; 3usize],
     pub u: xSTATIC_QUEUE__bindgen_ty_1,
     pub xDummy3: [StaticList_t; 2usize],
     pub uxDummy4: [UBaseType_t; 3usize],
@@ -402,7 +402,7 @@ pub struct xSTATIC_QUEUE {
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub union xSTATIC_QUEUE__bindgen_ty_1 {
-    pub pvDummy2: *mut core::ffi::c_void,
+    pub pvDummy2: *mut cty::c_void,
     pub uxDummy2: UBaseType_t,
 }
 pub type StaticQueue_t = xSTATIC_QUEUE;
@@ -418,10 +418,10 @@ pub type StaticEventGroup_t = xSTATIC_EVENT_GROUP;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct xSTATIC_TIMER {
-    pub pvDummy1: *mut core::ffi::c_void,
+    pub pvDummy1: *mut cty::c_void,
     pub xDummy2: StaticListItem_t,
     pub xDummy3: TickType_t,
-    pub pvDummy5: *mut core::ffi::c_void,
+    pub pvDummy5: *mut cty::c_void,
     pub pvDummy6: TaskFunction_t,
     pub uxDummy7: UBaseType_t,
     pub ucDummy8: u8,
@@ -431,7 +431,7 @@ pub type StaticTimer_t = xSTATIC_TIMER;
 #[derive(Debug, Copy, Clone)]
 pub struct xSTATIC_STREAM_BUFFER {
     pub uxDummy1: [usize; 4usize],
-    pub pvDummy2: [*mut core::ffi::c_void; 3usize],
+    pub pvDummy2: [*mut cty::c_void; 3usize],
     pub ucDummy3: u8,
     pub uxDummy4: UBaseType_t,
 }
@@ -443,7 +443,7 @@ pub struct xLIST_ITEM {
     pub xItemValue: TickType_t,
     pub pxNext: *mut xLIST_ITEM,
     pub pxPrevious: *mut xLIST_ITEM,
-    pub pvOwner: *mut core::ffi::c_void,
+    pub pvOwner: *mut cty::c_void,
     pub pvContainer: *mut xLIST,
 }
 pub type ListItem_t = xLIST_ITEM;
@@ -486,20 +486,20 @@ pub struct tskTaskControlBlock {
 pub type TaskHandle_t = *mut tskTaskControlBlock;
 pub type ConstTaskHandle_t = *const tskTaskControlBlock;
 pub type TaskHookFunction_t =
-    ::core::option::Option<unsafe extern "C" fn(arg: *mut core::ffi::c_void) -> BaseType_t>;
+    ::core::option::Option<unsafe extern "C" fn(arg: *mut cty::c_void) -> BaseType_t>;
 pub const eTaskState_eRunning: eTaskState = 0;
 pub const eTaskState_eReady: eTaskState = 1;
 pub const eTaskState_eBlocked: eTaskState = 2;
 pub const eTaskState_eSuspended: eTaskState = 3;
 pub const eTaskState_eDeleted: eTaskState = 4;
 pub const eTaskState_eInvalid: eTaskState = 5;
-pub type eTaskState = core::ffi::c_uint;
+pub type eTaskState = cty::c_uint;
 pub const eNotifyAction_eNoAction: eNotifyAction = 0;
 pub const eNotifyAction_eSetBits: eNotifyAction = 1;
 pub const eNotifyAction_eIncrement: eNotifyAction = 2;
 pub const eNotifyAction_eSetValueWithOverwrite: eNotifyAction = 3;
 pub const eNotifyAction_eSetValueWithoutOverwrite: eNotifyAction = 4;
-pub type eNotifyAction = core::ffi::c_uint;
+pub type eNotifyAction = cty::c_uint;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct xTIME_OUT {
@@ -510,18 +510,18 @@ pub type TimeOut_t = xTIME_OUT;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct xMEMORY_REGION {
-    pub pvBaseAddress: *mut core::ffi::c_void,
-    pub ulLengthInBytes: core::ffi::c_uint,
-    pub ulParameters: core::ffi::c_uint,
+    pub pvBaseAddress: *mut cty::c_void,
+    pub ulLengthInBytes: cty::c_uint,
+    pub ulParameters: cty::c_uint,
 }
 pub type MemoryRegion_t = xMEMORY_REGION;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct xTASK_PARAMETERS {
     pub pvTaskCode: TaskFunction_t,
-    pub pcName: *const core::ffi::c_char,
+    pub pcName: *const cty::c_char,
     pub usStackDepth: u16,
-    pub pvParameters: *mut core::ffi::c_void,
+    pub pvParameters: *mut cty::c_void,
     pub uxPriority: UBaseType_t,
     pub puxStackBuffer: *mut StackType_t,
     pub xRegions: [MemoryRegion_t; 1usize],
@@ -531,12 +531,12 @@ pub type TaskParameters_t = xTASK_PARAMETERS;
 #[derive(Debug, Copy, Clone)]
 pub struct xTASK_STATUS {
     pub xHandle: TaskHandle_t,
-    pub pcTaskName: *const core::ffi::c_char,
+    pub pcTaskName: *const cty::c_char,
     pub xTaskNumber: UBaseType_t,
     pub eCurrentState: eTaskState,
     pub uxCurrentPriority: UBaseType_t,
     pub uxBasePriority: UBaseType_t,
-    pub ulRunTimeCounter: core::ffi::c_uint,
+    pub ulRunTimeCounter: cty::c_uint,
     pub pxStackBase: *mut StackType_t,
     pub usStackHighWaterMark: u16,
 }
@@ -544,13 +544,13 @@ pub type TaskStatus_t = xTASK_STATUS;
 pub const eSleepModeStatus_eAbortSleep: eSleepModeStatus = 0;
 pub const eSleepModeStatus_eStandardSleep: eSleepModeStatus = 1;
 pub const eSleepModeStatus_eNoTasksWaitingTimeout: eSleepModeStatus = 2;
-pub type eSleepModeStatus = core::ffi::c_uint;
+pub type eSleepModeStatus = cty::c_uint;
 extern "C" {
     pub fn xTaskCreate(
         pxTaskCode: TaskFunction_t,
-        pcName: *const core::ffi::c_char,
+        pcName: *const cty::c_char,
         usStackDepth: u16,
-        pvParameters: *mut core::ffi::c_void,
+        pvParameters: *mut cty::c_void,
         uxPriority: UBaseType_t,
         pxCreatedTask: *mut TaskHandle_t,
     ) -> BaseType_t;
@@ -624,10 +624,10 @@ extern "C" {
     pub fn uxTaskGetNumberOfTasks() -> UBaseType_t;
 }
 extern "C" {
-    pub fn pcTaskGetName(xTaskToQuery: TaskHandle_t) -> *mut core::ffi::c_char;
+    pub fn pcTaskGetName(xTaskToQuery: TaskHandle_t) -> *mut cty::c_char;
 }
 extern "C" {
-    pub fn vApplicationStackOverflowHook(xTask: TaskHandle_t, pcTaskName: *mut core::ffi::c_char);
+    pub fn vApplicationStackOverflowHook(xTask: TaskHandle_t, pcTaskName: *mut cty::c_char);
 }
 extern "C" {
     pub fn vApplicationTickHook();
@@ -636,34 +636,34 @@ extern "C" {
     pub fn uxTaskGetSystemState(
         pxTaskStatusArray: *mut TaskStatus_t,
         uxArraySize: UBaseType_t,
-        pulTotalRunTime: *mut core::ffi::c_uint,
+        pulTotalRunTime: *mut cty::c_uint,
     ) -> UBaseType_t;
 }
 extern "C" {
     pub fn xTaskGenericNotify(
         xTaskToNotify: TaskHandle_t,
         uxIndexToNotify: UBaseType_t,
-        ulValue: core::ffi::c_uint,
+        ulValue: cty::c_uint,
         eAction: eNotifyAction,
-        pulPreviousNotificationValue: *mut core::ffi::c_uint,
+        pulPreviousNotificationValue: *mut cty::c_uint,
     ) -> BaseType_t;
 }
 extern "C" {
     pub fn xTaskGenericNotifyFromISR(
         xTaskToNotify: TaskHandle_t,
         uxIndexToNotify: UBaseType_t,
-        ulValue: core::ffi::c_uint,
+        ulValue: cty::c_uint,
         eAction: eNotifyAction,
-        pulPreviousNotificationValue: *mut core::ffi::c_uint,
+        pulPreviousNotificationValue: *mut cty::c_uint,
         pxHigherPriorityTaskWoken: *mut BaseType_t,
     ) -> BaseType_t;
 }
 extern "C" {
     pub fn xTaskGenericNotifyWait(
         uxIndexToWaitOn: UBaseType_t,
-        ulBitsToClearOnEntry: core::ffi::c_uint,
-        ulBitsToClearOnExit: core::ffi::c_uint,
-        pulNotificationValue: *mut core::ffi::c_uint,
+        ulBitsToClearOnEntry: cty::c_uint,
+        ulBitsToClearOnExit: cty::c_uint,
+        pulNotificationValue: *mut cty::c_uint,
         xTicksToWait: TickType_t,
     ) -> BaseType_t;
 }
@@ -679,7 +679,7 @@ extern "C" {
         uxIndexToWaitOn: UBaseType_t,
         xClearCountOnExit: BaseType_t,
         xTicksToWait: TickType_t,
-    ) -> core::ffi::c_uint;
+    ) -> cty::c_uint;
 }
 extern "C" {
     pub fn xTaskGenericNotifyStateClear(
@@ -691,8 +691,8 @@ extern "C" {
     pub fn ulTaskGenericNotifyValueClear(
         xTask: TaskHandle_t,
         uxIndexToClear: UBaseType_t,
-        ulBitsToClear: core::ffi::c_uint,
-    ) -> core::ffi::c_uint;
+        ulBitsToClear: cty::c_uint,
+    ) -> cty::c_uint;
 }
 extern "C" {
     pub fn vTaskSetTimeOutState(pxTimeOut: *mut TimeOut_t);
@@ -782,23 +782,22 @@ pub struct tmrTimerControl {
 pub type TimerHandle_t = *mut tmrTimerControl;
 pub type TimerCallbackFunction_t =
     ::core::option::Option<unsafe extern "C" fn(xTimer: TimerHandle_t)>;
-pub type PendedFunction_t = ::core::option::Option<
-    unsafe extern "C" fn(arg1: *mut core::ffi::c_void, arg2: core::ffi::c_uint),
->;
+pub type PendedFunction_t =
+    ::core::option::Option<unsafe extern "C" fn(arg1: *mut cty::c_void, arg2: cty::c_uint)>;
 extern "C" {
     pub fn xTimerCreate(
-        pcTimerName: *const core::ffi::c_char,
+        pcTimerName: *const cty::c_char,
         xTimerPeriodInTicks: TickType_t,
         xAutoReload: BaseType_t,
-        pvTimerID: *mut core::ffi::c_void,
+        pvTimerID: *mut cty::c_void,
         pxCallbackFunction: TimerCallbackFunction_t,
     ) -> TimerHandle_t;
 }
 extern "C" {
-    pub fn pvTimerGetTimerID(xTimer: TimerHandle_t) -> *mut core::ffi::c_void;
+    pub fn pvTimerGetTimerID(xTimer: TimerHandle_t) -> *mut cty::c_void;
 }
 extern "C" {
-    pub fn vTimerSetTimerID(xTimer: TimerHandle_t, pvNewID: *mut core::ffi::c_void);
+    pub fn vTimerSetTimerID(xTimer: TimerHandle_t, pvNewID: *mut cty::c_void);
 }
 extern "C" {
     pub fn xTimerIsTimerActive(xTimer: TimerHandle_t) -> BaseType_t;
@@ -807,7 +806,7 @@ extern "C" {
     pub fn xTimerGetTimerDaemonTaskHandle() -> TaskHandle_t;
 }
 extern "C" {
-    pub fn pcTimerGetName(xTimer: TimerHandle_t) -> *const core::ffi::c_char;
+    pub fn pcTimerGetName(xTimer: TimerHandle_t) -> *const cty::c_char;
 }
 extern "C" {
     pub fn vTimerSetReloadMode(xTimer: TimerHandle_t, xAutoReload: BaseType_t);
@@ -910,25 +909,16 @@ extern "C" {
     pub fn vEventGroupDelete(xEventGroup: EventGroupHandle_t);
 }
 extern "C" {
-    pub fn vEventGroupSetBitsCallback(
-        pvEventGroup: *mut core::ffi::c_void,
-        ulBitsToSet: core::ffi::c_uint,
-    );
+    pub fn vEventGroupSetBitsCallback(pvEventGroup: *mut cty::c_void, ulBitsToSet: cty::c_uint);
 }
 extern "C" {
-    pub fn vEventGroupClearBitsCallback(
-        pvEventGroup: *mut core::ffi::c_void,
-        ulBitsToClear: core::ffi::c_uint,
-    );
+    pub fn vEventGroupClearBitsCallback(pvEventGroup: *mut cty::c_void, ulBitsToClear: cty::c_uint);
 }
 extern "C" {
-    pub fn uxEventGroupGetNumber(xEventGroup: *mut core::ffi::c_void) -> UBaseType_t;
+    pub fn uxEventGroupGetNumber(xEventGroup: *mut cty::c_void) -> UBaseType_t;
 }
 extern "C" {
-    pub fn vEventGroupSetNumber(
-        xEventGroup: *mut core::ffi::c_void,
-        uxEventGroupNumber: UBaseType_t,
-    );
+    pub fn vEventGroupSetNumber(xEventGroup: *mut cty::c_void, uxEventGroupNumber: UBaseType_t);
 }
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
@@ -941,7 +931,7 @@ pub type QueueSetMemberHandle_t = *mut QueueDefinition;
 extern "C" {
     pub fn xQueueGenericSend(
         xQueue: QueueHandle_t,
-        pvItemToQueue: *const core::ffi::c_void,
+        pvItemToQueue: *const cty::c_void,
         xTicksToWait: TickType_t,
         xCopyPosition: BaseType_t,
     ) -> BaseType_t;
@@ -949,18 +939,17 @@ extern "C" {
 extern "C" {
     pub fn xQueuePeek(
         xQueue: QueueHandle_t,
-        pvBuffer: *mut core::ffi::c_void,
+        pvBuffer: *mut cty::c_void,
         xTicksToWait: TickType_t,
     ) -> BaseType_t;
 }
 extern "C" {
-    pub fn xQueuePeekFromISR(xQueue: QueueHandle_t, pvBuffer: *mut core::ffi::c_void)
-        -> BaseType_t;
+    pub fn xQueuePeekFromISR(xQueue: QueueHandle_t, pvBuffer: *mut cty::c_void) -> BaseType_t;
 }
 extern "C" {
     pub fn xQueueReceive(
         xQueue: QueueHandle_t,
-        pvBuffer: *mut core::ffi::c_void,
+        pvBuffer: *mut cty::c_void,
         xTicksToWait: TickType_t,
     ) -> BaseType_t;
 }
@@ -976,7 +965,7 @@ extern "C" {
 extern "C" {
     pub fn xQueueGenericSendFromISR(
         xQueue: QueueHandle_t,
-        pvItemToQueue: *const core::ffi::c_void,
+        pvItemToQueue: *const cty::c_void,
         pxHigherPriorityTaskWoken: *mut BaseType_t,
         xCopyPosition: BaseType_t,
     ) -> BaseType_t;
@@ -990,7 +979,7 @@ extern "C" {
 extern "C" {
     pub fn xQueueReceiveFromISR(
         xQueue: QueueHandle_t,
-        pvBuffer: *mut core::ffi::c_void,
+        pvBuffer: *mut cty::c_void,
         pxHigherPriorityTaskWoken: *mut BaseType_t,
     ) -> BaseType_t;
 }
@@ -1057,12 +1046,12 @@ pub type SemaphoreHandle_t = QueueHandle_t;
 extern "C" {
     pub fn lnCreateTask(
         pxTaskCode: TaskFunction_t,
-        pcName: *const core::ffi::c_char,
-        stackSizeInBytes: core::ffi::c_int,
-        pvParameters: *mut core::ffi::c_void,
+        pcName: *const cty::c_char,
+        stackSizeInBytes: cty::c_int,
+        pvParameters: *mut cty::c_void,
         uxPriority: UBaseType_t,
     ) -> bool;
 }
 extern "C" {
-    pub fn Logger_chars(n: core::ffi::c_int, data: *const core::ffi::c_char);
+    pub fn Logger_chars(n: cty::c_int, data: *const cty::c_char);
 }

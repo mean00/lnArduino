@@ -57,26 +57,26 @@ pub const __int_fast16_t_defined: u32 = 1;
 pub const __int_fast32_t_defined: u32 = 1;
 pub const __int_fast64_t_defined: u32 = 1;
 pub const WINT_MIN: u32 = 0;
-pub type __int8_t = core::ffi::c_schar;
-pub type __uint8_t = core::ffi::c_uchar;
-pub type __int16_t = core::ffi::c_short;
-pub type __uint16_t = core::ffi::c_ushort;
-pub type __int32_t = core::ffi::c_int;
-pub type __uint32_t = core::ffi::c_uint;
-pub type __int64_t = core::ffi::c_longlong;
-pub type __uint64_t = core::ffi::c_ulonglong;
-pub type __int_least8_t = core::ffi::c_schar;
-pub type __uint_least8_t = core::ffi::c_uchar;
-pub type __int_least16_t = core::ffi::c_short;
-pub type __uint_least16_t = core::ffi::c_ushort;
-pub type __int_least32_t = core::ffi::c_int;
-pub type __uint_least32_t = core::ffi::c_uint;
-pub type __int_least64_t = core::ffi::c_longlong;
-pub type __uint_least64_t = core::ffi::c_ulonglong;
-pub type __intmax_t = core::ffi::c_longlong;
-pub type __uintmax_t = core::ffi::c_ulonglong;
-pub type __intptr_t = core::ffi::c_int;
-pub type __uintptr_t = core::ffi::c_uint;
+pub type __int8_t = cty::c_schar;
+pub type __uint8_t = cty::c_uchar;
+pub type __int16_t = cty::c_short;
+pub type __uint16_t = cty::c_ushort;
+pub type __int32_t = cty::c_int;
+pub type __uint32_t = cty::c_uint;
+pub type __int64_t = cty::c_longlong;
+pub type __uint64_t = cty::c_ulonglong;
+pub type __int_least8_t = cty::c_schar;
+pub type __uint_least8_t = cty::c_uchar;
+pub type __int_least16_t = cty::c_short;
+pub type __uint_least16_t = cty::c_ushort;
+pub type __int_least32_t = cty::c_int;
+pub type __uint_least32_t = cty::c_uint;
+pub type __int_least64_t = cty::c_longlong;
+pub type __uint_least64_t = cty::c_ulonglong;
+pub type __intmax_t = cty::c_longlong;
+pub type __uintmax_t = cty::c_ulonglong;
+pub type __intptr_t = cty::c_int;
+pub type __uintptr_t = cty::c_uint;
 pub type intmax_t = __intmax_t;
 pub type uintmax_t = __uintmax_t;
 pub type int_least8_t = __int_least8_t;
@@ -87,62 +87,62 @@ pub type int_least32_t = __int_least32_t;
 pub type uint_least32_t = __uint_least32_t;
 pub type int_least64_t = __int_least64_t;
 pub type uint_least64_t = __uint_least64_t;
-pub type int_fast8_t = core::ffi::c_schar;
-pub type uint_fast8_t = core::ffi::c_uchar;
-pub type int_fast16_t = core::ffi::c_short;
-pub type uint_fast16_t = core::ffi::c_ushort;
-pub type int_fast32_t = core::ffi::c_int;
-pub type uint_fast32_t = core::ffi::c_uint;
-pub type int_fast64_t = core::ffi::c_longlong;
-pub type uint_fast64_t = core::ffi::c_ulonglong;
+pub type int_fast8_t = cty::c_schar;
+pub type uint_fast8_t = cty::c_uchar;
+pub type int_fast16_t = cty::c_short;
+pub type uint_fast16_t = cty::c_ushort;
+pub type int_fast32_t = cty::c_int;
+pub type uint_fast32_t = cty::c_uint;
+pub type int_fast64_t = cty::c_longlong;
+pub type uint_fast64_t = cty::c_ulonglong;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct ln_i2c_c {
-    pub dummy: *mut core::ffi::c_void,
+    pub dummy: *mut cty::c_void,
 }
 extern "C" {
-    pub fn lni2c_create(instance: core::ffi::c_int, speed: core::ffi::c_int) -> *mut ln_i2c_c;
+    pub fn lni2c_create(instance: cty::c_int, speed: cty::c_int) -> *mut ln_i2c_c;
 }
 extern "C" {
     pub fn lni2c_delete(i2c: *mut ln_i2c_c);
 }
 extern "C" {
-    pub fn lni2c_setSpeed(ptr: *mut ln_i2c_c, speed: core::ffi::c_int);
+    pub fn lni2c_setSpeed(ptr: *mut ln_i2c_c, speed: cty::c_int);
 }
 extern "C" {
-    pub fn lni2c_setAddress(ptr: *mut ln_i2c_c, address: core::ffi::c_int);
+    pub fn lni2c_setAddress(ptr: *mut ln_i2c_c, address: cty::c_int);
 }
 extern "C" {
-    pub fn lni2c_write(ptr: *mut ln_i2c_c, n: core::ffi::c_uint, data: *const u8) -> bool;
+    pub fn lni2c_write(ptr: *mut ln_i2c_c, n: cty::c_uint, data: *const u8) -> bool;
 }
 extern "C" {
-    pub fn lni2c_read(ptr: *mut ln_i2c_c, n: core::ffi::c_uint, data: *mut u8) -> bool;
+    pub fn lni2c_read(ptr: *mut ln_i2c_c, n: cty::c_uint, data: *mut u8) -> bool;
 }
 extern "C" {
     pub fn lni2c_write_to(
         ptr: *mut ln_i2c_c,
-        target: core::ffi::c_int,
-        n: core::ffi::c_uint,
+        target: cty::c_int,
+        n: cty::c_uint,
         data: *const u8,
     ) -> bool;
 }
 extern "C" {
     pub fn lni2c_multi_write_to(
         ptr: *mut ln_i2c_c,
-        target: core::ffi::c_int,
-        nbSeqn: core::ffi::c_uint,
-        seqLength: *const core::ffi::c_uint,
+        target: cty::c_int,
+        nbSeqn: cty::c_uint,
+        seqLength: *const cty::c_uint,
         data: *mut *const u8,
     ) -> bool;
 }
 extern "C" {
     pub fn lni2c_read_from(
         ptr: *mut ln_i2c_c,
-        target: core::ffi::c_int,
-        n: core::ffi::c_uint,
+        target: cty::c_int,
+        n: cty::c_uint,
         data: *mut u8,
     ) -> bool;
 }
 extern "C" {
-    pub fn lni2c_begin(ptr: *mut ln_i2c_c, target: core::ffi::c_int) -> bool;
+    pub fn lni2c_begin(ptr: *mut ln_i2c_c, target: cty::c_int) -> bool;
 }
