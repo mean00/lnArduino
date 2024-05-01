@@ -7,11 +7,11 @@ pub use gpio::rnEdge as rnEdge;
 
 //
 fn rnPin2extiPin( _pin : gpio::rnPin) -> exti::lnPin {
-    assert!(false, "not implemented");
+    panic!();
     exti::lnPin::PA0
 }
 fn rnEdge2extiEdge( _pin : gpio::rnEdge) -> exti::lnEdge {
-    assert!(false, "not implemented");
+    panic!( );
     exti::lnEdge::LN_EDGE_NONE
 }
 //
