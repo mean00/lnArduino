@@ -19,7 +19,7 @@
  * @param spi
  * @param cs
  */
-simplerAD9833::simplerAD9833(hwlnSPIClass *spi, lnPin cs, int baseClock)
+simplerAD9833::simplerAD9833(lnSPI *spi, lnPin cs, int baseClock)
 {
     _spi = spi;
     _cs = cs;
@@ -136,12 +136,12 @@ void simplerAD9833::setFrequency(int fq)
  */
 void simplerAD9833::writeRegister(int addr, int value)
 {
-    _spi->beginTransaction(*_spiSettings);
+    _spi->begin(16);
     digitalWrite(_cs, false);
     _spi->write16(value);
     lnDelayUs(1);
     digitalWrite(_cs, true);
-    _spi->endTransaction();
+    _spi->end();
 }
 
 // EOF

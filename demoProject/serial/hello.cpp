@@ -23,10 +23,10 @@ void setup()
 }
 int rx = 0, tx = 0;
 #define RX_SIZE 128
-class rxTask : public xTask
+class rxTask : public lnTask
 {
   public:
-    rxTask(lnSerialRxTx *serial) : xTask("RX", 3, 800)
+    rxTask(lnSerialRxTx *serial) : lnTask("RX", 3, 800)
     {
         _ser = serial;
     }
@@ -41,7 +41,7 @@ class rxTask : public xTask
     }
     void run()
     {
-        _evGroup = new xFastEventGroup;
+        _evGroup = new lnFastEventGroup;
         _evGroup->takeOwnership();
         _ser->setCallback(cb, this);
         _ser->transmit(4, (const uint8_t *)"\nGo\n");
@@ -68,7 +68,7 @@ class rxTask : public xTask
         }
     }
     lnSerialRxTx *_ser;
-    xFastEventGroup *_evGroup;
+    lnFastEventGroup *_evGroup;
 };
 
 const char *block = ";End of Gcode\n"

@@ -45,7 +45,7 @@ class simplerAD9833
         Sine
     };
 
-    simplerAD9833(hwlnSPIClass *spi, lnPin cs, int baseClock = 25000000);
+    simplerAD9833(lnSPI *spi, lnPin cs, int baseClock = 25000000);
     virtual ~simplerAD9833();
     void enable();
     void disable();
@@ -55,7 +55,7 @@ class simplerAD9833
   protected:
     int readRegister(int addr);
     void writeRegister(int addr, int value);
-    hwlnSPIClass *_spi;
+    lnSPI *_spi;
     lnPin _cs;
     WaveForm _waveform;
     int _frequency;

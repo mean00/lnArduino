@@ -10,7 +10,7 @@
 #define AD9833_SPI 1
 
 simplerAD9833 *ad;
-hwlnSPIClass *spi;
+lnSPI *spi;
 
 void spiLoop();
 /**
@@ -21,7 +21,7 @@ void setup()
     pinMode(LN_SYSTEM_LED, OUTPUT);
     digitalWrite(LN_SYSTEM_LED, 0);
     Logger("Starting AD9833...");
-    spi = new hwlnSPIClass(AD9833_SPI);
+    spi = lnSPI::create(AD9833_SPI);
     spi->begin();
     spi->setSpeed(1000); // dont care much about the speed
     spi->setBitOrder(SPI_MSBFIRST);

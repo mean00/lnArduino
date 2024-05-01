@@ -28,6 +28,6 @@ class WS2812B_timer : public WS2812B_base, public lnDmaTimerCallback
     uint8_t _timerPwmValue[48];
     int _one, _zero;
     int _nextLed;
-    xBinarySemaphore _sem;
+    lnBinarySemaphore _sem;
     uint32_t lookup[16];
 };

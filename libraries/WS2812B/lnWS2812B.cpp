@@ -14,7 +14,7 @@
  * @param nbLeds
  * @param s
  */
-WS2812B::WS2812B(int nbLeds, hwlnSPIClass *s) : WS2812B_base(nbLeds)
+WS2812B::WS2812B(int nbLeds, lnSPI *s) : WS2812B_base(nbLeds)
 {
     _spi = s;
     int up = ((nbLeds + 3) & (~3)) + (WS_PREAMBLE + 23) / 24; // next multiple of 4 + add one before / one after
@@ -30,7 +30,7 @@ void WS2812B::begin()
     xAssert(_spi);
     _spi->begin();
     // Grab the SPI speed
-    int clock = _spi->getPeripheralClock();
+    int clock = lnPeripherals::getClock(Peripherals::pSPI0); // assume all spi have the same clock
     switch (clock)
     {
     case 128000000:
@@ -107,7 +107,7 @@ void WS2812B::setLedBrightness(int led, int brightness)
  */
 void WS2812B::update()
 {
-    _spi->dmaWrite(_nbLeds * 3 * 8 + WS_PREAMBLE, _ledsColorSPI); // add a couple of zeros at the end
+    _spi->blockWrite8(_nbLeds * 3 * 8 + WS_PREAMBLE, _ledsColorSPI); // add a couple of zeros at the end
 }
 /**
  *
@@ -130,7 +130,7 @@ static void convertOne(int color, int b16, uint8_t *target)
     color = (color * b16) >> 16;
 
     p[0] = lookupTable[(color >> 4) & 0xf];
-    p[1] = lookupTable[(color)&0xf];
+    p[1] = lookupTable[(color) & 0xf];
 }
 /**
  *

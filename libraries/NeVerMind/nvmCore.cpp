@@ -131,7 +131,7 @@ bool lnNvm::sanityCheck()
  */
 bool lnNvm::format()
 {
-    xAutoMutex aut(&_mutex);
+    lnAutoMutex aut(&_mutex);
     _currentSector = NVM_INVALID_SECTOR;
     // Prepare sector 0
     if (!prepareSector(0))
@@ -291,7 +291,7 @@ bool lnNvm::write(int id, int size, uint8_t *data)
 
     //
     int roundup = (size + 1) & 0xfe;
-    if ((_writeIndex + 8 + roundup) >= (LN_NVM_SECTOR_SIZE)*9 / 10)
+    if ((_writeIndex + 8 + roundup) >= (LN_NVM_SECTOR_SIZE) * 9 / 10)
     {
         if (!garbageCollection())
         {

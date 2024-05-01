@@ -63,5 +63,5 @@ class myMcp23017
     int PortALatch;
     int PortBValue;
     bool changed;
-    xBinarySemaphore _sem;
+    lnBinarySemaphore _sem;
 };

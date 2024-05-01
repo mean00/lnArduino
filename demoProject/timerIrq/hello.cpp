@@ -11,18 +11,18 @@ void setup()
 int xduration = 5;
 
 lnBasicDelayTimer *timer = NULL;
-xBinarySemaphore *sem = NULL;
+lnBinarySemaphore *sem = NULL;
 
 void handler(void *cookie)
 {
-    xBinarySemaphore *s = (xBinarySemaphore *)cookie;
+    lnBinarySemaphore *s = (lnBinarySemaphore *)cookie;
     s->give();
 }
 
 void loop()
 {
     timer = new lnBasicDelayTimer(0);
-    sem = new xBinarySemaphore;
+    sem = new lnBinarySemaphore;
     timer->setInterrupt(handler, sem);
     Logger("Go!\n");
     while (1)

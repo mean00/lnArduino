@@ -4,7 +4,7 @@
 #define BOOT0 PA8
 
 lnPin pin = NoPin;
-xBinarySemaphore *sem;
+lnBinarySemaphore *sem;
 
 void button0Cb(lnPin apin, void *cookie)
 {
@@ -16,7 +16,7 @@ void button0Cb(lnPin apin, void *cookie)
 void setup()
 {
     pinMode(LED, OUTPUT);
-    sem = new xBinarySemaphore;
+    sem = new lnBinarySemaphore;
     lnExtiAttachInterrupt(BOOT0, LN_EDGE_BOTH, button0Cb, NULL);
 }
 /**

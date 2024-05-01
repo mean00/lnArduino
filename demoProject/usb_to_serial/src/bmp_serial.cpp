@@ -10,72 +10,73 @@
 #include "lnBmpTask.h"
 #include "lnSerial.h"
 
-
-
 /**
 
 */
 
-#define SERIAL_EVENT    1
-#define USB_EVENT_READ  2
+#define SERIAL_EVENT 1
+#define USB_EVENT_READ 2
 #define USB_EVENT_WRITE 4
-#define USB_EVENTS (USB_EVENT_READ+USB_EVENT_WRITE)
+#define USB_EVENTS (USB_EVENT_READ + USB_EVENT_WRITE)
 
 #define LN_BMP_BUFFER_SIZE 256
 
 #if 0
-    #define XXD Logger
-    #define XXD_C Logger_chars
+#define XXD Logger
+#define XXD_C Logger_chars
 #else
-    #define XXD(...) {}
-    #define XXD_C(...) {}
+#define XXD(...)                                                                                                       \
+    {                                                                                                                  \
+    }
+#define XXD_C(...)                                                                                                     \
+    {                                                                                                                  \
+    }
 #endif
 
 class lnPump
 {
-public:   
+  public:
     lnPump()
     {
-        _txing= false;
-        _dex= _limit = 0;
+        _txing = false;
+        _dex = _limit = 0;
     }
-    bool     _txing;
-    uint32_t _dex,_limit;
-    uint8_t  _buffer[LN_BMP_BUFFER_SIZE];
+    bool _txing;
+    uint32_t _dex, _limit;
+    uint8_t _buffer[LN_BMP_BUFFER_SIZE];
 };
 
 /**
- * @brief 
- * 
+ * @brief
+ *
  */
-class BMPSerial : public xTask
+class BMPSerial : public lnTask
 {
 
   public:
-  /**
-   * @brief Construct a new BMPSerial object
-   * 
-   * @param usbInst 
-   * @param serialInstance 
-   */
+    /**
+     * @brief Construct a new BMPSerial object
+     *
+     * @param usbInst
+     * @param serialInstance
+     */
     BMPSerial(int usbInst, int serialInstance)
-        : xTask("usbserial", TASK_BMP_SERIAL_PRIORITY, TASK_BMP_SERIAL_STACK_SIZE)
+        : lnTask("usbserial", TASK_BMP_SERIAL_PRIORITY, TASK_BMP_SERIAL_STACK_SIZE)
     {
         _usbInstance = usbInst;
         _serialInstance = serialInstance;
-        _evGroup = new xFastEventGroup;
+        _evGroup = new lnFastEventGroup;
         _usb = new lnUsbCDC(_usbInstance);
         bool dma = true;
         _serial = createLnSerialRxTx(_serialInstance, LN_BMP_BUFFER_SIZE, dma); // no dma
         _connected = false;
         start();
     }
-    
 
-   /**
-    * @brief 
-    * 
-    */
+    /**
+     * @brief
+     *
+     */
     void run()
     {
         _evGroup->takeOwnership();
@@ -86,80 +87,79 @@ class BMPSerial : public xTask
         _serial->enableRx(false);
         _usb->setEventHandler(gdbCdcEventHandler, this);
         uint32_t ev = SERIAL_EVENT + USB_EVENTS;
-        bool oldbusy=true;
+        bool oldbusy = true;
         while (true)
         {
-            bool busy=false;
-            busy =busy || runUsbToSerial(ev);
-            busy= busy || runSerialToUsb(ev);
-            if(!busy)
+            bool busy = false;
+            busy = busy || runUsbToSerial(ev);
+            busy = busy || runSerialToUsb(ev);
+            if (!busy)
             {
-                if(oldbusy)
+                if (oldbusy)
                 {
                     //_usb->flush();
                 }
-                oldbusy=false;
+                oldbusy = false;
                 ev = _evGroup->waitEvents(SERIAL_EVENT + USB_EVENTS);
             }
-            oldbusy=true;
+            oldbusy = true;
         }
     }
     /**
-     * @brief 
-     * 
-     * @param ev 
-     * @return true 
-     * @return false 
+     * @brief
+     *
+     * @param ev
+     * @return true
+     * @return false
      */
     bool runUsbToSerial(uint32_t ev)
     {
         int nb = 0;
-        switch((int)_usb2serial._txing)
+        switch ((int)_usb2serial._txing)
         {
-            case 0 :  // idle
-                {
-                    if((ev & USB_EVENT_READ )==0)  // no event
-                        return false;
-                    nb = _usb->read(_usb2serial._buffer, LN_BMP_BUFFER_SIZE);
-                    if(nb==0)
-                        return false;    // nothing to do            
-                    _usb2serial._txing=true; // prepare for txing, will happen at next round
-                    _usb2serial._limit=nb;
-                    _usb2serial._dex=0;
-                    return true;                 
-                }
-                break;
-            case 1:
+        case 0: // idle
+        {
+            if ((ev & USB_EVENT_READ) == 0) // no event
+                return false;
+            nb = _usb->read(_usb2serial._buffer, LN_BMP_BUFFER_SIZE);
+            if (nb == 0)
+                return false;          // nothing to do
+            _usb2serial._txing = true; // prepare for txing, will happen at next round
+            _usb2serial._limit = nb;
+            _usb2serial._dex = 0;
+            return true;
+        }
+        break;
+        case 1: {
+            int avail = (int)(_usb2serial._limit - _usb2serial._dex);
+            uint8_t *ptr = _usb2serial._buffer + _usb2serial._dex;
+            XXD("<U2s:>");
+            XXD_C(avail, (const char *)(ptr));
+            int txed = _serial->transmitNoBlock(avail, ptr);
+            if (txed <= 0)
+                return false; // will wait for the tx done event
+
+            _usb2serial._dex += txed;
+            if (_usb2serial._limit == _usb2serial._dex) // all done
             {
-                int avail = (int)(_usb2serial._limit- _usb2serial._dex);                
-                uint8_t *ptr =  _usb2serial._buffer+ _usb2serial._dex;
-                XXD("<U2s:>");
-                XXD_C(avail,(const char *)( ptr));
-                int txed=_serial->transmitNoBlock(avail, ptr);
-                if(txed<=0)
-                    return false; // will wait for the tx done event
-                
-                _usb2serial._dex+=txed;                
-                if( _usb2serial._limit== _usb2serial._dex) // all done
-                {
-                  _usb2serial._txing=false;
-                  _evGroup->setEvents(USB_EVENTS); // for re-evaluation at next loop
-                }
-                return true;
+                _usb2serial._txing = false;
+                _evGroup->setEvents(USB_EVENTS); // for re-evaluation at next loop
             }
-                break;
-            default:
-                break;
+            return true;
+        }
+        break;
+        default:
+            break;
         }
         return false;
     }
     /**
-        * @brief 
-        * 
-        * @param ev 
-        * @return true 
-        * @return false 
-        */
+     * @brief
+     *
+     * @param ev
+     * @return true
+     * @return false
+     */
     bool runSerialToUsb(uint32_t ev)
     {
         int nb;
@@ -171,54 +171,52 @@ class BMPSerial : public xTask
             _serial->purgeRx();
             return false;
         }
-        switch((int)_serial2usb._txing)
+        switch ((int)_serial2usb._txing)
         {
-            case 0:
+        case 0: {
+            if ((ev & SERIAL_EVENT) == 0)
+                return false;
+            nb = _serial->getReadPointer(&to);
+            if (nb <= 0)
+                return false; // nothing to do
+            if (nb > LN_BMP_BUFFER_SIZE)
+                nb = LN_BMP_BUFFER_SIZE;
+            memcpy(_serial2usb._buffer, to, nb);
+            _serial->consume(nb);
+            _serial2usb._txing = true;
+            _serial2usb._dex = 0;
+            _serial2usb._limit = nb;
+            return true;
+        }
+        case 1: {
+            if (!_connected) // only pump data if we are connected
             {
-                if( (ev & SERIAL_EVENT)==0)
-                    return false;                
-                nb = _serial->getReadPointer(&to);
-                if (nb <= 0)
-                    return false; // nothing to do
-                if(nb>LN_BMP_BUFFER_SIZE)
-                    nb=LN_BMP_BUFFER_SIZE;
-                memcpy( _serial2usb._buffer,to, nb);
-                _serial->consume(nb);                
-                _serial2usb._txing=true;
-                _serial2usb._dex=0;
-                _serial2usb._limit=nb;
-                return true;
-                
+                _serial2usb._txing = false;
+                return false;
             }
-            case 1:
+            int available = (int)(_serial2usb._limit - _serial2usb._dex);
+            xAssert(available < LN_BMP_BUFFER_SIZE);
+            uint8_t *ptr = _serial2usb._buffer + _serial2usb._dex;
+            uint32_t consumed = _usb->writeNoBlock(ptr, available);
+            XXD("<S2U:Avail:%d, wr:%d\n", available, consumed);
+            if (!consumed)
+                return false; // wait for sent done event
+            _usb->flush();
+            XXD("<S2U>");
+            XXD_C(consumed, (const char *)(ptr));
+
+            _serial2usb._dex += consumed;
+            if (_serial2usb._dex == _serial2usb._limit)
             {
-                if (!_connected) // only pump data if we are connected
-                {
-                    _serial2usb._txing=false;
-                    return false;
-                }
-                int available = (int)(_serial2usb._limit-_serial2usb._dex);
-                xAssert(available < LN_BMP_BUFFER_SIZE);
-                uint8_t *ptr = _serial2usb._buffer+_serial2usb._dex;
-                uint32_t consumed = _usb->writeNoBlock(ptr, available );
-                XXD("<S2U:Avail:%d, wr:%d\n",available,consumed);
-                if(!consumed)
-                    return false; // wait for sent done event
-                _usb->flush();                
-                XXD("<S2U>"); XXD_C(consumed,(const char *)( ptr ));
-                
-                _serial2usb._dex+=consumed;
-                if( _serial2usb._dex== _serial2usb._limit)
-                {
-                    _serial2usb._txing=false;
-                    _evGroup->setEvents(SERIAL_EVENT);
-                }
-                return true;
+                _serial2usb._txing = false;
+                _evGroup->setEvents(SERIAL_EVENT);
             }
+            return true;
+        }
+        break;
+        default:
+            xAssert(0);
             break;
-            default:
-                xAssert(0);
-                break;
         }
         return false;
     }
@@ -240,12 +238,12 @@ class BMPSerial : public xTask
     {
         switch (event)
         {
-            
+
         case lnSerialCore::dataAvailable:
             _evGroup->setEvents(SERIAL_EVENT);
             break;
         case lnSerialCore::txDone:
-            _evGroup->setEvents(SERIAL_EVENT);            
+            _evGroup->setEvents(SERIAL_EVENT);
             break;
         default:
             xAssert(0);
@@ -275,7 +273,7 @@ class BMPSerial : public xTask
             break;
         case lnUsbCDC::CDC_SESSION_START:
             Logger("CDC SESSION START\n");
-            if(!_connected)
+            if (!_connected)
             {
                 _serial->enableRx(true);
             }
@@ -284,7 +282,8 @@ class BMPSerial : public xTask
         case lnUsbCDC::CDC_WRITE_AVAILABLE:
             _evGroup->setEvents(USB_EVENT_WRITE);
             break;
-        case lnUsbCDC::CDC_SESSION_END: // it is unlikely we'll get that one, some prg always sets it to 1, it works one time
+        case lnUsbCDC::CDC_SESSION_END: // it is unlikely we'll get that one, some prg always sets it to 1, it works one
+                                        // time
             _connected = false;
             Logger("CDC SESSION END\n");
             break;
@@ -295,14 +294,14 @@ class BMPSerial : public xTask
     }
 
   protected:
-    bool        _connected;
-    int         _usbInstance, _serialInstance;    
+    bool _connected;
+    int _usbInstance, _serialInstance;
     lnSerialRxTx *_serial;
-    lnUsbCDC    *_usb;
+    lnUsbCDC *_usb;
 
-    xFastEventGroup *_evGroup;
-    lnPump  _usb2serial;
-    lnPump  _serial2usb;
+    lnFastEventGroup *_evGroup;
+    lnPump _usb2serial;
+    lnPump _serial2usb;
 };
 
 void serialInit()

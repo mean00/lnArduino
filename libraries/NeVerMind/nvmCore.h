@@ -51,7 +51,7 @@ class lnNvm
   protected:
     int _nbSectors;
     int _currentSector;
-    xMutex _mutex;
+    lnMutex _mutex;
     int _writeIndex;
     int _readIndex;
 

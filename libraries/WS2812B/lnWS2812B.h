@@ -13,7 +13,7 @@
 class WS2812B : public WS2812B_base
 {
   public:
-    WS2812B(int nbLeds, hwlnSPIClass *s);
+    WS2812B(int nbLeds, lnSPI *s);
     virtual ~WS2812B();
 
     void begin();                                   // call this first
@@ -24,7 +24,7 @@ class WS2812B : public WS2812B_base
     void update();                                  // call this to have the changes committed
 
   protected:
-    hwlnSPIClass *_spi;
+    lnSPI *_spi;
     uint8_t *_ledsColorSPI;
 
   protected:

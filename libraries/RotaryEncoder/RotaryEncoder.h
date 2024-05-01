@@ -31,7 +31,7 @@ class lnRotary
     int _event;
     uint32_t _lastRead;
     uint32_t _down; // time down was detected
-    xFastEventGroup _events;
+    lnFastEventGroup _events;
     unsigned char _state;
     int process();
 };
