@@ -1,6 +1,10 @@
 #![allow(dead_code)]
 
-use crate::rn_gpio_c as gpio;
+#[cfg(feature = "rp2040")]
+use crate::rn_gpio_rp2040_c as gpio;
+#[cfg(not(feature = "rp2040"))]
+use crate::rn_gpio_bp_c as gpio;
+//
 pub use gpio::lnPin as  rnPin;
 pub use gpio::lnEdge as  rnEdge;
 pub use gpio::lnGpioMode as rnGpioMode;

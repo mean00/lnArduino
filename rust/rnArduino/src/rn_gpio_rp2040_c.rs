@@ -952,93 +952,6 @@ extern "C" {
 extern "C" {
     pub static mut lnScratchRegister: cty::c_uint;
 }
-impl lnPin {
-    pub const PA0: lnPin = lnPin::GPIO0;
-}
-impl lnPin {
-    pub const PA1: lnPin = lnPin::GPIO1;
-}
-impl lnPin {
-    pub const PA2: lnPin = lnPin::GPIO2;
-}
-impl lnPin {
-    pub const PA3: lnPin = lnPin::GPIO3;
-}
-impl lnPin {
-    pub const PA4: lnPin = lnPin::GPIO4;
-}
-impl lnPin {
-    pub const PA5: lnPin = lnPin::GPIO5;
-}
-impl lnPin {
-    pub const PA6: lnPin = lnPin::GPIO6;
-}
-impl lnPin {
-    pub const PA7: lnPin = lnPin::GPIO7;
-}
-impl lnPin {
-    pub const PA8: lnPin = lnPin::GPIO8;
-}
-impl lnPin {
-    pub const PA9: lnPin = lnPin::GPIO9;
-}
-impl lnPin {
-    pub const PA10: lnPin = lnPin::GPIO10;
-}
-impl lnPin {
-    pub const PA11: lnPin = lnPin::GPIO11;
-}
-impl lnPin {
-    pub const PA12: lnPin = lnPin::GPIO12;
-}
-impl lnPin {
-    pub const PA13: lnPin = lnPin::GPIO13;
-}
-impl lnPin {
-    pub const PA14: lnPin = lnPin::GPIO14;
-}
-impl lnPin {
-    pub const PA15: lnPin = lnPin::GPIO15;
-}
-impl lnPin {
-    pub const PB0: lnPin = lnPin::GPIO16;
-}
-impl lnPin {
-    pub const PB1: lnPin = lnPin::GPIO17;
-}
-impl lnPin {
-    pub const PB2: lnPin = lnPin::GPIO18;
-}
-impl lnPin {
-    pub const PB3: lnPin = lnPin::GPIO19;
-}
-impl lnPin {
-    pub const PB4: lnPin = lnPin::GPIO20;
-}
-impl lnPin {
-    pub const PB5: lnPin = lnPin::GPIO21;
-}
-impl lnPin {
-    pub const PB6: lnPin = lnPin::GPIO22;
-}
-impl lnPin {
-    pub const PB7: lnPin = lnPin::GPIO23;
-}
-impl lnPin {
-    pub const PB8: lnPin = lnPin::GPIO24;
-}
-impl lnPin {
-    pub const PB9: lnPin = lnPin::GPIO25;
-}
-impl lnPin {
-    pub const PB10: lnPin = lnPin::GPIO26;
-}
-impl lnPin {
-    pub const PB11: lnPin = lnPin::GPIO27;
-}
-impl lnPin {
-    pub const PB12: lnPin = lnPin::GPIO28;
-}
 #[repr(i32)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub enum lnPin {
@@ -1072,57 +985,6 @@ pub enum lnPin {
     GPIO27 = 27,
     GPIO28 = 28,
     GPIO99 = 99,
-    PB13 = 29,
-    PB14 = 30,
-    PB15 = 31,
-    PC0 = 32,
-    PC1 = 33,
-    PC2 = 34,
-    PC3 = 35,
-    PC4 = 36,
-    PC5 = 37,
-    PC6 = 38,
-    PC7 = 39,
-    PC8 = 40,
-    PC9 = 41,
-    PC10 = 42,
-    PC11 = 43,
-    PC12 = 44,
-    PC13 = 45,
-    PC14 = 46,
-    PC15 = 47,
-    PD0 = 48,
-    PD1 = 49,
-    PD2 = 50,
-    PD3 = 51,
-    PD4 = 52,
-    PD5 = 53,
-    PD6 = 54,
-    PD7 = 55,
-    PD8 = 56,
-    PD9 = 57,
-    PD10 = 58,
-    PD11 = 59,
-    PD12 = 60,
-    PD13 = 61,
-    PD14 = 62,
-    PD15 = 63,
-    PE0 = 64,
-    PE1 = 65,
-    PE2 = 66,
-    PE3 = 67,
-    PE4 = 68,
-    PE5 = 69,
-    PE6 = 70,
-    PE7 = 71,
-    PE8 = 72,
-    PE9 = 73,
-    PE10 = 74,
-    PE11 = 75,
-    PE12 = 76,
-    PE13 = 77,
-    PE14 = 78,
-    PE15 = 79,
     NoPin = -1,
 }
 #[repr(u32)]
@@ -1185,9 +1047,9 @@ extern "C" {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct lnFastIO {
-    pub _onoff: *mut cty::c_uint,
-    pub _onbit: cty::c_uint,
-    pub _offbit: cty::c_uint,
+    pub _on: *mut cty::c_uint,
+    pub _off: *mut cty::c_uint,
+    pub _bit: cty::c_uint,
 }
 extern "C" {
     #[link_name = "\u{1}_ZN8lnFastIOC1E5lnPin"]

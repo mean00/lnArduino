@@ -9,7 +9,6 @@ IF(True) #NOT ARDUINO_GD32_FREERTOS)
 
         MESSAGE(STATUS "ARDUINO_GD32_FREERTOS is ${ARDUINO_GD32_FREERTOS}")
         
-        OPTION(LN_ENABLE_RUST "Enable rust support" OFF) 
 
 
         include(applyPatch)

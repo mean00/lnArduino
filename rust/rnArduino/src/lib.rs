@@ -12,7 +12,10 @@ use core::panic::PanicInfo;
 // C api -> bindgen
 mod rn_i2c_c;
 mod rn_spi_c;
-mod rn_gpio_c;
+#[cfg(feature = "rp2040")]
+mod rn_gpio_rp2040_c;
+#[cfg(not(feature = "rp2040"))]
+mod rn_gpio_bp_c;
 mod rn_exti_c;
 mod rn_timer_c;
 mod rn_fast_event_c;

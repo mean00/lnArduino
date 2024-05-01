@@ -11,13 +11,14 @@ gen_c()
 echo "__________________c:${1}_________________________"
 bash ../../../cmake/rustgen_c.sh  ${1}   ${2} $PWD
 }
-
+# Will work for CH32/STM32 and GD32
+bash ../../../cmake/rustgen.sh lnGPIO_c.h ../src/rn_gpio_bp_c.rs ../../../mcus/arm_gd32fx/include
+bash ../../../cmake/rustgen.sh lnGPIO_c.h ../src/rn_gpio_rp2040_c.rs ../../../mcus/arm_rp2040/include
 
 #gen_cpp ../../../include/lnSPI.h ../src/rn_spi_l.rs
 gen_cpp lnTimer_c.h ../src/rn_timer_c.rs
 gen_cpp lnExti_c.h ../src/rn_exti_c.rs
 gen_c lnI2C_c.h ../src/rn_i2c_c.rs
-gen_cpp lnGPIO_c.h ../src/rn_gpio_c.rs
 gen_cpp lnSPI_c.h ../src/rn_spi_c.rs
 gen_c lnCDC_c.h ../src/rn_cdc_c.rs
 gen_c lnUSB_c.h ../src/rn_usb_c.rs
