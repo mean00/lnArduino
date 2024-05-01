@@ -1,5 +1,5 @@
 #!/bin/bash
-set -x
+#set -x
 #
 if [ "$#" -ne 2 ]; then
     echo "rustgen.sh xxx.h xxx.rs"

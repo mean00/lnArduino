@@ -22,10 +22,10 @@ export PATH=$PLATFORM_TOOLCHAIN_PATH:$PATH
 
 echo "** Processing $1 **"
 echo "   using <$LN> as basedir **"
-echo "   using <$PLATFORM_TOOLCHAIN_PATH> as PLATFORM_TOOLCHAIN_PATH **"
+#echo "   using <$PLATFORM_TOOLCHAIN_PATH> as PLATFORM_TOOLCHAIN_PATH **"
 echo "$1 => $2"
 export TMP=$1.tmp
-echo "Tmp .h file = $TMP"
+#echo "Tmp .h file = $TMP"
 rm -f $TMP
 echo "#ifdef __ARM_ARCH "> $TMP
 echo "   #undef uint32_t ">> $TMP
