@@ -3,7 +3,7 @@
  * @brief
  *
  */
- /*
+/*
  *  (C) 2021 MEAN00 fixounet@free.fr
  *  See license file
  */
@@ -29,7 +29,7 @@ class lnSerialBpTxOnlyInterrupt : public lnSerialBpCore, public lnSerialTxOnly
         return lnSerialBpCore::setSpeed(speed);
     }
     virtual bool transmit(int size, const uint8_t *buffer);
-    virtual int  transmitNoBlock(int size, const uint8_t *buffer);
+    virtual int transmitNoBlock(int size, const uint8_t *buffer);
     void txInterruptHandler(void);
     virtual void _interrupt(void);
     virtual bool rawWrite(int count, const uint8_t *buffer)

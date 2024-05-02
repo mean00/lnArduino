@@ -57,7 +57,7 @@ class lnSerialBpTxOnlyBufferedDma : public lnSerialBpCore, public lnSerialTxOnly
         return ln_serial_rawWrite(d, count, buffer);
     }
     virtual bool transmit(int size, const uint8_t *buffer);
-    virtual int  transmitNoBlock(int size, const uint8_t *buffer);
+    virtual int transmitNoBlock(int size, const uint8_t *buffer);
     virtual void _interrupt(void)
     {
         xAssert(0);

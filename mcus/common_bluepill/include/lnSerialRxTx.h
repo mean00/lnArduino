@@ -14,11 +14,11 @@ class lnSerialBpRxTx : public lnSerialBpTxOnlyInterrupt, public lnSerialRxTx
     {
         return lnSerialBpTxOnlyInterrupt::transmit(size, buffer);
     }
-    virtual int  transmitNoBlock(int size, const uint8_t *buffer)
+    virtual int transmitNoBlock(int size, const uint8_t *buffer)
     {
-         return lnSerialBpTxOnlyInterrupt::transmitNoBlock(size, buffer);
+        return lnSerialBpTxOnlyInterrupt::transmitNoBlock(size, buffer);
     }
-   
+
     virtual bool enableRx(bool enabled);
     virtual void purgeRx();
     virtual int read(int max, uint8_t *to);
@@ -33,7 +33,7 @@ class lnSerialBpRxTx : public lnSerialBpTxOnlyInterrupt, public lnSerialRxTx
     }
     void setCallback(lnSerialCallback *cb, void *cookie)
     {
-        lnSerialBpCore::_setCallback(cb,cookie);
+        lnSerialBpCore::_setCallback(cb, cookie);
     }
     //
     int modulo(int in)

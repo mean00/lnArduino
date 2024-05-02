@@ -36,5 +36,4 @@ class lnFastIO
     volatile uint32_t _onbit, _offbit;
 };
 
-
 // EOF
