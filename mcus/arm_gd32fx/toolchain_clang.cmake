@@ -129,6 +129,7 @@ SET(CMAKE_EXECUTABLE_SUFFIX_CXX .elf CACHE INTERNAL "")
 include_directories(${AF_FOLDER}/${LN_EXT}/boards/${GD32_BOARD}/)
 include_directories(${AF_FOLDER}/${LN_EXT}/)
 include_directories(${AF_FOLDER}/mcus/common_bluepill/)
+include_directories(${AF_FOLDER}/mcus/common_bluepill/include)
 
 
 MESSAGE(STATUS "MCU Architecture ${LN_ARCH}")
