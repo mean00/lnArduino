@@ -3,7 +3,7 @@ import subprocess
 import os
 
 projects = []
-blacklist = ['cmake','everything','usb','hello']
+blacklist = ['cmake','everything','usb'] #,'hello']
 failures = []
 
 def dbg(c):
