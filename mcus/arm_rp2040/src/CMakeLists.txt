@@ -122,3 +122,7 @@ target_include_directories(rplib PUBLIC  ${CMAKE_CURRENT_SOURCE_DIR}/../include)
 target_include_directories(rplib  PRIVATE ../private_include )
 target_link_libraries(rplib  PRIVATE lnArduinoInternal )
 
+IF(LN_ENABLE_RUST)
+                target_link_libraries(rplib PRIVATE lnarduino_c_bindings )        
+ENDIF(LN_ENABLE_RUST)
+
