@@ -30,4 +30,3 @@ GENERATE_GD32_FIRMWARE(lnDEMO src/demo.cpp)
 
 ADD_SUBDIRECTORY(rust)
 target_link_libraries(lnDEMO rust_demo)
-target_link_libraries(lnDEMO lnarduino_c_bindings)

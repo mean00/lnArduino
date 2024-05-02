@@ -128,6 +128,7 @@ include_directories(${AF_FOLDER}/mcus/common_bluepill/include)
 
 MESSAGE(STATUS "MCU Architecture ${LN_ARCH}")
 MESSAGE(STATUS "MCU Type         ${LN_MCU}")
+MESSAGE(STATUS "MCU Ext          ${LN_EXT}")
 MESSAGE(STATUS "MCU Speed        ${LN_MCU_SPEED}")
 MESSAGE(STATUS "MCU Flash Size   ${LN_MCU_FLASH_SIZE}")
 MESSAGE(STATUS "NVME Size        ${LN_MCU_EEPROM_SIZE}")

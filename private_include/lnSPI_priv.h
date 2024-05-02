@@ -4,7 +4,7 @@
  */
 
 #pragma once
-
+#include "stdint.h"
 struct LN_SPI_Registersx
 {
     uint32_t CTL0;    // 0
