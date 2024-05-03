@@ -5,16 +5,22 @@ include_directories( ${C} )
 
 IF(LN_ENABLE_USBD)
     include(${AF_FOLDER}/libraries/tinyUsb/tiny.cmake)
-    SET(USB ${C}/lnCDC_c.cpp
-            ${C}/lnUSB_c.cpp
-            )
+    SET(EXTRA ${EXTRA} ${C}/lnCDC_c.cpp ${C}/lnUSB_c.cpp)
+    MESSAGE(STATUS "********************************************************************* LN_ENABLE_USBD ${LN_ENABLE_USBD}")
+ENDIF()
+
+IF(LN_ENABLE_SPI)
+  SET(EXTRA ${EXTRA} ${C}/lnSPI_c.cpp)
+ENDIF()
+
+IF(LN_ENABLE_I2C)
+  SET(EXTRA ${EXTRA} ${C}/lnI2C_c.cpp)
 ENDIF()
 
 add_library(lnarduino_c_bindings STATIC 
-                                        ${C}/lnSPI_c.cpp 
-                                        ${C}/lnI2C_c.cpp 
+                                        ${EXTRA}
                                         ${C}/lnFast_EventGroup_c.cpp
-                                        ${USB} )
+                                         )
 target_link_libraries(lnarduino_c_bindings lnArduinoInternal)
 
 IF(LN_ENABLE_USBD)
