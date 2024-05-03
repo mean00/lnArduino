@@ -16,6 +16,10 @@ mod rn_spi_c;
 pub mod rn_gpio_rp2040_c;
 #[cfg(not(feature = "rp2040"))]
 pub mod rn_gpio_bp_c;
+#[cfg(feature = "rp2040")]
+pub mod rn_fast_gpio_rp2040;
+#[cfg(not(feature = "rp2040"))]
+pub mod rn_fast_gpio_bp;
 mod rn_exti_c;
 mod rn_timer_c;
 mod rn_fast_event_c;

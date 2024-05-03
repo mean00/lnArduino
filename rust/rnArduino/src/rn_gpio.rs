@@ -9,6 +9,11 @@ pub use crate::rn_gpio_bp_c ;
 #[cfg(not(feature = "rp2040"))]
 pub use crate::rn_gpio_bp_c as gpio;
 //
+#[cfg(feature = "rp2040")]
+pub use crate::rn_fast_gpio_rp2040;
+#[cfg(not(feature = "rp2040"))]
+pub use crate::rn_fast_gpio_bp;
+
 pub use crate::rn_exti;
 
 //pub use crate::rn_gpio_bp_c ;

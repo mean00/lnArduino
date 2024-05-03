@@ -28,7 +28,6 @@ If(NOT Rust_CARGO_TARGET)
        ENDIF(LN_ARCH STREQUAL "ARM") 
     ENDIF()
     
-    
 ENDIF(NOT Rust_CARGO_TARGET)
 #
 MESSAGE(STATUS " Rust cargo target : ${Rust_CARGO_TARGET} (ARCH = ${LN_ARCH})")
@@ -36,7 +35,13 @@ MESSAGE(STATUS " Rust cargo target : ${Rust_CARGO_TARGET} (ARCH = ${LN_ARCH})")
 ADD_SUBDIRECTORY(${ARDUINO_GD32_FREERTOS}/rust/corrosion corrosion)
 #
 #
-MACRO(RUST_ADD tgt MANIFEST)
-    corrosion_import_crate(MANIFEST_PATH ${MANIFEST} FLAGS "${LN_RUST_BUILD_FLAGS}")
-    corrosion_add_target_rustflags(${tgt} "${LN_LTO_RUST_FLAGS}")
+MACRO(RUST_ADD tgt MANIFEST )
+  #MESSAGE(STATUS "${ARGC}:<${ARGN}>:<${LN_RUST_BUILD_FLAGS}>")
+  if(${ARGC} GREATER 2)
+    MESSAGE(STATUS "   RUST : Enabling feature ${ARGN}")
+    corrosion_import_crate(MANIFEST_PATH ${MANIFEST} FLAGS "${LN_RUST_BUILD_FLAGS}" FEATURES "${ARGN}")
+  else()
+    corrosion_import_crate(MANIFEST_PATH ${MANIFEST} FLAGS "${LN_RUST_BUILD_FLAGS}" )
+  endif()
+  corrosion_add_target_rustflags(${tgt} "${LN_LTO_RUST_FLAGS}")
 ENDMACRO(RUST_ADD MANIFEST)    

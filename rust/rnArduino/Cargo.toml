@@ -14,6 +14,7 @@ heapless = { version = "*", features = ["ufmt-impl"] }
 [features]
 cdc = []
 rp2040 = []
+default = []
 
 [lib]
 name = "rnarduino"
