@@ -10,30 +10,30 @@ pub type size_t = cty::c_uint;
 
 use core::panic::PanicInfo;
 // C api -> bindgen
-mod rn_i2c_c;
-mod rn_spi_c;
-#[cfg(feature = "rp2040")]
-pub mod rn_gpio_rp2040_c;
+mod rn_exti_c;
+mod rn_fast_event_c;
 #[cfg(not(feature = "rp2040"))]
-pub mod rn_gpio_bp_c;
+pub mod rn_fast_gpio_bp;
 #[cfg(feature = "rp2040")]
 pub mod rn_fast_gpio_rp2040;
 #[cfg(not(feature = "rp2040"))]
-pub mod rn_fast_gpio_bp;
-mod rn_exti_c;
+pub mod rn_gpio_bp_c;
+#[cfg(feature = "rp2040")]
+pub mod rn_gpio_rp2040_c;
+mod rn_i2c_c;
+mod rn_spi_c;
 mod rn_timer_c;
-mod rn_fast_event_c;
 pub mod rnarduino;
 // internal API
-pub mod rn_gpio;
-pub mod rn_i2c;
-pub mod rn_freertos_c;
-pub mod rn_os_helper;
 pub mod rn_exti;
 pub mod rn_fast_event_group;
+pub mod rn_freertos_c;
+pub mod rn_gpio;
+pub mod rn_i2c;
+pub mod rn_os_helper;
 //pub mod rn_adc_timer;
-pub mod rn_spi;
 pub mod rn_logger;
+pub mod rn_spi;
 //mod rn_timer_c;
 //pub use rn_timer_c::lnGetUs;
 //pub use rn_timer_c::lnGetMs;
@@ -45,26 +45,25 @@ pub mod rn_logger;
 //pub mod rn_hal_gpio;
 
 #[cfg(feature = "cdc")]
-pub mod rn_usb_cdc;
-#[cfg(feature = "cdc")]
 pub mod rn_cdc_c;
+#[cfg(feature = "cdc")]
+pub mod rn_usb;
 #[cfg(feature = "cdc")]
 pub mod rn_usb_c;
 #[cfg(feature = "cdc")]
-pub mod rn_usb;
+pub mod rn_usb_cdc;
 
 pub struct FreeRtosAllocator;
 
-
 unsafe impl GlobalAlloc for FreeRtosAllocator {
-   unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
-    let res = pvPortMalloc(layout.size() as  cty::c_uint);
-    res as *mut u8
-   }
+    unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
+        let res = pvPortMalloc(layout.size() as cty::c_uint);
+        res as *mut u8
+    }
 
-   unsafe fn dealloc(&self, ptr: *mut u8, _layout: Layout)  {
-       vPortFree(ptr as  *mut cty::c_void);
-   }
+    unsafe fn dealloc(&self, ptr: *mut u8, _layout: Layout) {
+        vPortFree(ptr as *mut cty::c_void);
+    }
 }
 #[global_allocator] // borrowed from https://github.com/lobaro/FreeRTOS-rust
 static GLOBAL: FreeRtosAllocator = FreeRtosAllocator;
@@ -82,10 +81,7 @@ extern "C" {
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> ! {
     unsafe {
-    deadEnd(55); //: cty::c_int);
+        deadEnd(55); //: cty::c_int);
     }
-    loop {
-        
-    }
+    loop {}
 }
-

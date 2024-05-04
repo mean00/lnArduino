@@ -2,9 +2,8 @@
 
 use crate::rn_freertos_c::Logger_chars;
 
-use ufmt::uWrite;
 use core::convert::Infallible;
-
+use ufmt::uWrite;
 
 pub struct W;
 
@@ -20,8 +19,8 @@ impl uWrite for W {
 }
 
 #[macro_export]
-macro_rules! lnLogger {    
-    
+macro_rules! lnLogger {
+
     ($x:expr) => {
         uwrite!(&mut W, "{}", $x).unwrap()
     };
@@ -32,9 +31,9 @@ macro_rules! lnLogger {
 }
 
 #[macro_export]
-macro_rules! lnLogger_init {    
+macro_rules! lnLogger_init {
     () => {
-            use ufmt::uwrite;
-            use rnarduino::rn_logger::W;
-    }    
+        use rnarduino::rn_logger::W;
+        use ufmt::uwrite;
+    };
 }
