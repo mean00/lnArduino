@@ -111,7 +111,7 @@ bool lnspi_write16(ln_spi_c *ptr, uint16_t data)
 /**
  *
  */
-bool lnspi_wait_for_completion(ln_spi_c *ptr, uint16_t data)
+bool lnspi_wait_for_completion(ln_spi_c *ptr)
 {
     WRAPME(ptr)->waitForCompletion();
     return true;

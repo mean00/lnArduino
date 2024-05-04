@@ -56,7 +56,6 @@ impl rnSPI
             t
         }
     }
-
     pub fn rn2ln(rn : &rnSPISettings) -> rc::lnSPISettings
     {
         rc::lnSPISettings{
@@ -68,12 +67,18 @@ impl rnSPI
         }
 
     }
+    pub fn wait_for_completion(&mut self)
+    {
+        unsafe {
+            rc::lnspi_wait_for_completion(self.ln);
+            }
+
+    }
     pub fn set(&mut self,  st: &rnSPISettings)
     {
         unsafe {
             rc::lnspi_set(self.ln, &rnSPI::rn2ln(st))
             }
-
     }
     pub fn begin(&mut self, sz: usize)
     {

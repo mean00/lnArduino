@@ -21,7 +21,7 @@ void lnspi_set(ln_spi_c *instance, const lnSPISettings &st);
 
 bool lnspi_write8(ln_spi_c *instance, uint8_t data);
 bool lnspi_write16(ln_spi_c *instance, uint16_t data);
-bool lnspi_wait_for_completion(ln_spi_c *instance, uint16_t data);
+bool lnspi_wait_for_completion(ln_spi_c *instance);
 
 bool lnspi_block_write16_repeat(ln_spi_c *instance, unsigned int nbWord, const uint16_t data);
 bool lnspi_block_write8_repeat(ln_spi_c *instance, unsigned int nbByte, const uint8_t data);

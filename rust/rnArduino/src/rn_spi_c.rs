@@ -133,8 +133,8 @@ extern "C" {
     pub fn lnspi_write16(instance: *mut ln_spi_c, data: u16) -> bool;
 }
 extern "C" {
-    #[link_name = "\u{1}_Z25lnspi_wait_for_completionP8ln_spi_ct"]
-    pub fn lnspi_wait_for_completion(instance: *mut ln_spi_c, data: u16) -> bool;
+    #[link_name = "\u{1}_Z25lnspi_wait_for_completionP8ln_spi_c"]
+    pub fn lnspi_wait_for_completion(instance: *mut ln_spi_c) -> bool;
 }
 extern "C" {
     #[link_name = "\u{1}_Z26lnspi_block_write16_repeatP8ln_spi_cjt"]
