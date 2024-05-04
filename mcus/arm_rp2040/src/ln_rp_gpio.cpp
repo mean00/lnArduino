@@ -114,10 +114,13 @@ void lnDigitalToggle(const lnPin pin)
     //----------------- This is bluepill common specific !-------------
 */
 
-volatile uint32_t *lnGetGpioToggleRegister(int port) // Bop register for port "port" with port A:0, B:1, ...
+volatile uint32_t *lnGetGpioOnRegister(int port) // Bop register for port "port" with port A:0, B:1, ...
 {
-    xAssert(0);
-    return NULL;
+    return &(lnSio->GPIO_OUT_SET);
+}
+volatile uint32_t *lnGetGpioOffRegister(int port) // Bop register for port "port" with port A:0, B:1, ...
+{
+    return &(lnSio->GPIO_OUT_CLR);
 }
 /**
     \fn
