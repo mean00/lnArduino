@@ -10,9 +10,9 @@ pub use crate::rn_gpio_bp_c ;
 pub use crate::rn_gpio_bp_c as gpio;
 //
 #[cfg(feature = "rp2040")]
-pub use crate::rn_fast_gpio_rp2040;
+pub use crate::rn_fast_gpio_rp2040 as rn_fast_gpio;
 #[cfg(not(feature = "rp2040"))]
-pub use crate::rn_fast_gpio_bp;
+pub use crate::rn_fast_gpio_bp as rn_fast_gpio;
 
 pub use crate::rn_exti;
 
@@ -25,48 +25,6 @@ pub use gpio::lnPin as rnPin;
 pub use rn_exti::rnEdge as  rnEdge;
 pub use gpio::lnGpioMode as rnGpioMode;
 pub use gpio::lnGetGpioToggleRegister;
-
-pub struct rnFastIO
-{
-    onoff_adr       : *mut u32,
-    on_bit          : u32,
-    off_bit         : u32
-}
-
-impl rnFastIO
-{
-    pub fn new( pin : rnPin) -> Self
-    {
-        let bit : u32 = 1_u32 <<( (pin as u32)& 0x0f);
-        pinMode(pin,rnGpioMode::lnOUTPUT);
-        let r : rnFastIO ;
-        unsafe {
-            r= rnFastIO {
-                onoff_adr   : lnGetGpioToggleRegister( ((pin as usize ) >> 4) as i32),
-                on_bit      : bit,
-                off_bit     : bit<<16,
-            };
-        }
-        r
-    }
-    #[inline(always)]
-    pub fn on(&mut self)
-    {
-        unsafe {
-            *self.onoff_adr = self.on_bit;
-        }
-    }
-    #[inline(always)]
-    pub fn off(&mut self)
-    {
-        unsafe {
-            *self.onoff_adr = self.off_bit;
-        }
-
-    }
-
-}
-
 
 pub fn digitalWrite( pin: rnPin, value: bool)
 {

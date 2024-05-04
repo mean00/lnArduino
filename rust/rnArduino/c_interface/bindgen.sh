@@ -12,7 +12,7 @@ echo "__________________c:${1}_________________________"
 bash ../../../cmake/rustgen_c.sh  ${1}   ${2} $PWD
 }
 # Will work for CH32/STM32 and GD32
-bash ../../../cmake/rustgen.sh lnGPIO_c.h ../src/rn_gpio_bp_c.rs ../../../mcus/arm_gd32fx/include
+bash ../../../cmake/rustgen.sh lnGPIO_c.h ../src/rn_gpio_bp_c.rs ../../../mcus/common_bluepill/include
 bash ../../../cmake/rustgen.sh lnGPIO_c.h ../src/rn_gpio_rp2040_c.rs ../../../mcus/arm_rp2040/include
 
 #gen_cpp ../../../include/lnSPI.h ../src/rn_spi_l.rs

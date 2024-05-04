@@ -1,18 +1,20 @@
 #![allow(dead_code)]
 
-use crate::rn_gpio_rp2040_c ;
+//use crate::rn_gpio_rp2040_c ;
 //
+use crate::rn_gpio_rp2040_c as gpio;
 use gpio::lnPin as rnPin;
+use crate::rn_gpio::pinMode;
 //
 use gpio::lnGpioMode as rnGpioMode;
-use gpio::lnGetGpioToggleRegister;
-use crate::rn_gpio_rp2040_c as gpio;
-use crate::rn_gpio::pinMode;
+
+
+use gpio::{lnGetGpioOnRegister,lnGetGpioOffRegister};
 pub struct rnFastIO
 {
-    onoff_adr       : *mut u32,
+    on_adr          : *mut u32,
+    off_adr         : *mut u32,
     on_bit          : u32,
-    off_bit         : u32
 }
 
 impl rnFastIO
@@ -24,9 +26,9 @@ impl rnFastIO
         let r : rnFastIO ;
         unsafe {
             r= rnFastIO {
-                onoff_adr   : lnGetGpioToggleRegister( ((pin as usize ) >> 4) as i32),
+                on_adr      : lnGetGpioOnRegister( 0),
+                off_adr     : lnGetGpioOffRegister( 0),
                 on_bit      : bit,
-                off_bit     : bit<<16,
             };
         }
         r
@@ -35,14 +37,14 @@ impl rnFastIO
     pub fn on(&mut self)
     {
         unsafe {
-            *self.onoff_adr = self.on_bit;
+            *self.on_adr = self.on_bit;
         }
     }
     #[inline(always)]
     pub fn off(&mut self)
     {
         unsafe {
-            *self.onoff_adr = self.off_bit;
+            *self.off_adr = self.on_bit;
         }
 
     }
