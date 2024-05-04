@@ -154,12 +154,22 @@ void rpSPI::setSpeed(int speed)
 
     int div = (fq_in) / (speed);
     int org = (div / RATIO);
-    _prescaler = org & ~1;
+    _prescaler = org & ~1; // must be even, starting at 2, see 4.4.4
     if (!_prescaler)
         _prescaler = 2;
+
+    // the actual clock is SPI_CLOCK/(prescaler*scaler)
+    // do scaler = SPI_CLOCK/(wanted_clock*presaler)
+    // which is the same as sclae = (spi_CLOK/wanter) / prescaler
+    // div/prescaler with round up / down
+
     int scaler = ((div + (_prescaler >> 1)) / _prescaler) - 1;
+    if (scaler > 255)
+        scaler = 255;
     _cr0 &= ~LN_RP_SPI_CR0_DIVIDER_MASK;
     _cr0 |= LN_RP_SPI_CR0_DIVIDER(scaler);
+
+    // static int actual_div = fq_in / (_prescaler * (scaler + 1));
 }
 
 /**
