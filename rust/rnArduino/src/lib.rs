@@ -25,14 +25,14 @@ mod rn_spi_c;
 mod rn_timer_c;
 pub mod rnarduino;
 // internal API
+pub mod rn_adc_timer;
 pub mod rn_exti;
 pub mod rn_fast_event_group;
 pub mod rn_freertos_c;
 pub mod rn_gpio;
 pub mod rn_i2c;
-pub mod rn_os_helper;
-//pub mod rn_adc_timer;
 pub mod rn_logger;
+pub mod rn_os_helper;
 pub mod rn_spi;
 //mod rn_timer_c;
 //pub use rn_timer_c::lnGetUs;

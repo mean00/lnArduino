@@ -2,7 +2,7 @@
 
 //use crate::rn_gpio_bp_c ;
 //
-use gpio::lnPin as rnPin;
+use crate::rn_gpio::rnPin;
 //
 use crate::rn_gpio::pinMode;
 use crate::rn_gpio_bp_c as gpio;
