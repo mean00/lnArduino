@@ -2,11 +2,11 @@
 
 //use crate::rn_gpio_rp2040_c ;
 //
-use crate::rn_gpio::pinMode;
-use crate::rn_gpio_rp2040_c as gpio;
-use gpio::lnPin as rnPin;
+use crate::rn_gpio as gpio;
+use gpio::pinMode;
+use gpio::rnPin; 
 //
-use gpio::lnGpioMode as rnGpioMode;
+use gpio::rnGpioMode; // as rnGpioMode;
 
 use gpio::{lnGetGpioOffRegister, lnGetGpioOnRegister};
 pub struct rnFastIO {

@@ -1,13 +1,9 @@
 #![allow(dead_code)]
 
-//use crate::rn_gpio_bp_c ;
-//
-use crate::rn_gpio::rnPin;
-//
-use crate::rn_gpio::pinMode;
+use crate::rn_gpio::{rnPin,pinMode};
 use crate::rn_gpio_bp_c as gpio;
-use gpio::lnGetGpioToggleRegister;
-use gpio::lnGpioMode as rnGpioMode;
+use gpio::{lnGetGpioToggleRegister, lnGpioMode as rnGpioMode};
+
 pub struct rnFastIO {
     onoff_adr: *mut u32,
     on_bit: u32,
@@ -41,3 +37,4 @@ impl rnFastIO {
         }
     }
 }
+//

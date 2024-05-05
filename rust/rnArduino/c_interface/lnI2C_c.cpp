@@ -1,6 +1,10 @@
 // this is not thread safe, but it should not matter much
 // the returned object ARE thread sage, it's just the creation/deletion that is not
+extern "C"
+{
 #include "lnI2C_c.h"
+}
+
 #include "lnArduino.h"
 #include "lnI2C.h"
 
