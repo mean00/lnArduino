@@ -25,7 +25,8 @@ mod rn_spi_c;
 mod rn_timer_c;
 pub mod rnarduino;
 // internal API
-pub mod rn_adc_timer;
+pub mod rn_timing_adc_c;
+pub mod rn_timing_adc;
 pub mod rn_exti;
 pub mod rn_fast_event_group;
 pub mod rn_freertos_c;

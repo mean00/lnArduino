@@ -14,7 +14,7 @@ bash ../../../cmake/rustgen.sh lnGPIO_c.h ../src/rn_gpio_bp_c.rs ../../../mcus/c
 bash ../../../cmake/rustgen.sh lnGPIO_c.h ../src/rn_gpio_rp2040_c.rs ../../../mcus/arm_rp2040/include
 
 #gen_cpp ../../../include/lnSPI.h ../src/rn_spi_l.rs
-gen_cpp lnTiming_adc_c.h ../src/rn_adc_c.rs
+gen_cpp lnTiming_adc_c.h ../src/rn_timing_adc_c.rs
 gen_cpp lnTimer_c.h ../src/rn_timer_c.rs
 gen_cpp lnExti_c.h ../src/rn_exti_c.rs
 gen_c lnI2C_c.h ../src/rn_i2c_c.rs

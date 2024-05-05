@@ -1,7 +1,6 @@
 #![allow(dead_code)]
-use crate::rn_gpio as gpio;
+use crate::rn_gpio::rnPin;
 use crate::rn_i2c_c::*;
-pub use gpio::rnPin;
 
 type cint = cty::c_int;
 type uint = cty::c_uint;
