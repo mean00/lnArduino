@@ -10,7 +10,7 @@ pub type size_t = cty::c_uint;
 
 use core::panic::PanicInfo;
 // C api -> bindgen
-mod rn_exti_c;
+// done manually mod rn_exti_c;
 mod rn_fast_event_c;
 #[cfg(not(feature = "rp2040"))]
 pub mod rn_fast_gpio_bp;

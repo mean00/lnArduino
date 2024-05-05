@@ -1,28 +1,47 @@
 #![allow(dead_code)]
 
-use crate::rn_exti_c as exti;
-use crate::rn_gpio as gpio;
-pub use exti::lnEdge as rnEdge;
-pub use gpio::rnPin;
+//use crate::rn_exti_c as exti;
+use crate::rn_gpio::rnpin2lnpin;
+use crate::rn_gpio::{lnPin, rnPin};
+
+#[repr(u32)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub enum rnEdge {
+    LN_EDGE_NONE = 0,
+    LN_EDGE_RISING = 1,
+    LN_EDGE_FALLING = 2,
+    LN_EDGE_BOTH = 3,
+}
+pub type lnExtiCallback =
+    ::core::option::Option<unsafe extern "C" fn(pin: rnPin, cookie: *mut cty::c_void)>;
+extern "C" {
+    #[link_name = "\u{1}_Z21lnExtiAttachInterrupt5lnPin6lnEdgePFvS_PvES1_"]
+    pub fn lnExtiAttachInterrupt(
+        pin: lnPin,
+        edge: rnEdge,
+        cb: lnExtiCallback,
+        cookie: *mut cty::c_void,
+    );
+}
+extern "C" {
+    #[link_name = "\u{1}_Z21lnExtiDetachInterrupt5lnPin"]
+    pub fn lnExtiDetachInterrupt(pin: lnPin);
+}
+extern "C" {
+    #[link_name = "\u{1}_Z21lnExtiEnableInterrupt5lnPin"]
+    pub fn lnExtiEnableInterrupt(pin: lnPin);
+}
+extern "C" {
+    #[link_name = "\u{1}_Z22lnExtiDisableInterrupt5lnPin"]
+    pub fn lnExtiDisableInterrupt(pin: lnPin);
+}
 
 //
-fn rnPin2extiPin(_pin: gpio::rnPin) -> exti::lnPin {
-    panic!();
-}
-fn rnEdge2extiEdge(_pin: gpio::rnEdge) -> exti::lnEdge {
-    panic!();
-}
 //
 //
-//
-pub fn attach_interrupt(
-    pin: gpio::rnPin,
-    edge: gpio::rnEdge,
-    cb: exti::lnExtiCallback,
-    cookie: *mut cty::c_void,
-) {
+pub fn attach_interrupt(pin: rnPin, edge: rnEdge, cb: lnExtiCallback, cookie: *mut cty::c_void) {
     unsafe {
-        exti::lnExtiAttachInterrupt(rnPin2extiPin(pin), rnEdge2extiEdge(edge), cb, cookie);
+        lnExtiAttachInterrupt(rnpin2lnpin(pin), edge, cb, cookie);
     }
 }
 //
@@ -30,7 +49,7 @@ pub fn attach_interrupt(
 //
 pub fn detach_interrupt(pin: rnPin) {
     unsafe {
-        exti::lnExtiDetachInterrupt(rnPin2extiPin(pin));
+        lnExtiDetachInterrupt(rnpin2lnpin(pin));
     }
 }
 //
@@ -38,7 +57,7 @@ pub fn detach_interrupt(pin: rnPin) {
 //
 pub fn enable_interrupt(pin: rnPin) {
     unsafe {
-        exti::lnExtiEnableInterrupt(rnPin2extiPin(pin));
+        lnExtiEnableInterrupt(rnpin2lnpin(pin));
     }
 }
 //
@@ -46,7 +65,7 @@ pub fn enable_interrupt(pin: rnPin) {
 //
 pub fn disable_interrupt(pin: rnPin) {
     unsafe {
-        exti::lnExtiDisableInterrupt(rnPin2extiPin(pin));
+        lnExtiDisableInterrupt(rnpin2lnpin(pin));
     }
 }
 // EOF

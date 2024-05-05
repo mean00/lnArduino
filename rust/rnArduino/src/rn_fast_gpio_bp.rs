@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 
-use crate::rn_gpio::{rnPin,pinMode};
+use crate::rn_gpio::{pinMode, rnPin};
 use crate::rn_gpio_bp_c as gpio;
 use gpio::{lnGetGpioToggleRegister, lnGpioMode as rnGpioMode};
 

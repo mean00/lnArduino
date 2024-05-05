@@ -4,7 +4,7 @@
 //
 use crate::rn_gpio as gpio;
 use gpio::pinMode;
-use gpio::rnPin; 
+use gpio::rnPin;
 //
 use gpio::rnGpioMode; // as rnGpioMode;
 
