@@ -20,6 +20,7 @@ ENDIF()
 add_library(lnarduino_c_bindings STATIC 
                                         ${EXTRA}
                                         ${C}/lnFast_EventGroup_c.cpp
+                                        ${C}/lnTiming_adc_c.cpp
                                          )
 target_link_libraries(lnarduino_c_bindings lnArduinoInternal)
 
