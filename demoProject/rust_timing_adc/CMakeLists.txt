@@ -23,10 +23,10 @@ SET(LN_USB_NB_HID  0 CACHE INTERNAL "")
 SET(LN_USB_DFU_RUNTIME 1 CACHE INTERNAL "")
 SET(LN_ENABLE_USBD FALSE CACHE INTERNAL "")
 
-include(./build_default.cmake)
+#include(./build_default.cmake)
 
-SET(AF_FOLDER  ${CMAKE_SOURCE_DIR}/lnArduino/)
 include(./mcuSelect.cmake)
+SET(AF_FOLDER  ${CMAKE_SOURCE_DIR}/lnArduino/)
 SET(CMAKE_TOOLCHAIN_FILE ${AF_FOLDER}/lnArduino.cmake)
 
 
