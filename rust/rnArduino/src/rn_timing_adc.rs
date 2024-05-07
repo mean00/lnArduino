@@ -33,7 +33,6 @@ impl rnTimingAdc {
         frequency: usize,
         pins: &[rnPin],
     ) -> bool {
-        /* CROCO */
         self.nb_pins = pins.len();
         unsafe {
             adc::ln_timing_adc_set_source(
@@ -44,8 +43,6 @@ impl rnTimingAdc {
                pins.len() as cty::c_int ,
                pins.as_ptr() as *const rn_timing_adc_c::lnPin)
         }
-        /* 
-        false*/
     }
     //
     //
