@@ -1,5 +1,5 @@
 #![allow(dead_code)]
-use crate::rn_gpio::{rnPin,rnGpioMode};
+use crate::rn_gpio::rnPin; //,rnGpioMode};
 use crate::rn_timing_adc_c;
 pub use crate::rn_exti::rnEdge;
 //use alloc::boxed::Box;

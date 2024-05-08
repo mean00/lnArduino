@@ -1,5 +1,5 @@
 #![allow(dead_code)]
-use crate::rn_gpio::rnPin;
+//use crate::rn_gpio::rnPin;
 use crate::rn_i2c_c::*;
 
 type cint = cty::c_int;
