@@ -14,8 +14,16 @@
  * @param irq
  */
 #define M(x) usartMapping[instance].x
-//#define DISABLE_TIMER_COLLECTOR
-#define CHECK_OVERFLOW() { xAssert( (_rxHead-_rxTail)<=_rxBufferSize);}
+// #define DISABLE_TIMER_COLLECTOR
+#define CHECK_OVERFLOW()                                                                                               \
+    {                                                                                                                  \
+        if((_rxHead - _rxTail) > _rxBufferSize)                                                                 \
+        { \
+          nb_overflow++; \
+          _rxTail=_rxHead; \
+        } \
+    }
+static int nb_overflow = 0;
 /*
  */
 
@@ -29,9 +37,9 @@ void lnSerialBpRxTxDma::_interrupt()
 }
 /**
  * @brief Construct a new ln Serial Bp Rx Tx Dma::ln Serial Bp Rx Tx Dma object
- * 
- * @param instance 
- * @param bufferSize 
+ *
+ * @param instance
+ * @param bufferSize
  */
 lnSerialBpRxTxDma::lnSerialBpRxTxDma(int instance, int bufferSize)
     : lnSerialBpTxOnlyBufferedDma(instance, bufferSize >> 1), lnSerialRxTx(instance),
@@ -69,7 +77,8 @@ int lnSerialBpRxTxDma::read(int max, uint8_t *to)
     ENTER_CRITICAL();
     int nb = getReadPointer(&ptr);
     EXIT_CRITICAL();
-    if(nb>max) nb=max;
+    if (nb > max)
+        nb = max;
     memcpy(to, ptr, nb);
 
     ENTER_CRITICAL();
@@ -108,13 +117,13 @@ bool lnSerialBpRxTxDma::enableRx(bool enabled)
 
     if (enabled)
     {
-        _rxHead=_rxTail=0;
+        _rxHead = _rxTail = 0;
         _rxDma.pause();
         ENTER_CRITICAL();
         d->CTL0 |= (LN_USART_CTL0_RBNEIE | LN_USART_CTL0_REN);
         d->CTL2 |= LN_USART_CTL2_DMA_RX;
         _rxEnabled = true;
-        EXIT_CRITICAL();        
+        EXIT_CRITICAL();
         startRxDma();
         _timer.start();
     }
@@ -125,7 +134,7 @@ bool lnSerialBpRxTxDma::enableRx(bool enabled)
         ENTER_CRITICAL();
         _timer.stop();
         _rxEnabled = false;
-        d->CTL0 &= ~(LN_USART_CTL0_REN | LN_USART_CTL0_RBNEIE) ;
+        d->CTL0 &= ~(LN_USART_CTL0_REN | LN_USART_CTL0_RBNEIE);
         d->CTL2 &= ~LN_USART_CTL2_DMA_RX;
         EXIT_CRITICAL();
     }
@@ -138,9 +147,9 @@ bool lnSerialBpRxTxDma::enableRx(bool enabled)
 void lnSerialBpRxTxDma::timerCallback()
 {
     ENTER_CRITICAL(); // we are in a task, need to block interrupt and other tasks
-#ifndef DISABLE_TIMER_COLLECTOR    
+#ifndef DISABLE_TIMER_COLLECTOR
     checkForNewData();
-#endif    
+#endif
     EXIT_CRITICAL();
 }
 /**
@@ -198,7 +207,6 @@ int lnSerialBpRxTxDma::getReadPointer(uint8_t **to)
     ENTER_CRITICAL();
     int h = _rxHead & _rxMask;
     int t = _rxTail & _rxMask;
-    
 
     int nb;
     if (h >= t)
@@ -222,58 +230,57 @@ int lnSerialBpRxTxDma::getReadPointer(uint8_t **to)
 void lnSerialBpRxTxDma::consume(int n)
 {
     ENTER_CRITICAL();
-     xAssert(n<= _rxBufferSize);
-    _rxTail += n;    
-    if(_rxTail>_rxBufferSize && _rxHead > _rxBufferSize)
-    {        
-        _rxTail-=_rxBufferSize;
-        _rxHead-=_rxBufferSize;
+    xAssert(n <= _rxBufferSize);
+    _rxTail += n;
+    if (_rxTail > _rxBufferSize && _rxHead > _rxBufferSize)
+    {
+        _rxTail -= _rxBufferSize;
+        _rxHead -= _rxBufferSize;
     }
     EXIT_CRITICAL();
 }
 
 /**
  * @brief This is not interrupt safe, must be called from interrupt or with interrupt disabled
- * 
+ *
  */
 void lnSerialBpRxTxDma::checkForNewData()
 {
     if (!_rxEnabled)
         return;
-    
+
     uint32_t count = _rxDma.getCurrentCount(); // transfer pending, between N and 1, 0 means transfer done
-    count = _rxBufferSize - count;        // this is the # of bytes transfered already
+    count = _rxBufferSize - count;             // this is the # of bytes transfered already
     uint32_t maskedHead = _rxHead & _rxMask;
     if (count == maskedHead)
-    {    
+    {
         return;
     }
-    uint32_t t=_rxHead & _rxMask;
-    _rxHead = _rxHead & ~_rxMask;    
-    _rxHead+=count;
+    uint32_t t = _rxHead & _rxMask;
+    _rxHead = _rxHead & ~_rxMask;
+    _rxHead += count;
     CHECK_OVERFLOW();
-    if(t>=count)
+    if (t >= count)
     {
-        _rxHead+=_rxBufferSize;
+        _rxHead += _rxBufferSize;
         CHECK_OVERFLOW();
     }
-    xAssert(_cb);    
+    xAssert(_cb);
     _cb(_cbCookie, lnSerialCore::dataAvailable);
-
 }
 /**
  * @brief
  *
  * @param type
  */
+int oldHead = 0;
 void lnSerialBpRxTxDma::rxDma(lnDMA::DmaInterruptType type)
 {
 #if 0    
     checkForNewData();
     return;
-#endif    
-
-
+#endif
+    oldHead = _rxHead;
     int current = _rxHead & _rxMask;
     bool newData = false;
     switch (type)
@@ -283,7 +290,7 @@ void lnSerialBpRxTxDma::rxDma(lnDMA::DmaInterruptType type)
         {
             newData = true;
             _rxHead = _rxHead & ~_rxMask;
-            _rxHead+= _rxBufferSize >> 1;            
+            _rxHead += _rxBufferSize >> 1;
             CHECK_OVERFLOW();
         }
         break;
@@ -292,8 +299,8 @@ void lnSerialBpRxTxDma::rxDma(lnDMA::DmaInterruptType type)
         {
             newData = true;
             _rxHead = _rxHead & ~_rxMask;
-            _rxHead+= _rxBufferSize ;   
-            CHECK_OVERFLOW();         
+            _rxHead += _rxBufferSize;
+            CHECK_OVERFLOW();
         }
         break;
     default:
