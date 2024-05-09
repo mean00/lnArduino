@@ -7,7 +7,7 @@ pub use crate::rn_gpio_bp_c as gpio;
 #[cfg(feature = "rp2040")]
 pub use crate::rn_gpio_rp2040_c;
 #[cfg(feature = "rp2040")]
-pub use rn_gpio_rp2040_c as gpio;
+pub use crate::rn_gpio_rp2040_c as gpio;
 //
 #[cfg(not(feature = "rp2040"))]
 pub use crate::rn_fast_gpio_bp as rn_fast_gpio;
@@ -28,7 +28,7 @@ pub use rn_exti::rnEdge;
 #[cfg(feature = "rp2040")]
 #[repr(i32)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
-pub enum lnPin {
+pub enum rnPin {
     GPIO0 = 0,
     GPIO1 = 1,
     GPIO2 = 2,
