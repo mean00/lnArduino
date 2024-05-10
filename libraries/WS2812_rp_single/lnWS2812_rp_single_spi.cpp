@@ -53,6 +53,6 @@ void WS2812_rp2040_single::setColor(uint8_t r, uint8_t g, uint8_t b)
     _buffer[3] = lookupTable[r & 0xf];
     _buffer[4] = lookupTable[b >> 4];
     _buffer[5] = lookupTable[b & 0xf];
-    _spi->write16(6, _buffer);
+    _spi->blockWrite16(6, _buffer);
 }
 // EOF

@@ -13,7 +13,7 @@ class WS2812_rp2040_single
     WS2812_rp2040_single(int spi_instance, lnPin pin)
     {
         _spi = new rpSPI(spi_instance);
-        lnPinMode(pin, lnSPI);
+        lnPinMode(pin, lnSPI_MODE);
         _spi->setSpeed(3470 * 1000); // 3.47 Meg; to=288 ns
         _spi->begin(16);
     }

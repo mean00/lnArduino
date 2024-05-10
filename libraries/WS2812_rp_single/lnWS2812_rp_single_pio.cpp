@@ -11,6 +11,7 @@
 #include "hardware/pio.h"
 #include "lnWS2812_rp_single_pio.h"
 #include "pico/stdlib.h"
+#include "lnArduino.h"
 #include "ws2812.pio.h"
 /**
  * @brief Construct a new ws2812 rp2040 pio single::ws2812 rp2040 pio single object
