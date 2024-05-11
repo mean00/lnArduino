@@ -114,7 +114,7 @@ IF(NOT DEFINED LN_EXT)
         ${ARDUINO_GD32_FREERTOS}/${LN_EXT}/boards/${GD32_BOARD}/
         ${AF_FOLDER}/mcus/common_bluepill/
         ${AF_FOLDER}/mcus/common_bluepill/include
-        CACHE Internal ""
+        CACHE INTERNAL ""
         )
     SET(CMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES  ${CMAKE_C_STANDARD_INCLUDE_DIRECTORIES} CACHE INTERNAL "")
 
