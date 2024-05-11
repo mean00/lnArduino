@@ -28,7 +28,6 @@
 
 #pragma once
 #include "lnArduino.h"
-#include "lnDma.h"
 
 #include "lnSPI_defines.h"
 
