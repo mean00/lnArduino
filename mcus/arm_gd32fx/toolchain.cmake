@@ -124,7 +124,7 @@ SET(CMAKE_EXECUTABLE_SUFFIX_CXX .elf CACHE INTERNAL "")
         ${ARDUINO_GD32_FREERTOS}/${LN_EXT}
         ${AF_FOLDER}/mcus/common_bluepill/
         ${AF_FOLDER}/mcus/common_bluepill/include
-        CACHE Internal ""
+        CACHE INTERNAL ""
         )
     SET(CMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES  ${CMAKE_C_STANDARD_INCLUDE_DIRECTORIES} CACHE INTERNAL "")
 

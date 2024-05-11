@@ -13,14 +13,17 @@ IF(LN_ENABLE_SPI)
   SET(EXTRA ${EXTRA} ${C}/lnSPI_c.cpp)
 ENDIF()
 
-IF(LN_ENABLE_I2C)
-  SET(EXTRA ${EXTRA} ${C}/lnI2C_c.cpp)
-ENDIF()
+IF(USE_RP2040)
+ELSE()
+  SET(EXTRA ${EXTRA} ${C}/lnTiming_adc_c.cpp)
+  IF(LN_ENABLE_I2C)
+      SET(EXTRA ${EXTRA} ${C}/lnI2C_c.cpp)
+  ENDIF()
+ENDIF() 
 
 add_library(lnarduino_c_bindings STATIC 
                                         ${EXTRA}
                                         ${C}/lnFast_EventGroup_c.cpp
-                                        ${C}/lnTiming_adc_c.cpp
                                          )
 target_link_libraries(lnarduino_c_bindings lnArduinoInternal)
 
