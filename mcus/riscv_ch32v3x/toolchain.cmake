@@ -105,6 +105,8 @@ IF(NOT DEFINED LN_EXT)
     SET(CMAKE_EXECUTABLE_SUFFIX_CXX .elf CACHE INTERNAL "")
 
     include_directories(${ARDUINO_GD32_FREERTOS}/${LN_EXT}/boards/${GD32_BOARD}/)
+    include_directories(${AF_FOLDER}/mcus/common_bluepill/)
+    include_directories(${AF_FOLDER}/mcus/common_bluepill/include)
 
     # Sees optimizaton >=2 are causing issues (???)
 
