@@ -133,6 +133,9 @@ SET(CMAKE_EXECUTABLE_SUFFIX_CXX .elf CACHE INTERNAL "")
         ${AF_FOLDER}/mcus/common_bluepill/include
         CACHE INTERNAL ""
         )
+    include_directories(  # This helps the LSP /IDE
+            ${AF_FOLDER}/mcus/common_bluepill/
+            ${AF_FOLDER}/mcus/common_bluepill/include)
     SET(CMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES  ${CMAKE_C_STANDARD_INCLUDE_DIRECTORIES} CACHE INTERNAL "")
 
     MESSAGE(STATUS ">>> STD C includes:<${CMAKE_C_STANDARD_INCLUDE_DIRECTORIES}>")
