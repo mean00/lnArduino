@@ -5,6 +5,7 @@
 #pragma once
 // #include "lnArduino.h"
 #include "stdint.h"
+#include "lnArduino_macro.h"
 
 /**
  */

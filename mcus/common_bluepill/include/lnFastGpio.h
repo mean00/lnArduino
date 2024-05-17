@@ -3,7 +3,7 @@
  *  See license file
  */
 #pragma once
-
+#include "lnArduino_macro.h"
 /**
  *
  * @param p
@@ -12,20 +12,20 @@ class lnFastIO
 {
   public:
     lnFastIO(lnPin p);
-    void on() volatile
+    LN_ALWAYS_INLINE void on()  
     {
         *_onoff = _onbit;
     }
-    void off() volatile
+    LN_ALWAYS_INLINE void off()  
     {
         *_onoff = _offbit;
     }
-    void pulseLow() volatile __attribute__((always_inline))
+    LN_ALWAYS_INLINE void pulseLow() 
     {
         *_onoff = _offbit;
         *_onoff = _onbit;
     }
-    void pulseHigh() volatile __attribute__((always_inline))
+    void pulseHigh() 
     {
         *_onoff = _onbit;
         *_onoff = _offbit;
@@ -33,7 +33,7 @@ class lnFastIO
 
   protected:
     volatile uint32_t *_onoff;
-    volatile uint32_t _onbit, _offbit;
+    uint32_t _onbit, _offbit;
 };
 
 // EOF

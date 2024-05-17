@@ -8,7 +8,7 @@
 #include "stdint.h"
 #include "stdio.h"
 #include "string.h"
-
+#include "lnArduino_macro.h"
 #define LN_ARCH_UNKNOWN 0
 #define LN_ARCH_RISCV 1
 #define LN_ARCH_ARM 2
