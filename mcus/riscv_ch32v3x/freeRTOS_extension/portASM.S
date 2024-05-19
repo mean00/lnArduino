@@ -172,6 +172,9 @@ into the task stack. We can only change the SP value used by the calling functio
 the interrupt stack.This problem can be solved by modifying the interrupt to the assembly entry,
 and there is no need to reserve 512 bytes. You only need to switch the interrupt stack at the
 beginning of the interrupt function */
+	lw t0, xISRStackTop /* MEANX : The systick interrupt handler will switch to the SP pointed by mscratch */
+	addi t0, t0, -512
+	csrw mscratch,t0
 
 	load_x  sp, pxCurrentTCB	/* Load pxCurrentTCB. */
 	load_x  sp, 0( sp )		 	/* Read sp from first TCB member. */
