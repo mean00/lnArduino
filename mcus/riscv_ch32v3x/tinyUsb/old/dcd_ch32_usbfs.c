@@ -604,4 +604,12 @@ void dcd_int_handler(uint8_t rhport)
     TU_ASSERT(0,);
 }
 
+void dcd_sof_enable(uint8_t rhport, bool en) {
+  (void) rhport;
+  (void) en;
+
+  // TODO implement later
+}
+
+
 
