@@ -334,9 +334,10 @@ runtime_init:
 // cross-core FIFOs) but it's good to be defensive.
 
 hold_non_core0_in_bootrom:
-    ldr r0, = 'W' | ('V' << 8)
-    bl rom_func_lookup
-    bx r0
+    b hold_non_core0_in_bootrom
+    // MEANX ldr r0, = 'W' | ('V' << 8)
+    // MEANX bl rom_func_lookup
+    // MEANX bx r0
 
 // ----------------------------------------------------------------------------
 // Stack/heap dummies to set size
