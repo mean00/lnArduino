@@ -22,6 +22,7 @@ void lnSetInterruptHandler(const LnIRQ &irq, lnInterruptHandler *handler)
 {
     int real_irq = (int)irq + 16;
     ram_vector_table[real_irq] = (uint32_t)handler;
+    __asm__("dmb" : : : "memory");
 }
 /**
  * @brief
@@ -50,3 +51,33 @@ extern "C" void dummy_caller(int code)
     volatile uint32_t vtor = scb->vtor;
     __asm__("bkpt #0");
 }
+#if 1
+extern "C" void irq_init_priorities() {
+}
+/**
+ *
+ */
+void irq_set_mask_enabled(uint32_t mask, bool enabled) {
+    if (enabled) {
+        // Clear pending before enable
+        // (if IRQ is actually asserted, it will immediately re-pend)
+        *((io_rw_32 *) (PPB_BASE + M0PLUS_NVIC_ICPR_OFFSET)) = mask;
+        *((io_rw_32 *) (PPB_BASE + M0PLUS_NVIC_ISER_OFFSET)) = mask;
+    } else {
+        *((io_rw_32 *) (PPB_BASE + M0PLUS_NVIC_ICER_OFFSET)) = mask;
+    }
+}
+/**
+ *
+ */
+extern "C" void irq_set_enabled(uint num, bool enabled) {
+    irq_set_mask_enabled(1u << num, enabled);
+}
+/**
+*
+*/
+extern "C" void irq_set_exclusive_handler(uint num, irq_handler_t handler) {
+    lnSetInterruptHandler((LnIRQ )num,  handler);
+}
+
+#endif
