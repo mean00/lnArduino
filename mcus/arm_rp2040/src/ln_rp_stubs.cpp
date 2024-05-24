@@ -9,3 +9,12 @@ extern "C" void mutex_init(void *mtx)
 
 
 }
+extern "C" void spin_locks_reset(void)
+{
+
+}
+
+extern "C" void watchdog_start_tick(unsigned int cycles) 
+{
+
+}

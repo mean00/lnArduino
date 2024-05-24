@@ -15,8 +15,8 @@ SET(RP_LN_SOURCES
 )
 SET(RP_SDK_SOURCES
 
-  ${PICO_SDK_PATH}/src/rp2_common/hardware_timer/timer.c # Maybe
-  ${PICO_SDK_PATH}/src/rp2_common/hardware_uart/uart.c # Maybe
+${PICO_SDK_PATH}/src/rp2_common/hardware_timer/timer.c # Maybe
+${PICO_SDK_PATH}/src/rp2_common/hardware_uart/uart.c # Maybe
 
 ${PICO_SDK_PATH}/src/rp2_common/pico_platform/platform.c
 ${PICO_SDK_PATH}/src/rp2_common/pico_runtime/runtime.c
@@ -24,12 +24,12 @@ ${PICO_SDK_PATH}/src/rp2_common/pico_runtime/runtime.c
 ${PICO_SDK_PATH}/src/rp2_common/hardware_clocks/clocks.c
 ${PICO_SDK_PATH}/src/rp2_common/hardware_irq/irq.c
 ${PICO_SDK_PATH}/src/rp2_common/hardware_pll/pll.c
-${PICO_SDK_PATH}/src/rp2_common/hardware_sync/sync.c  # Maybe
 ${PICO_SDK_PATH}/src/rp2_common/hardware_vreg/vreg.c
-${PICO_SDK_PATH}/src/rp2_common/hardware_watchdog/watchdog.c # Maybe
 ${PICO_SDK_PATH}/src/rp2_common/hardware_xosc/xosc.c
 
+#${PICO_SDK_PATH}/src/rp2_common/hardware_watchdog/watchdog.c # Maybe
 
+#${PICO_SDK_PATH}/src/rp2_common/hardware_sync/sync.c  # Maybe
 #${PICO_SDK_PATH}/src/rp2_common/pico_bootrom/bootrom.c # Maybe
 
 #${PICO_SDK_PATH}/src/common/pico_sync/critical_section.c
