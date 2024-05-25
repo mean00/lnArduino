@@ -164,4 +164,5 @@ lnFastIO::lnFastIO(lnPin pin)
     _off = &(lnSio->GPIO_OUT_CLR);
     _bit = 1 << pin;
 }
+
 // EOF
