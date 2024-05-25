@@ -32,7 +32,7 @@ ${CMAKE_CURRENT_SOURCE_DIR}/rp_irq.cpp
 
 ${CMAKE_CURRENT_SOURCE_DIR}/../sdk_copy/platform.c
 ${CMAKE_CURRENT_SOURCE_DIR}/../sdk_copy/runtime.c
-${CMAKE_CURRENT_SOURCE_DIR}/../sdk_copy/crt0.S)
+${CMAKE_CURRENT_SOURCE_DIR}/../sdk_copy/crt0.S
 )
 
 add_library(rplib STATIC rp.cpp ${CMAKE_CURRENT_SOURCE_DIR}/../conf/bs2_default_padded_checksummed.S ${RP_LN_SOURCES} ${RP_SDK_SOURCES})
