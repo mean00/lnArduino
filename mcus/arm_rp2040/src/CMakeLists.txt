@@ -15,40 +15,35 @@ SET(RP_LN_SOURCES
 )
 IF(FALSE)
   SET(BASE_SOURCES
-${CMAKE_CURRENT_SOURCE_DIR}/../sdk_copy/timer.c # Maybe
-${CMAKE_CURRENT_SOURCE_DIR}/../sdk_copy/uart.c # Maybe
-${CMAKE_CURRENT_SOURCE_DIR}/../sdk_copy/clocks.c
-${CMAKE_CURRENT_SOURCE_DIR}/../sdk_copy/pll.c
-${CMAKE_CURRENT_SOURCE_DIR}/../sdk_copy/vreg.c
-${CMAKE_CURRENT_SOURCE_DIR}/../sdk_copy/xosc.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../sdk_copy/timer.c # Maybe
+    ${CMAKE_CURRENT_SOURCE_DIR}/../sdk_copy/uart.c # Maybe
+    ${CMAKE_CURRENT_SOURCE_DIR}/../sdk_copy/clocks.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../sdk_copy/pll.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../sdk_copy/vreg.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../sdk_copy/xosc.c
 )
 ELSE()
   SET(BASE_SOURCES
-${PICO_SDK_PATH}/src/rp2_common/hardware_timer/timer.c # Maybe
-${PICO_SDK_PATH}/src/rp2_common/hardware_uart/uart.c # Maybe
-${PICO_SDK_PATH}/src/rp2_common/hardware_clocks/clocks.c
-${PICO_SDK_PATH}/src/rp2_common/hardware_pll/pll.c
-${PICO_SDK_PATH}/src/rp2_common/hardware_vreg/vreg.c
-${PICO_SDK_PATH}/src/rp2_common/hardware_xosc/xosc.c
-${PICO_SDK_PATH}/src/rp2_common/hardware_irq/irq.c
-${PICO_SDK_PATH}/src/rp2_common/hardware_irq/irq_handler_chain.S
-${PICO_SDK_PATH}/src/rp2_common/hardware_pio/pio.c
+    ${PICO_SDK_PATH}/src/rp2_common/hardware_timer/timer.c # Maybe
+    ${PICO_SDK_PATH}/src/rp2_common/hardware_uart/uart.c # Maybe
+    ${PICO_SDK_PATH}/src/rp2_common/hardware_clocks/clocks.c
+    ${PICO_SDK_PATH}/src/rp2_common/hardware_pll/pll.c
+    ${PICO_SDK_PATH}/src/rp2_common/hardware_vreg/vreg.c
+    ${PICO_SDK_PATH}/src/rp2_common/hardware_xosc/xosc.c
+    ${PICO_SDK_PATH}/src/rp2_common/hardware_irq/irq.c
+    ${PICO_SDK_PATH}/src/rp2_common/hardware_irq/irq_handler_chain.S
+    ${PICO_SDK_PATH}/src/rp2_common/hardware_pio/pio.c
 )
 ENDIF()
 SET(RP_SDK_SOURCES
-   ${BASE_SOURCES}
-#${PICO_SDK_PATH}/src/rp2_common/pico_platform/platform.c
-#${PICO_SDK_PATH}/src/rp2_common/pico_runtime/runtime.c
-#${PICO_SDK_PATH}/src/rp2_common/hardware_irq/irq.c
+  ${BASE_SOURCES}
+  ${CMAKE_CURRENT_SOURCE_DIR}/ln_rp_stubs.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/rp_serial.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/rp_irq.cpp
 
-
-${CMAKE_CURRENT_SOURCE_DIR}/ln_rp_stubs.cpp
-${CMAKE_CURRENT_SOURCE_DIR}/rp_serial.cpp
-${CMAKE_CURRENT_SOURCE_DIR}/rp_irq.cpp
-
-${CMAKE_CURRENT_SOURCE_DIR}/../sdk_copy/platform.c
-${CMAKE_CURRENT_SOURCE_DIR}/../sdk_copy/runtime.c
-${CMAKE_CURRENT_SOURCE_DIR}/../sdk_copy/crt0.S
+  ${CMAKE_CURRENT_SOURCE_DIR}/../sdk_copy/platform.c
+  ${CMAKE_CURRENT_SOURCE_DIR}/../sdk_copy/runtime.c
+  ${CMAKE_CURRENT_SOURCE_DIR}/../sdk_copy/crt0.S
 )
 
 add_library(rplib STATIC rp.cpp ${CMAKE_CURRENT_SOURCE_DIR}/../conf/bs2_default_padded_checksummed.S ${RP_LN_SOURCES} ${RP_SDK_SOURCES})
@@ -99,4 +94,7 @@ target_include_directories(rplib PUBLIC  ${CMAKE_CURRENT_SOURCE_DIR}/../include)
 target_include_directories(rplib  PRIVATE ../private_include )
 target_link_libraries(rplib  PRIVATE lnArduinoInternal )
 
+#${PICO_SDK_PATH}/src/rp2_common/pico_platform/platform.c
+#${PICO_SDK_PATH}/src/rp2_common/pico_runtime/runtime.c
+#${PICO_SDK_PATH}/src/rp2_common/hardware_irq/irq.c
 
