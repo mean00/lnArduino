@@ -135,18 +135,19 @@ bss_header_start:
     stmia r1!,{r0} 
     b 3b
     //--------------------------
+    // No r1 is 64 aligned
     // Body 64 bytes at a time 
     //--------------------------
 
 bss_header_done:
-    ldr r0, = 0xffffffC0 // 64 round down
-    ands r2, r0
+    ldr r0, = 0xffffffc0 // 64 round down
+    ands r2, r0          // round down end address
     movs r3, #0
     movs r4, #0
     movs r5, #0
     movs r6, #0
     b bss_fill_test
-bss_fill_loop:
+bss_fill_loop:                // 4x16 bytes = 64 bytes at a time
     stmia r1!, {r3,r4,r5,r6}  // 16 bytes at a time
     stmia r1!, {r3,r4,r5,r6}  // 16 bytes at a time
     stmia r1!, {r3,r4,r5,r6}  // 16 bytes at a time
