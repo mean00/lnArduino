@@ -40,8 +40,12 @@ void gpio_set_function(unsigned int pin, enum gpio_function pio)
   switch(pio)
   {
     case GPIO_FUNC_PIO0:
+        lnPinMode( (lnPin) pin, lnRP_PIO0_MODE);
+        return;
         break;
     case GPIO_FUNC_PIO1:
+        lnPinMode( (lnPin) pin, lnRP_PIO1_MODE);
+        return;
         break;
     default:
       xAssert(0);
