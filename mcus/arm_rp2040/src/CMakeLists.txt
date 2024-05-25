@@ -13,25 +13,34 @@ SET(RP_LN_SOURCES
         ln_rp_dma.cpp
         ln_rp_spi.cpp
 )
-SET(RP_SDK_SOURCES
-
+IF(FALSE)
+  SET(BASE_SOURCES
 ${CMAKE_CURRENT_SOURCE_DIR}/../sdk_copy/timer.c # Maybe
 ${CMAKE_CURRENT_SOURCE_DIR}/../sdk_copy/uart.c # Maybe
-#${PICO_SDK_PATH}/src/rp2_common/hardware_timer/timer.c # Maybe
-#${PICO_SDK_PATH}/src/rp2_common/hardware_uart/uart.c # Maybe
-
-#${PICO_SDK_PATH}/src/rp2_common/pico_platform/platform.c
-#${PICO_SDK_PATH}/src/rp2_common/pico_runtime/runtime.c
-#${PICO_SDK_PATH}/src/rp2_common/hardware_irq/irq.c
 ${CMAKE_CURRENT_SOURCE_DIR}/../sdk_copy/clocks.c
 ${CMAKE_CURRENT_SOURCE_DIR}/../sdk_copy/pll.c
 ${CMAKE_CURRENT_SOURCE_DIR}/../sdk_copy/vreg.c
 ${CMAKE_CURRENT_SOURCE_DIR}/../sdk_copy/xosc.c
+)
+ELSE()
+  SET(BASE_SOURCES
+${PICO_SDK_PATH}/src/rp2_common/hardware_timer/timer.c # Maybe
+${PICO_SDK_PATH}/src/rp2_common/hardware_uart/uart.c # Maybe
+${PICO_SDK_PATH}/src/rp2_common/hardware_clocks/clocks.c
+${PICO_SDK_PATH}/src/rp2_common/hardware_pll/pll.c
+${PICO_SDK_PATH}/src/rp2_common/hardware_vreg/vreg.c
+${PICO_SDK_PATH}/src/rp2_common/hardware_xosc/xosc.c
+${PICO_SDK_PATH}/src/rp2_common/hardware_irq/irq.c
+${PICO_SDK_PATH}/src/rp2_common/hardware_irq/irq_handler_chain.S
+)
+ENDIF()
+SET(RP_SDK_SOURCES
+   ${BASE_SOURCES}
+#${PICO_SDK_PATH}/src/rp2_common/pico_platform/platform.c
+#${PICO_SDK_PATH}/src/rp2_common/pico_runtime/runtime.c
+#${PICO_SDK_PATH}/src/rp2_common/hardware_irq/irq.c
 
-#${PICO_SDK_PATH}/src/rp2_common/hardware_clocks/clocks.c
-#${PICO_SDK_PATH}/src/rp2_common/hardware_pll/pll.c
-#${PICO_SDK_PATH}/src/rp2_common/hardware_vreg/vreg.c
-#${PICO_SDK_PATH}/src/rp2_common/hardware_xosc/xosc.c
+
 ${CMAKE_CURRENT_SOURCE_DIR}/ln_rp_stubs.cpp
 ${CMAKE_CURRENT_SOURCE_DIR}/rp_serial.cpp
 ${CMAKE_CURRENT_SOURCE_DIR}/rp_irq.cpp

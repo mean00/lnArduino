@@ -51,7 +51,7 @@ extern "C" void dummy_caller(int code)
     volatile uint32_t vtor = scb->vtor;
     __asm__("bkpt #0");
 }
-#if 1
+#if 0
 extern "C" void irq_init_priorities() {
 }
 /**
