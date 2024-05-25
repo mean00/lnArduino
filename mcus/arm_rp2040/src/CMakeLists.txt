@@ -15,17 +15,23 @@ SET(RP_LN_SOURCES
 )
 SET(RP_SDK_SOURCES
 
-${PICO_SDK_PATH}/src/rp2_common/hardware_timer/timer.c # Maybe
-${PICO_SDK_PATH}/src/rp2_common/hardware_uart/uart.c # Maybe
+${CMAKE_CURRENT_SOURCE_DIR}/../sdk_copy/timer.c # Maybe
+${CMAKE_CURRENT_SOURCE_DIR}/../sdk_copy/uart.c # Maybe
+#${PICO_SDK_PATH}/src/rp2_common/hardware_timer/timer.c # Maybe
+#${PICO_SDK_PATH}/src/rp2_common/hardware_uart/uart.c # Maybe
 
 #${PICO_SDK_PATH}/src/rp2_common/pico_platform/platform.c
 #${PICO_SDK_PATH}/src/rp2_common/pico_runtime/runtime.c
-
-${PICO_SDK_PATH}/src/rp2_common/hardware_clocks/clocks.c
 #${PICO_SDK_PATH}/src/rp2_common/hardware_irq/irq.c
-${PICO_SDK_PATH}/src/rp2_common/hardware_pll/pll.c
-${PICO_SDK_PATH}/src/rp2_common/hardware_vreg/vreg.c
-${PICO_SDK_PATH}/src/rp2_common/hardware_xosc/xosc.c
+${CMAKE_CURRENT_SOURCE_DIR}/../sdk_copy/clocks.c
+${CMAKE_CURRENT_SOURCE_DIR}/../sdk_copy/pll.c
+${CMAKE_CURRENT_SOURCE_DIR}/../sdk_copy/vreg.c
+${CMAKE_CURRENT_SOURCE_DIR}/../sdk_copy/xosc.c
+
+#${PICO_SDK_PATH}/src/rp2_common/hardware_clocks/clocks.c
+#${PICO_SDK_PATH}/src/rp2_common/hardware_pll/pll.c
+#${PICO_SDK_PATH}/src/rp2_common/hardware_vreg/vreg.c
+#${PICO_SDK_PATH}/src/rp2_common/hardware_xosc/xosc.c
 ${CMAKE_CURRENT_SOURCE_DIR}/ln_rp_stubs.cpp
 ${CMAKE_CURRENT_SOURCE_DIR}/rp_serial.cpp
 ${CMAKE_CURRENT_SOURCE_DIR}/rp_irq.cpp

@@ -18,3 +18,9 @@ extern "C" void watchdog_start_tick(unsigned int cycles)
 {
 
 }
+
+extern "C" bool running_on_fpga()
+{
+  return false;
+}
+extern "C" int stderr=0;
