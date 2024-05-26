@@ -30,7 +30,7 @@ ELSE()
     ${PICO_SDK_PATH}/src/rp2_common/hardware_pll/pll.c
     ${PICO_SDK_PATH}/src/rp2_common/hardware_vreg/vreg.c
     ${PICO_SDK_PATH}/src/rp2_common/hardware_xosc/xosc.c
-    ${PICO_SDK_PATH}/src/rp2_common/hardware_irq/irq.c
+    #${PICO_SDK_PATH}/src/rp2_common/hardware_irq/irq.c
     ${PICO_SDK_PATH}/src/rp2_common/hardware_irq/irq_handler_chain.S
     ${PICO_SDK_PATH}/src/rp2_common/hardware_pio/pio.c
 )
