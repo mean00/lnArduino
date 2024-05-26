@@ -52,6 +52,15 @@ extern "C" void dummy_caller(int code)
     __asm__("bkpt #0");
 }
 #if 1
+
+/*
+ * Copyright (c) 2020 Raspberry Pi (Trading) Ltd.
+ *
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+// this block is dervied from the original irq.c code
+
+
 extern "C" void irq_handler_chain_first_slot(void);
 extern "C" void irq_handler_chain_remove_tail(void);
 extern "C" void irq_add_tail_to_free_list(struct irq_handler_chain_slot *slot);
