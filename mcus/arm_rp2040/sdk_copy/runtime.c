@@ -21,22 +21,8 @@
 #include "hardware/irq.h"
 #include "hardware/resets.h"
 
-
-// MEANX #include "pico/mutex.h"
-// MEANX #include "pico/time.h"
-
-// MEANX #include "pico/printf.h"
-// MEANX #else
-// MEANX #define weak_raw_printf printf
-// MEANX #define weak_raw_vprintf vprintf
-// MEANX #endif
-
-#if PICO_ENTER_USB_BOOT_ON_EXIT
-#include "pico/bootrom.h"
-#endif
-
-
-uint32_t __attribute__((section(".ram_vector_table"))) ram_vector_table[48];
+#define LN_IRQ_VECTOR_NUMBER 48
+uint32_t __attribute__((section(".ram_vector_table"))) ram_vector_table[ LN_IRQ_VECTOR_NUMBER  ];
 
 
 void runtime_init(void) {
@@ -65,21 +51,7 @@ void runtime_init(void) {
             RESETS_RESET_USBCTRL_BITS
     ));
 
-    // pre-init runs really early since we need it even for memcpy and divide!
-    // (basically anything in aeabi that uses bootrom)
-
-    // Start and end points of the constructor list,
-    // defined by the linker script.
-    extern void (*__preinit_array_start)(void);
-    extern void (*__preinit_array_end)(void);
-
-    // Call each function in the list.
-    // We have to take the address of the symbols, as __preinit_array_start *is*
-    // the first function pointer, not the address of it.
-    for (void (**p)(void) = &__preinit_array_start; p < &__preinit_array_end; ++p) {
-        (*p)();
-    }
-
+  
     // After calling preinit we have enough runtime to do the exciting maths
     // in clocks_init
     clocks_init();
@@ -94,42 +66,9 @@ void runtime_init(void) {
             padsbank0_hw_clear->io[28] = padsbank0_hw_clear->io[29] = PADS_BANK0_GPIO0_IE_BITS;
 #endif
 
-    // this is an array of either mutex_t or recursive_mutex_t (i.e. not necessarily the same size)
-    // however each starts with a lock_core_t, and the spin_lock is initialized to address 1 for a recursive
-    // spinlock and 0 for a regular one.
-
-    // MEANX static_assert(!(sizeof(mutex_t)&3), "");
-    // MEANX static_assert(!(sizeof(recursive_mutex_t)&3), "");
-    // MEANX static_assert(!offsetof(mutex_t, core), "");
-    // MEANX static_assert(!offsetof(recursive_mutex_t, core), "");
-    // MEANX extern lock_core_t __mutex_array_start;
-    // MEANX extern lock_core_t __mutex_array_end;
-// MEANX 
-    // MEANX for (lock_core_t *l = &__mutex_array_start; l < &__mutex_array_end; ) {
-        // MEANX if (l->spin_lock) {
-            // MEANX // MEANX assert(1 == (uintptr_t)l->spin_lock); // indicator for a recursive mutex
-            // MEANX recursive_mutex_t *rm = (recursive_mutex_t *)l;
-            // MEANX recursive_mutex_init(rm);
-            // MEANX l = &rm[1].core; // next
-        // MEANX } else {
-            // MEANX mutex_t *m = (mutex_t *)l;
-            // MEANX mutex_init(m);
-            // MEANX l = &m[1].core; // next
-        // MEANX }
-    // MEANX }
-
-#if !(PICO_NO_RAM_VECTOR_TABLE || PICO_NO_FLASH)
-    __builtin_memcpy(ram_vector_table, (uint32_t *) scb_hw->vtor, sizeof(ram_vector_table));
+    __builtin_memset(ram_vector_table,0, LN_IRQ_VECTOR_NUMBER *4);
+    __builtin_memcpy(ram_vector_table, (uint32_t *) scb_hw->vtor, 4*4); // just copy reset & msp
     scb_hw->vtor = (uintptr_t) ram_vector_table;
-#endif
-
-#ifndef NDEBUG
-    if (__get_current_exception()) {
-        // crap; started in exception handler
-        __breakpoint();
-    }
-#endif
-
 
     // MEANX spin_locks_reset();
     irq_init_priorities();
