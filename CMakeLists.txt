@@ -27,6 +27,8 @@ IF(True) #NOT ARDUINO_GD32_FREERTOS)
         OPTION(USE_CH32v3x_USB_HS  "Use the USB HS interface (CH32V307 only)" FALSE)
         OPTION(USE_CH32v3x_USB_OTG "Use the USB OTG interface (CH32V30x only)" FALSE)
 
+        OPTION(USE_RP2040_PURE_RAM "Load and run from RAM (RP2040 only)" FALSE)
+
         SET(LN_MCU_FOLDER ${ARDUINO_GD32_FREERTOS}/mcus/${LN_EXT}/ CACHE INTERNAL "")
         include( ${LN_MCU_FOLDER}/freeRTOS_port_${LN_EXT}.cmake)
 
