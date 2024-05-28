@@ -2,8 +2,7 @@ include(FindPython3)
 MACRO(GENERATE_GD32_FIRMWARE target)
 
   #MESSAGE(STATUS " *** LN_MCU_FOLDER ${LN_MCU_FOLDER}")
-    OPTION(RP2040_NO_FLASH "store everything in ram" OFF)
-    IF(RP2040_NO_FLASH)
+    IF(USE_RP2040_PURE_RAM)
         configure_file( "${LN_MCU_FOLDER}/boards/${GD32_BOARD}/rp2040_linker_ram.ld.in" "${CMAKE_BINARY_DIR}/linker_script.ld" @ONLY)
     ELSE()
         configure_file( "${LN_MCU_FOLDER}/boards/${GD32_BOARD}/rp2040_linker.ld.in" "${CMAKE_BINARY_DIR}/linker_script.ld" @ONLY)
@@ -33,7 +32,7 @@ MACRO(GENERATE_GD32_FIRMWARE target)
                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
                    COMMENT "Memory summary"
     )
-    IF(RP2040_NO_FLASH)
+    IF(USE_RP2040_PURE_RAM)
     ELSE()
         find_program ( elf2uf2      NAMES elf2uf2)    
         if( "x${elf2uf2}" STREQUAL "xelf2uf2-NOTFOUND")
