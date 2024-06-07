@@ -98,6 +98,7 @@ extern "C"
     {
       do_assert(fmt);
     }
+    int stderr;
 }
 
 namespace std
