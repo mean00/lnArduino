@@ -53,7 +53,7 @@ typedef volatile CH32V3_INTERRUPTx CH32V3_INTERRUPT;
         INTERRUPT_DESC(unsupported),              /* 11 .word   0                           */                         \
         INTERRUPT_DESC(SysTick_Handler),          /* 12 .word   SysTick_Handler             */                         \
         INTERRUPT_DESC(unsupported),              /* 13 .word   0                           */                         \
-        INTERRUPT_DESC_RAW(SW_Handler),               /* 14 .word   SW_Handler                  */                         \
+        INTERRUPT_DESC_RAW(SW_Handler),           /* 14 .word   SW_Handler                  */                         \
         INTERRUPT_DESC(unsupported),              /* 15 .word   0                           */                         \
         INTERRUPT_DESC(unsupported),              /*.word   WWDG_IRQHandler                 */                         \
         INTERRUPT_DESC(unsupported),              /*.word   PVD_IRQHandler                  */                         \
@@ -146,10 +146,10 @@ typedef volatile CH32V3_INTERRUPTx CH32V3_INTERRUPT;
 
 #define LIST_OF_HANDLERS                                                                                               \
     HANDLER_DESC(Break_Point_Handler)                                                                                  \
-    HANDLER_DESC(SysTick_Handler)                                                                                    \
+    HANDLER_DESC(SysTick_Handler)                                                                                      \
     HANDLER_DESC(Ecall_M_Mode_Handler)                                                                                 \
     HANDLER_DESC(Ecall_U_Mode_Handler)                                                                                 \
-    HANDLER_DESC_RAW(SW_Handler)                                                                                         \
+    HANDLER_DESC_RAW(SW_Handler)                                                                                       \
     HANDLER_DESC(USART0_IRQHandler)                                                                                    \
     HANDLER_DESC(DMA0_Channel0_IRQHandler)                                                                             \
     HANDLER_DESC(DMA0_Channel1_IRQHandler)                                                                             \

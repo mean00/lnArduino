@@ -55,9 +55,9 @@
 #define DCSR_CAUSE_STEP 4
 #define DCSR_CAUSE_HALT 5
 
-#define MCONTROL_TYPE(xlen) (0xfULL << ((xlen)-4))
-#define MCONTROL_DMODE(xlen) (1ULL << ((xlen)-5))
-#define MCONTROL_MASKMAX(xlen) (0x3fULL << ((xlen)-11))
+#define MCONTROL_TYPE(xlen) (0xfULL << ((xlen) - 4))
+#define MCONTROL_DMODE(xlen) (1ULL << ((xlen) - 5))
+#define MCONTROL_MASKMAX(xlen) (0x3fULL << ((xlen) - 11))
 
 #define MCONTROL_SELECT (1 << 19)
 #define MCONTROL_TIMING (1 << 18)

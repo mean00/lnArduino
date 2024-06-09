@@ -6,8 +6,7 @@
 #define LED LN_SYSTEM_LED
 /**
  */
-void serialInit(); 
-
+void serialInit();
 
 #define MEVENT(x)                                                                                                      \
     case lnUsbStack::USB_##x:                                                                                          \
@@ -31,14 +30,12 @@ void helloUsbEvent(void *cookie, lnUsbStack::lnUsbStackEvents event)
     }
 }
 
-
 void setup()
 {
     Logger("Starting lnTUSB Test\n");
     pinMode(LED, OUTPUT);
     pinMode(PB8, OUTPUT);
     pinMode(PB9, OUTPUT);
-
 
     // Prepare USB
     Logger("Starting CDC \n");
@@ -53,10 +50,10 @@ void setup()
 
 void loop()
 {
-    while(1)
+    while (1)
     {
         lnDelayMs(1000);
-        digitalToggle( LED);         
+        digitalToggle(LED);
         Logger("*\n");
     }
 }

@@ -94,6 +94,11 @@ extern "C"
         {
         }
     }
+    void __attribute__((noreturn)) panic(const char *fmt, ...)
+    {
+        do_assert(fmt);
+    }
+    int stderr;
 }
 
 namespace std

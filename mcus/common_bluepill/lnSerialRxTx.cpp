@@ -3,7 +3,6 @@
  *  See license file
  */
 
-
 #include "lnArduino.h"
 #include "lnSerial.h"
 #include "lnSerial_priv.h"
@@ -12,7 +11,6 @@
 
 #include "lnSerialTxOnly.h"
 #include "lnSerialTxOnlyDma.h"
-
 
 /**
  * @brief

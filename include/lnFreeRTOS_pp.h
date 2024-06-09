@@ -4,6 +4,7 @@
  */
 
 #pragma once
+#include "lnAssert.h"
 #include "lnFreeRTOS.h"
 #include "systemHelper.h"
 
@@ -118,15 +119,6 @@ class lnAutoMutex
 };
 
 void xDelay(uint32_t ms);
-extern "C"
-{
-    void __attribute__((noreturn)) do_assert(const char *a);
-}
-#define xAssert(a)                                                                                                     \
-    if (!(a))                                                                                                          \
-    {                                                                                                                  \
-        do_assert(#a);                                                                                                 \
-    }
 /**
  * @brief
  *

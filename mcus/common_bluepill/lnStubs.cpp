@@ -10,7 +10,7 @@ extern "C" void *_sbrk(ptrdiff_t incr)
     xAssert(0);
     return 0;
 }
-extern "C" void _putchar(char){};
+extern "C" void _putchar(char) {};
 
 #undef printf
 #undef scanf

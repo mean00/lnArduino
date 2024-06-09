@@ -95,8 +95,8 @@ typedef uint32_t rv_csr_t;
             rv_csr_t _reserved5 : 38; /*!< bit:     24..61 Reserved  */
             rv_csr_t mxl : 2;         /*!< bit:     62..63 Machine XLEN  */
 #else
-        rv_csr_t _reserved5 : 6;  /*!< bit:     24..29 Reserved  */
-        rv_csr_t mxl : 2;         /*!< bit:     30..31 Machine XLEN  */
+        rv_csr_t _reserved5 : 6; /*!< bit:     24..29 Reserved  */
+        rv_csr_t mxl : 2;        /*!< bit:     30..31 Machine XLEN  */
 #endif
         } b;        /*!< Structure used for bit  access */
         rv_csr_t d; /*!< Type      used for csr data access */
@@ -154,7 +154,7 @@ typedef uint32_t rv_csr_t;
 #if defined(__RISCV_XLEN) && __RISCV_XLEN == 64
             rv_csr_t addr : 58; /*!< bit:     6..63  mtvec address */
 #else
-        rv_csr_t addr : 26;       /*!< bit:     6..31  mtvec address */
+        rv_csr_t addr : 26; /*!< bit:     6..31  mtvec address */
 #endif
         } b;        /*!< Structure used for bit  access */
         rv_csr_t d; /*!< Type      used for csr data access */
@@ -177,7 +177,7 @@ typedef uint32_t rv_csr_t;
             rv_csr_t _reserved2 : 32; /*!< bit:     31..62  Reserved */
             rv_csr_t interrupt : 1;   /*!< bit:     63  trap type. 0 means exception and 1 means interrupt */
 #else
-        rv_csr_t interrupt : 1;   /*!< bit:     31  trap type. 0 means exception and 1 means interrupt */
+        rv_csr_t interrupt : 1; /*!< bit:     31  trap type. 0 means exception and 1 means interrupt */
 #endif
         } b;        /*!< Structure used for bit  access */
         rv_csr_t d; /*!< Type      used for csr data access */

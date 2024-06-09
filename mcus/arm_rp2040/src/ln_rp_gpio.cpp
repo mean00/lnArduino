@@ -11,6 +11,14 @@ void lnPinMode(const lnPin pin, const lnGpioMode mode, const int speedInMhz)
     uint32_t pad, control;
     switch (mode)
     {
+    case lnRP_PIO0_MODE:
+        fun = LN_RP_GPIO_CONTROL_FUNC(PIO0);
+        lnGpio->PINS[pin].control = fun + LN_RP_GPIO_CONTROL_OE(NORMAL);
+        return;
+    case lnRP_PIO1_MODE:
+        fun = LN_RP_GPIO_CONTROL_FUNC(PIO1);
+        lnGpio->PINS[pin].control = fun + LN_RP_GPIO_CONTROL_OE(NORMAL);
+        return;
     case lnSPI_MODE:
         fun = LN_RP_GPIO_CONTROL_FUNC(SPI);
         lnGpio->PINS[pin].control = fun + LN_RP_GPIO_CONTROL_OE(NORMAL);
@@ -164,4 +172,5 @@ lnFastIO::lnFastIO(lnPin pin)
     _off = &(lnSio->GPIO_OUT_CLR);
     _bit = 1 << pin;
 }
+
 // EOF

@@ -91,9 +91,9 @@ extern "C"
 #define DCSR_CAUSE_STEP 4
 #define DCSR_CAUSE_HALT 5
 
-#define MCONTROL_TYPE(xlen) (0xfULL << ((xlen)-4))
-#define MCONTROL_DMODE(xlen) (1ULL << ((xlen)-5))
-#define MCONTROL_MASKMAX(xlen) (0x3fULL << ((xlen)-11))
+#define MCONTROL_TYPE(xlen) (0xfULL << ((xlen) - 4))
+#define MCONTROL_DMODE(xlen) (1ULL << ((xlen) - 5))
+#define MCONTROL_MASKMAX(xlen) (0x3fULL << ((xlen) - 11))
 
 #define MCONTROL_SELECT (1 << 19)
 #define MCONTROL_TIMING (1 << 18)
@@ -153,10 +153,10 @@ extern "C"
 #define MCOUNTINHIBIT_IR (1 << 2)
 #define MCOUNTINHIBIT_CY (1 << 0)
 
-#define MILM_CTL_ILM_BPA (((1ULL << ((__riscv_xlen)-10)) - 1) << 10)
+#define MILM_CTL_ILM_BPA (((1ULL << ((__riscv_xlen) - 10)) - 1) << 10)
 #define MILM_CTL_ILM_EN (1 << 0)
 
-#define MDLM_CTL_DLM_BPA (((1ULL << ((__riscv_xlen)-10)) - 1) << 10)
+#define MDLM_CTL_DLM_BPA (((1ULL << ((__riscv_xlen) - 10)) - 1) << 10)
 #define MDLM_CTL_DLM_EN (1 << 0)
 
 #define MSUBM_PTYP (0x3 << 8)
@@ -173,7 +173,7 @@ extern "C"
 #define MCACHE_CTL_DC_EN (1 << 16)
 
 #define MTVT2_MTVT2EN (1 << 0)
-#define MTVT2_COMMON_CODE_ENTRY (((1ULL << ((__riscv_xlen)-2)) - 1) << 2)
+#define MTVT2_COMMON_CODE_ENTRY (((1ULL << ((__riscv_xlen) - 2)) - 1) << 2)
 
 #define MCFG_INFO_TEE (1 << 0)
 #define MCFG_INFO_ECC (1 << 1)
@@ -199,10 +199,10 @@ extern "C"
 #define MDCFG_DLM_SIZE (0x1F << 16)
 
 #define MPPICFG_INFO_PPI_SIZE (0x1F << 1)
-#define MPPICFG_INFO_PPI_BPA (((1ULL << ((__riscv_xlen)-10)) - 1) << 10)
+#define MPPICFG_INFO_PPI_BPA (((1ULL << ((__riscv_xlen) - 10)) - 1) << 10)
 
 #define MFIOCFG_INFO_FIO_SIZE (0x1F << 1)
-#define MFIOCFG_INFO_FIO_BPA (((1ULL << ((__riscv_xlen)-10)) - 1) << 10)
+#define MFIOCFG_INFO_FIO_BPA (((1ULL << ((__riscv_xlen) - 10)) - 1) << 10)
 
 #define SIP_SSIP MIP_SSIP
 #define SIP_STIP MIP_STIP

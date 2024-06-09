@@ -1,79 +1,56 @@
 configure_file( ${PICO_SDK_PATH}/src/common/pico_base/include/pico/version.h.in ${CMAKE_BINARY_DIR}/pico/version.h)
-IF(RP2040_NO_FLASH)
-  ADD_DEFINITIONS("-DPICO_NO_FLASH=1")
-ENDIF()
 add_custom_command(
   OUTPUT ${CMAKE_BINARY_DIR}/bs2_default_padded_checksummed.S
   COMMAND python ${PICO_SDK_PATH}/src/rp2_common/boot_stage2/pad_checksum -s 0xffffffff ${PICO_SDK_PATH}/src/rp2_common/boot_stage2/bs2_default.bin ${CMAKE_BINARY_DIR}/bs2_default_padded_checksummed.S
   DEPENDS 
   )
 
+
+IF(USE_RP2040_PURE_RAM)
+  SET(CRT0 ${CMAKE_CURRENT_SOURCE_DIR}/../sdk_copy/crt0_ram.S 
+           ${CMAKE_CURRENT_SOURCE_DIR}/ln_sys_init_ram.cpp)
+ELSE()
+  SET(CRT0 ${CMAKE_CURRENT_SOURCE_DIR}/../sdk_copy/crt0.S)
+ENDIF()
+
+
 SET(RP_LN_SOURCES
         ln_rp_gpio.cpp
         ln_rp_dma.cpp
         ln_rp_spi.cpp
 )
-SET(RP_SDK_SOURCES
-
-${PICO_SDK_PATH}/src/common/pico_sync/critical_section.c
-${PICO_SDK_PATH}/src/common/pico_sync/lock_core.c
-${PICO_SDK_PATH}/src/common/pico_sync/mutex.c
-${PICO_SDK_PATH}/src/common/pico_sync/sem.c
-
-${PICO_SDK_PATH}/src/common/pico_time/timeout_helper.c
-${PICO_SDK_PATH}/src/common/pico_util/datetime.c
-${PICO_SDK_PATH}/src/common/pico_util/pheap.c
-${PICO_SDK_PATH}/src/common/pico_util/queue.c
-${PICO_SDK_PATH}/src/rp2_common/boot_stage2/compile_time_choice.S
-${PICO_SDK_PATH}/src/rp2_common/hardware_claim/claim.c
-${PICO_SDK_PATH}/src/rp2_common/hardware_clocks/clocks.c
-${PICO_SDK_PATH}/src/rp2_common/hardware_divider/divider.S
-${PICO_SDK_PATH}/src/rp2_common/hardware_gpio/gpio.c
-${PICO_SDK_PATH}/src/rp2_common/hardware_irq/irq.c
-${PICO_SDK_PATH}/src/rp2_common/hardware_irq/irq_handler_chain.S
-${PICO_SDK_PATH}/src/rp2_common/hardware_pll/pll.c
-${PICO_SDK_PATH}/src/rp2_common/hardware_sync/sync.c
-${PICO_SDK_PATH}/src/rp2_common/hardware_timer/timer.c
-${PICO_SDK_PATH}/src/rp2_common/hardware_uart/uart.c
-${PICO_SDK_PATH}/src/rp2_common/hardware_vreg/vreg.c
-${PICO_SDK_PATH}/src/rp2_common/hardware_watchdog/watchdog.c
-${PICO_SDK_PATH}/src/rp2_common/hardware_xosc/xosc.c
-${PICO_SDK_PATH}/src/rp2_common/pico_bit_ops/bit_ops_aeabi.S
-${PICO_SDK_PATH}/src/rp2_common/pico_bootrom/bootrom.c
-${PICO_SDK_PATH}/src/rp2_common/pico_divider/divider.S
-# {PICO_SDK_PATH}/src/rp2_common/pico_double/double_aeabi.S
-# ${PICO_SDK_PATH}/src/rp2_common/pico_double/double_init_rom.c
-# ${PICO_SDK_PATH}/src/rp2_common/pico_double/double_math.c
-# ${PICO_SDK_PATH}/src/rp2_common/pico_double/double_v1_rom_shim.S
-# ${PICO_SDK_PATH}/src/rp2_common/pico_float/float_aeabi.S
-# ${PICO_SDK_PATH}/src/rp2_common/pico_float/float_init_rom.c
-# ${PICO_SDK_PATH}/src/rp2_common/pico_float/float_math.c
-# ${PICO_SDK_PATH}/src/rp2_common/pico_float/float_v1_rom_shim.S
-${PICO_SDK_PATH}/src/rp2_common/pico_int64_ops/pico_int64_ops_aeabi.S
-${PICO_SDK_PATH}/src/rp2_common/pico_mem_ops/mem_ops_aeabi.S
-${PICO_SDK_PATH}/src/rp2_common/pico_platform/platform.c
-${PICO_SDK_PATH}/src/rp2_common/pico_printf/printf.c
-${PICO_SDK_PATH}/src/rp2_common/pico_runtime/runtime.c
-${PICO_SDK_PATH}/src/rp2_common/pico_standard_link/binary_info.c
-
-${PICO_SDK_PATH}/src/rp2_common/pico_stdio/stdio.c
-${PICO_SDK_PATH}/src/rp2_common/pico_stdio_uart/stdio_uart.c
-#${PICO_SDK_PATH}/src/rp2_common/pico_standard_link/crt0.S
-
-${PICO_SDK_PATH}/src/rp2_common/hardware_pio/pio.c
-
-#${PICO_SDK_PATH}/src/rp2_common/pico_malloc/pico_malloc.c
-#${PICO_SDK_PATH}/src/rp2_common/pico_standard_link/new_delete.cpp
-#${PICO_SDK_PATH}/src/common/pico_time/time.c
-
-${PICO_SDK_PATH}/src/rp2_common/pico_stdlib/stdlib.c
-
-${CMAKE_CURRENT_SOURCE_DIR}/rp_serial.cpp
-${CMAKE_CURRENT_SOURCE_DIR}/rp_irq.cpp
-
-${CMAKE_CURRENT_SOURCE_DIR}/crt0.S
+IF(FALSE)
+  SET(BASE_SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/../sdk_copy/timer.c # Maybe
+    ${CMAKE_CURRENT_SOURCE_DIR}/../sdk_copy/uart.c # Maybe
+    ${CMAKE_CURRENT_SOURCE_DIR}/../sdk_copy/clocks.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../sdk_copy/pll.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../sdk_copy/vreg.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../sdk_copy/xosc.c
 )
+ELSE()
+  SET(BASE_SOURCES
+    ${PICO_SDK_PATH}/src/rp2_common/hardware_timer/timer.c # Maybe
+    ${PICO_SDK_PATH}/src/rp2_common/hardware_uart/uart.c # Maybe
+    ${PICO_SDK_PATH}/src/rp2_common/hardware_clocks/clocks.c
+    ${PICO_SDK_PATH}/src/rp2_common/hardware_pll/pll.c
+    ${PICO_SDK_PATH}/src/rp2_common/hardware_vreg/vreg.c
+    ${PICO_SDK_PATH}/src/rp2_common/hardware_xosc/xosc.c
+    #${PICO_SDK_PATH}/src/rp2_common/hardware_irq/irq.c
+    ${PICO_SDK_PATH}/src/rp2_common/hardware_irq/irq_handler_chain.S
+    ${PICO_SDK_PATH}/src/rp2_common/hardware_pio/pio.c
+)
+ENDIF()
+SET(RP_SDK_SOURCES
+  ${BASE_SOURCES}
+  ${CMAKE_CURRENT_SOURCE_DIR}/ln_rp_stubs.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/rp_serial.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/rp_irq.cpp
 
+  ${CMAKE_CURRENT_SOURCE_DIR}/../sdk_copy/platform.c
+  ${CMAKE_CURRENT_SOURCE_DIR}/../sdk_copy/runtime.c
+  ${CRT0}
+)
 add_library(rplib STATIC rp.cpp ${CMAKE_CURRENT_SOURCE_DIR}/../conf/bs2_default_padded_checksummed.S ${RP_LN_SOURCES} ${RP_SDK_SOURCES})
 target_include_directories(rplib PUBLIC 
         ${PICO_SDK_PATH}        
@@ -122,4 +99,7 @@ target_include_directories(rplib PUBLIC  ${CMAKE_CURRENT_SOURCE_DIR}/../include)
 target_include_directories(rplib  PRIVATE ../private_include )
 target_link_libraries(rplib  PRIVATE lnArduinoInternal )
 
+#${PICO_SDK_PATH}/src/rp2_common/pico_platform/platform.c
+#${PICO_SDK_PATH}/src/rp2_common/pico_runtime/runtime.c
+#${PICO_SDK_PATH}/src/rp2_common/hardware_irq/irq.c
 

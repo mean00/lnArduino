@@ -24,13 +24,12 @@ extern "C" void unsupported_relay();
 #define WCH_HW_STACK 0
 #endif
 
+#include "ch32v30x_isr_helper.h"
 #include "ch32v3x_interrupt_table.h"
 #include "lnArduino.h"
 #include "lnIRQ.h"
 #include "lnIRQ_riscv_priv_ch32v3x.h"
 #include "lnRCU.h"
-#include "ch32v30x_isr_helper.h"
-
 
 /**
  *
@@ -55,7 +54,6 @@ CH32V3_INTERRUPT *pfic = (CH32V3_INTERRUPT *)LN_PFIC_ADR;
 //              1 vectored
 //
 
-
 #ifdef LN_ENABLE_I2C
 void i2cIrqHandler(int instance, bool error);
 #else
@@ -63,29 +61,29 @@ void i2cIrqHandler(int instance, bool error);
 #endif
 
 //--
-ISR_CODE extern "C"  void LOCAL_LN_INTERRUPT_TYPE I2C0_EV_IRQHandler(void)
+ISR_CODE extern "C" void LOCAL_LN_INTERRUPT_TYPE I2C0_EV_IRQHandler(void)
 {
     i2cIrqHandler(0, false);
 }
 /**
- * @brief 
- * 
+ * @brief
+ *
  */
-ISR_CODE extern "C"  void LOCAL_LN_INTERRUPT_TYPE I2C0_ERR_IRQHandler(void)
+ISR_CODE extern "C" void LOCAL_LN_INTERRUPT_TYPE I2C0_ERR_IRQHandler(void)
 {
     i2cIrqHandler(0, true);
 }
 /**
- * @brief 
- * 
+ * @brief
+ *
  */
-ISR_CODE extern "C"  void LOCAL_LN_INTERRUPT_TYPE I2C1_EV_IRQHandler(void)
+ISR_CODE extern "C" void LOCAL_LN_INTERRUPT_TYPE I2C1_EV_IRQHandler(void)
 {
     i2cIrqHandler(1, false);
 }
 /**
- * @brief 
- * 
+ * @brief
+ *
  */
 ISR_CODE extern "C" void LOCAL_LN_INTERRUPT_TYPE I2C1_ERR_IRQHandler(void)
 {
@@ -132,8 +130,8 @@ ISR_CODE static int lookupIrq(int irq)
 }
 
 /**
- * @brief 
- * 
+ * @brief
+ *
  */
 ISR_CODE void lnIrqSysInit()
 {
@@ -153,13 +151,14 @@ ISR_CODE void lnIrqSysInit()
         pfic->IPRIOIR[i] = prio32;
     }
     //
-    extern const uint32_t size_of_vec_table;;
+    extern const uint32_t size_of_vec_table;
+    ;
     // Prepare invert able
-    for(int i=0;i<size_of_vec_table;i++)
+    for (int i = 0; i < size_of_vec_table; i++)
     {
         int inverted = lookupIrq(i);
-        xAssert(inverted<256);
-        vec_revert_table[i]=inverted;
+        xAssert(inverted < 256);
+        vec_revert_table[i] = inverted;
     }
 
     // allow fast path for these 2 interrupts
@@ -169,21 +168,17 @@ ISR_CODE void lnIrqSysInit()
     lnIrqSetPriority(LN_IRQ_SYSTICK, 6);
     lnIrqSetPriority(LN_IRQ_SW, 7);
 
-   
     // relocate vector table
     // Initialise WCH enhance interrutp controller,
     // WCH code puts 0x6088 in mstatus
     uint32_t syscr = WCH_HW_STACK | CH32_SYSCR_INESTEN | CH32_SYSCR_MPTCFG_2NESTED | CH32_SYSCR_HWSTKOVEN;
-    //uint32_t syscr = WCH_HW_STACK | CH32_SYSCR_HWSTKOVEN;
-    uint32_t mstatus = LN_RISCV_FPU_MODE(ARCH_FPU)+LN_RISCV_MPP(0); // enable FPU if ARCH_FPU=1
-
-    
-
+    // uint32_t syscr = WCH_HW_STACK | CH32_SYSCR_HWSTKOVEN;
+    uint32_t mstatus = LN_RISCV_FPU_MODE(ARCH_FPU) + LN_RISCV_MPP(0); // enable FPU if ARCH_FPU=1
 
     asm volatile("mv t0, %1\n"      // load syscr
                  "csrw 0x804, t0\n" // INTSYSCR : hw stack etc...
 
-                 "mv t0, %2\n"      
+                 "mv t0, %2\n"
                  "csrw mstatus, t0\n" // Enable floating point and disable interrupts
 
                  "mv t0, %0 \n"
@@ -191,8 +186,7 @@ ISR_CODE void lnIrqSysInit()
                  "csrw mtvec, t0 \n" //
 
                  ::"r"(vecTable),
-                 "r"(syscr),"r"(mstatus));
-
+                 "r"(syscr), "r"(mstatus));
 }
 /**
 
@@ -239,7 +233,7 @@ ISR_CODE void PromoteIrqToFast(const LnIRQ &irq, int no)
     {
         xAssert(0);
     }
-    no--; // between 0 and 3 now
+    no--;                                // between 0 and 3 now
     int irq_num = vec_revert_table[irq]; //_irqs[irq].irqNb;
     xAssert(irq_num);
     uint32_t adr = vecTable[irq_num];
@@ -295,7 +289,7 @@ ISR_CODE void lnDisableInterrupt(const LnIRQ &irq)
 
 void dmaIrqHandler(int dma, int channel);
 #define DMA_IRQ(d, c)                                                                                                  \
-    ISR_CODE extern "C" void LOCAL_LN_INTERRUPT_TYPE DMA##d##_Channel##c##_IRQHandler(void)                                                \
+    ISR_CODE extern "C" void LOCAL_LN_INTERRUPT_TYPE DMA##d##_Channel##c##_IRQHandler(void)                            \
     {                                                                                                                  \
         dmaIrqHandler(d, c);                                                                                           \
     }
@@ -361,6 +355,5 @@ void lnSoftSystemReset()
         __asm__("nop");
     }
 }
-
 
 // EOF

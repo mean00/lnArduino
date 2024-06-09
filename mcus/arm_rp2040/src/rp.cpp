@@ -10,15 +10,15 @@ extern void setup();
 extern void loop();
 
 uint8_t ucHeap[configTOTAL_HEAP_SIZE];
-extern void  lnRpDmaSysInit();
+extern void lnRpDmaSysInit();
 /**
- * @brief 
- * 
+ * @brief
+ *
  */
 extern "C" void alarm_pool_init_default()
 {
-    //xAssert(0);
-    #warning this is a stub to avoid pulling the pico-sdk libc malloc
+// xAssert(0);
+#warning this is a stub to avoid pulling the pico-sdk libc malloc
 }
 
 /**
@@ -46,15 +46,15 @@ extern "C"
     void vPortSVCHandler(void);
 }
 /**
- * @brief 
- * 
- * @return int 
+ * @brief
+ *
+ * @return int
  */
 int main()
 {
     lnPinMode(GPIO17, lnUART);
     lnPinMode(GPIO16, lnUART);
-    lnRpDmaSysInit();    
+    lnRpDmaSysInit();
 
     lnSetInterruptHandler(LN_IRQ_SYSTICK, xPortSysTickHandler);
     lnSetInterruptHandler(LN_IRQ_PENDSV, xPortPendSVHandler);

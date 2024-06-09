@@ -9,41 +9,38 @@
 
 lnUsbDevice *_usbInstance = NULL;
 
-
 /**
  */
 lnUsbDevice::lnUsbDevice(int port)
 {
-   xAssert(port == 0);
+    xAssert(port == 0);
     _handler = NULL;
-    _usbInstance = this;    
+    _usbInstance = this;
 }
 /**
  */
 lnUsbDevice::~lnUsbDevice()
 {
     _usbInstance = NULL;
-
 }
 /**
  */
 bool lnUsbDevice::init()
 {
-   
+
     return true;
 }
 /**
  */
 bool lnUsbDevice::power(bool onoff)
 {
-   
+
     return true;
 }
 /**
  */
 bool lnUsbDevice::irqEnabled(bool onoff)
 {
-
 
     return true;
 }
@@ -60,6 +57,5 @@ bool lnUsbDevice::registerEventHandler(const lnUsbEventHandler *h)
 */
 void lnUsbDevice::hwReset()
 {
-
 }
 // EOF

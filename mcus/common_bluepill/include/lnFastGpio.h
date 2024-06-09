@@ -12,20 +12,20 @@ class lnFastIO
 {
   public:
     lnFastIO(lnPin p);
-    LN_ALWAYS_INLINE void on()  
+    LN_ALWAYS_INLINE void on()
     {
         *_onoff = _onbit;
     }
-    LN_ALWAYS_INLINE void off()  
+    LN_ALWAYS_INLINE void off()
     {
         *_onoff = _offbit;
     }
-    LN_ALWAYS_INLINE void pulseLow() 
+    LN_ALWAYS_INLINE void pulseLow()
     {
         *_onoff = _offbit;
         *_onoff = _onbit;
     }
-    void pulseHigh() 
+    void pulseHigh()
     {
         *_onoff = _onbit;
         *_onoff = _offbit;

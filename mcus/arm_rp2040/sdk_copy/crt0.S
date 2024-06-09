@@ -35,139 +35,10 @@ __VECTOR_TABLE:
 __vectors:
 .word __StackTop
 .word _reset_handler
-.word isr_nmi
-.word isr_hardfault
-.word isr_invalid1 // Reserved, should never fire
-.word isr_invalid2 // Reserved, should never fire
-.word isr_invalid3 // Reserved, should never fire
-.word isr_invalid4 // Reserved, should never fire
-.word isr_invalid5 // Reserved, should never fire
-.word isr_invalid6 // Reserved, should never fire
-.word isr_invalid7 // Reserved, should never fire
-.word isr_svcall
-.word isr_invalid8 // Reserved, should never fire
-.word isr_invalid9 // Reserved, should never fire
-.word isr_pendsv
-.word isr_systick
-.word isr_irq0
-.word isr_irq1
-.word isr_irq2
-.word isr_irq3
-.word isr_irq4
-.word isr_irq5
-.word isr_irq6
-.word isr_irq7
-.word isr_irq8
-.word isr_irq9
-.word isr_irq10
-.word isr_irq11
-.word isr_irq12
-.word isr_irq13
-.word isr_irq14
-.word isr_irq15
-.word isr_irq16
-.word isr_irq17
-.word isr_irq18
-.word isr_irq19
-.word isr_irq20
-.word isr_irq21
-.word isr_irq22
-.word isr_irq23
-.word isr_irq24
-.word isr_irq25
-.word isr_irq26
-.word isr_irq27
-.word isr_irq28
-.word isr_irq29
-.word isr_irq30
-.word isr_irq31
-
 // all default exception handlers do nothing, and we can check for them being set to our
 // default values by seeing if they point to somewhere between __defaults_isrs_start and __default_isrs_end
 .global __default_isrs_start
 __default_isrs_start:
-
-// Declare a weak symbol for each ISR.
-// By default, they will fall through to the undefined IRQ handler below (breakpoint),
-// but can be overridden by C functions with correct name.
-
-.macro decl_isr_bkpt name
-.weak \name
-.type \name,%function
-.thumb_func
-\name:
-    bkpt #0
-.endm
-
-// these are separated out for clarity
-decl_isr_bkpt isr_invalid1
-decl_isr_bkpt isr_invalid2
-decl_isr_bkpt isr_invalid3
-decl_isr_bkpt isr_invalid4
-decl_isr_bkpt isr_invalid5
-decl_isr_bkpt isr_invalid6
-decl_isr_bkpt isr_invalid7
-decl_isr_bkpt isr_invalid8
-decl_isr_bkpt isr_invalid9
-
-decl_isr_bkpt isr_nmi
-decl_isr_bkpt isr_hardfault
-decl_isr_bkpt isr_svcall
-decl_isr_bkpt isr_pendsv
-decl_isr_bkpt isr_systick
-
-.global __default_isrs_end
-__default_isrs_end:
-
-.macro decl_isr name
-.weak \name
-.type \name,%function
-.thumb_func
-\name:
-.endm
-
-decl_isr isr_irq0
-decl_isr isr_irq1
-decl_isr isr_irq2
-decl_isr isr_irq3
-decl_isr isr_irq4
-decl_isr isr_irq5
-decl_isr isr_irq6
-decl_isr isr_irq7
-decl_isr isr_irq8
-decl_isr isr_irq9
-decl_isr isr_irq10
-decl_isr isr_irq11
-decl_isr isr_irq12
-decl_isr isr_irq13
-decl_isr isr_irq14
-decl_isr isr_irq15
-decl_isr isr_irq16
-decl_isr isr_irq17
-decl_isr isr_irq18
-decl_isr isr_irq19
-decl_isr isr_irq20
-decl_isr isr_irq21
-decl_isr isr_irq22
-decl_isr isr_irq23
-decl_isr isr_irq24
-decl_isr isr_irq25
-decl_isr isr_irq26
-decl_isr isr_irq27
-decl_isr isr_irq28
-decl_isr isr_irq29
-decl_isr isr_irq30
-decl_isr isr_irq31
-
-// All unhandled USER IRQs fall through to here
-.global __unhandled_user_irq
-.thumb_func
-__unhandled_user_irq:
-    mrs  r0, ipsr
-    subs r0, #16
-.global unhandled_user_irq_num_in_r0
-unhandled_user_irq_num_in_r0:
-    bkpt #0
 
 // ----------------------------------------------------------------------------
 
@@ -209,15 +80,9 @@ binary_info_header:
 .global _entry_point
 _entry_point:
 
-#if PICO_NO_FLASH
-    // Vector through our own table (SP, VTOR will not have been set up at
-    // this point). Same path for debugger entry and bootloader entry.
-    ldr r0, =__vectors
-#else
     // Debugger tried to run code after loading, so SSI is in 03h-only mode.
     // Go back through bootrom + boot2 to properly initialise flash.
     movs r0, #0
-#endif
     ldr r1, =(PPB_BASE + M0PLUS_VTOR_OFFSET)
     str r0, [r1]
     ldmia r0!, {r1, r2}
@@ -241,9 +106,6 @@ _reset_handler:
     cmp r0, #0
     bne hold_non_core0_in_bootrom
 
-    // In a NO_FLASH binary, don't perform .data copy, since it's loaded
-    // in-place by the SRAM load. Still need to clear .bss
-#if !PICO_NO_FLASH
     adr r4, data_cpy_table
 
     // assume there is at least one entry
@@ -254,18 +116,58 @@ _reset_handler:
     bl data_cpy
     b 1b
 2:
-#endif
 
+bss_header_start:
     // Zero out the BSS
+    //--------------------------
+    // Header to align to 64
+    //--------------------------
     ldr r1, =__bss_start__
     ldr r2, =__bss_end__
     movs r0, #0
+
+    // Header to align to 64
+    ldr r4, = 63 // 64 round down
+3:
+    mov r5, r4 // 64 round down
+    ands r5, r1
+    beq bss_header_done
+    stmia r1!,{r0} 
+    b 3b
+    //--------------------------
+    // No r1 is 64 aligned
+    // Body 64 bytes at a time 
+    //--------------------------
+
+bss_header_done:
+    ldr r0, = 0xffffffc0 // 64 round down
+    ands r2, r0          // round down end address
+    movs r3, #0
+    movs r4, #0
+    movs r5, #0
+    movs r6, #0
     b bss_fill_test
-bss_fill_loop:
-    stm r1!, {r0}
+bss_fill_loop:                // 4x16 bytes = 64 bytes at a time
+    stmia r1!, {r3,r4,r5,r6}  // 16 bytes at a time
+    stmia r1!, {r3,r4,r5,r6}  // 16 bytes at a time
+    stmia r1!, {r3,r4,r5,r6}  // 16 bytes at a time
+    stmia r1!, {r3,r4,r5,r6}  // 16 bytes at a time
 bss_fill_test:
     cmp r1, r2
     bne bss_fill_loop
+    //--------------------------
+    // Trailer to align to 64
+    //--------------------------
+
+    ldr r2, =__bss_end__
+    b bss_trailer_end
+    
+bss_trailer: 
+    stmia r1!,{r0}
+bss_trailer_end:
+    cmp r1, r2
+    bne bss_trailer
+
 
 platform_entry: // symbol for stack traces
     // Use 32-bit jumps, in case these symbols are moved out of branch range
@@ -282,7 +184,6 @@ platform_entry: // symbol for stack traces
     bkpt #0
     b 1b
 
-#if !PICO_NO_FLASH
 data_cpy_loop:
     ldm r1!, {r0}
     stm r2!, {r0}
@@ -290,7 +191,6 @@ data_cpy:
     cmp r2, r3
     blo data_cpy_loop
     bx lr
-#endif
 
 // Note the data copy table is still included for NO_FLASH builds, even though
 // we skip the copy, because it is listed in binary info
@@ -318,52 +218,11 @@ data_cpy_table:
 .word 0 // null terminator
 
 // ----------------------------------------------------------------------------
-// Provide safe defaults for _exit and runtime_init
-// Full implementations usually provided by platform.c
-
-.weak runtime_init
-.type runtime_init,%function
-.thumb_func
-runtime_init:
-    bx lr
-
-// ----------------------------------------------------------------------------
 // If core 1 somehow gets into crt0 due to a spectacular VTOR mishap, we need to
 // catch it and send back to the sleep-and-launch code in the bootrom. Shouldn't
 // happen (it should sleep in the ROM until given an entry point via the
 // cross-core FIFOs) but it's good to be defensive.
 
 hold_non_core0_in_bootrom:
-    ldr r0, = 'W' | ('V' << 8)
-    bl rom_func_lookup
-    bx r0
-
-// ----------------------------------------------------------------------------
-// Stack/heap dummies to set size
-
-// Prior to SDK 1.5.1 these were `.section .stack` without the `, "a"`... Clang linker gives a warning about this,
-// however setting it explicitly to `, "a"` makes GCC *now* discard the section unless it is also KEEP. This
-// seems like very surprising behavior!
-//
-// Strictly the most correct thing to do (as .stack and .heap are unreferenced) is to mark them as "a", and also KEEP, which
-// works correctly for both GCC and Clang, however doing so may break anyone who already has custom linker scripts without
-// the KEEP. Therefore we will only add the "a" on Clang, but will also use KEEP to our own linker scripts.
-
-.macro spacer_section name
-#if PICO_ASSEMBLER_IS_CLANG
-.section \name, "a"
-#else
-.section \name
-#endif
-.endm
-
-spacer_section .stack
-// align to allow for memory protection (although this alignment is pretty much ignored by linker script)
-.p2align 5
-    .equ StackSize, PICO_STACK_SIZE
-.space StackSize
-
-spacer_section .heap
-.p2align 2
-    .equ HeapSize, PICO_HEAP_SIZE
-.space HeapSize
+    b hold_non_core0_in_bootrom
+   
