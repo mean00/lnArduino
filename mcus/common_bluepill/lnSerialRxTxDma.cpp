@@ -118,7 +118,7 @@ bool lnSerialBpRxTxDma::enableRx(bool enabled)
     if (enabled)
     {
         _rxHead = _rxTail = 0;
-        _rxDma.pause();
+        _rxDma.cancelTransfer();
         ENTER_CRITICAL();
         d->CTL0 |= (LN_USART_CTL0_RBNEIE | LN_USART_CTL0_REN);
         d->CTL2 |= LN_USART_CTL2_DMA_RX;
