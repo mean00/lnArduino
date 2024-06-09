@@ -3,11 +3,11 @@
  *  See license file
  */
 
-#include "lnSerialRxTx.h"
 #include "lnArduino.h"
-#include "lnPeripheral_priv.h"
 #include "lnSerial.h"
 #include "lnSerial_priv.h"
+#include "lnSerialRxTx.h"
+#include "lnPeripheral_priv.h"
 
 #include "lnSerialTxOnly.h"
 #include "lnSerialTxOnlyDma.h"

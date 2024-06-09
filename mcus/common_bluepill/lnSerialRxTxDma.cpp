@@ -3,11 +3,11 @@
  *  See license file
  */
 
-#include "lnSerialRxTxDma.h"
 #include "lnArduino.h"
 #include "lnSerialBpCore.h"
-#include "lnSerialRxTx.h"
 #include "lnSerialTxOnlyDma.h"
+#include "lnSerialRxTxDma.h"
+#include "lnSerialRxTx.h"
 /**
  *
  * @param instance
