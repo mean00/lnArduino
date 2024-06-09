@@ -1,6 +1,8 @@
 
 
 #pragma once
+#include "lnAssert.h"
+#include "stddef.h"
 #include "stdint.h"
 /**
  * @brief
