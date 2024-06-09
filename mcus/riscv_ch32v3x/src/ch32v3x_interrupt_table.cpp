@@ -5,11 +5,11 @@
  *  That means interrupt priority between 0..7 ignoring preemption
  *
  */
+#include "ch32v30x_isr_helper.h"
 #include "lnArduino.h"
 #include "lnIRQ.h"
 #include "lnIRQ_riscv_priv_ch32v3x.h"
 #include "lnRCU.h"
-#include "ch32v30x_isr_helper.h"
 
 #ifdef USE_CH32v3x_HW_IRQ_STACK
 #define HANDLER_DESC(x)                                                                                                \
@@ -35,7 +35,6 @@ extern "C" void unsupported_relay();
  */
 
 LIST_OF_HANDLERS
-
 
 /**
  * @brief
@@ -72,8 +71,6 @@ void LOCAL_LN_INTERRUPT_TYPE HardFault_relay()
 unsupported_no_decl(1) unsupported_no_decl(2) unsupported_no_decl(3) unsupported_no_decl(4) unsupported_no_decl(5)
     unsupported_no_decl(6) unsupported_no_decl(7) unsupported_no_decl(8)
 
-
-
 //---------------------------------------------------------------------
 //---------------------------------------------------------------------
 /*- Create vector table -*/
@@ -89,19 +86,16 @@ unsupported_no_decl(1) unsupported_no_decl(2) unsupported_no_decl(3) unsupported
 #define UNSUPPORTED_NO(y) (uint32_t) unsupported_##y
 
 #define VECTOR_TABLE __attribute__((section(".vector_table")))
+    //--
+    extern VECTOR_TABLE const uint32_t vecTable[] __attribute__((aligned(32)));
+VECTOR_TABLE const uint32_t vecTable[] __attribute__((aligned(32))) = {LIST_OF_INTERRUPTS};
 //--
-extern VECTOR_TABLE const uint32_t vecTable[]  __attribute__((aligned(32)));
-VECTOR_TABLE const uint32_t vecTable[]   __attribute__((aligned(32))) = {LIST_OF_INTERRUPTS};
-//--
-#define SIZE_OF_VEC_TABLE sizeof(vecTable)/sizeof(uint32_t)
+#define SIZE_OF_VEC_TABLE sizeof(vecTable) / sizeof(uint32_t)
 extern const uint32_t size_of_vec_table = SIZE_OF_VEC_TABLE;
 
 uint8_t vec_revert_table[SIZE_OF_VEC_TABLE];
 
 #undef INTERRUPT_DESC
-
-
-
 
 #define WEAK_INTERRUPT(y)                                                                                              \
     extern "C" void __attribute__((weak)) y()                                                                          \
@@ -117,11 +111,10 @@ WEAK_INTERRUPT(USART1_IRQHandler)
 WEAK_INTERRUPT(USART2_IRQHandler)
 WEAK_INTERRUPT(OTG_FS_IRQHandler)
 
-
 #define RELAY_FUNC(x)                                                                                                  \
-    ISR_CODE extern "C" void __attribute__((naked)) x##_relay()                                                                 \
+    ISR_CODE extern "C" void __attribute__((naked)) x##_relay()                                                        \
     {                                                                                                                  \
-        __asm__("jal " #x "\n"                                                                                        \
+        __asm__("jal " #x "\n"                                                                                         \
                 "mret");                                                                                               \
     }
 #define RELAY_DMA(d, c) RELAY_FUNC(DMA##d##_Channel##c##_IRQHandler)

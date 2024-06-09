@@ -35,13 +35,13 @@
 #include "portmacro.h"
 #include "task.h"
 /* Standard includes. */
-#include "string.h"
 #include "port_define.h"
+#include "string.h"
 // MEANX
 #ifdef USE_CH32v3x_HW_IRQ_STACK
-  #define LN_IRQ_FOS
+#define LN_IRQ_FOS
 #else
-  #define LN_IRQ_FOS  __attribute__((interrupt))
+#define LN_IRQ_FOS __attribute__((interrupt))
 #endif
 
 #ifdef configCLINT_BASE_ADDRESS
@@ -75,7 +75,7 @@ interrupt stack after the scheduler has started. */
 #ifdef configISR_STACK_SIZE_WORDS
 #define ISR_ALIGN 16
 static __attribute__((aligned(ISR_ALIGN))) StackType_t xISRStack[configISR_STACK_SIZE_WORDS] = {0};
-const StackType_t xISRStackTop = (StackType_t) & (xISRStack[configISR_STACK_SIZE_WORDS & ~(ISR_ALIGN-1)]);
+const StackType_t xISRStackTop = (StackType_t) & (xISRStack[configISR_STACK_SIZE_WORDS & ~(ISR_ALIGN - 1)]);
 
 /* Don't use 0xa5 as the stack fill bytes as that is used by the kernerl for
 the task stacks, and so will legitimately appear in many positions within
@@ -226,7 +226,7 @@ void vPortEndScheduler(void)
         ;
 }
 /*-----------------------------------------------------------*/
-void SysTick_Handler(void) __attribute__((used)) LN_IRQ_FOS ;
+void SysTick_Handler(void) __attribute__((used)) LN_IRQ_FOS;
 void SysTick_Handler(void)
 {
     GET_INT_SP();
@@ -262,8 +262,8 @@ void vPortExitCritical(void)
 portUBASE_TYPE xPortSetInterruptMask(void)
 {
     portUBASE_TYPE uvalue = 0;
-    __asm volatile("csrr %0, mstatus" : "=r"(uvalue) );
-    __asm volatile("csrc mstatus, %0" :: "r"(0x88) );
+    __asm volatile("csrr %0, mstatus" : "=r"(uvalue));
+    __asm volatile("csrc mstatus, %0" ::"r"(0x88));
     return uvalue;
 }
 
@@ -283,27 +283,27 @@ void vPortClearInterruptMask(portUBASE_TYPE uvalue)
  *  The stack layout is (MEPC/MSTATUS) (FPU) (GPR)
  *  In that task we start with a clean FPU so no need to save the FPU registers
  */
- #define RISCV_MIE (1<<3)
- #define RISCV_MPIE (1<<7)
- StackType_t *pxPortInitialiseStack( StackType_t *pxTopOfStack, TaskFunction_t pxCode, void *pvParameters )
- {
-    uint32_t mstatus=0;
-    
+#define RISCV_MIE (1 << 3)
+#define RISCV_MPIE (1 << 7)
+StackType_t *pxPortInitialiseStack(StackType_t *pxTopOfStack, TaskFunction_t pxCode, void *pvParameters)
+{
+    uint32_t mstatus = 0;
+
     mstatus |= RISCV_MPIE;
-    mstatus |= (2<<11); // MPP=2
+    mstatus |= (2 << 11); // MPP=2
 
-#if ARCH_FPU == 1    
-    mstatus |= CH32_FPU_STATE(CH32_FPU_INITIAL);  // Set FS bits to "initial"
+#if ARCH_FPU == 1
+    mstatus |= CH32_FPU_STATE(CH32_FPU_INITIAL); // Set FS bits to "initial"
 #endif
-    int stack_usage = portCONTEXT_COUNT+portHEADER_COUNT;    
+    int stack_usage = portCONTEXT_COUNT + portHEADER_COUNT;
 
-    //mstatus=0x3880; //
-    pxTopOfStack -=(stack_usage);
+    // mstatus=0x3880; //
+    pxTopOfStack -= (stack_usage);
     StackType_t *newStack = pxTopOfStack;
     pxTopOfStack[0] = (StackType_t)pxCode; // fill in headers
     pxTopOfStack[1] = mstatus;
-    pxTopOfStack+=portHEADER_COUNT; // jump to GPR registers    
-    pxTopOfStack[6] = (StackType_t) pvParameters; // 6 is x10=A0
+    pxTopOfStack += portHEADER_COUNT;            // jump to GPR registers
+    pxTopOfStack[6] = (StackType_t)pvParameters; // 6 is x10=A0
     return newStack;
- }
+}
 //--

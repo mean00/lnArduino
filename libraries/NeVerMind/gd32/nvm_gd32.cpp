@@ -12,8 +12,8 @@ extern "C"
     extern const uint32_t eeprom_begin, eeprom_size;
 }
 
-#define EEPROM_BEGIN ((uint32_t)&eeprom_begin)
-#define EEPROM_SIZE ((uint32_t)&eeprom_size)
+#define EEPROM_BEGIN ((uint32_t) & eeprom_begin)
+#define EEPROM_SIZE ((uint32_t) & eeprom_size)
 
 /**
  *

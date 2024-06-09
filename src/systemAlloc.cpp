@@ -33,7 +33,6 @@ extern "C"
     {
         do_assert("realloc");
     }
- 
 
     //----------------------------------
     void *malloc(size_t size)

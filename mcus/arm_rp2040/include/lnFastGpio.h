@@ -12,11 +12,11 @@ class lnFastIO
 {
   public:
     lnFastIO(lnPin p);
-    void on() volatile  __attribute__((always_inline))
+    void on() volatile __attribute__((always_inline))
     {
         *_on = _bit;
     }
-    void off() volatile  __attribute__((always_inline))
+    void off() volatile __attribute__((always_inline))
     {
         *_off = _bit;
     }

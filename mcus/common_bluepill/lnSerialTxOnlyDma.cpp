@@ -3,9 +3,9 @@
  *  See license file
  */
 
+#include "lnSerialTxOnlyDma.h"
 #include "lnArduino.h"
 #include "lnSerialBpCore.h"
-#include "lnSerialTxOnlyDma.h"
 
 #include "lnRingBuffer.h"
 

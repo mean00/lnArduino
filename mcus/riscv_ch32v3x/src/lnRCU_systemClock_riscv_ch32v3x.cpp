@@ -15,7 +15,7 @@
 extern LN_RCU *arcu;
 
 //
-#define CH32_APB1_DIVIDER 0  // If set to 1 APB1 is sysclock /2, if set to 0 APB1 is sysclock
+#define CH32_APB1_DIVIDER 0 // If set to 1 APB1 is sysclock /2, if set to 0 APB1 is sysclock
 
 //
 
@@ -246,6 +246,5 @@ void lnInitSystemClock()
 #warning DO WE NEED WAIT STATE FOR THE FLASH (CH32) ????
 #warning DO WE NEED WAIT STATE FOR THE FLASH (CH32) ????
 #warning DO WE NEED WAIT STATE FOR THE FLASH (CH32) ????
-
 
 } // EOF

@@ -132,15 +132,15 @@ void lnRemapTimerPin(int timer)
 #define LN_GPIO_OUTPUT_OD_GND 0
 
 /**
- * @brief 
- * 
- * @param pin 
- * @param close 
+ * @brief
+ *
+ * @param pin
+ * @param close
  */
 void lnOpenDrainClose(const lnPin pin, const bool close)
 {
     bool s = LN_GPIO_OUTPUT_OD_GND;
-    if(!close)
+    if (!close)
         s = LN_GPIO_OUTPUT_OD_HIZ;
     lnDigitalWrite(pin, s);
 }

@@ -8,7 +8,7 @@
 lnSerialBpTxOnlyInterrupt::lnSerialBpTxOnlyInterrupt(int instance) : lnSerialTxOnly(instance), lnSerialBpCore(instance)
 {
 }
-int  lnSerialBpTxOnlyInterrupt::transmitNoBlock(int size, const uint8_t *buffer)
+int lnSerialBpTxOnlyInterrupt::transmitNoBlock(int size, const uint8_t *buffer)
 {
     xAssert(0);
     return 0;

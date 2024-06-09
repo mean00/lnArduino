@@ -3,11 +3,11 @@
  *  See license file
  */
 
+#include "lnSerialRxTxDma.h"
 #include "lnArduino.h"
 #include "lnSerialBpCore.h"
 #include "lnSerialRxTx.h"
 #include "lnSerialTxOnlyDma.h"
-#include "lnSerialRxTxDma.h"
 /**
  *
  * @param instance
@@ -17,11 +17,11 @@
 // #define DISABLE_TIMER_COLLECTOR
 #define CHECK_OVERFLOW()                                                                                               \
     {                                                                                                                  \
-        if((_rxHead - _rxTail) > _rxBufferSize)                                                                 \
-        { \
-          nb_overflow++; \
-          _rxTail=_rxHead; \
-        } \
+        if ((_rxHead - _rxTail) > _rxBufferSize)                                                                       \
+        {                                                                                                              \
+            nb_overflow++;                                                                                             \
+            _rxTail = _rxHead;                                                                                         \
+        }                                                                                                              \
     }
 static int nb_overflow = 0;
 /*

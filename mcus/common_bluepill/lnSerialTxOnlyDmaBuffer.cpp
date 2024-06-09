@@ -1,12 +1,10 @@
 
 
-
 /**
  */
- #include "lnArduino.h"
+#include "lnArduino.h"
 #include "lnSerialBpCore.h"
 #include "lnSerialTxOnlyDma.h"
-
 
 #define M(x) usartMapping[instance].x
 /**
@@ -84,15 +82,15 @@ void lnSerialBpTxOnlyBufferedDma::txDmaCb2(lnDMA::DmaInterruptType it)
     uint8_t *to;
     _txRingBuffer.consume(_inFlight);
     _inFlight = 0;
-    if(_cb==NULL)
+    if (_cb == NULL)
         _txRingSem.give(); // space freed, wake up thread
 
     int nb = _txRingBuffer.getReadPointer(&to);
     if (!nb) // done !
     {
         _txing = false;
-        if(_cb!=NULL)
-            _cb(_cbCookie,lnSerialCore::txDone);
+        if (_cb != NULL)
+            _cb(_cbCookie, lnSerialCore::txDone);
         return;
     }
     // send remainer
@@ -101,29 +99,29 @@ void lnSerialBpTxOnlyBufferedDma::txDmaCb2(lnDMA::DmaInterruptType it)
     _txDma.doMemoryToPeripheralTransferNoLock(nb, (uint16_t *)to, (uint16_t *)&(d->DATA), false);
 }
 /**
- * @brief 
- * 
- * @param size 
- * @param buffer 
- * @return int 
+ * @brief
+ *
+ * @param size
+ * @param buffer
+ * @return int
  */
-int  lnSerialBpTxOnlyBufferedDma::transmitNoBlock(int size, const uint8_t *buffer)
+int lnSerialBpTxOnlyBufferedDma::transmitNoBlock(int size, const uint8_t *buffer)
 {
-    int processed=0;
-    while (size!=0)
+    int processed = 0;
+    while (size != 0)
     {
         ENTER_CRITICAL();
         int nb = _txRingBuffer.free();
-        if (nb==0)
-        {            
-            EXIT_CRITICAL(); 
+        if (nb == 0)
+        {
+            EXIT_CRITICAL();
             return processed;
         }
         if (nb > size)
             nb = size;
         int inc = _txRingBuffer.put(nb, buffer);
         buffer += inc, size -= inc;
-        processed+=inc;
+        processed += inc;
         if (!_txing)
             igniteTx();
         EXIT_CRITICAL();

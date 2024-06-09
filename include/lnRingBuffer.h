@@ -3,8 +3,8 @@
 #pragma once
 #include "stdint.h"
 /**
- * @brief 
- * 
+ * @brief
+ *
  */
 class lnRingBuffer
 {
@@ -131,9 +131,9 @@ class lnRingBuffer
         uint32_t t = _tail & _mask;
         *to = _buffer + t;
         int nb;
-        if (h==t)
+        if (h == t)
         {
-            if(_head == _tail) 
+            if (_head == _tail)
                 nb = 0;
             else
                 nb = _size;
@@ -168,7 +168,7 @@ class lnRingBuffer
             }
             else
             {
-                c = CMIN(t - h , size);
+                c = CMIN(t - h, size);
             }
             memcpy(_buffer + h, data, c);
             _head += c;

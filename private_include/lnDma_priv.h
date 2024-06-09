@@ -27,24 +27,24 @@ struct DMA_structx
 typedef volatile DMA_structx DMA_struct;
 
 #define LN_DMA_CHAN_ENABLE (1 << 0)
-#define LN_DMA_CHAN_TFTFIE (1 << 1)     // transfer interrupt enable
-#define LN_DMA_CHAN_HTFIE (1 << 2)      // half interrupt enable
-#define LN_DMA_CHAN_ERRIE (1 << 3)      // error interrupt enable
-#define LN_DMA_CHAN_DIR_P2M (0 << 4)    // peripharl -> memory
-#define LN_DMA_CHAN_DIR_M2P (1 << 4)    // memory -> peripheral
-#define LN_DMA_CHAN_CMEN (1 << 5)       // circular
-#define LN_DMA_CHAN_PINCREASE (1 << 6)  // circular
-#define LN_DMA_CHAN_MINCREASE (1 << 7)  // circular
+#define LN_DMA_CHAN_TFTFIE (1 << 1)    // transfer interrupt enable
+#define LN_DMA_CHAN_HTFIE (1 << 2)     // half interrupt enable
+#define LN_DMA_CHAN_ERRIE (1 << 3)     // error interrupt enable
+#define LN_DMA_CHAN_DIR_P2M (0 << 4)   // peripharl -> memory
+#define LN_DMA_CHAN_DIR_M2P (1 << 4)   // memory -> peripheral
+#define LN_DMA_CHAN_CMEN (1 << 5)      // circular
+#define LN_DMA_CHAN_PINCREASE (1 << 6) // circular
+#define LN_DMA_CHAN_MINCREASE (1 << 7) // circular
 
-#define PWIDTH_x(x) ((x)<<8)
-#define MWIDTH_x(x) ((x)<<10)
+#define PWIDTH_x(x) ((x) << 8)
+#define MWIDTH_x(x) ((x) << 10)
 
-#define LN_DMA_CHAN_PWIDTH_8    PWIDTH_x(0)
-#define LN_DMA_CHAN_PWIDTH_16   PWIDTH_x(1)
-#define LN_DMA_CHAN_PWIDTH_32   PWIDTH_x(2)
-#define LN_DMA_CHAN_MWIDTH_8    MWIDTH_x(0)
-#define LN_DMA_CHAN_MWIDTH_16   MWIDTH_x(1)
-#define LN_DMA_CHAN_MWIDTH_32   MWIDTH_x(2)
+#define LN_DMA_CHAN_PWIDTH_8 PWIDTH_x(0)
+#define LN_DMA_CHAN_PWIDTH_16 PWIDTH_x(1)
+#define LN_DMA_CHAN_PWIDTH_32 PWIDTH_x(2)
+#define LN_DMA_CHAN_MWIDTH_8 MWIDTH_x(0)
+#define LN_DMA_CHAN_MWIDTH_16 MWIDTH_x(1)
+#define LN_DMA_CHAN_MWIDTH_32 MWIDTH_x(2)
 
 #define LN_DMA_CHAN_PRIO_LOW (0 << 12)   // circular
 #define LN_DMA_CHAN_PRIO_MED (1 << 12)   // circular

@@ -140,8 +140,7 @@ void dcd_ep_ctr_rx_handler(int ep)
         if (count != 0U)
         {
             _usbInstance->copyFromSRAM((uint8_t *)&(xfer->buffer[xfer->queued_len]),
-                                       EndPoints::getBTable(ep)->RxAdr /* *pcd_ep_rx_address_ptr(EPindex)*/,
-                                       count);
+                                       EndPoints::getBTable(ep)->RxAdr /* *pcd_ep_rx_address_ptr(EPindex)*/, count);
             xfer->queued_len = (uint16_t)(xfer->queued_len + count);
         }
 
@@ -207,23 +206,30 @@ bool dcd_edpt_open(uint8_t rhport, tusb_desc_endpoint_t const *p_endpoint_desc)
 
     // Isochronous not supported (yet), and some other driver assumptions.
     TU_ASSERT(p_endpoint_desc->bmAttributes.xfer != TUSB_XFER_ISOCHRONOUS);
-    TU_ASSERT(epnum < (MAX_EP_COUNT+2)); // ep0 is pre-reserved
+    TU_ASSERT(epnum < (MAX_EP_COUNT + 2)); // ep0 is pre-reserved
 
     // Set type
     switch (p_endpoint_desc->bmAttributes.xfer)
     {
-        case TUSB_XFER_CONTROL: wType = LN_USBD_EPxCS_EPCTL_CONTROL; break;
+    case TUSB_XFER_CONTROL:
+        wType = LN_USBD_EPxCS_EPCTL_CONTROL;
+        break;
 #if (0)
-        case TUSB_XFER_ISOCHRONOUS: // FIXME: Not yet supported
-            wType = LN_USBD_EPxCS_EPCTL_ISO;
-            break;
+    case TUSB_XFER_ISOCHRONOUS: // FIXME: Not yet supported
+        wType = LN_USBD_EPxCS_EPCTL_ISO;
+        break;
 #endif
 
-        case TUSB_XFER_BULK: wType = LN_USBD_EPxCS_EPCTL_CONTROL; break;
+    case TUSB_XFER_BULK:
+        wType = LN_USBD_EPxCS_EPCTL_CONTROL;
+        break;
 
-        case TUSB_XFER_INTERRUPT: wType = LN_USBD_EPxCS_EPCTL_INTERRUPT; break;
+    case TUSB_XFER_INTERRUPT:
+        wType = LN_USBD_EPxCS_EPCTL_INTERRUPT;
+        break;
 
-        default: TU_ASSERT(false);
+    default:
+        TU_ASSERT(false);
     }
     _usbInstance->setEpType(epnum, wType);
     _usbInstance->setEpAddress(epnum, epnum);
@@ -375,10 +381,10 @@ void dcd_edpt_clear_stall(uint8_t rhport, uint8_t ep_addr)
 }
 void dcd_sof_enable(uint8_t rhport, bool en)
 {
-  (void) rhport;
-  (void) en;
+    (void)rhport;
+    (void)en;
 
-  // TODO implement later
+    // TODO implement later
 }
 
 // EOF
