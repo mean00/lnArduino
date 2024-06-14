@@ -163,7 +163,7 @@ bss_fill_test:
     b bss_trailer_end
     
 bss_trailer: 
-    stmia r1!,{r0}
+    stmia r1!,{r3}
 bss_trailer_end:
     cmp r1, r2
     bne bss_trailer
