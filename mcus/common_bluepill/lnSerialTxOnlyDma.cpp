@@ -3,11 +3,13 @@
  *  See license file
  */
 
+// clang-format off
 #include "lnArduino.h"
 #include "lnSerialBpCore.h"
 #include "lnSerialTxOnlyDma.h"
 
 #include "lnRingBuffer.h"
+// clang-format on
 
 #define M(x) usartMapping[instance].x
 

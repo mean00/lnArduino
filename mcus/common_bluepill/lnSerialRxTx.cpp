@@ -3,6 +3,7 @@
  *  See license file
  */
 
+// clang-format off
 #include "lnArduino.h"
 #include "lnSerial.h"
 #include "lnSerial_priv.h"
@@ -11,6 +12,7 @@
 
 #include "lnSerialTxOnly.h"
 #include "lnSerialTxOnlyDma.h"
+// clang-format on
 
 /**
  * @brief

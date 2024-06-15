@@ -3,11 +3,13 @@
  *  See license file
  */
 
+// clang-format off
 #include "lnArduino.h"
 #include "lnSerialBpCore.h"
 #include "lnSerialTxOnlyDma.h"
 #include "lnSerialRxTxDma.h"
 #include "lnSerialRxTx.h"
+// clang-format on
 /**
  *
  * @param instance

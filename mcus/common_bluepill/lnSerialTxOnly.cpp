@@ -1,4 +1,6 @@
+// clang-format off
 #include "lnSerialTxOnly.h"
+// clang-format on
 
 /**
  * @brief Construct a new ln Serial Bp Tx Only Interrupt object
