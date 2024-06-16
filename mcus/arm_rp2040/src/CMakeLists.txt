@@ -46,6 +46,7 @@ SET(RP_SDK_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/ln_rp_stubs.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/rp_serial.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/rp_irq.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/rp_adc.cpp
 
   ${CMAKE_CURRENT_SOURCE_DIR}/../sdk_copy/platform.c
   ${CMAKE_CURRENT_SOURCE_DIR}/../sdk_copy/runtime.c
@@ -66,6 +67,7 @@ target_include_directories(rplib PUBLIC
         ${PICO_SDK_PATH}/src/rp2040/hardware_regs/include  
         ${PICO_SDK_PATH}/src/rp2040/hardware_structs/include  
         ${PICO_SDK_PATH}/src/rp2_common/boot_stage2/include        
+        ${PICO_SDK_PATH}/src/rp2_common/hardware_adc/include  
         ${PICO_SDK_PATH}/src/rp2_common/hardware_base/include  
         ${PICO_SDK_PATH}/src/rp2_common/hardware_claim/include  
         ${PICO_SDK_PATH}/src/rp2_common/hardware_clocks/include  
