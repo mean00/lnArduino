@@ -19,12 +19,10 @@ class lnSimpleADC
     virtual ~lnSimpleADC();
     lnPin pin();
     bool setPin(lnPin pin);
-    int simpleRead();                                                 // do a basic sampling
-    int getVref();         // direct value
-    static float getVcc(); // Vcc value in mv
+    uint32_t simpleRead(uint32_t averaging);                                                 // do a basic sampling
   protected:
-    void readVcc();
     void setup();
+    void shutdown();
     lnPin _pin;
 };
 // EOF

@@ -48,6 +48,7 @@ typedef volatile LN_RP_GPIOx LN_RP_GPIO;
 #define LN_RP_GPIO_CONTROL_FUNC_PIO0 (6)
 #define LN_RP_GPIO_CONTROL_FUNC_PIO1 (7)
 #define LN_RP_GPIO_CONTROL_FUNC_USB (9)
+#define LN_RP_GPIO_CONTROL_FUNC_ADC (0x1f)
 
 #define LN_RP_GPIO_CONTROL_FUNC(x) (LN_RP_GPIO_CONTROL_FUNC_##x << 0) //
 #define LN_RP_GPIO_CONTROL_FUNC_MASK (0x1F)                           //

@@ -23,6 +23,10 @@ void lnPinMode(const lnPin pin, const lnGpioMode mode, const int speedInMhz)
         fun = LN_RP_GPIO_CONTROL_FUNC(SPI);
         lnGpio->PINS[pin].control = fun + LN_RP_GPIO_CONTROL_OE(NORMAL);
         return;
+    case lnADC_MODE:
+        lnPads->PADS[pin] =  LN_RP_PADS_SLEW_FAST | LN_RP_PADS_OUTPUT_DISABLE; //
+        lnGpio->PINS[pin].control = LN_RP_GPIO_CONTROL_OE(DISABLE) + LN_RP_GPIO_CONTROL_FUNC(ADC); // FIXME NOT SURE
+        return;
     case lnUART:
         fun = LN_RP_GPIO_CONTROL_FUNC(UART);
         lnGpio->PINS[pin].control = fun + LN_RP_GPIO_CONTROL_OE(NORMAL);
