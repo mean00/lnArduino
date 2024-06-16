@@ -1,5 +1,5 @@
 /**
-*
+* Very very basic ADC
 */
 #include "hardware/gpio.h"
 #include "hardware/adc.h"
@@ -17,6 +17,7 @@ lnSimpleADC::lnSimpleADC(int instance, lnPin pin)
   if(!adc_inited)
   {
     adc_inited=true;
+    // init once if/when needed, for example clock
   }
   xAssert(instance==0);
   xAssert(pin>=GPIO26 && pin<=GPIO29);
@@ -62,6 +63,7 @@ uint32_t  lnSimpleADC::simpleRead(uint32_t averaging)
       }
       sum+= lnAdc->RESULT & LN_RP_ADC_FIFO_VALUE_MASK;
     }
+    shutdown();
     return sum/averaging;
 }
 /**
@@ -82,7 +84,6 @@ void lnSimpleADC::setup()
 void lnSimpleADC::shutdown()
 {
     lnAdc->CS &= ~LN_RP_ADC_CS_ENABLE  ;
-
 }
-    //lnPin _pin;
+// -- EOF --
 
