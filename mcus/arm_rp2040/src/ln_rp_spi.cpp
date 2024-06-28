@@ -169,7 +169,7 @@ void rpSPI::setSpeed(int speed)
     _cr0 &= ~LN_RP_SPI_CR0_DIVIDER_MASK;
     _cr0 |= LN_RP_SPI_CR0_DIVIDER(scaler);
 
-    // static int actual_div = fq_in / (_prescaler * (scaler + 1));
+    _spi->CR0 = _cr0;
 }
 
 /**
@@ -491,16 +491,18 @@ bool rpSPI::write8(const uint8_t data)
  */
 bool rpSPI::write16(const uint16_t data)
 {
-    int countdown = 1 * 1000 * 1000; // 100M/90k =>
+    int countdown = 1000 * 1000 * 1000; // 100M/90k =>
     while (!(_spi->SR & LN_RP_SPI_SR_TFE))
     {
         __asm__("nop");
         if (--countdown == 0)
         {
+            //xAssert(0);
             return false;
         }
     }
     _spi->DR = data;
+    waitForCompletion();
     return true;
 }
 
