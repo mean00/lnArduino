@@ -103,7 +103,7 @@ IF(NOT DEFINED LN_EXT)
     SET(CLANG_LINKER_OPT "" CACHE INTERNAL "")
     #
     SET(GD32_LD_FLAGS "-fuse-ld=lld  ${LN_LTO} -nostdlib ${GD32_SPECS_SPECS} --sysroot ${PLATFORM_CLANG_SYSROOT}  -Wl,--warn-common" CACHE INTERNAL "")
-    SET(GD32_LD_LIBS "-lm  -lc ${CLANG_LINKER_OPT} -Wl,--gc-sections -Wl,--gdb-index " CACHE INTERNAL "")
+    SET(GD32_LD_LIBS "-lm   ${CLANG_LINKER_OPT} -Wl,--gc-sections -Wl,--gdb-index " CACHE INTERNAL "")
     
     #
     set(CMAKE_CXX_LINK_EXECUTABLE    "<CMAKE_CXX_COMPILER>  ${PLATFORM_CLANG_EXTRA_LD_ARG} <CMAKE_CXX_LINK_FLAGS>  ${PLATFORM_CLANG_C_FLAGS} <LINK_FLAGS>   -Wl,--start-group  <OBJECTS> <LINK_LIBRARIES> -Wl,--end-group  -Wl,-Map,<TARGET>.map   -o <TARGET> ${GD32_LD_FLAGS} ${GD32_LD_LIBS} ${GD32_LD_FLAGS}   -lclang_rt.builtins "  CACHE INTERNAL "")

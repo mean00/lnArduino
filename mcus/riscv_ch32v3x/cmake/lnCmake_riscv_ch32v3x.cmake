@@ -15,7 +15,7 @@ MACRO(GENERATE_GD32_FIRMWARE target)
 
     ADD_EXECUTABLE(${target}  ${LN_MCU_FOLDER}/start.S ${ARGN})
     TARGET_LINK_LIBRARIES(${target} ${USED_LIBS} lnArduino ) # duplicates are NOT a mistake !
-    TARGET_LINK_LIBRARIES(${target} embeddedPrintf lnArduino_impl  FreeRTOS   c gcc ) # dupicates are NOT a mistake !
+    TARGET_LINK_LIBRARIES(${target} embeddedPrintf lnArduino_impl  FreeRTOS    gcc ) # dupicates are NOT a mistake !
     TARGET_LINK_OPTIONS(${target}  PRIVATE "-T${CMAKE_BINARY_DIR}/linker_script.ld" )
 
     add_custom_command(TARGET ${target}

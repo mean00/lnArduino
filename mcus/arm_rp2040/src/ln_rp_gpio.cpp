@@ -1,7 +1,27 @@
 #include "ln_rp_gpio.h"
 #include "lnArduino.h"
 #include "lnGPIO.h"
-
+/**
+ * \brief This is a rp2040 specific function to configure the pin in PIO mode
+ */
+void lnPinModePIO(const lnPin pin, const int instance, const bool pullup)
+{
+    uint32_t fun;
+    if (!instance)
+    {
+        fun = LN_RP_GPIO_CONTROL_FUNC(PIO0);
+    }
+    else
+    {
+        fun = LN_RP_GPIO_CONTROL_FUNC(PIO1);
+    }
+    uint32_t pad = LN_RP_PADS_DRIVE(12MA) | LN_RP_PADS_INPUT_ENABLE | LN_RP_PADS_SLEW_FAST | LN_RP_PADS_SCHMITT_FAST; // default is input / output
+    if(pullup)
+        pad|=LN_RP_PADS_PULLUP;
+    uint32_t control = LN_RP_GPIO_CONTROL_OE(NORMAL); // 12 mA
+    lnGpio->PINS[pin].control = fun + control;
+    lnPads->PADS[pin] = pad ;
+}
 /**
     \fn
 */
@@ -11,20 +31,12 @@ void lnPinMode(const lnPin pin, const lnGpioMode mode, const int speedInMhz)
     uint32_t pad, control;
     switch (mode)
     {
-    case lnRP_PIO0_MODE:
-        fun = LN_RP_GPIO_CONTROL_FUNC(PIO0);
-        lnGpio->PINS[pin].control = fun + LN_RP_GPIO_CONTROL_OE(NORMAL);
-        return;
-    case lnRP_PIO1_MODE:
-        fun = LN_RP_GPIO_CONTROL_FUNC(PIO1);
-        lnGpio->PINS[pin].control = fun + LN_RP_GPIO_CONTROL_OE(NORMAL);
-        return;
     case lnSPI_MODE:
         fun = LN_RP_GPIO_CONTROL_FUNC(SPI);
         lnGpio->PINS[pin].control = fun + LN_RP_GPIO_CONTROL_OE(NORMAL);
         return;
     case lnADC_MODE:
-        lnPads->PADS[pin] =  LN_RP_PADS_SLEW_FAST | LN_RP_PADS_OUTPUT_DISABLE; //
+        lnPads->PADS[pin] = LN_RP_PADS_SLEW_FAST | LN_RP_PADS_OUTPUT_DISABLE;                      //
         lnGpio->PINS[pin].control = LN_RP_GPIO_CONTROL_OE(DISABLE) + LN_RP_GPIO_CONTROL_FUNC(ADC); // FIXME NOT SURE
         return;
     case lnUART:

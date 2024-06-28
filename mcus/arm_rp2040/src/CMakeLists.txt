@@ -19,6 +19,7 @@ SET(RP_LN_SOURCES
         ln_rp_dma.cpp
         ln_rp_spi.cpp
         ln_rp_adc.cpp
+        ln_rp_pio.cpp
 )
 IF(FALSE)
   SET(BASE_SOURCES
@@ -47,7 +48,7 @@ SET(RP_SDK_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/ln_rp_stubs.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/rp_serial.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/rp_irq.cpp
-
+  ${CMAKE_CURRENT_SOURCE_DIR}/rp_rcu.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/../sdk_copy/platform.c
   ${CMAKE_CURRENT_SOURCE_DIR}/../sdk_copy/runtime.c
   ${CRT0}

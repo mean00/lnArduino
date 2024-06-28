@@ -6,7 +6,7 @@ include_directories( ${C} )
 IF(LN_ENABLE_USBD)
     include(${AF_FOLDER}/libraries/tinyUsb/tiny.cmake)
     SET(EXTRA ${EXTRA} ${C}/lnCDC_c.cpp ${C}/lnUSB_c.cpp)
-    MESSAGE(STATUS "********************************************************************* LN_ENABLE_USBD ${LN_ENABLE_USBD}")
+    #MESSAGE(STATUS "********************************************************************* LN_ENABLE_USBD ${LN_ENABLE_USBD}")
 ENDIF()
 
 IF(LN_ENABLE_SPI)

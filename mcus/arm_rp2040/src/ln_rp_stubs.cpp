@@ -34,12 +34,10 @@ extern "C"
         switch (pio)
         {
         case GPIO_FUNC_PIO0:
-            lnPinMode((lnPin)pin, lnRP_PIO0_MODE);
-            return;
+            lnPinModePIO((lnPin)pin, 0);
             break;
         case GPIO_FUNC_PIO1:
-            lnPinMode((lnPin)pin, lnRP_PIO1_MODE);
-            return;
+            lnPinModePIO((lnPin)pin, 1);
             break;
         default:
             xAssert(0);

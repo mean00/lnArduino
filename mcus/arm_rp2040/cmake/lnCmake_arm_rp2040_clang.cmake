@@ -1,4 +1,19 @@
 include(FindPython3)
+#
+#
+#
+MACRO(RP_PIO_GENERATE sourcefile target)
+   add_custom_command(OUTPUT ${target}
+                   DEPENDS ${sourcefile}
+                   COMMAND pioasm ${sourcefile} ${target} 
+                   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+                   COMMENT "Compiling pio asm... "
+    )
+ 
+ENDMACRO()
+#
+#
+#
 MACRO(GENERATE_GD32_FIRMWARE target)
 
   #MESSAGE(STATUS " *** LN_MCU_FOLDER ${LN_MCU_FOLDER}")
