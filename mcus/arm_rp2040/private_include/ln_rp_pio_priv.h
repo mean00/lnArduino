@@ -61,6 +61,7 @@ typedef volatile LN_RP_PIOx LN_RP_PIO;
 
 // CONTROL
 #define LN_RP_PIO_CTRL_ENABLE_BIT(x)         (1 << x)    //  Each bit enable one SM
+#define LN_RP_PIO_CTRL_ENABLE_ALL            (0xf)    //  Each bit enable one SM
 #define LN_RP_PIO_CTRL_RESTART_BIT(x)        (1 << (4+x))    //  Each bit enable one SM
 #define LN_RP_PIO_CTRL_CLKDIV_RESTART_BIT(x) (1 << (11+x))    //  Each bit enable one SM
 
@@ -106,9 +107,8 @@ typedef volatile LN_RP_PIOx LN_RP_PIO;
 // SM SHIFTCTRL
 #define LN_RP_PIO_SM_SHIFTCTRL_AUTOPUSH           (1<<16)
 #define LN_RP_PIO_SM_SHIFTCTRL_AUTOPULL           (1<<17)
-#define LN_RP_PIO_SM_SHIFTCTRL_AUTOPULL           (1<<18)
-#define LN_RP_PIO_SM_SHIFTCTRL_IN_SHIFTDIR        (1<<19)
-#define LN_RP_PIO_SM_SHIFTCTRL_OUT_SHIFTDIR       (1<<20)
+#define LN_RP_PIO_SM_SHIFTCTRL_IN_SHIFTDIR        (1<<18)
+#define LN_RP_PIO_SM_SHIFTCTRL_OUT_SHIFTDIR       (1<<19)
 #define LN_RP_PIO_SM_SHIFTCTRL_PUSH_THRESH(x)     (x<<20)
 #define LN_RP_PIO_SM_SHIFTCTRL_PULL_THRESH(x)     (x<<25)
 #define LN_RP_PIO_SM_SHIFTCTRL_FJOIN_TX           (1<<30)
@@ -128,4 +128,6 @@ typedef volatile LN_RP_PIOx LN_RP_PIO;
 #define LN_RP_PIO_IRQX_TXNFULL(x)               (1<<(x+4))
 #define LN_RP_PIO_IRQX_SMx(x)                   (1<<(x+8))
 
+//
+#define LN_RP_PIO_MAX_PROGRAM_SPACE             32
 // EOF

@@ -19,6 +19,7 @@ SET(RP_LN_SOURCES
         ln_rp_dma.cpp
         ln_rp_spi.cpp
         ln_rp_adc.cpp
+        ln_rp_pio.cpp
 )
 IF(FALSE)
   SET(BASE_SOURCES
