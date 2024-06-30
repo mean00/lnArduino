@@ -19,7 +19,7 @@
  *
  */
 
-typedef struct LN_RP_PIO_SM
+typedef struct 
 {
   uint32_t CLKDIV;
   uint32_t EXECCTRL;
@@ -27,14 +27,14 @@ typedef struct LN_RP_PIO_SM
   uint32_t ADDR;
   uint32_t INSTR;
   uint32_t PINCTRL;
-};
+}LN_RP_PIO_SM;
 
-typedef struct LN_RP_PIO_IRQx
+typedef struct 
 {
   uint32_t INTE;
   uint32_t INTF;
   uint32_t INTS;
-};
+}LN_RP_PIO_IRQx;
 
 struct LN_RP_PIOx
 {
@@ -102,7 +102,7 @@ typedef volatile LN_RP_PIOx LN_RP_PIO;
 #define LN_RP_PIO_SM_EXECCTRL_JMP_PIN(x)          ((x)<<24)
 #define LN_RP_PIO_SM_EXECCTRL_SIDE_PINDIR         (1<<29)
 #define LN_RP_PIO_SM_EXECCTRL_SIDE_EN             (1<<30)
-#define LN_RP_PIO_SM_EXECCTRL_EXEC_STALLE         (1<<31)
+#define LN_RP_PIO_SM_EXECCTRL_EXEC_STALLE         (1<<31UL)
 
 // SM SHIFTCTRL
 #define LN_RP_PIO_SM_SHIFTCTRL_AUTOPUSH           (1<<16)
@@ -112,15 +112,17 @@ typedef volatile LN_RP_PIOx LN_RP_PIO;
 #define LN_RP_PIO_SM_SHIFTCTRL_PUSH_THRESH(x)     (x<<20)
 #define LN_RP_PIO_SM_SHIFTCTRL_PULL_THRESH(x)     (x<<25)
 #define LN_RP_PIO_SM_SHIFTCTRL_FJOIN_TX           (1<<30)
-#define LN_RP_PIO_SM_SHIFTCTRL_FJOIN_RX           (1<<31)
+#define LN_RP_PIO_SM_SHIFTCTRL_FJOIN_RX           (1<<31UL)
 
 
 // SM PINCTRL
-#define LN_RP_PIO_SM_PINCTRL_OUT_BASE_BIT(x)    ((x)<<0)
-#define LN_RP_PIO_SM_PINCTRL_SET_BASE_BIT(x)    ((x)<<5)
-#define LN_RP_PIO_SM_PINCTRL_SETSET_BASE_BIT(x) ((x)<<10)
-#define LN_RP_PIO_SM_PINCTRL_IN_BASE_BIT(x)     ((x)<<15)
-#define LN_RP_PIO_SM_PINCTRL_OUT_COUNT_BIT(x)   ((x)<<20)
+#define LN_RP_PIO_SM_PINCTRL_OUT_BASE_BIT(x)    ((x)<<0UL)
+#define LN_RP_PIO_SM_PINCTRL_SET_BASE_BIT(x)    ((x)<<5UL)
+#define LN_RP_PIO_SM_PINCTRL_SETSET_BASE_BIT(x) ((x)<<10UL)
+#define LN_RP_PIO_SM_PINCTRL_IN_BASE_BIT(x)     ((x)<<15UL)
+#define LN_RP_PIO_SM_PINCTRL_OUT_COUNT_BIT(x)   ((x)<<20UL)
+#define LN_RP_PIO_SM_PINCTRL_SET_COUNT_BIT(x)   ((x)<<26UL)
+#define LN_RP_PIO_SM_PINCTRL_SIDESET_COUNT_BIT(x)   ((x)<<29UL)
 
 
 // valid for INTE, INTS &INTF
