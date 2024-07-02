@@ -97,6 +97,10 @@ bool rpPIO_SM::uploadCode(uint32_t codeSize, const uint16_t *code, uint32_t wrap
     {
         ptr[i] = (uint32_t)code[i]; // 16->32, instructionis 16 bits, reg is 32
     }
+    // set wrap
+    ENGINE()->PIO_SM[_sm].EXECCTRL =
+        LN_RP_PIO_SM_EXECCTRL_WRAP_BOTTOM_BIT(wrapEnd) + LN_RP_PIO_SM_EXECCTRL_WRAP_TOP_BIT(wrapBegin);
+
     return true;
 }
 /**

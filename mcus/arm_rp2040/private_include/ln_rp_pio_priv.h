@@ -90,8 +90,8 @@ typedef volatile LN_RP_PIOx LN_RP_PIO;
 // SM EXECTRL
 #define LN_RP_PIO_SM_EXECCTRL_STATUS_N_BIT(x) (x & 0xf)
 #define LN_RP_PIO_SM_EXECCTRL_STATUS_SEL_BIT(x) ((x & 0xf) << 4)
-#define LN_RP_PIO_SM_EXECCTRL_WRAP_BOTTOM_BIT(x) ((x & 0xf) << 7)
-#define LN_RP_PIO_SM_EXECCTRL_WRAP_TOP_BIT(x) ((x & 0xf) << 12)
+#define LN_RP_PIO_SM_EXECCTRL_WRAP_BOTTOM_BIT(x) ((x & 0x1f) << 7)
+#define LN_RP_PIO_SM_EXECCTRL_WRAP_TOP_BIT(x) ((x & 0x1f) << 12)
 #define LN_RP_PIO_SM_EXECCTRL_OUT_STICKY (1 << 17)
 #define LN_RP_PIO_SM_EXECCTRL_INLINE_OUT_EN(x) ((x) << 18)
 #define LN_RP_PIO_SM_EXECCTRL_OUT_EN_SEL(x) ((x) << 19)
