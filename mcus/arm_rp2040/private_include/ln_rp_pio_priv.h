@@ -41,7 +41,8 @@ struct LN_RP_PIOx
     uint32_t PIO_CTRL;              // 0x00:control
     uint32_t PIO_FSTAT;             // Fifo stat
     uint32_t PIO_FDEBUG;            // Fifo debug
-    uint32_t PIO_TXF[4];            // directT write to FSM tx fifo x
+    uint32_t PIO_LEVEL;             // Fifo level
+    uint32_t PIO_TXF[4];            // 0x10:directT write to FSM tx fifo x
     uint32_t PIO_RXF[4];            // direct write to FSM rx fifo x
     uint32_t PIO_IRQ;               // 0x30:
     uint32_t PIO_IRQ_FORCE;         //
@@ -89,9 +90,10 @@ typedef volatile LN_RP_PIOx LN_RP_PIO;
 
 // SM EXECTRL
 #define LN_RP_PIO_SM_EXECCTRL_STATUS_N_BIT(x) (x & 0xf)
-#define LN_RP_PIO_SM_EXECCTRL_STATUS_SEL_BIT(x) ((x & 0xf) << 4)
-#define LN_RP_PIO_SM_EXECCTRL_WRAP_BOTTOM_BIT(x) ((x & 0x1f) << 7)
-#define LN_RP_PIO_SM_EXECCTRL_WRAP_TOP_BIT(x) ((x & 0x1f) << 12)
+#define LN_RP_PIO_SM_EXECCTRL_STATUS_SEL_BIT_SET(x) ((x & 1) << 4)
+#define LN_RP_PIO_SM_EXECCTRL_STATUS_SEL_BIT_GET(x) (!!(x & (1<<4)) )
+#define LN_RP_PIO_SM_EXECCTRL_WRAP_BOTTOM_BIT_SET(x) ((x & 0x1f) << 7) // when top is reached , it jumps to bottom
+#define LN_RP_PIO_SM_EXECCTRL_WRAP_TOP_BIT_SET(x) ((x & 0x1f) << 12)
 #define LN_RP_PIO_SM_EXECCTRL_OUT_STICKY (1 << 17)
 #define LN_RP_PIO_SM_EXECCTRL_INLINE_OUT_EN(x) ((x) << 18)
 #define LN_RP_PIO_SM_EXECCTRL_OUT_EN_SEL(x) ((x) << 19)

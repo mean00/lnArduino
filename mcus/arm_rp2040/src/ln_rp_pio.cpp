@@ -80,7 +80,7 @@ rpPIO_SM::rpPIO_SM(uint32_t unit, uint32_t sm)
     _sm = sm;
 }
 /**
- *
+ * when wrapEnd is reached, it jumps tp wrapBegin
  */
 bool rpPIO_SM::uploadCode(uint32_t codeSize, const uint16_t *code, uint32_t wrapBegin, uint32_t wrapEnd)
 {
@@ -98,8 +98,10 @@ bool rpPIO_SM::uploadCode(uint32_t codeSize, const uint16_t *code, uint32_t wrap
         ptr[i] = (uint32_t)code[i]; // 16->32, instructionis 16 bits, reg is 32
     }
     // set wrap
+    // when wrapEnd is reached, it jumps tp wrapBegin
+    // when TOP is reached it jumps to BOTTOM
     ENGINE()->PIO_SM[_sm].EXECCTRL =
-        LN_RP_PIO_SM_EXECCTRL_WRAP_BOTTOM_BIT(wrapEnd) + LN_RP_PIO_SM_EXECCTRL_WRAP_TOP_BIT(wrapBegin);
+        LN_RP_PIO_SM_EXECCTRL_WRAP_TOP_BIT_SET(wrapEnd) + LN_RP_PIO_SM_EXECCTRL_WRAP_BOTTOM_BIT_SET(wrapBegin);
 
     return true;
 }
@@ -119,7 +121,30 @@ bool rpPIO_SM::setSpeed(uint32_t fq)
  */
 bool rpPIO_SM::configure(const rpPIO_pinConfig &config)
 {
-#warning FIXME TEMPORARY
+    // properly set the direction we have to execute pindirs instruction
+    // we just scan the sets , others are input
+    int begin = config.sets.startPin;
+    int end = begin+config.sets.pinNb;
+    for(int i=0;i<30;i++)
+    {
+        int state=0; // in by default
+        if(i>=begin && i< end) // output
+        {            
+            state = 1;
+        }
+        // output
+        uint32_t control =   LN_RP_PIO_SM_PINCTRL_SET_BASE_BIT(i) + LN_RP_PIO_SM_PINCTRL_SET_COUNT_BIT(1);
+
+
+#define PIO_INSTR_SET   7        
+#define SET_DEST_PINDIR 4      
+
+        int instruction = (PIO_INSTR_SET<<13)+(state<<0)+(SET_DEST_PINDIR<<5);
+        ENGINE()->PIO_SM[_sm].PINCTRL = control;
+        ENGINE()->PIO_SM[_sm].INSTR = instruction;
+    }
+
+    // now program the thingie
     uint32_t pin_ctrol = LN_RP_PIO_SM_PINCTRL_OUT_BASE_BIT(config.outputs.startPin) + // assume base = set
                          LN_RP_PIO_SM_PINCTRL_OUT_COUNT_BIT(config.outputs.pinNb);
     pin_ctrol |=
@@ -161,6 +186,7 @@ bool rpPIO_SM::read(uint32_t nb, uint32_t *data)
 bool rpPIO_SM::write(uint32_t nb, uint32_t *data)
 {
 #warning INCOMPLETE/ TEMPORARY
+    xAssert(nb==1);
     ENGINE()->PIO_TXF[0] = data[0];
     return true;
 }
