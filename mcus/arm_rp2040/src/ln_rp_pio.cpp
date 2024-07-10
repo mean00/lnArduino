@@ -106,6 +106,31 @@ bool rpPIO_SM::uploadCode(uint32_t codeSize, const uint16_t *code, uint32_t wrap
     return true;
 }
 /**
+
+ */
+bool rpPIO_SM::setBitOrder(bool inputMsbFirst, bool outputMsbFirst)
+{
+    uint32_t shiftctrl = ENGINE()->PIO_SM[_sm].SHIFTCTRL;
+    if(outputMsbFirst)
+    {
+        shiftctrl &= ~LN_RP_PIO_SM_SHIFTCTRL_OUT_SHIFTDIR ; // shift output to the left, input to the left
+    }
+    else
+    {
+        shiftctrl |= LN_RP_PIO_SM_SHIFTCTRL_OUT_SHIFTDIR ; // shift output to the right, input to the left        
+    }
+    if(inputMsbFirst)
+    {
+        shiftctrl &= ~LN_RP_PIO_SM_SHIFTCTRL_IN_SHIFTDIR ; // shift output to the left, input to the left
+    }
+    else
+    {
+        shiftctrl |= LN_RP_PIO_SM_SHIFTCTRL_IN_SHIFTDIR ; // shift output to the right, input to the left        
+    }
+    ENGINE()->PIO_SM[_sm].SHIFTCTRL = shiftctrl;
+    return true;
+}
+/**
  */
 bool rpPIO_SM::setSpeed(uint32_t fq)
 {
@@ -121,6 +146,8 @@ bool rpPIO_SM::setSpeed(uint32_t fq)
  */
 bool rpPIO_SM::configure(const rpPIO_pinConfig &config)
 {
+    uint32_t oldshift =  ENGINE()->PIO_SM[_sm].SHIFTCTRL;
+    ENGINE()->PIO_SM[_sm].SHIFTCTRL=0;
     // properly set the direction we have to execute pindirs instruction
     // we just scan the sets , others are input
     int begin = config.sets.startPin;
@@ -153,9 +180,8 @@ bool rpPIO_SM::configure(const rpPIO_pinConfig &config)
                  LN_RP_PIO_SM_PINCTRL_SIDESET_COUNT_BIT(config.sidesets.pinNb);
     pin_ctrol |= LN_RP_PIO_SM_PINCTRL_IN_BASE_BIT(config.inputs.startPin);
     ENGINE()->PIO_SM[_sm].PINCTRL = pin_ctrol;
-    ENGINE()->PIO_SM[_sm].SHIFTCTRL =
-        LN_RP_PIO_SM_SHIFTCTRL_OUT_SHIFTDIR + // shift output to the right, input to the left
-        0;
+    // default is input from the left, output from the right
+    ENGINE()->PIO_SM[_sm].SHIFTCTRL = oldshift;
     return true;
 }
 /**

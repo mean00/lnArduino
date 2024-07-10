@@ -53,6 +53,7 @@ class rpPIO_SM
     friend class rpPIO;
 
   public:
+    bool setBitOrder(bool inputMsbFirst, bool outputMsbFirst);    
     bool setSpeed(uint32_t fq);
     bool configure(const rpPIO_pinConfig &config);
     bool execute();
