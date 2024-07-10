@@ -187,7 +187,7 @@ bool rpPIO_SM::write(uint32_t nb, uint32_t *data)
 {
 #warning INCOMPLETE/ TEMPORARY
     xAssert(nb==1);
-    ENGINE()->PIO_TXF[0] = data[0];
+    ENGINE()->PIO_TXF[_sm] = data[0];
     return true;
 }
 // -- EOF
