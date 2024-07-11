@@ -30,7 +30,7 @@ const uint8_t xsin[181] = {
     #define WS_SPEED 5 * 1000 * 1000
 #else
     #define PIN_TO_USE GPIO23 // GPIO16 for zero, GPIO23 for normal size RP2040
-    #define WS_SPEED 4800 * 1000
+    #define WS_SPEED (800000 * 10)
 #endif
 
 #define STEP 1
