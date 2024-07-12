@@ -74,7 +74,7 @@ extern "C" void deadEnd(int code)
 
 void lnSoftSystemReset(void)
 {
-    volatile uint32_t *aircr = (volatile uint32_t *)(0xe000000UL + 0xed0C); // see 2.4.8 in RP2040 doc
-    *aircr |= (1 << 2);                                                     // SYSRESETREQ
-    //*wd_ctrl |= WD_ENABLE;
+    volatile uint32_t *aircr = (volatile uint32_t *)(0xe000ed0cUL); // see 2.4.8 in RP2040 doc
+    *aircr = (1 << 2) + (0x5fa << 16);                              // SYSRESETREQ + VECTKEY
 }
+// EOF
