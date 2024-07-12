@@ -97,6 +97,9 @@ extern "C"
     void __attribute__((noreturn)) panic(const char *fmt, ...)
     {
         do_assert(fmt);
+        while (1)
+        {
+        }
     }
     int stderr;
 }
