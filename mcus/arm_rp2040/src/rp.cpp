@@ -3,7 +3,7 @@
 #include "stdio.h"
 
 #include "hardware/gpio.h"
-
+#include "ln_rp_memory_map.h"
 FILE *const stdout = NULL;
 
 extern void setup();
@@ -70,4 +70,11 @@ extern "C" void deadEnd(int code)
 
 {
     __asm__("bkpt #0");
+}
+
+void lnSoftSystemReset(void)
+{
+    volatile uint32_t *aircr = (volatile uint32_t *)(0xe000000UL + 0xed0C); // see 2.4.8 in RP2040 doc
+    *aircr |= (1 << 2);                                                     // SYSRESETREQ
+    //*wd_ctrl |= WD_ENABLE;
 }
