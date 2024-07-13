@@ -77,4 +77,14 @@ void lnSoftSystemReset(void)
     volatile uint32_t *aircr = (volatile uint32_t *)(0xe000ed0cUL); // see 2.4.8 in RP2040 doc
     *aircr = (1 << 2) + (0x5fa << 16);                              // SYSRESETREQ + VECTKEY
 }
+
+void lnRp2040_reboot_to_usb()
+{
+    // we hardcode the address for the momment
+#warning HARDCODED ROM ADDRESS
+    typedef void *cb_usb_reset(uint32_t a, uint32_t b);
+    cb_usb_reset *reset = (cb_usb_reset *)0x2591;
+    reset(0, 0);
+}
+
 // EOF
