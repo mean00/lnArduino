@@ -35,9 +35,9 @@ void initTask(void *)
     }
 }
 
-#define LN_INITIAL_STACK_SIZE 1024
+#define LN_INITIAL_STACK_SIZE 8 * 1024
 #define LN_INITIAL_TASK_PRIORITY 2
-uint32_t SystemCoreClock = 100000000;
+uint32_t SystemCoreClock = 125000000;
 
 extern "C"
 {
@@ -66,18 +66,27 @@ int main()
     deadEnd(25);
 }
 
-extern "C" void deadEnd(int code)
-
-{
-    __asm__("bkpt #0");
-}
-
+/**
+ *
+ */
 void lnSoftSystemReset(void)
 {
     volatile uint32_t *aircr = (volatile uint32_t *)(0xe000ed0cUL); // see 2.4.8 in RP2040 doc
     *aircr = (1 << 2) + (0x5fa << 16);                              // SYSRESETREQ + VECTKEY
 }
+/**
+ *
+ */
+extern "C" void deadEnd(int code)
 
+{
+    __asm__("bkpt #0");
+    lnSoftSystemReset();
+}
+
+/**
+ *
+ */
 void lnRp2040_reboot_to_usb()
 {
     // we hardcode the address for the momment
