@@ -111,21 +111,21 @@ bool rpPIO_SM::uploadCode(uint32_t codeSize, const uint16_t *code, uint32_t wrap
 bool rpPIO_SM::setBitOrder(bool inputMsbFirst, bool outputMsbFirst)
 {
     uint32_t shiftctrl = ENGINE()->PIO_SM[_sm].SHIFTCTRL;
-    if(outputMsbFirst)
+    if (outputMsbFirst)
     {
-        shiftctrl &= ~LN_RP_PIO_SM_SHIFTCTRL_OUT_SHIFTDIR ; // shift output to the left, input to the left
+        shiftctrl &= ~LN_RP_PIO_SM_SHIFTCTRL_OUT_SHIFTDIR; // shift output to the left, input to the left
     }
     else
     {
-        shiftctrl |= LN_RP_PIO_SM_SHIFTCTRL_OUT_SHIFTDIR ; // shift output to the right, input to the left        
+        shiftctrl |= LN_RP_PIO_SM_SHIFTCTRL_OUT_SHIFTDIR; // shift output to the right, input to the left
     }
-    if(inputMsbFirst)
+    if (inputMsbFirst)
     {
-        shiftctrl &= ~LN_RP_PIO_SM_SHIFTCTRL_IN_SHIFTDIR ; // shift output to the left, input to the left
+        shiftctrl &= ~LN_RP_PIO_SM_SHIFTCTRL_IN_SHIFTDIR; // shift output to the left, input to the left
     }
     else
     {
-        shiftctrl |= LN_RP_PIO_SM_SHIFTCTRL_IN_SHIFTDIR ; // shift output to the right, input to the left        
+        shiftctrl |= LN_RP_PIO_SM_SHIFTCTRL_IN_SHIFTDIR; // shift output to the right, input to the left
     }
     ENGINE()->PIO_SM[_sm].SHIFTCTRL = shiftctrl;
     return true;
@@ -146,41 +146,48 @@ bool rpPIO_SM::setSpeed(uint32_t fq)
  */
 bool rpPIO_SM::configure(const rpPIO_pinConfig &config)
 {
-    uint32_t oldshift =  ENGINE()->PIO_SM[_sm].SHIFTCTRL;
-    ENGINE()->PIO_SM[_sm].SHIFTCTRL=0;
+    uint32_t oldshift = ENGINE()->PIO_SM[_sm].SHIFTCTRL;
+    ENGINE()->PIO_SM[_sm].SHIFTCTRL = 0;
     // properly set the direction we have to execute pindirs instruction
-    // we just scan the sets , others are input
+    // we just scan the "sets" pins , other pins are input by default
     int begin = config.sets.startPin;
-    int end = begin+config.sets.pinNb;
-    for(int i=0;i<30;i++)
+    int end = begin + config.sets.pinNb;
+    int sideBegin = config.sidesets.startPin;
+    int sideEnd = config.sidesets.startPin + config.sidesets.pinNb;
+    for (int i = 0; i < 30; i++)
     {
-        int state=0; // in by default
-        if(i>=begin && i< end) // output
-        {            
+        int state = 0;                     // in by default
+        if (i >= sideBegin && i < sideEnd) // output
+        {
+            state = 1;
+        }
+        if (i >= begin && i < end) // output
+        {
             state = 1;
         }
         // output
-        uint32_t control =   LN_RP_PIO_SM_PINCTRL_SET_BASE_BIT(i) + LN_RP_PIO_SM_PINCTRL_SET_COUNT_BIT(1);
+        uint32_t control = LN_RP_PIO_SM_PINCTRL_SET_BASE_BIT(i) + LN_RP_PIO_SM_PINCTRL_SET_COUNT_BIT(1);
 
-
-#define PIO_INSTR_SET   7        
-#define SET_DEST_PINDIR 4      
-
-        int instruction = (PIO_INSTR_SET<<13)+(state<<0)+(SET_DEST_PINDIR<<5);
+#define PIO_INSTR_SET 7
+#define SET_DEST_PINDIR 4
+        int instruction = (PIO_INSTR_SET << 13) + (SET_DEST_PINDIR << 5) + (state << 0);
         ENGINE()->PIO_SM[_sm].PINCTRL = control;
         ENGINE()->PIO_SM[_sm].INSTR = instruction;
     }
 
     // now program the thingie
-    uint32_t pin_ctrol = LN_RP_PIO_SM_PINCTRL_OUT_BASE_BIT(config.outputs.startPin) + // assume base = set
-                         LN_RP_PIO_SM_PINCTRL_OUT_COUNT_BIT(config.outputs.pinNb);
-    pin_ctrol |=
-        LN_RP_PIO_SM_PINCTRL_SET_BASE_BIT(config.sets.startPin) + LN_RP_PIO_SM_PINCTRL_SET_COUNT_BIT(config.sets.pinNb);
-    pin_ctrol |= LN_RP_PIO_SM_PINCTRL_SIDESET_BASE_BIT(config.sidesets.startPin) +
-                 LN_RP_PIO_SM_PINCTRL_SIDESET_COUNT_BIT(config.sidesets.pinNb);
+    uint32_t pin_ctrol = 0;
+    pin_ctrol |= LN_RP_PIO_SM_PINCTRL_OUT_BASE_BIT(config.outputs.startPin) +
+                 LN_RP_PIO_SM_PINCTRL_OUT_COUNT_BIT(config.outputs.pinNb);
+    pin_ctrol |= LN_RP_PIO_SM_PINCTRL_SET_BASE_BIT(config.sets.startPin) + //
+                 LN_RP_PIO_SM_PINCTRL_SET_COUNT_BIT(config.sets.pinNb);
+    pin_ctrol |= LN_RP_PIO_SM_PINCTRL_SIDESET_BASE_BIT(config.sidesets.startPin);
     pin_ctrol |= LN_RP_PIO_SM_PINCTRL_IN_BASE_BIT(config.inputs.startPin);
+    // Use 1 state pine
+    xAssert(config.sidesets.pinNb <= 1);                    // only drive one sideset pins for now Hardcoded
+    pin_ctrol |= LN_RP_PIO_SM_PINCTRL_SIDESET_COUNT_BIT(1); // this should be log2(actual set number)
+
     ENGINE()->PIO_SM[_sm].PINCTRL = pin_ctrol;
-    // default is input from the left, output from the right
     ENGINE()->PIO_SM[_sm].SHIFTCTRL = oldshift;
     return true;
 }
@@ -212,7 +219,7 @@ bool rpPIO_SM::read(uint32_t nb, uint32_t *data)
 bool rpPIO_SM::write(uint32_t nb, uint32_t *data)
 {
 #warning INCOMPLETE/ TEMPORARY
-    xAssert(nb==1);
+    xAssert(nb == 1);
     ENGINE()->PIO_TXF[_sm] = data[0];
     return true;
 }
