@@ -41,7 +41,6 @@ class rpPIO_pinConfig
     rpPIO_pinSet inputs;
     rpPIO_pinSet outputs;
     rpPIO_pinSet sets;
-    rpPIO_pinSet sidesets;
 };
 /**
  *
@@ -53,9 +52,11 @@ class rpPIO_SM
     friend class rpPIO;
 
   public:
-    bool setBitOrder(bool inputMsbFirst, bool outputMsbFirst);    
+    bool setBitOrder(bool inputMsbFirst, bool outputMsbFirst);
     bool setSpeed(uint32_t fq);
     bool configure(const rpPIO_pinConfig &config);
+    bool configureSideSet(int startPin, int nbPin, int sideNbBits, bool optional);
+    bool setPinDir(lnPin pin, bool isOutput);
     bool execute();
     bool stop();
     bool write(uint32_t nb, uint32_t *data);
