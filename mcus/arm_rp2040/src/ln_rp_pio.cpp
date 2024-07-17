@@ -178,6 +178,51 @@ bool rpPIO_SM::setPinDir(lnPin pin, bool isOutput)
     ENGINE()->PIO_SM[_sm].PINCTRL = oldpin;
     return true;
 }
+/**
+ *
+ *
+ */
+bool rpPIO_SM::waitTxEmpty()
+{
+    while (1)
+    {
+        uint32_t fstat = ENGINE()->PIO_FSTAT;
+        fstat >>= 24;
+        fstat >>= _sm;
+        if ((1 & fstat))
+            return true;
+    }
+}
+/**
+ *
+ *
+ */
+bool rpPIO_SM::waitTxReady()
+{
+    while (1)
+    {
+        uint32_t fstat = ENGINE()->PIO_FSTAT;
+        fstat >>= 16;
+        fstat >>= _sm;
+        if (!(1 & fstat))
+            return true;
+    }
+}
+/**
+ *
+ *
+ */
+bool rpPIO_SM::waitRxReady()
+{
+    while (1)
+    {
+        uint32_t fstat = ENGINE()->PIO_FSTAT;
+        fstat >>= 8;
+        fstat >>= _sm;
+        if (!(1 & fstat))
+            return true;
+    }
+}
 
 /**
  *
@@ -185,9 +230,22 @@ bool rpPIO_SM::setPinDir(lnPin pin, bool isOutput)
 bool rpPIO_SM::configureSideSet(int startPin, int nbPin, int sideNbBits, bool optional)
 {
     uint32_t pin_ctrol = ENGINE()->PIO_SM[_sm].PINCTRL;
+    pin_ctrol &= ~LN_RP_PIO_SM_PINCTRL_SIDESET_COUNT_BIT(7); // this should be log2(actual set number)
+    pin_ctrol &= ~LN_RP_PIO_SM_PINCTRL_SIDESET_BASE_BIT(0x1F);
     pin_ctrol |= LN_RP_PIO_SM_PINCTRL_SIDESET_COUNT_BIT(sideNbBits); // this should be log2(actual set number)
     pin_ctrol |= LN_RP_PIO_SM_PINCTRL_SIDESET_BASE_BIT(startPin);
     ENGINE()->PIO_SM[_sm].PINCTRL = pin_ctrol;
+
+    uint32_t exec = ENGINE()->PIO_SM[_sm].EXECCTRL;
+    if (nbPin && optional)
+    {
+        exec |= LN_RP_PIO_SM_EXECCTRL_SIDE_EN;
+    }
+    else
+    {
+        exec &= ~LN_RP_PIO_SM_EXECCTRL_SIDE_EN;
+    }
+    ENGINE()->PIO_SM[_sm].EXECCTRL = exec;
     return true;
 }
 /**

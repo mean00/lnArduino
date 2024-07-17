@@ -56,6 +56,9 @@ class rpPIO_SM
     bool setSpeed(uint32_t fq);
     bool configure(const rpPIO_pinConfig &config);
     bool configureSideSet(int startPin, int nbPin, int sideNbBits, bool optional);
+    bool waitTxEmpty();
+    bool waitTxReady();
+    bool waitRxReady();
     bool setPinDir(lnPin pin, bool isOutput);
     bool execute();
     bool stop();
