@@ -184,12 +184,11 @@ bool rpPIO_SM::setPinDir(lnPin pin, bool isOutput)
  */
 bool rpPIO_SM::waitTxEmpty()
 {
+    const uint32_t msk = LN_RP_PIO_FSTAT_TX_EMPTY_BIT(_sm);
     while (1)
     {
         uint32_t fstat = ENGINE()->PIO_FSTAT;
-        fstat >>= 24;
-        fstat >>= _sm;
-        if ((1 & fstat))
+        if (fstat & msk)
             return true;
     }
 }
@@ -199,12 +198,11 @@ bool rpPIO_SM::waitTxEmpty()
  */
 bool rpPIO_SM::waitTxReady()
 {
+    const uint32_t msk = LN_RP_PIO_FSTAT_TX_FULL_BIT(_sm);
     while (1)
     {
         uint32_t fstat = ENGINE()->PIO_FSTAT;
-        fstat >>= 16;
-        fstat >>= _sm;
-        if (!(1 & fstat))
+        if (!(fstat & msk))
             return true;
     }
 }
@@ -214,12 +212,11 @@ bool rpPIO_SM::waitTxReady()
  */
 bool rpPIO_SM::waitRxReady()
 {
+    const uint32_t msk = LN_RP_PIO_FSTAT_RX_EMPTY_BIT(_sm);
     while (1)
     {
         uint32_t fstat = ENGINE()->PIO_FSTAT;
-        fstat >>= 8;
-        fstat >>= _sm;
-        if (!(1 & fstat))
+        if (!(fstat & msk))
             return true;
     }
 }
