@@ -119,7 +119,7 @@ bool rpPIO_SM::setBitOrder(bool inputMsbFirst, bool outputMsbFirst)
     {
         shiftctrl |= LN_RP_PIO_SM_SHIFTCTRL_OUT_SHIFTDIR; // shift output to the right, input to the left
     }
-    if (inputMsbFirst)
+    if (!inputMsbFirst)
     {
         shiftctrl &= ~LN_RP_PIO_SM_SHIFTCTRL_IN_SHIFTDIR; // shift output to the left, input to the left
     }
