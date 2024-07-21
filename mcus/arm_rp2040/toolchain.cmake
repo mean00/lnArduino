@@ -124,7 +124,7 @@ SET(CMAKE_ASM_FLAGS "${GD32_C_FLAGS}" CACHE INTERNAL "")
 SET(CMAKE_CXX_FLAGS "${GD32_C_FLAGS}  -fno-rtti -fno-exceptions -fno-threadsafe-statics" CACHE INTERNAL "") 
 #
 SET(GD32_LD_FLAGS "-nostdlib ${GD32_SPECS} ${GD32_MCU} ${GD32_LD_EXTRA}" CACHE INTERNAL "")
-SET(GD32_LD_LIBS "-lm -lc -lgcc -lgcc" CACHE INTERNAL "")
+SET(GD32_LD_LIBS "-lm -lgcc -lgcc" CACHE INTERNAL "")
 #
 set(CMAKE_CXX_LINK_EXECUTABLE    "<CMAKE_CXX_COMPILER>   <CMAKE_CXX_LINK_FLAGS>  <LINK_FLAGS> ${LN_LTO} -lgcc -Xlinker -print-memory-usage -Xlinker --gc-sections  -Wl,--start-group  <OBJECTS> <LINK_LIBRARIES> -Wl,--end-group  -Wl,--cref -Wl,-Map,<TARGET>.map   -o <TARGET> ${GD32_LD_FLAGS} ${GD32_LD_LIBS} -e _entry_point " CACHE INTERNAL "")
 SET(CMAKE_EXECUTABLE_SUFFIX_C .elf CACHE INTERNAL "")

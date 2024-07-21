@@ -118,7 +118,7 @@ SET(CMAKE_ASM_FLAGS "${GD32_C_FLAGS}" CACHE INTERNAL "")
 SET(CMAKE_CXX_FLAGS "${GD32_C_FLAGS} -std=gnu++11 -fno-rtti -fno-exceptions -fno-threadsafe-statics" CACHE INTERNAL "") 
 #
 SET(GD32_LD_FLAGS " -fuse-ld=lld -nostdlib ${GD32_SPECS}  ${GD32_MCU}  ${GD32_LD_EXTRA}  ${GD32_LIBC}" CACHE INTERNAL "")
-SET(GD32_LD_LIBS "-lm -lc -Wl,--gc-sections -Wl,--gdb-index " CACHE INTERNAL "")
+SET(GD32_LD_LIBS "-lm  -Wl,--gc-sections -Wl,--gdb-index " CACHE INTERNAL "")
 #
 SET(CLANG_LINKER_OPT "${MINI_SYSROOT}/lib/libclang_rt.builtins.a")  
 #

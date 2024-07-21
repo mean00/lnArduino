@@ -95,8 +95,8 @@ IF(NOT DEFINED LN_EXT)
     SET(CMAKE_CXX_FLAGS "${GD32_SPECS_C_FLAGS}  -fno-rtti -fno-exceptions -fno-threadsafe-statics" CACHE INTERNAL "") 
     #
     SET(GD32_SPECS_LD_FLAGS "-nostdlib ${GD32_SPECS}  -Wl,--traditional-format -Wl,--warn-common" CACHE INTERNAL "")
-    SET(GD32_SPECS_LD_LIBS "-lm -lc -lgcc")
-    SET(GD32_LD_LIBS "-lm -lc -Wl,--gc-sections " CACHE INTERNAL "")
+    SET(GD32_SPECS_LD_LIBS "-lm  -lgcc")
+    SET(GD32_LD_LIBS "-lm -Wl,--gc-sections " CACHE INTERNAL "")
     
     SET(GD32_LD_FLAGS ${PLATFORM_C_FLAGS} CACHE INTERNAL "")
     #
