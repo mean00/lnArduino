@@ -24,6 +24,15 @@ static void startPIO(LN_RP_PIO *rpio, uint32_t sm)
     ctrl |= LN_RP_PIO_CTRL_RESTART_BIT(sm);        // restart SM
     ctrl |= LN_RP_PIO_CTRL_ENABLE_BIT(sm);         // and go...
     rpio->PIO_CTRL = ctrl;
+    // Purge RX
+    const uint32_t msk = LN_RP_PIO_FSTAT_RX_EMPTY_BIT(sm);
+    while(1)
+    {
+        uint32_t fstat = rpio->PIO_FSTAT;
+        if (fstat & msk)
+            return;
+        volatile uint32_t x=rpio->PIO_RXF[sm];
+    }
 }
 /**
  *
