@@ -38,7 +38,7 @@ void runPio()
     rpPIO xpio(0);
     rpPIO_SM *xsm = xpio.getSm(0);
 
-    lnPinMode(pin, lnRP_PIO0_MODE);
+    lnPinModePIO((lnPin)pin, 0); // PIO0
 
     rpPIO_pinConfig pinConfig;
     pinConfig.sets.pinNb = 1;
