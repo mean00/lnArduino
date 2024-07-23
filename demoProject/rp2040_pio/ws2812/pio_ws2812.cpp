@@ -8,7 +8,6 @@
 #define PICO_NO_HARDWARE 1
 #include "ws.h"
 
-
 /**
  * @brief
  *
@@ -24,13 +23,12 @@ const uint8_t xsin[181] = {
     248, 249, 249, 250, 251, 251, 252, 252, 253, 253, 253, 254, 254, 254, 255, 255, 255, 255, 255, 255,
 };
 
-
 #if 0
-    #define PIN_TO_USE GPIO6
-    #define WS_SPEED 5 * 1000 * 1000
+#define PIN_TO_USE GPIO6
+#define WS_SPEED 5 * 1000 * 1000
 #else
-    #define PIN_TO_USE GPIO23 // GPIO16 for zero, GPIO23 for normal size RP2040
-    #define WS_SPEED (800000 * 10)
+#define PIN_TO_USE GPIO23 // GPIO16 for zero, GPIO23 for normal size RP2040
+#define WS_SPEED (800000 * 10)
 #endif
 
 #define STEP 1
@@ -49,17 +47,18 @@ void runPio()
     pinConfig.outputs.startPin = pin;
 
     xsm->setSpeed(WS_SPEED);
-    xsm->setBitOrder(false,true);
+    xsm->setBitOrder(false, true);
     xsm->uploadCode(sizeof(ws_program_instructions) / 2, ws_program_instructions, ws_wrap_target, ws_wrap);
     xsm->configure(pinConfig);
+    xsm->setPinDir(pin, true);
     xsm->execute();
 
     int pix = 0;
     int inc = STEP;
     while (1)
     {
-        uint32_t wait = xsin[pix]<<16;
-        xsm->write(1, &wait);        
+        uint32_t wait = xsin[pix] << 16;
+        xsm->write(1, &wait);
         pix += inc;
         if (inc == STEP)
         {
@@ -75,7 +74,7 @@ void runPio()
                 inc = -inc;
             }
         }
-        lnDelayMs(6);        
+        lnDelayMs(6);
     }
 }
 
