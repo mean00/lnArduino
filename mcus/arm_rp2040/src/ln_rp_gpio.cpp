@@ -2,7 +2,7 @@
 #include "lnArduino.h"
 #include "lnGPIO.h"
 /**
- *
+ * \brief This is a rp2040 specific function to configure the pin in PIO mode
  */
 void lnPinModePIO(const lnPin pin, const int instance)
 {
@@ -18,7 +18,7 @@ void lnPinModePIO(const lnPin pin, const int instance)
     uint32_t pad = LN_RP_PADS_DRIVE(12MA);
     uint32_t control = LN_RP_GPIO_CONTROL_OE(NORMAL); // 12 mA
     lnGpio->PINS[pin].control = fun + control;
-    // lnPads->PADS[pin] = pad | LN_RP_PADS_SLEW_FAST;
+    lnPads->PADS[pin] = pad | LN_RP_PADS_SLEW_FAST;
 }
 /**
     \fn
