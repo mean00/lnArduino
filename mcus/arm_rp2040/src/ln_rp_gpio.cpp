@@ -15,10 +15,10 @@ void lnPinModePIO(const lnPin pin, const int instance)
     {
         fun = LN_RP_GPIO_CONTROL_FUNC(PIO1);
     }
-    uint32_t pad = LN_RP_PADS_DRIVE(12MA);
+    uint32_t pad = LN_RP_PADS_DRIVE(12MA) | LN_RP_PADS_INPUT_ENABLE | LN_RP_PADS_SLEW_FAST | LN_RP_PADS_SCHMITT_FAST; // default is input / output
     uint32_t control = LN_RP_GPIO_CONTROL_OE(NORMAL); // 12 mA
     lnGpio->PINS[pin].control = fun + control;
-    lnPads->PADS[pin] = pad | LN_RP_PADS_SLEW_FAST;
+   // lnPads->PADS[pin] = pad ;
 }
 /**
     \fn
