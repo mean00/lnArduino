@@ -6,6 +6,9 @@ cmake_minimum_required(VERSION 3.13)
 MESSAGE(STATUS "======================")
 MESSAGE(STATUS "Starting rust demo ")
 MESSAGE(STATUS "======================")
+#
+SET(USE_RP2040  TRUE CACHE INTERNAL "")
+SET(USE_CLANG   TRUE CACHE INTERNAL "")
 
 #SET(LN_LTO "-flto"  CACHE INTERNAL "")
 SET(LN_ENABLE_USBD  OFF CACHE INTERNAL "")
