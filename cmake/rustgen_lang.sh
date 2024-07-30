@@ -21,14 +21,14 @@ fi
 echo " bindgen is $BINDGEN ."
 export LN=`realpath $ME/..` 
 
-export PLATFORM_TOOLCHAIN_PATH=`cmake -DUSE_CLANG=1 -DHOME=$LN -P $ME/toolchain_env.cmake 2>& 1`
+export PLATFORM_CLANG_PATH=`cmake -DUSE_CLANG=1 -DHOME=$LN -P $ME/toolchain_env.cmake 2>& 1`
 #export PLATFORM_TOOLCHAIN_PATH=/home/fx/Arduino_stm32/arm-gcc-2021q4/bin
 
-export PATH=$PLATFORM_TOOLCHAIN_PATH:$PATH
+export PATH=$PLATFORM_CLANG_PATH:$PATH
 
 echo "** Processing $1 **"
 echo "   using <$LN> as basedir **"
-echo "   using <$PLATFORM_TOOLCHAIN_PATH> as PLATFORM_TOOLCHAIN_PATH **"
+echo "   using <$PLATFORM_CLANG_PATH> as PLATFORM_CLANG_PATH **"
 echo "$1 => $2"
 export TMP=$1.tmp
 echo "Tmp .h file = $TMP"
@@ -46,6 +46,7 @@ $BINDGEN      --use-core --no-doc-comments \
     --rustified-enum "ln.*" \
     -o $2.tmp \
     -- -x ${LANG}   -DLN_ARCH=LN_ARCH_ARM \
+    -funsigned-char \
     -I${EXTRA_DIR} \
     -I$LN -I$LN/include/  -I$LN/arduinoLayer/include/ \
     -I$LN/FreeRTOS/include/  \
@@ -55,7 +56,10 @@ $BINDGEN      --use-core --no-doc-comments \
     -I$LN/legacy/boards/bluepill/ \
     -I$LN/FreeRTOS/portable/GCC/ARM_CM3/ \
     -target "thumbv7m-none-eabi"  \
-    -I${PLATFORM_TOOLCHAIN_PATH}/../arm-none-eabi/include/ \
+    -I${PLATFORM_CLANG_PATH}/../lib/clang-runtimes/arm-none-eabi/armv7m_soft_nofp/include/
+    
+
+#-I${PLATFORM_CLANG_PATH}/../arm-none-eabi/include/ \
     
 cat header.rs.in > ${output}
 cat $2.tmp >> ${output}
