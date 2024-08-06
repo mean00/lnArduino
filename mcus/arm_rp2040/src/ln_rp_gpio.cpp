@@ -15,12 +15,13 @@ void lnPinModePIO(const lnPin pin, const int instance, const bool pullup)
     {
         fun = LN_RP_GPIO_CONTROL_FUNC(PIO1);
     }
-    uint32_t pad = LN_RP_PADS_DRIVE(12MA) | LN_RP_PADS_INPUT_ENABLE | LN_RP_PADS_SLEW_FAST | LN_RP_PADS_SCHMITT_FAST; // default is input / output
-    if(pullup)
-        pad|=LN_RP_PADS_PULLUP;
+    uint32_t pad = LN_RP_PADS_DRIVE(12MA) | LN_RP_PADS_INPUT_ENABLE | LN_RP_PADS_SLEW_FAST |
+                   LN_RP_PADS_SCHMITT_FAST; // default is input / output
+    if (pullup)
+        pad |= LN_RP_PADS_PULLUP;
     uint32_t control = LN_RP_GPIO_CONTROL_OE(NORMAL); // 12 mA
     lnGpio->PINS[pin].control = fun + control;
-    lnPads->PADS[pin] = pad ;
+    lnPads->PADS[pin] = pad;
 }
 /**
     \fn
@@ -61,6 +62,7 @@ void lnPinMode(const lnPin pin, const lnGpioMode mode, const int speedInMhz)
         control = LN_RP_GPIO_CONTROL_OE_DISABLE;
         break;
     case lnOUTPUT_OPEN_DRAIN:
+        lnSio->GPIO_OUT_CLR = 1 << pin; // set output to 0
         pad = LN_RP_PADS_OUTPUT_DISABLE;
         control = LN_RP_GPIO_CONTROL_OE_DISABLE;
         break;
@@ -92,9 +94,9 @@ void lnOpenDrainClose(const lnPin pin, const bool close)
     uint32_t fun = LN_RP_GPIO_CONTROL_FUNC(SIO);
     uint32_t pad, control;
 
-    if (close) // passing
+    lnSio->GPIO_OUT_CLR = 1 << pin; // set output to 0
+    if (close)                      // passing -> reconfigure as output to 0
     {
-        lnSio->GPIO_OUT_CLR = 1 << pin;
         pad = LN_RP_PADS_DRIVE(12MA);
         control = LN_RP_GPIO_CONTROL_OE(ENABLE); // 12 mA
     }
