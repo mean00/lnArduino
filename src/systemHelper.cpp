@@ -102,6 +102,15 @@ extern "C"
         }
     }
     int stderr;
+#undef vfprintf
+    void vfprintf()
+    {
+        do_assert("vfprintf");
+    }
+    void fprintf()
+    {
+        do_assert("vfprintf");
+    }
 }
 
 namespace std
