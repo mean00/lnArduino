@@ -52,7 +52,7 @@ class rpPIO_SM
     friend class rpPIO;
 
   public:
-    bool setBitOrder(bool inputMsbFirst, bool outputMsbFirst);
+    bool setBitOrder(bool transmitShiftToRight, bool ReceiveShiftToRight);
     bool setSpeed(uint32_t fq);
     bool configure(const rpPIO_pinConfig &config);
     bool configureSideSet(int startPin, int nbPin, int sideNbBits, bool optional);
@@ -60,11 +60,13 @@ class rpPIO_SM
     bool waitTxReady();
     bool waitRxReady();
     bool setPinDir(lnPin pin, bool isOutput);
+    bool setPinsValue(uint32_t value);
     bool execute();
     bool stop();
     bool write(uint32_t nb, uint32_t *data);
     bool read(uint32_t nb, uint32_t *data);
-    bool uploadCode(uint32_t codeSize, const uint16_t *code, uint32_t wrapBegin, uint32_t wrapEnd);
+    bool uploadCode(uint32_t codeSizeInHalfWord, const uint16_t *code, uint32_t wrapBegin, uint32_t wrapEnd);
+    bool execute_jmp(uint32_t addr);
 
   protected:
     rpPIO_SM(uint32_t unit, uint32_t sm);
@@ -88,6 +90,7 @@ class rpPIO
     virtual ~rpPIO();
     // size is in 16 bits instrucitons
     rpPIO_SM *getSm(uint32_t sm);
+    void reset();
 
   protected:
     int _unit;
