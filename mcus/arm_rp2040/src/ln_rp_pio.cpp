@@ -77,14 +77,6 @@ rpPIO::rpPIO(uint32_t unit)
 /**
  *
  */
-void rpPIO::reset()
-{
-    DEBUG("reset\n");
-    consumedPioSpace[_unit] = 0;
-}
-/**
- *
- */
 rpPIO::~rpPIO()
 {
     resetPIO(ENGINE(), 0);
@@ -102,6 +94,14 @@ rpPIO_SM *rpPIO::getSm(uint32_t sm)
 //===============================================================================
 //===============================================================================
 //===============================================================================
+/**
+ *
+ */
+void rpPIO_SM::reset()
+{
+    DEBUG("reset\n");
+    consumedPioSpace[_unit] = 0;
+}
 rpPIO_SM::rpPIO_SM(uint32_t unit, uint32_t sm)
 {
     _unit = unit;
@@ -166,7 +166,7 @@ bool rpPIO_SM::setBitOrder(bool transmitShiftToRight, bool receiveShiftToRight)
     }
     else
     {
-        receiveShiftToRight &= ~LN_RP_PIO_SM_SHIFTCTRL_IN_SHIFTDIR; // shift output to the left, input to the left
+        shiftctrl &= ~LN_RP_PIO_SM_SHIFTCTRL_IN_SHIFTDIR; // shift output to the left, input to the left
     }
     ENGINE()->PIO_SM[_sm].SHIFTCTRL = shiftctrl;
     return true;
@@ -300,7 +300,7 @@ bool rpPIO_SM::configureSideSet(int startPin, int nbPin, int sideNbBits, bool op
     pin_ctrol |= LN_RP_PIO_SM_PINCTRL_SIDESET_BASE_BIT(startPin);
     ENGINE()->PIO_SM[_sm].PINCTRL = pin_ctrol;
 
-    uint32_t exec = 0xA042; // this is a nop
+    uint32_t exec = ENGINE()->PIO_SM[_sm].EXECCTRL;
     if (nbPin && optional)
     {
         exec |= LN_RP_PIO_SM_EXECCTRL_SIDE_EN;

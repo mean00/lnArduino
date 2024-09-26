@@ -67,6 +67,7 @@ class rpPIO_SM
     bool read(uint32_t nb, uint32_t *data);
     bool uploadCode(uint32_t codeSizeInHalfWord, const uint16_t *code, uint32_t wrapBegin, uint32_t wrapEnd);
     bool execute_jmp(uint32_t addr);
+    void reset();
 
   protected:
     rpPIO_SM(uint32_t unit, uint32_t sm);
@@ -90,7 +91,6 @@ class rpPIO
     virtual ~rpPIO();
     // size is in 16 bits instrucitons
     rpPIO_SM *getSm(uint32_t sm);
-    void reset();
 
   protected:
     int _unit;
