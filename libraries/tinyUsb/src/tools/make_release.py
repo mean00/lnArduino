@@ -1,6 +1,7 @@
 import re
+import gen_doc
 
-version = '0.16.0'
+version = '0.17.0'
 
 print('version {}'.format(version))
 ver_id = version.split('.')
@@ -45,5 +46,7 @@ with open(f_library_json, 'w') as f:
 ###################
 # docs/info/changelog.rst
 ###################
+
+gen_doc.gen_deps_doc()
 
 print("Update docs/info/changelog.rst")
