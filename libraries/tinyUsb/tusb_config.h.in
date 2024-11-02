@@ -20,6 +20,9 @@
 
 #define CFG_TUD_DFU_XFER_BUFSIZE 512
 
+#if CFG_TUSB_MCU == OPT_MCU_CH32V307
+#define CFG_TUD_WCH_USBIP_USBFS 1
+#endif
 //
 #define CFG_TUD_ENDPOINT0_SIZE    64
 #define CFG_TUSB_MEM_ALIGN          __attribute__ ((aligned(4)))

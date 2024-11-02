@@ -1,34 +1,49 @@
-#include "ch32_usbfs_reg.h"     // MEANX
-#include "dcd_usbfs_platform.h" // MEANX
-#include <stdint.h>
-#include <stdio.h>
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2024 Matthew Tran
+ * Copyright (c) 2024 hathach
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ *
+ * This file is part of the TinyUSB stack.
+ */
 
 #include "tusb_option.h"
-
-#if 1 // CFG_TUD_ENABLED && (CFG_TUSB_MCU == OPT_MCU_CH32V20X)
+//
+#include "stdint.h" // MEANX
+//
+#if CFG_TUD_ENABLED && defined(TUP_USBIP_WCH_USBFS) && CFG_TUD_WCH_USBIP_USBFS
 
 #include "ch32_usbfs_reg.h"
-#include "ch32_usbfs_reg2.h" // MEANX
 #include "device/dcd.h"
 
-LN_USB_OTG_DEVICE *USBOTGD = (LN_USB_OTG_DEVICE *)USBOTG_BASE;
-#define USBOTG_FS USBOTGD
-#define UEP0_DMA dma
-#define UDEV_CTRL DEVICE_CTRL // ??
-#define BASE_CTRL CTRL        // ??
-#define DEV_ADDR DEV_ADDRESS  // ??
-#define EP_TX_LEN(ep) USBOTGD->endp[ep].tx_length
-#define EP_TX_CTRL(ep) USBOTGD->endp[ep].tx_ctrl
-#define EP_RX_CTRL(ep) USBOTGD->endp[ep].rx_ctrl
+// MEANX
+#include "fs_bridge.c"
 
-extern void dcd_fs_platform_init();
 /* private defines */
 #define EP_MAX (8)
 
-#define EP_DMA(ep) (USBOTG_FS->UEP0_DMA[ep])
-// #define EP_TX_LEN(ep)  ((&USBOTG_FS->UEP0_TX_LEN)[2 * ep])
-// #define EP_TX_CTRL(ep) ((&USBOTG_FS->UEP0_TX_CTRL)[4 * ep])
-// #define EP_RX_CTRL(ep) ((&USBOTG_FS->UEP0_RX_CTRL)[4 * ep])
+#define EP_DMA(ep) ((&USBOTG_FS->UEP0_DMA)[ep])
+#define EP_TX_LEN(ep) ((&USBOTG_FS->UEP0_TX_LEN)[2 * ep])
+#define EP_TX_CTRL(ep) ((&USBOTG_FS->UEP0_TX_CTRL)[4 * ep])
+#define EP_RX_CTRL(ep) ((&USBOTG_FS->UEP0_RX_CTRL)[4 * ep])
 
 /* private data */
 struct usb_xfer
@@ -138,9 +153,9 @@ static void update_out(uint8_t rhport, uint8_t ep, size_t rx_len)
 /* public functions */
 void dcd_init(uint8_t rhport)
 {
+    dcd_fs_platform_init();   // MEANX get a clock
+    dcd_fs_platform_delay(1); // MEANX let it power up
     // init registers
-    dcd_fs_platform_init();
-
     USBOTG_FS->BASE_CTRL = USBFS_CTRL_SYS_CTRL | USBFS_CTRL_INT_BUSY | USBFS_CTRL_DMA_EN;
     USBOTG_FS->UDEV_CTRL = USBFS_UDEV_CTRL_PD_DIS | USBFS_UDEV_CTRL_PORT_EN;
     USBOTG_FS->DEV_ADDR = 0x00;
@@ -155,16 +170,11 @@ void dcd_init(uint8_t rhport)
     EP_RX_CTRL(0) = USBFS_EP_R_RES_ACK;
 
     // enable other endpoints but NAK everything
-    USBOTG_FS->mod[0] = 0xCC;
-    USBOTG_FS->mod[1] = 0xCC;
-    USBOTG_FS->mod[2] = 0xCC;
-    USBOTG_FS->mod[3] = 0x0C;
-#ifdef UNUSED_XXX
     USBOTG_FS->UEP4_1_MOD = 0xCC;
     USBOTG_FS->UEP2_3_MOD = 0xCC;
     USBOTG_FS->UEP5_6_MOD = 0xCC;
     USBOTG_FS->UEP7_MOD = 0x0C;
-#endif
+
     for (uint8_t ep = 1; ep < EP_MAX; ep++)
     {
         EP_DMA(ep) = (uint32_t)&data.buffer[ep][0];
@@ -174,9 +184,6 @@ void dcd_init(uint8_t rhport)
     }
     EP_DMA(3) = (uint32_t)&data.ep3_buffer.out[0];
 
-    // MEANX
-    // MEANX
-
     dcd_connect(rhport);
 }
 
@@ -184,7 +191,6 @@ void dcd_int_handler(uint8_t rhport)
 {
     (void)rhport;
     uint8_t status = USBOTG_FS->INT_FG;
-    uint16_t rx_len; // MEA?X
     if (status & USBFS_INT_FG_TRANSFER)
     {
         uint8_t ep = USBFS_INT_ST_MASK_UIS_ENDP(USBOTG_FS->INT_ST);
@@ -192,16 +198,21 @@ void dcd_int_handler(uint8_t rhport)
 
         switch (token)
         {
-        case PID_OUT:
-            rx_len = USBOTG_FS->RX_LEN;
+        case PID_OUT: {
+            uint16_t rx_len = USBOTG_FS->RX_LEN;
             update_out(rhport, ep, rx_len);
             break;
+        }
 
         case PID_IN:
             update_in(rhport, ep, false);
             break;
 
         case PID_SETUP:
+            // setup clears stall
+            EP_TX_CTRL(0) = USBFS_EP_T_RES_NAK;
+            EP_RX_CTRL(0) = USBFS_EP_R_RES_ACK;
+
             data.ep0_tog = true;
             dcd_event_setup_received(rhport, &data.buffer[0][TUSB_DIR_OUT][0], true);
             break;
@@ -229,15 +240,15 @@ void dcd_int_handler(uint8_t rhport)
         USBOTG_FS->INT_FG = USBFS_INT_FG_SUSPEND;
     }
 }
-#if 0 // MEA?X
+#if 0 // MEANX
 void dcd_int_enable(uint8_t rhport) {
-    (void) rhport;
-    NVIC_EnableIRQ(USBHD_IRQn);
+  (void) rhport;
+  NVIC_EnableIRQ(USBHD_IRQn);
 }
 
 void dcd_int_disable(uint8_t rhport) {
-    (void) rhport;
-    NVIC_DisableIRQ(USBHD_IRQn);
+  (void) rhport;
+  NVIC_DisableIRQ(USBHD_IRQn);
 }
 #endif
 void dcd_set_address(uint8_t rhport, uint8_t dev_addr)
@@ -262,6 +273,14 @@ void dcd_disconnect(uint8_t rhport)
 {
     (void)rhport;
     USBOTG_FS->BASE_CTRL &= ~USBFS_CTRL_DEV_PUEN;
+}
+
+void dcd_sof_enable(uint8_t rhport, bool en)
+{
+    (void)rhport;
+    (void)en;
+
+    // TODO implement later
 }
 
 void dcd_edpt0_status_complete(uint8_t rhport, tusb_control_request_t const *request)
@@ -328,10 +347,12 @@ bool dcd_edpt_xfer(uint8_t rhport, uint8_t ep_addr, uint8_t *buffer, uint16_t to
     uint8_t dir = tu_edpt_dir(ep_addr);
 
     struct usb_xfer *xfer = &data.xfer[ep][dir];
+    dcd_int_disable(rhport);
     xfer->valid = true;
     xfer->buffer = buffer;
     xfer->len = total_bytes;
     xfer->processed_len = 0;
+    dcd_int_enable(rhport);
 
     if (dir == TUSB_DIR_IN)
     {
@@ -395,4 +416,4 @@ void dcd_edpt_clear_stall(uint8_t rhport, uint8_t ep_addr)
     }
 }
 
-#endif // CFG_TUD_ENABLED && (CFG_TUSB_MCU == OPT_MCU_CH32V20X)
+#endif
