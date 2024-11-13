@@ -129,10 +129,14 @@ SECTIONS
   } >ram AT>rom 
   
   
+  .vma_section : 
+  {
+    . = ALIGN(4);
+    PROVIDE( _data_lma = .);
+  } > rom
   .data          :
   {
-    LONG(0) /* Marker */
-    LONG(0)
+    PROVIDE( _data_begin = .);
     *(.rdata) 
    
     *(.gnu.linkonce.r.*)
@@ -148,16 +152,13 @@ SECTIONS
     *(.srodata.cst4)
     *(.srodata.cst2)
     *(.srodata .srodata.*)
+    PROVIDE( _data_end = .); 
   } >ram AT>rom 
-
-  . = ALIGN(4);
-  PROVIDE( _edata = . );
-  PROVIDE( edata = . );
-
-  PROVIDE( _fbss = . ); /*0X200052A0  0X200002A0*/
-  PROVIDE( __bss_start = . );
-  .bss            :
+  
+  .bss            (NOLOAD) :
   {
+    . = ALIGN(4);
+    PROVIDE( _bss_begin = . );
     *(.sbss*)
     *(.gnu.linkonce.sb.*)
     *(.bss .bss.*)
@@ -168,6 +169,7 @@ SECTIONS
    {
     *(.initial_heap)
     . = ALIGN(4);
+    PROVIDE(_bss_end = .);
     } >ram AT>ram 
 
   . = ALIGN(8);
