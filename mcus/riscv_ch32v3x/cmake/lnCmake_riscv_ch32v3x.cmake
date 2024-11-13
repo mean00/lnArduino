@@ -11,7 +11,11 @@ MACRO(GENERATE_GD32_FIRMWARE target)
             SET(LN_MCU_EEPROM_SIZE 4 CACHE INTERNAL "")
     ENDIF(NOT LN_MCU_EEPROM_SIZE)
 
+  IF(USE_CH32v3x_PURE_RAM)
+    configure_file( "${LN_MCU_FOLDER}/boards/ch32v3x/ld_ram.lds.in" "${CMAKE_BINARY_DIR}/linker_script.ld" @ONLY)
+  ELSE()
     configure_file( "${LN_MCU_FOLDER}/boards/ch32v3x/ld.lds.in" "${CMAKE_BINARY_DIR}/linker_script.ld" @ONLY)
+  ENDIF()
 
     ADD_EXECUTABLE(${target}  ${LN_MCU_FOLDER}/start.S ${ARGN})
     TARGET_LINK_LIBRARIES(${target} ${USED_LIBS} lnArduino ) # duplicates are NOT a mistake !
