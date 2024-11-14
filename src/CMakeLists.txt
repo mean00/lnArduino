@@ -1,8 +1,13 @@
 #
+IF(LN_DISABLE_LOGGER_UART)
+ELSE()
+  SET(LN_UART_CODE lnDebug.cpp)
+ENDIF()
+
 SET(LN_SOURCE_UTILS       
                        lnFreeRTOS_pp.cpp 
                        systemAlloc.cpp 
-                       lnDebug.cpp
+                       ${LN_UART_CODE}
                        lnStopWatch.cpp
                        systemHelper.cpp
                     )

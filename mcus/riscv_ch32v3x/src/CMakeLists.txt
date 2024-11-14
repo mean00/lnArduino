@@ -6,11 +6,19 @@ add_subdirectory(../../common_bluepill common_bp)
 
 target_include_directories(lnArduino_impl PRIVATE ${S} ${S}/../include)
 
+IF(LN_DISABLE_DEFAULT_IRQ_TABLE)
+
+ELSE()
+  SET(IRQ_TABLE     ${S}/ch32v3x_interrupt_table.cpp  
+                    ${S}/lnIRQ_riscv_ch32v3x.cpp  
+      )
+ENDIF()
+
 target_sources( lnArduino_impl PRIVATE
     ${S}/lnCpuID_riscv_ch32v3x.cpp  
     ${S}/lnFMC_impl.cpp  
-    ${S}/lnIRQ_riscv_ch32v3x.cpp  
-    ${S}/ch32v3x_interrupt_table.cpp  
+    
+    ${IRQ_TABLE}
     ${S}/lnRCU_ch32v3x_usb.cpp  
     ${S}/lnRCU_systemClock_riscv_ch32v3x.cpp  
     ${S}/lnRunTime_riscv_ch32v3x.cpp  

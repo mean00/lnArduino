@@ -30,8 +30,23 @@ IF(True) #NOT ARDUINO_GD32_FREERTOS)
   OPTION(USE_RP2040_PURE_RAM "Load and run from RAM (RP2040 only)" FALSE)
   OPTION(USE_CH32v3x_PURE_RAM "Load and run from RAM (CH32vxx only)" FALSE)
 
+  OPTION(LN_DISABLE_LOGGER_UART "Disable completely uart code" FALSE)
+  OPTION(LN_DISABLE_FLOAT_PRINTF "Disable float support in printf" FALSE)
+  OPTION(LN_DISABLE_DEFAULT_IRQ_TABLE "Disable default interrupt table" FALSE)
+  
+
+
   SET(LN_MCU_FOLDER ${ARDUINO_GD32_FREERTOS}/mcus/${LN_EXT}/ CACHE INTERNAL "")
   include( ${LN_MCU_FOLDER}/freeRTOS_port_${LN_EXT}.cmake)
+
+#
+  IF(LN_FREERTOS_CONFIG_DIR)    
+  ELSE()
+    SET(LN_FREERTOS_CONFIG_DIR ${ARDUINO_GD32_FREERTOS}/FreeRTOS_config CACHE INTERNAL "")
+  ENDIF()
+  MESSAGE(STATUS "FreeRTOS config directory is ${LN_FREERTOS_CONFIG_DIR}")
+  
+
 
   # Ok let's create our internal interface libary
   ADD_LIBRARY(lnArduinoInternal INTERFACE)
@@ -47,7 +62,7 @@ IF(True) #NOT ARDUINO_GD32_FREERTOS)
   target_include_directories(lnArduinoInternal INTERFACE ${CMAKE_BINARY_DIR}) # To catch generated files
   target_include_directories(lnArduinoInternal INTERFACE ${LN_MCU_FOLDER})
   target_include_directories(lnArduinoInternal INTERFACE ${LN_MCU_FOLDER}/include)
-
+  target_include_directories(lnArduinoInternal INTERFACE ${LN_FREERTOS_CONFIG_DIR})
 
   IF(LN_BOOTLOADER_SIZE)
     SET(LN_BOOTLOADER_SIZE ${LN_BOOTLOADER_SIZE} CACHE INTERNAL "")
@@ -55,6 +70,7 @@ IF(True) #NOT ARDUINO_GD32_FREERTOS)
     MESSAGE(STATUS "No bootloader reserved space.")
     SET(LN_BOOTLOADER_SIZE 0 CACHE INTERNAL "")
   ENDIF(LN_BOOTLOADER_SIZE)
+
 
 
   include(./freeRTOS.cmake)
@@ -77,4 +93,6 @@ IF(True) #NOT ARDUINO_GD32_FREERTOS)
   target_include_directories(lnArduino INTERFACE ${ARDUINO_GD32_FREERTOS})
   target_include_directories(lnArduino INTERFACE ${ARDUINO_GD32_FREERTOS}/include)
   target_include_directories(lnArduino INTERFACE ${LN_MCU_FOLDER})
+  
+  
 ENDIF()
