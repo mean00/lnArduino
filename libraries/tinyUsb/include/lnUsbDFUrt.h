@@ -1,12 +1,12 @@
 #pragma once
 
-typedef void lnDFUCb(void);
+typedef void lnDFUCbrt(void);
 /**
  * 
  */
 class lnUsbDFURT
 {
 public:
-        static void addDFURTCb(lnDFUCb *cb);
+        static void addDFURTCb(lnDFUCbrt *cb);
 
 };

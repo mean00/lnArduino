@@ -48,7 +48,7 @@ IF( LN_USB_DFU_RUNTIME GREATER 0 )
 ENDIF()        
    
 IF( LN_USB_DFU GREATER 0 )
-        SET(CLASS_FILES ${CLASS_FILES} ${TUSB}/class/dfu/dfu_device.c )
+        SET(CLASS_FILES ${CLASS_FILES} ${TUSB}/class/dfu/dfu_device.c  ${LNSRC}/lnUsbDFU.cpp)
 ENDIF()     
 
 
@@ -73,6 +73,7 @@ target_include_directories(tinyUsb PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories(tinyUsb PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_include_directories(tinyUsb PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/private_include)
 target_include_directories(tinyUsb PUBLIC ${TUSB})
+target_include_directories(tinyUsb PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/public)
 target_include_directories(tinyUsb PUBLIC ${TUSB}/common)
 target_include_directories(tinyUsb PUBLIC ${TUSB}/device)
 target_include_directories(tinyUsb PUBLIC ${TUSB}/class/device/cdc)

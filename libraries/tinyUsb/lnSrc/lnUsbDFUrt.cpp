@@ -5,13 +5,13 @@
 #include "lnUsbDFUrt.h"
 
 
-static lnDFUCb *_dfuCb=NULL;
+static lnDFUCbrt *_dfuCbrt=NULL;
 /**
  * 
  */
 void lnUsbDFURT::addDFURTCb(lnDFUCb *cb)
 {
-        _dfuCb=cb;
+        _dfuCbrt=cb;
 }
 /**
  * 
@@ -19,11 +19,11 @@ void lnUsbDFURT::addDFURTCb(lnDFUCb *cb)
 extern "C" void tud_dfu_runtime_reboot_to_dfu_cb()
 {
 
-    if(!_dfuCb)
+    if(!_dfuCbrt)
     {
         Logger("No DFU RT callback\n");
         return;
     }
-    _dfuCb();
+    _dfuCbrt();
 }
 // EOF

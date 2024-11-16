@@ -5,6 +5,7 @@
 #include "device/dcd.h"
 #include "lnUSBD.h"
 #include "lnUsbStack.h"
+#include "algorithm"
 
 
 #if CFG_TUSB_DEBUG!=0
@@ -194,31 +195,35 @@ uint16_t const* tud_descriptor_string_cb(uint8_t index, uint16_t langid)
 
 // Invoked when received GET STRING DESCRIPTOR request
 // Application return pointer to descriptor, whose contents must exist long enough for transfer to complete
+#define DESC_MAX_SIZE 63
+static uint16_t buffer_desc_str[DESC_MAX_SIZE+1];
+/**
+ */
 uint16_t const* lnUsbStack::getDeviceDescriptor(int index)
 {
-static uint16_t _desc_str[32];
+
 
   xAssert(_deviceDescriptor);
   xAssert(_nbDeviceDescriptor);
-  uint16_t *p=&(_desc_str[0]);
+  uint16_t *p=&(buffer_desc_str[0]);
   if ( !index )
   {
     *p++ = (TUSB_DESC_STRING << 8 ) | 4;
     memcpy(p, _deviceDescriptor[0], 2);
-    return _desc_str;
+    return buffer_desc_str;
   }
   // Note: the 0xEE index string is a Microsoft OS 1.0 Descriptors.
   // https://docs.microsoft.com/en-us/windows-hardware/drivers/usbcon/microsoft-defined-usb-descriptors
-  if(index>=_nbDeviceDescriptor) return NULL;
-  const char* str = _deviceDescriptor[index];
-  // Cap at max char
-  int mx = strlen(str);
-  if ( mx > 31 ) mx = 31;
+  if(index>=_nbDeviceDescriptor) 
+      return NULL;
 
-  *p++ = (TUSB_DESC_STRING << 8 ) | (2*mx + 2);
-  for(int i=0; i<mx; i++)
-      *p++ = str[i];
-  return _desc_str;
+  const char *input_str = _deviceDescriptor[index];
+  // Cap at max char
+  size_t capped_size = std::min((size_t)DESC_MAX_SIZE,strlen(input_str));  
+  *p++ = (TUSB_DESC_STRING << 8 ) | (2*capped_size + 2);
+  for(int i=0; i<capped_size; i++)
+      *p++ = input_str[i];
+  return buffer_desc_str;
 }
 //--//
 
