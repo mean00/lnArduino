@@ -78,9 +78,9 @@ EXTERN(main)
 
 /* Initial stack pointer value. */
 /* Reset vector and chip reset entry point */
-EXTERN(__start__)
-ENTRY(__start__)
-PROVIDE(__exc_reset = __start__);
+EXTERN(_start)
+ENTRY(_start)
+PROVIDE(__exc_reset = _start);
 
 
 SECTIONS
