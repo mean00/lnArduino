@@ -35,20 +35,21 @@ IF(True) #NOT ARDUINO_GD32_FREERTOS)
   OPTION(LN_DISABLE_DEFAULT_IRQ_TABLE "Disable default interrupt table" FALSE)
   OPTION(LN_DISABLE_DEFAULT_INIT "Disable default init" FALSE)
   OPTION(LN_DISABLE_DEFAULT_DMA "Disable  dma code" FALSE)
-  
-  
+  OPTION(LN_DISABLE_PRINTF "Disable built in embedded printf" FALSE)
+
+
 
 
   SET(LN_MCU_FOLDER ${ARDUINO_GD32_FREERTOS}/mcus/${LN_EXT}/ CACHE INTERNAL "")
   include( ${LN_MCU_FOLDER}/freeRTOS_port_${LN_EXT}.cmake)
 
-#
-  IF(LN_FREERTOS_CONFIG_DIR)    
+  #
+  IF(LN_FREERTOS_CONFIG_DIR)
   ELSE()
     SET(LN_FREERTOS_CONFIG_DIR ${ARDUINO_GD32_FREERTOS}/FreeRTOS_config CACHE INTERNAL "")
   ENDIF()
   MESSAGE(STATUS "FreeRTOS config directory is ${LN_FREERTOS_CONFIG_DIR}")
-  
+
 
 
   # Ok let's create our internal interface libary
@@ -78,7 +79,10 @@ IF(True) #NOT ARDUINO_GD32_FREERTOS)
 
   include(./freeRTOS.cmake)
   include(./arduino.cmake)
-  include(./embeddedPrintf.cmake)
+  IF(LN_DISABLE_PRINTF)
+  ELSE()
+    include(./embeddedPrintf.cmake)
+  ENDIF()
 
   add_subdirectory(${LN_MCU_FOLDER}/src)
 
@@ -92,10 +96,15 @@ IF(True) #NOT ARDUINO_GD32_FREERTOS)
   # Ok let's create our public libary
   # a firmmware should link against that one
   ADD_LIBRARY(lnArduino INTERFACE)
-  target_link_libraries(lnArduino INTERFACE ln_utils gd32Arduino FreeRTOS embeddedPrintf lnArduinoInternal)
+  target_link_libraries(lnArduino INTERFACE ln_utils gd32Arduino FreeRTOS )
+  IF( LN_DISABLE_PRINTF )
+  ELSE()
+    target_link_libraries(lnArduino INTERFACE embeddedPrintf )
+  ENDIF()
+  target_link_libraries(lnArduino INTERFACE lnArduinoInternal)
   target_include_directories(lnArduino INTERFACE ${ARDUINO_GD32_FREERTOS})
   target_include_directories(lnArduino INTERFACE ${ARDUINO_GD32_FREERTOS}/include)
   target_include_directories(lnArduino INTERFACE ${LN_MCU_FOLDER})
-  
-  
+
+
 ENDIF()
