@@ -33,6 +33,9 @@ IF(True) #NOT ARDUINO_GD32_FREERTOS)
   OPTION(LN_DISABLE_LOGGER_UART "Disable completely uart code" FALSE)
   OPTION(LN_DISABLE_FLOAT_PRINTF "Disable float support in printf" FALSE)
   OPTION(LN_DISABLE_DEFAULT_IRQ_TABLE "Disable default interrupt table" FALSE)
+  OPTION(LN_DISABLE_DEFAULT_INIT "Disable default init" FALSE)
+  OPTION(LN_DISABLE_DEFAULT_DMA "Disable  dma code" FALSE)
+  
   
 
 

@@ -1,13 +1,26 @@
 #
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/../../private_include)
 
+IF(LN_DISABLE_DEFAULT_INIT)
+
+ELSE()
+  SET(LN_SYSTEM_INIT lnSystemInit.cpp  )
+ENDIF()
+
+IF(LN_DISABLE_DEFAULT_DMA)
+
+ELSE()
+  SET(LN_SYSTEM_DMA lnDma.cpp  )
+ENDIF()
 
 
 SET(OVERLAY_SRCS       
+                      ${LN_SYSTEM_INIT}
+                      ${LN_SYSTEM_DMA}
                        lnSerialCore.cpp 
                        lnGPIO.cpp                      
-                       lnDma.cpp 
-                       lnSystemInit.cpp lnRCU.cpp 
+                       
+                       lnRCU.cpp 
                        lnExti.cpp
                        lnBasicTimer.cpp
                        lnBasicDelayTimer.cpp
@@ -29,7 +42,6 @@ SET(OVERLAY_SRCS
 #                       ${LN_MCU_FOLDER}/boards/${GD32_BOARD}/lnPinMapping.cpp
                        CACHE INTERNAL ""
                     )
-
 
 
 

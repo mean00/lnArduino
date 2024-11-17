@@ -77,11 +77,11 @@ static int xmin(int a, int b)
 #define XFER_CTL_BASE(_ep, is_in) (&(xfer_status.eps[_ep * 2 + is_in]))
 static __attribute__((aligned(4))) all_xfer_t xfer_status;
 
-volatile uint8_t ep0_tx_tog = 0x01;
-volatile uint8_t ep0_rx_tog = 0x01;
+static volatile uint8_t ep0_tx_tog = 0x01;
+static volatile uint8_t ep0_rx_tog = 0x01;
 
-int tog_ko_out = 0; /*-*/
-int tog_ko_in = 0;
+static int tog_ko_out = 0; /*-*/
+static int tog_ko_in = 0;
 
 /**
  */
@@ -103,29 +103,29 @@ void dcd_remote_wakeup(uint8_t rhport)
     The control variant does not touch the toggle bit (auto tog)
     The set variant overwrites the toggle bit, so you have to explictely set them
 */
-void rxControl(int epnum, uint32_t mask, uint32_t set)
+static void rxControl(int epnum, uint32_t mask, uint32_t set)
 {
     uint32_t reg = USBOTGD->ep[epnum].rx_ctrl;
     reg &= ~(mask);
     reg |= set;
     USBOTGD->ep[epnum].rx_ctrl = reg;
 }
-void txControl(int epnum, uint32_t mask, uint32_t set)
+static void txControl(int epnum, uint32_t mask, uint32_t set)
 {
     uint32_t reg = USBOTGD->ep[epnum].tx_ctrl;
     reg &= ~(mask);
     reg |= set;
     USBOTGD->ep[epnum].tx_ctrl = reg;
 }
-void txSet(int epnum, uint32_t val)
+static void txSet(int epnum, uint32_t val)
 {
     USBOTGD->ep[epnum].tx_ctrl = val;
 }
-void rxSet(int epnum, uint32_t val)
+static void rxSet(int epnum, uint32_t val)
 {
     USBOTGD->ep[epnum].rx_ctrl = val;
 }
-void txLenSet(int epnum, uint32_t size)
+static void txLenSet(int epnum, uint32_t size)
 {
     USBOTGD->ep[epnum].tx_length = size;
 }
@@ -136,7 +136,7 @@ void txLenSet(int epnum, uint32_t size)
     - Tx only / Rx only
     - TX/Rx in sequence
 */
-uint8_t *getBufferAddress(int x, bool is_in)
+static uint8_t *getBufferAddress(int x, bool is_in)
 {
     TU_ASSERT((x < EP_MAX), NULL);
     uint8_t *s = xfer_status.internal_buffer[x];
@@ -151,10 +151,10 @@ uint8_t *getBufferAddress(int x, bool is_in)
     Enabling rx & tx at the same time may be troublesome depending on the IP flavor
 */
 //                          0         1   2   3  4  5 6  7
-const uint8_t offset[8] = {0, 0, 1, 1, 0, 2, 2, 3};
-const uint8_t up[8] = {0, 1, 0, 1, 0, 0, 1, 0};
+static const uint8_t offset[8] = {0, 0, 1, 1, 0, 2, 2, 3};
+static const uint8_t up[8] = {0, 1, 0, 1, 0, 0, 1, 0};
 
-void setEndpointMode(int endpoint, bool mod, bool enable_tx, bool enable_rx)
+static void setEndpointMode(int endpoint, bool mod, bool enable_tx, bool enable_rx)
 {
 
     if (!endpoint)
@@ -333,7 +333,7 @@ bool dcd_edpt_open(uint8_t rhport, tusb_desc_endpoint_t const *desc_edpt)
 /*
      ep_in => it's a write actually from the device point of view
 */
-bool dcd_edpt_xfer_ep_in(xfer_ctl_t *xfer, uint8_t epnum)
+static  bool dcd_edpt_xfer_ep_in(xfer_ctl_t *xfer, uint8_t epnum)
 {
     LDEBUG("Prepare for IN with %d bytes on EP %d tog tx= %d\n", xfer->total_len, epnum, ep0_tx_tog);
     int short_packet_size = xmin(xfer->total_len, xfer->max_size);
@@ -371,7 +371,7 @@ bool dcd_edpt_xfer_ep_in(xfer_ctl_t *xfer, uint8_t epnum)
 /*
      ep_out => it's a read actually from the device point of view
 */
-bool dcd_edpt_xfer_ep_out(xfer_ctl_t *xfer, uint8_t epnum)
+static bool dcd_edpt_xfer_ep_out(xfer_ctl_t *xfer, uint8_t epnum)
 {
     LDEBUG("Prepare for OUT with %d bytes on EP %d tog_rx=%d\n", xfer->total_len, epnum, ep0_rx_tog);
     if (!epnum) // ep0
@@ -423,7 +423,7 @@ bool dcd_edpt_xfer(uint8_t rhport, uint8_t ep_addr, uint8_t *buffer, uint16_t to
 //
 //
 //
-void dcd_int_reset(void)
+static void dcd_int_reset(void)
 {
     USBOTGD->INT_EN &= ~USBOTG_INT_EN_BUS_RESET_IE;
     XFER_CTL_BASE(0, 0)->max_size = 64;
@@ -470,7 +470,7 @@ void dcd_edpt0_status_complete(uint8_t rhport, tusb_control_request_t const *req
 /**
     It's ep_out so it's a read
 */
-void dcd_int_out0(void)
+static void dcd_int_out0(void)
 {
     int rx_len = USBOTGD->RX_LEN;
     xfer_ctl_t *xfer = XFER_CTL_BASE(0, false);
@@ -510,7 +510,7 @@ void dcd_int_out0(void)
     ep0_rx_tog ^= 1;
 }
 // out-> write
-void dcd_int_out(int end_num)
+static void dcd_int_out(int end_num)
 {
     xfer_ctl_t *xfer = XFER_CTL_BASE(end_num, false);
     int rx_len = USBOTGD->RX_LEN;
@@ -536,7 +536,7 @@ void dcd_int_out(int end_num)
 //
 // ep_in, it's a write
 //
-void dcd_int_in0(void)
+static void dcd_int_in0(void)
 {
     xfer_ctl_t *xfer = XFER_CTL_BASE(0, 1);
     // assume one transfer is enough (?)
@@ -564,7 +564,7 @@ void dcd_int_in0(void)
     return;
 }
 // in => tx
-void dcd_int_in(int end_num)
+static void dcd_int_in(int end_num)
 {
     xfer_ctl_t *xfer = XFER_CTL_BASE(end_num, 1);
     // finish or queue the next one ?

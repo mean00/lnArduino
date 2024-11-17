@@ -45,6 +45,7 @@ extern const uint32_t *lnGetFreeRTOSDebug();
 int main()
 {
     //
+
     lnRunTimeInit();
     // Initialize system
     lnInitSystemClock();
