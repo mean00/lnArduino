@@ -5,8 +5,8 @@
 #include "device/dcd.h"
 #include "lnUSBD.h"
 #include "lnUsbStack.h"
-#include "algorithm"
 
+#define xmin(a,b) a>b ? b: a
 
 #if CFG_TUSB_DEBUG!=0
   #define USBD_EXTRA_STACK 1024
@@ -219,7 +219,7 @@ uint16_t const* lnUsbStack::getDeviceDescriptor(int index)
 
   const char *input_str = _deviceDescriptor[index];
   // Cap at max char
-  size_t capped_size = std::min((size_t)DESC_MAX_SIZE,strlen(input_str));  
+  size_t capped_size = xmin((size_t)DESC_MAX_SIZE,strlen(input_str));  
   *p++ = (TUSB_DESC_STRING << 8 ) | (2*capped_size + 2);
   for(int i=0; i<capped_size; i++)
       *p++ = input_str[i];
