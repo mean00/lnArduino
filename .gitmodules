@@ -1,15 +1,6 @@
 [submodule "FreeRTOS"]
 	path = FreeRTOS
 	url = https://github.com/FreeRTOS/FreeRTOS-Kernel.git
-[submodule "libraries/simplerSSD1306"]
-	path = libraries/simplerSSD1306
-	url = https://github.com/mean00/simpler_SSD1306.git
-[submodule "gdbGD32_freeRTOS_support"]
-	path = riscv/gdbGD32_freeRTOS_support
-	url = git@github.com:mean00/FreeRTOS-GDB.git
 [submodule "embedded_printf"]
 	path = embedded_printf
     url = https://github.com/mean00/embedded_printf.git
-[submodule "freeRTOS_gdb_support"]
-	path = freeRTOS_gdb_support
-	url = https://github.com/mean00/lnArduino_FreeRTOS_gdb.git
