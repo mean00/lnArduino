@@ -15,10 +15,10 @@
     extern "C" void y();                                                                                               \
     extern "C" void y##_relay() LN_INTERRUPT_TYPE;
 extern "C" void unsupported_relay();
-#define LOCAL_LN_INTERRUPT_TYPE
+#define LOCAL_LN_INTERRUPT_TYPE __attribute__((used))
 #define WCH_HW_STACK CH32_SYSCR_HWSTKEN
 #else
-#define LOCAL_LN_INTERRUPT_TYPE LN_INTERRUPT_TYPE
+#define LOCAL_LN_INTERRUPT_TYPE LN_INTERRUPT_TYPE __attribute__((used))
 #define HANDLER_DESC(x) extern "C" void x() LOCAL_LN_INTERRUPT_TYPE;
 #define HANDLER_DESC_C(y) extern "C" void y() LOCAL_LN_INTERRUPT_TYPE;
 #define WCH_HW_STACK 0
@@ -337,7 +337,7 @@ extern "C" void __attribute__((noinline)) deadEnd(int code)
  * @brief
  *
  */
-extern "C" void LN_INTERRUPT_TYPE Break_Point_Handler(void)
+extern "C" void LN_INTERRUPT_TYPE __attribute__((used)) Break_Point_Handler(void)
 {
     deadEnd(5);
 }

@@ -18,11 +18,11 @@
 #define HANDLER_DESC_C(y)                                                                                              \
     extern "C" void y();                                                                                               \
     extern "C" void y##_relay() LN_INTERRUPT_TYPE;
-extern "C" void unsupported_relay();
-#define LOCAL_LN_INTERRUPT_TYPE
+extern "C" void unsupported_relay() __attribute__((used));
+#define LOCAL_LN_INTERRUPT_TYPE __attribute__((used))
 #define WCH_HW_STACK CH32_SYSCR_HWSTKEN
 #else
-#define LOCAL_LN_INTERRUPT_TYPE LN_INTERRUPT_TYPE
+#define LOCAL_LN_INTERRUPT_TYPE LN_INTERRUPT_TYPE __attribute__((used))
 #define HANDLER_DESC(x) extern "C" void x() LOCAL_LN_INTERRUPT_TYPE;
 #define HANDLER_DESC_C(y) extern "C" void y() LOCAL_LN_INTERRUPT_TYPE;
 #define WCH_HW_STACK 0
@@ -40,7 +40,7 @@ LIST_OF_HANDLERS
  * @brief
  *
  */
-extern "C" void __attribute__((noinline)) unsupported()
+extern "C" void __attribute__((noinline)) __attribute__((used)) unsupported()
 {
     deadEnd(11);
 }
@@ -98,7 +98,7 @@ uint8_t vec_revert_table[SIZE_OF_VEC_TABLE];
 #undef INTERRUPT_DESC
 
 #define WEAK_INTERRUPT(y)                                                                                              \
-    extern "C" void __attribute__((weak)) y()                                                                          \
+    extern "C" void __attribute__((used)) __attribute__((weak)) y()                                                    \
     {                                                                                                                  \
         xAssert(0);                                                                                                    \
     }
@@ -112,7 +112,7 @@ WEAK_INTERRUPT(USART2_IRQHandler)
 WEAK_INTERRUPT(OTG_FS_IRQHandler)
 
 #define RELAY_FUNC(x)                                                                                                  \
-    ISR_CODE extern "C" void __attribute__((naked)) x##_relay()                                                        \
+    ISR_CODE extern "C" void __attribute__((naked)) __attribute((used)) x##_relay()                                    \
     {                                                                                                                  \
         __asm__("jal " #x "\n"                                                                                         \
                 "mret");                                                                                               \

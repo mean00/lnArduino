@@ -175,7 +175,6 @@ typedef volatile CH32V3_INTERRUPTx CH32V3_INTERRUPT;
     HANDLER_DESC(USART1_IRQHandler)                                                                                    \
     HANDLER_DESC(USART2_IRQHandler)                                                                                    \
                                                                                                                        \
-    HANDLER_DESC(USART1_IRQHandler)                                                                                    \
     HANDLER_DESC(I2C0_EV_IRQHandler)                                                                                   \
     HANDLER_DESC(I2C0_ERR_IRQHandler)                                                                                  \
     HANDLER_DESC(I2C1_EV_IRQHandler)                                                                                   \
