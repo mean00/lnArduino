@@ -2,6 +2,7 @@
 #![allow(non_upper_case_globals)]
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
+#![allow(clashing_extern_declarations)]
 //#![feature(lang_items)]
 use core::alloc::{GlobalAlloc, Layout};
 extern crate alloc;
@@ -25,8 +26,6 @@ mod rn_spi_c;
 mod rn_timer_c;
 pub mod rnarduino;
 // internal API
-pub mod rn_timing_adc_c;
-pub mod rn_timing_adc;
 pub mod rn_exti;
 pub mod rn_fast_event_group;
 pub mod rn_freertos_c;
@@ -35,6 +34,8 @@ pub mod rn_i2c;
 pub mod rn_logger;
 pub mod rn_os_helper;
 pub mod rn_spi;
+pub mod rn_timing_adc;
+pub mod rn_timing_adc_c;
 //mod rn_timer_c;
 //pub use rn_timer_c::lnGetUs;
 //pub use rn_timer_c::lnGetMs;

@@ -60,7 +60,7 @@ impl<'a> Drop for rnCDC<'a> {
 }
 impl<'a> rnCDC<'a> {
     // ctor
-    pub fn new(instance: u32, handler: &'a dyn cdc_event_handler) -> Box<rnCDC> {
+    pub fn new(instance: u32, handler: &'a dyn cdc_event_handler) -> Box<rnCDC<'a>> {
         unsafe {
             let r = Box::new(rnCDC {
                 cdc: lncdc_create(instance),

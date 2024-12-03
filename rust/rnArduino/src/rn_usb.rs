@@ -69,7 +69,7 @@ impl<'a> Drop for rnUSB<'a> {
  */
 impl<'a> rnUSB<'a> {
     // ctor
-    pub fn new(instance: u32, handler: &'a dyn usb_event_handler) -> Box<rnUSB> {
+    pub fn new(instance: u32, handler: &'a dyn usb_event_handler) -> Box<rnUSB<'a>> {
         unsafe {
             let r = Box::new(rnUSB {
                 usb: lnusb_create(instance),
