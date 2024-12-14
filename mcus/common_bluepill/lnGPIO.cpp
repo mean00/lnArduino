@@ -85,6 +85,8 @@ void lnPinMode(const lnPin xpin, const GpioMode mode, const int speedInMhz)
 
         // lnTimer::setPwmMode(lnPin->timer, lnPin->timerChannel);
 
+    case lnSPI_MODE:
+        break;
     case lnALTERNATE_PP:
         value = LNGPIOSET(speed, LN_CTL_OUTPUT_ALTERNAT_PP);
         break;
