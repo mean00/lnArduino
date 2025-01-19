@@ -80,13 +80,11 @@ void lnPinMode(const lnPin xpin, const GpioMode mode, const int speedInMhz)
     case lnOUTPUT_OPEN_DRAIN:
         value = LNGPIOSET(speed, LN_CTL_OUTPUT_OD);
         break;
-    case lnPWM:
-        xAssert(lnPin->timer != -1);
-
-        // lnTimer::setPwmMode(lnPin->timer, lnPin->timerChannel);
-
     case lnSPI_MODE:
         break;
+    case lnPWM:
+        xAssert(lnPin->timer != -1);
+        // fall through ON PURPOSE no breal missing
     case lnALTERNATE_PP:
         value = LNGPIOSET(speed, LN_CTL_OUTPUT_ALTERNAT_PP);
         break;
