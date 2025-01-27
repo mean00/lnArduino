@@ -296,7 +296,8 @@ bool rpPIO_SM::configureSideSet(int startPin, int nbPin, int sideNbBits, bool op
     uint32_t pin_ctrol = ENGINE()->PIO_SM[_sm].PINCTRL;
     pin_ctrol &= ~LN_RP_PIO_SM_PINCTRL_SIDESET_COUNT_BIT(7); // this should be log2(actual set number)
     pin_ctrol &= ~LN_RP_PIO_SM_PINCTRL_SIDESET_BASE_BIT(0x1F);
-    pin_ctrol |= LN_RP_PIO_SM_PINCTRL_SIDESET_COUNT_BIT(sideNbBits); // this should be log2(actual set number)
+    pin_ctrol |=
+        LN_RP_PIO_SM_PINCTRL_SIDESET_COUNT_BIT(sideNbBits + optional); // this should be log2(actual set number)
     pin_ctrol |= LN_RP_PIO_SM_PINCTRL_SIDESET_BASE_BIT(startPin);
     ENGINE()->PIO_SM[_sm].PINCTRL = pin_ctrol;
 
