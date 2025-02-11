@@ -24,6 +24,12 @@
 #define LN_IRQ_VECTOR_NUMBER 48
 uint32_t __attribute__((section(".ram_vector_table"))) ram_vector_table[LN_IRQ_VECTOR_NUMBER];
 
+#if RP_SDK_VERSION == 2
+#define padsbank0_hw_t pads_bank0_hw_t
+extern void runtime_init_clocks();
+#define clocks_init runtime_init_clocks
+#endif
+
 void runtime_init(void)
 {
     // Reset all peripherals to put system into a known state,

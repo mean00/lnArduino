@@ -13,17 +13,13 @@
 #include "lnArduino.h"
 #include "lnGPIO.h"
 #include "lnSPI.h"
+#include "ln_rp_clocks.h"
 #include "ln_rp_dma.h"
 #include "ln_rp_memory_map.h"
 #include "ln_rp_spi_priv.h"
 
 // #define NO_DMA 1
 
-extern "C"
-{
-#include "hardware/structs/clocks.h"
-    uint32_t clock_get_hz(enum clock_index clk_index);
-}
 class rpSPI;
 #define RP_SPI_USE_DMA 1
 typedef struct
@@ -497,7 +493,7 @@ bool rpSPI::write16(const uint16_t data)
         __asm__("nop");
         if (--countdown == 0)
         {
-            //xAssert(0);
+            // xAssert(0);
             return false;
         }
     }

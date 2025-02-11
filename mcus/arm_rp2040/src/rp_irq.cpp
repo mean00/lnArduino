@@ -5,7 +5,13 @@
 #include "stdio.h"
 
 #include "hardware/structs/scb.h"
+#if RP_SDK_VERSION == 1
 volatile armv6m_scb_t *scb = ((volatile armv6m_scb_t *)(PPB_BASE + M0PLUS_CPUID_OFFSET));
+#elif RP_SDK_VERSION == 2
+volatile armv6m_scb_hw_t *scb = ((volatile armv6m_scb_hw_t *)(PPB_BASE + M0PLUS_CPUID_OFFSET));
+#else
+#error no sdk set
+#endif
 
 /*
 0 msp
@@ -109,10 +115,8 @@ static inline int8_t slot_diff(struct irq_handler_chain_slot *to, struct irq_han
     pico_default_asm("subs %1, %2\n"
                      "adcs %1, %1\n" // * 2 (and + 1 if negative for rounding)
                      "muls %0, %1\n"
-                     "lsrs %0, %0, #20\n"
-                     : "+l"(result), "+l"(to)
-                     : "l"(from)
-                     :);
+                     "lsrs %0, %0, #20\n" : "+l"(result),
+                     "+l"(to) : "l"(from) :);
     return (int8_t)result;
 }
 
@@ -143,10 +147,11 @@ static inline int8_t get_slot_index(struct irq_handler_chain_slot *slot)
 {
     return slot_diff(slot, irq_handler_chain_slots);
 }
-
+#if RP_SDK_VERSION == 1
 extern "C" void irq_init_priorities()
 {
 }
+#endif
 static int8_t irq_hander_chain_free_slot_head;
 /**
  *
@@ -287,6 +292,33 @@ extern "C" void irq_add_shared_handler(uint num, irq_handler_t handler, uint8_t 
     }
     // set_raw_irq_handler_and_unlock(num, vtable_handler, save);
     irq_set_exclusive_handler(num, vtable_handler);
+}
+
+#ifndef __riscv
+static io_rw_32 *nvic_ipr0(void)
+{
+    return (io_rw_32 *)(PPB_BASE + ARM_CPU_PREFIXED(NVIC_IPR0_OFFSET));
+}
+#endif
+
+__weak void runtime_init_per_core_irq_priorities(void)
+{
+#if PICO_DEFAULT_IRQ_PRIORITY != 0
+#ifndef __riscv
+    // static_assert(!(NUM_IRQS & 3), ""); // this isn't really required - the reg is still 32 bit
+    uint32_t prio4 = (PICO_DEFAULT_IRQ_PRIORITY & 0xff) * 0x1010101u;
+    io_rw_32 *p = nvic_ipr0();
+    for (uint i = 0; i < (NUM_IRQS + 3) / 4; i++)
+    {
+        *p++ = prio4;
+    }
+#else
+    for (uint i = 0; i < NUM_IRQS; ++i)
+    {
+        irq_set_priority(i, PICO_DEFAULT_IRQ_PRIORITY);
+    }
+#endif
+#endif
 }
 
 #endif
