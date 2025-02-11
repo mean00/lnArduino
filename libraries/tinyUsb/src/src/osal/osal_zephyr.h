@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2019 Ha Thach (tinyusb.org)
+ * Copyright (c) 2025 Ha Thach (tinyusb.org)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,34 +23,25 @@
  *
  * This file is part of the TinyUSB stack.
  */
+#ifndef TUSB_OSAL_ZEPHYR_H
+#define TUSB_OSAL_ZEPHYR_H
 
-#ifndef TUSB_OSAL_NONE_H_
-#define TUSB_OSAL_NONE_H_
-
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <zephyr/kernel.h>
 
 //--------------------------------------------------------------------+
 // TASK API
 //--------------------------------------------------------------------+
-
-#if CFG_TUH_ENABLED
-// currently only needed/available in host mode
-TU_ATTR_WEAK void osal_task_delay(uint32_t msec);
-#endif
+TU_ATTR_ALWAYS_INLINE static inline void osal_task_delay(uint32_t msec) {
+  k_msleep(msec);
+}
 
 //--------------------------------------------------------------------+
 // Binary Semaphore API
 //--------------------------------------------------------------------+
-typedef struct {
-  volatile uint16_t count;
-} osal_semaphore_def_t;
-
-typedef osal_semaphore_def_t* osal_semaphore_t;
+typedef struct k_sem osal_semaphore_def_t, * osal_semaphore_t;
 
 TU_ATTR_ALWAYS_INLINE static inline osal_semaphore_t osal_semaphore_create(osal_semaphore_def_t* semdef) {
-  semdef->count = 0;
+  k_sem_init(semdef, 0, 255);
   return semdef;
 }
 
@@ -59,41 +50,31 @@ TU_ATTR_ALWAYS_INLINE static inline bool osal_semaphore_delete(osal_semaphore_t 
   return true; // nothing to do
 }
 
-
 TU_ATTR_ALWAYS_INLINE static inline bool osal_semaphore_post(osal_semaphore_t sem_hdl, bool in_isr) {
   (void) in_isr;
-  sem_hdl->count++;
+  k_sem_give(sem_hdl);
   return true;
 }
 
-// TODO blocking for now
 TU_ATTR_ALWAYS_INLINE static inline bool osal_semaphore_wait(osal_semaphore_t sem_hdl, uint32_t msec) {
-  (void) msec;
-
-  while (sem_hdl->count == 0) {}
-  sem_hdl->count--;
-
-  return true;
+  return 0 == k_sem_take(sem_hdl, K_MSEC(msec));
 }
 
 TU_ATTR_ALWAYS_INLINE static inline void osal_semaphore_reset(osal_semaphore_t sem_hdl) {
-  sem_hdl->count = 0;
+  k_sem_reset(sem_hdl);
 }
 
 //--------------------------------------------------------------------+
 // MUTEX API
-// Within tinyusb, mutex is never used in ISR context
 //--------------------------------------------------------------------+
-typedef osal_semaphore_def_t osal_mutex_def_t;
-typedef osal_semaphore_t osal_mutex_t;
-
-#if OSAL_MUTEX_REQUIRED
-// Note: multiple cores MCUs usually do provide IPC API for mutex
-// or we can use std atomic function
+typedef struct k_mutex osal_mutex_def_t, *osal_mutex_t;
 
 TU_ATTR_ALWAYS_INLINE static inline osal_mutex_t osal_mutex_create(osal_mutex_def_t* mdef) {
-  mdef->count = 1;
-  return mdef;
+  if ( 0 == k_mutex_init(mdef) ) {
+    return mdef;
+  } else {
+    return NULL;
+  }
 }
 
 TU_ATTR_ALWAYS_INLINE static inline bool osal_mutex_delete(osal_mutex_t mutex_hdl) {
@@ -101,84 +82,42 @@ TU_ATTR_ALWAYS_INLINE static inline bool osal_mutex_delete(osal_mutex_t mutex_hd
   return true; // nothing to do
 }
 
-TU_ATTR_ALWAYS_INLINE static inline bool osal_mutex_lock (osal_mutex_t mutex_hdl, uint32_t msec) {
-  return osal_semaphore_wait(mutex_hdl, msec);
+TU_ATTR_ALWAYS_INLINE static inline bool osal_mutex_lock(osal_mutex_t mutex_hdl, uint32_t msec) {
+  return 0 == k_mutex_lock(mutex_hdl, K_MSEC(msec));
 }
 
 TU_ATTR_ALWAYS_INLINE static inline bool osal_mutex_unlock(osal_mutex_t mutex_hdl) {
-  return osal_semaphore_post(mutex_hdl, false);
+  return 0 == k_mutex_unlock(mutex_hdl);
 }
-
-#else
-
-#define osal_mutex_create(_mdef)          (NULL)
-#define osal_mutex_lock(_mutex_hdl, _ms)  (true)
-#define osal_mutex_unlock(_mutex_hdl)     (true)
-
-#endif
 
 //--------------------------------------------------------------------+
 // QUEUE API
 //--------------------------------------------------------------------+
-#include "common/tusb_fifo.h"
+typedef struct k_msgq osal_queue_def_t, * osal_queue_t;
 
-typedef struct {
-  void (* interrupt_set)(bool);
-  tu_fifo_t ff;
-} osal_queue_def_t;
-
-typedef osal_queue_def_t* osal_queue_t;
-
-// _int_set is used as mutex in OS NONE (disable/enable USB ISR)
-#define OSAL_QUEUE_DEF(_int_set, _name, _depth, _type)    \
-  uint8_t _name##_buf[_depth*sizeof(_type)];              \
-  osal_queue_def_t _name = {                              \
-    .interrupt_set = _int_set,                            \
-    .ff = TU_FIFO_INIT(_name##_buf, _depth, _type, false) \
-  }
+// role device/host is used by OS NONE for mutex (disable usb isr) only
+#define OSAL_QUEUE_DEF(_int_set, _name, _depth, _type)  K_MSGQ_DEFINE(_name, sizeof(_type), _depth, 4)
 
 TU_ATTR_ALWAYS_INLINE static inline osal_queue_t osal_queue_create(osal_queue_def_t* qdef) {
-  tu_fifo_clear(&qdef->ff);
+  // K_MSGQ_DEFINE already initializes the queue
   return (osal_queue_t) qdef;
 }
 
 TU_ATTR_ALWAYS_INLINE static inline bool osal_queue_delete(osal_queue_t qhdl) {
   (void) qhdl;
-  return true; // nothing to do
+  return true;
 }
 
 TU_ATTR_ALWAYS_INLINE static inline bool osal_queue_receive(osal_queue_t qhdl, void* data, uint32_t msec) {
-  (void) msec; // not used, always behave as msec = 0
-
-  qhdl->interrupt_set(false);
-  const bool success = tu_fifo_read(&qhdl->ff, data);
-  qhdl->interrupt_set(true);
-
-  return success;
+  return 0 == k_msgq_get(qhdl, data, K_MSEC(msec));
 }
 
 TU_ATTR_ALWAYS_INLINE static inline bool osal_queue_send(osal_queue_t qhdl, void const* data, bool in_isr) {
-  if (!in_isr) {
-    qhdl->interrupt_set(false);
-  }
-
-  const bool success = tu_fifo_write(&qhdl->ff, data);
-
-  if (!in_isr) {
-    qhdl->interrupt_set(true);
-  }
-
-  return success;
+  return 0 == k_msgq_put(qhdl, data,  in_isr ? K_NO_WAIT : K_FOREVER);
 }
 
 TU_ATTR_ALWAYS_INLINE static inline bool osal_queue_empty(osal_queue_t qhdl) {
-  // Skip queue lock/unlock since this function is primarily called
-  // with interrupt disabled before going into low power mode
-  return tu_fifo_empty(&qhdl->ff);
+  return 0 == k_msgq_num_used_get(qhdl);
 }
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

@@ -37,7 +37,7 @@ void dcd_int_enable(uint8_t rhport)
     _usbDevice->irqEnabled(true);
 }
 
-void dcd_init(uint8_t rhport)
+bool dcd_init(uint8_t rhport, const tusb_rhport_init_t *rh_init )
 {
     // Send a reset
     _usbDevice->hwReset();

@@ -1,9 +1,11 @@
+// clang-format off
 #include "lnArduino.h"
 #include "lnIRQ.h"
 #include "stdio.h"
-
+#include "ln_rp.h" 
 #include "hardware/gpio.h"
 #include "ln_rp_memory_map.h"
+// clang-format on
 FILE *const stdout = NULL;
 
 extern void setup();
@@ -94,6 +96,13 @@ void lnRp2040_reboot_to_usb()
     typedef void *cb_usb_reset(uint32_t a, uint32_t b);
     cb_usb_reset *reset = (cb_usb_reset *)0x2591;
     reset(0, 0);
+}
+/**
+ *
+ */
+void Rp2040ResetToFwUpload()
+{
+    lnRp2040_reboot_to_usb();
 }
 
 // EOF

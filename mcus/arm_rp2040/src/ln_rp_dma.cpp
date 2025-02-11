@@ -8,11 +8,13 @@
  * @copyright Copyright (c) 2023
  *
  */
-
-#include "ln_rp_dma.h"
+// clang-format off
+#include "ln_rp.h" 
 #include "hardware/irq.h"
 #include "hardware/regs/intctrl.h"
+#include "ln_rp_dma.h"
 #include "ln_rp_dma_priv.h"
+// clang-format on
 
 static lnRpDMA *dmaInstances[LN_RP_DMA_CHANNEL_COUNT] = {NULL, NULL, NULL, NULL, NULL, NULL,
                                                          NULL, NULL, NULL, NULL, NULL, NULL};
