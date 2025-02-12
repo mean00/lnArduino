@@ -1,8 +1,10 @@
-tinyusb has been duplicated as the original project is way too big due to all its submodule
-There is only one patch applied
-
-commit id = b60d0ff1d4f1db0e3caeb26895e73e749206023a
-Merge: f918406a1 f600a8a0f
+Manual update to 
+commit 5afcfb7522c4fd8b50512cfb277d8a3ccdbc5453 (HEAD -> master, origin/master, origin/HEAD)
+Merge: bb48e6acc 3560ed3d9
 Author: Ha Thach <thach@tinyusb.org>
-Date:   Tue Feb 6 16:34:02 2024 +0700
+Date:   Tue Feb 11 22:54:57 2025 +0700
+
+    Merge pull request #2989 from hathach/rtos-house-keeping
+
+    Rtos house keeping
 
