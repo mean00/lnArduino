@@ -243,7 +243,7 @@ void dcd_edpt_clear_stall(uint8_t rhport, uint8_t ep_addr)
 }
 /**
  */
-void dcd_init(uint8_t rhport)
+bool dcd_init(uint8_t rhport,  const tusb_rhport_init_t* rh_init)
 {
     (void)rhport;
 
@@ -282,6 +282,7 @@ void dcd_init(uint8_t rhport)
 
     USBOTGD->INT_FG = 0xff; // clear interrupt (again)
     USBOTGD->DEVICE_CTRL = USBOTG_DEVICE_CTRL_ENABLE;
+    return true;
 }
 
 void dcd_set_address(uint8_t rhport, uint8_t dev_addr)

@@ -12,6 +12,8 @@ volatile armv6m_scb_hw_t *scb = ((volatile armv6m_scb_hw_t *)(PPB_BASE + M0PLUS_
 #else
 #error no sdk set
 #endif
+#define NVIC_IPR0_OFFSET M0PLUS_NVIC_IPR0_OFFSET
+#define ARM_CPU_PREFIXED(x) M0PLUS_##x
 
 /*
 0 msp
@@ -301,7 +303,7 @@ static io_rw_32 *nvic_ipr0(void)
 }
 #endif
 
-__weak void runtime_init_per_core_irq_priorities(void)
+void runtime_init_per_core_irq_priorities(void)
 {
 #if PICO_DEFAULT_IRQ_PRIORITY != 0
 #ifndef __riscv
