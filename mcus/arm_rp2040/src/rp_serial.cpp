@@ -8,7 +8,9 @@
  * @copyright Copyright (c) 2023
  *
  */
+// clang-format off
 #include "lnArduino.h"
+#include "ln_rp.h" 
 #include "lnIRQ_arm.h"
 #include "lnRingBuffer.h"
 #include "lnSerial.h"
@@ -20,6 +22,7 @@
 #include "ln_rp_dma_channel_map.h"
 
 #include "timers.h"
+// clang-format on
 
 class lnRpSerialTxOnly;
 static void uart0_irq_handler();

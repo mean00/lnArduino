@@ -1,6 +1,9 @@
+// clang-format off
+#include "ln_rp.h" 
 #include "ln_rp_gpio.h"
 #include "lnArduino.h"
 #include "lnGPIO.h"
+// clang-format on
 /**
  * \brief This is a rp2040 specific function to configure the pin in PIO mode
  */

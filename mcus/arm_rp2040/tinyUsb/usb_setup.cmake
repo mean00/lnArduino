@@ -6,14 +6,28 @@ SET(LN_OPT_TUSB_MCU     OPT_MCU_RP2040)
 SET(LN_OPT_MODE         OPT_MODE_FULL_SPEED)
 
 ADD_DEFINITIONS("-DPICO_RP2040=1")
-#ADD_DEFINITIONS("-D__force_inline=__attribute__((always_inline))")
-#ADD_DEFINITIONS("-D__force_inline=__attribute__((always_inline))")
 
-FOREACH( subdir hardware_uart hardware_sync hardware_gpio pico_stdio pico_platform hardware_timer hardware_resets hardware_irq hardware_base   )
+#
+FOREACH(subdir hardware_uart hardware_sync hardware_gpio pico_stdio pico_platform hardware_timer hardware_resets hardware_irq hardware_base   )
   LIST(APPEND idir  ${PICO_SDK_PATH}/src/rp2_common/${subdir}/include)
 ENDFOREACH()
+#
+FOREACH(subdir
+  pico_platform_compiler
+  pico_platform_sections
+  pico_platform_panic
+  hardware_sync_spin_lock
+  boot_bootrom_headers
+)
+  LIST(APPEND idir  ${PICO_SDK_PATH}/src/rp2_common/${subdir}/include)
+ENDFOREACH()
+#
+LIST(APPEND idir
+  ${PICO_SDK_PATH}/src/common/pico_base_headers/include/
+  ${PICO_SDK_PATH}/src/rp2040/pico_platform/include/
+) # for sdk2
 
-FOREACH( subdir
+FOREACH(subdir
                     /
                     src/common/pico_time/include/
                     src/common/pico_base/include/
@@ -25,6 +39,6 @@ FOREACH( subdir
   LIST(APPEND idir  ${PICO_SDK_PATH}/${subdir})
 ENDFOREACH()
 
-SET(LN_TUSB_EXTRA_IDIR ${idir} )
+SET(LN_TUSB_EXTRA_IDIR ${idir})
 
 #  ${LNSRC}/lnUsbStubs.cpp

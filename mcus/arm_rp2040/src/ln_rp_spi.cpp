@@ -9,6 +9,8 @@
  * @copyright Copyright (c) 2023
  *
  */
+// clang-format off
+#include "ln_rp.h" 
 #include "ln_rp_spi.h"
 #include "lnArduino.h"
 #include "lnGPIO.h"
@@ -17,6 +19,7 @@
 #include "ln_rp_dma.h"
 #include "ln_rp_memory_map.h"
 #include "ln_rp_spi_priv.h"
+// clang-format on
 
 // #define NO_DMA 1
 

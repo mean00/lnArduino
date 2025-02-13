@@ -2,6 +2,7 @@
 #include "hardware/irq.h"
 #include "hardware/regs/intctrl.h"
 #include "lnArduino.h"
+#include "ln_rp.h"
 #include "stdio.h"
 
 #include "hardware/structs/scb.h"

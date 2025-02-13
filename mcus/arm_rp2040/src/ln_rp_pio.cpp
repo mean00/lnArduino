@@ -5,10 +5,13 @@
  *
  */
 
+// clang-format off
+#include "ln_rp.h" 
 #include "ln_rp_pio.h"
 #include "lnArduino.h"
 #include "ln_rp_clocks.h"
 #include "ln_rp_pio_priv.h"
+// clang-format on
 
 static int consumedPioSpace[2] = {0, 0};
 static const LN_RP_PIO *rpiox[2] = {(LN_RP_PIO *)LN_PIO0_BASE_ADR, (LN_RP_PIO *)LN_PIO1_BASE_ADR};

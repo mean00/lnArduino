@@ -3,22 +3,25 @@ SET(RP_CHIP rp2040)
 IF(EXISTS "${PICO_SDK_PATH}/src/common/pico_base/include/pico/version.h.in")
   MESSAGE(STATUS "Detected SDK v1.x")
   SET(RP_SDK_VERSION 1)
-  SET(RP_BASE_INCLUDE "pico_base")
+  SET(RP_SUFFIX_INCLUDE "")
   SET(VERSION_FILE "${PICO_SDK_PATH}/src/common/pico_base/include/pico/version.h.in")
   SET(RP_PLATFORM_INCLUDE "${PICO_SDK_PATH}/src/rp2_common/pico_platform/include")
 ELSEIF(EXISTS "${PICO_SDK_PATH}/src/common/pico_base_headers/include/pico/version.h.in")
   MESSAGE(STATUS "Detected SDK v2.x")
   SET(RP_SDK_VERSION 2)
-  SET(RP_BASE_INCLUDE "pico_base_headers")
+  SET(RP_SUFFIX_INCLUDE "_headers")
   SET(VERSION_FILE "${PICO_SDK_PATH}/src/common/pico_base_headers/include/pico/version.h.in")
   SET(RP_PLATFORM_INCLUDE "${PICO_SDK_PATH}/src/${RP_CHIP}/pico_platform/include"
                           "${PICO_SDK_PATH}/src/rp2_common/pico_platform_compiler/include"
                           "${PICO_SDK_PATH}/src/rp2_common/pico_platform_sections/include"
                           "${PICO_SDK_PATH}/src/rp2_common/pico_platform_panic/include"
+                          "${PICO_SDK_PATH}/src/rp2_common/pico_flash/include"
                           "${PICO_SDK_PATH}/src/rp2_common/hardware_sync_spin_lock/include/"
                           "${PICO_SDK_PATH}/src/rp2_common/hardware_ticks/include/"
+                          "${PICO_SDK_PATH}/src/rp2_common/hardware_boot_lock/include/"
                           "${PICO_SDK_PATH}/src/rp2_common/pico_runtime_init/include/"
                           "${PICO_SDK_PATH}/src/common/hardware_claim/include/"
+                          "${PICO_SDK_PATH}/src/rp2_common/boot_bootrom_headers/include"
                           )
 SET(RP_EXTRA_SOURCES ${PICO_SDK_PATH}/src/rp2_common/pico_runtime_init/runtime_init_clocks.c
 ${PICO_SDK_PATH}/src/rp2_common/hardware_ticks/ticks.c)
@@ -86,11 +89,11 @@ add_library(rplib STATIC rp.cpp ${CMAKE_CURRENT_SOURCE_DIR}/../conf/bs2_default_
 target_include_directories(rplib PUBLIC
         ${PICO_SDK_PATH}
         ${PICO_SDK_PATH}/src/boards/include
-        ${PICO_SDK_PATH}/src/common/${RP_BASE_INCLUDE}/include
+        ${PICO_SDK_PATH}/src/common/pico_base${RP_SUFFIX_INCLUDE}/include
         ${PICO_SDK_PATH}/src/common/pico_binary_info/include
-        ${PICO_SDK_PATH}/src/common/pico_bit_ops/include
-        ${PICO_SDK_PATH}/src/common/pico_divider/include
-        ${PICO_SDK_PATH}/src/common/pico_stdlib/include
+        ${PICO_SDK_PATH}/src/common/pico_bit_ops${RP_SUFFIX_INCLUDE}/include
+        ${PICO_SDK_PATH}/src/common/pico_divider${RP_SUFFIX_INCLUDE}/include
+        ${PICO_SDK_PATH}/src/common/pico_stdlib${RP_SUFFIX_INCLUDE}/include
         ${PICO_SDK_PATH}/src/common/pico_sync/include
         ${PICO_SDK_PATH}/src/common/pico_time/include
         ${PICO_SDK_PATH}/src/common/pico_util/include
