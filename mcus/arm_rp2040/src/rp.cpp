@@ -97,5 +97,12 @@ void lnRp2040_reboot_to_usb()
     cb_usb_reset *reset = (cb_usb_reset *)0x2591;
     reset(0, 0);
 }
+/**
+ *
+ */
+void Rp2040ResetToFwUpload()
+{
+    lnRp2040_reboot_to_usb();
+}
 
 // EOF
