@@ -2,82 +2,137 @@
 import subprocess
 import os
 
-projects = []
+
 blacklist = ['cmake','everything','usb'] #,'hello']
 failures = []
+#
+#
+#_____________________________________
 
 def dbg(c):
-  pass
+    #print(str(c))
+    pass
+#
+#
+#_____________________________________
 
-def grab_demo_folders():
-    for item in os.scandir('../demoProject'):
+def grab_demo_folders(path):
+    projects = []
+    dbg("Scanning "+path)
+    for item in os.scandir(path):
         if item.is_dir():
             if not (item.name in blacklist):
                 #print(item.name)
                 projects.append(item.name)
     projects.sort()
+    dbg(str(projects))
+    return projects
+#
+#
+#_____________________________________
 
 def exec_makethingie(title, cmds):
     res=0
-    print("\t"+title+"...")
+    print("\t"+title+"...",end='')
     dbg(str(cmds))
     dbg(os.getcwd())
+    out=""
     try:
-        res=0 # Assume it taises an excception if a problem occurs
-        subprocess.check_call(cmds,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL) #, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        res=0 # Assume it raises an excception if a problem occurs
+        #subprocess.check_call(cmds,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL) #, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        out=subprocess.check_output(cmds,stderr=subprocess.STDOUT)
     except Exception as e:
         print("\t OS ERROR" +str(e))
+        dbg("\t OS ERROR" +str(out))
         res=-1
     if res!=0:
         print("\t"+title+"FAILED")
         return False
     print("\t\tok")
     return True
-##
-def build_single(arch, mcu,use, proj,extra,extra_title):
-    cwd=os.getcwd()
-    os.chdir(cwd+'/../demoProject/'+str(proj))
-    #print(os.getcwd())
+#
+#
+#_____________________________________
+
+def build_single(  working_dir, build_name, extra_args):
+    os.chdir(working_dir)
+    dbg(build_name+":"+os.getcwd())
     #-- Cleanup
-    build_dir='build'+'_'+str(arch)+'_'+str(mcu)+str(extra_title)
+    build_dir=working_dir+'/build'+'_'+str(build_name)
+    for i in extra_args:
+        build_dir=build_dir+'_'+str(i) 
     subprocess.check_call(['rm','-Rf',build_dir])
     subprocess.check_call(['rm','-f','lnArduino'])
-    subprocess.check_call(['ln','-s','../..','lnArduino'])
+    subprocess.check_call(['ln','-s',top_lnArduino,'lnArduino'])
     subprocess.check_call(['mkdir',build_dir])
-    os.chdir(cwd+'/../demoProject/'+str(proj)+'/'+build_dir)
+    os.chdir(build_dir)
+    dbg(os.getcwd())
     #
-    cmakeParam= [ 'cmake', '-G', 'Ninja','-DUSE_'+use+'=True',extra,'..']
+    cmakeParam= [ 'cmake', '-G', 'Ninja']
+    for i in extra_args:
+        cmakeParam.append('-DUSE_'+i+'=True')
+    cmakeParam.append('..')
+
     makeParam = ['ninja','-v']
+
+    dbg(cmakeParam)
+   # return False
+    
     if exec_makethingie("CMAKE",cmakeParam)==False:
         return False
     if exec_makethingie("BUILD",makeParam)==False:
         return False
     #if it i sok, cleanup
-    os.chdir(cwd+'/../demoProject/'+str(proj))
+   
     subprocess.check_call(['rm','-Rf',build_dir])
     return True
     #os.chdir(cwd)
-    print(str(projects))
-def build_all(arch, mcu,use, extra, extra_title):
-    cwd=os.getcwd()
-    for i in projects:
-        print("[",arch,"/",mcu,"/",extra_title,"]:",i)
-        os.chdir(cwd)
-        if False==build_single(arch,mcu,use,i,extra,extra_title):
-            failures.append( str(arch)+'_'+str(mcu)+'_'+str(i)+str(extra_title) )
-    os.chdir(cwd)
-    pass
+    #print(str(projects))
+#
+#
+#_____________________________________
+def build_all(category, title, use):
 
+    top_working_dir=top_folder+"/"+category
+    dbg("For "+category +" => working dir : "+str(top_working_dir))
+    subprojects = grab_demo_folders(top_working_dir)
+
+    for i in subprojects:
+        shortname = i
+        print("[",title, "/",use,"]:",shortname)
+        os.chdir(top_working_dir)
+        working_dir=top_working_dir+"/"+i
+        build_name=title
+        if False==build_single(working_dir, build_name, use):
+            failures.append( str(title)+'_'+str(i)+str(use)) 
+        #quit()
+    pass
+def build_all_bp(category ):
+    build_all(category, "ARM_M4",["GD32F3"])
+    build_all(category, "ARM_M4",["CLANG","GD32F3"])
+    build_all(category, "ARM_M3",["CLANG"])
+    build_all(category, "ARM_M3",[])
+    build_all(category, "RISCV_CH32V3x",["CLANG","CH32V3x"])
+#
+#
+#________________________________________
+top_folder=os.path.abspath(os.getcwd()+'/../demoProject/')
+top_lnArduino=os.path.abspath(os.getcwd()+'/../../lnArduino')
+
+dbg("LnArduino:"+top_lnArduino)
+dbg( "Top Folder : "+top_folder)
 print("-- Build all --")
-grab_demo_folders()
-with_clang = "-DUSE_CLANG=True"
-build_all("ARM","M3","","","gcc")
-build_all("ARM","M3","",with_clang,"clang")
-build_all("ARM","M4","GD32F3","","gcc")
-build_all("ARM","M4","GD32F3",with_clang,"clang")
-#build_all("RISCV","CH32V3x","CH32V3x","","gcc")
-build_all("RISCV","CH32V3x","CH32V3x",with_clang,"clang")
-# Obsolete build_all("RISCV","VF103")
+if True:
+    build_all_bp("common")
+# RP
+if True:
+    build_all("rp", "ARM_M33",["RP2350","CLANG"])
+    build_all("rp", "ARM_M0",["RP2040","CLANG"])
+
+if True:
+    build_all_bp("bp")
+
+
 print("-- Failures --")
 for i in failures:
     print("\t"+i)

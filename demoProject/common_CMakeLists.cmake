@@ -1,9 +1,12 @@
+CMAKE_MINIMUM_REQUIRED(VERSION 3.20)
 
 SET(AF_FOLDER  ${CMAKE_SOURCE_DIR}/lnArduino/)
 
-include(../common_mcuSelect.cmake)
+INCLUDE(common_platformConfig)
+INCLUDE(common_mcuSelect)
 SET(CMAKE_TOOLCHAIN_FILE ${AF_FOLDER}/lnArduino.cmake)
+SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake ${AF_FOLDER}/cmake CACHE INTERNAL "")
 SET(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 
-        
+

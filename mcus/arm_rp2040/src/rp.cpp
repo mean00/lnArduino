@@ -6,7 +6,9 @@
 #include "hardware/gpio.h"
 #include "ln_rp_memory_map.h"
 // clang-format on
+#ifdef __clang__
 FILE *const stdout = NULL;
+#endif
 
 extern void setup();
 extern void loop();
@@ -22,6 +24,16 @@ extern "C" void alarm_pool_init_default()
 // xAssert(0);
 #warning this is a stub to avoid pulling the pico-sdk libc malloc
 }
+
+#if 1
+#define X_SYSTICK SysTick_Handler
+#define X_PENDSV PendSV_Handler
+#define X_SVHANDLER SVC_Handler
+#else
+#define X_SYSTICK xPortSysTickHandler
+#define X_PENDSV xPortPendSVHandler
+#define X_SVHANDLER vPortSVCHandler
+#endif
 
 /**
  *
@@ -43,9 +55,9 @@ uint32_t SystemCoreClock = 125000000;
 
 extern "C"
 {
-    void xPortSysTickHandler(void);
-    void xPortPendSVHandler(void);
-    void vPortSVCHandler(void);
+    void X_SYSTICK(void);
+    void X_PENDSV(void);
+    void X_SVHANDLER(void);
 }
 /**
  * @brief
@@ -58,9 +70,9 @@ int main()
     lnPinMode(GPIO16, lnUART);
     lnRpDmaSysInit();
 
-    lnSetInterruptHandler(LN_IRQ_SYSTICK, xPortSysTickHandler);
-    lnSetInterruptHandler(LN_IRQ_PENDSV, xPortPendSVHandler);
-    lnSetInterruptHandler(LN_IRQ_SVCALL, vPortSVCHandler);
+    lnSetInterruptHandler(LN_IRQ_SYSTICK, X_SYSTICK);
+    lnSetInterruptHandler(LN_IRQ_PENDSV, X_PENDSV);
+    lnSetInterruptHandler(LN_IRQ_SVCALL, X_SVHANDLER);
 
     lnCreateTask(initTask, "entryTask", LN_INITIAL_STACK_SIZE, NULL, LN_INITIAL_TASK_PRIORITY);
     vTaskStartScheduler();

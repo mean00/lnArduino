@@ -48,6 +48,7 @@ typedef volatile LN_RP_GPIOx LN_RP_GPIO;
 #define LN_RP_GPIO_CONTROL_FUNC_PIO0 (6)
 #define LN_RP_GPIO_CONTROL_FUNC_PIO1 (7)
 #define LN_RP_GPIO_CONTROL_FUNC_USB (9)
+#define LN_RP_GPIO_CONTROL_FUNC_UART2 (0)
 #define LN_RP_GPIO_CONTROL_FUNC_ADC (0x1f)
 
 #define LN_RP_GPIO_CONTROL_FUNC(x) (LN_RP_GPIO_CONTROL_FUNC_##x << 0) //
@@ -109,13 +110,13 @@ typedef volatile LN_RP_PADSx LN_RP_PADS;
 struct LN_RP_SIOx
 {
     uint32_t CPUID;           // 0x00
-    uint32_t GPIO_IN;         // 0x04
+    uint32_t GPIO_IN[1];      // 0x04
     uint32_t GPIO_HI_IN;      // 0x08
     uint32_t GPIO_HI_IN2;     // 0x0C
     uint32_t GPIO_OUT;        // 0x10
-    uint32_t GPIO_OUT_SET;    // 0x14
-    uint32_t GPIO_OUT_CLR;    // 0x18
-    uint32_t GPIO_OUT_XOR;    // 0x1C
+    uint32_t GPIO_OUT_SET[1]; // 0x14
+    uint32_t GPIO_OUT_CLR[1]; // 0x18
+    uint32_t GPIO_OUT_XOR[1]; // 0x1C
     uint32_t GPIO_OE;         // 0x20
     uint32_t GPIO_OE_SET;     // 0x24
     uint32_t GPIO_OE_CLR;     // 0x28

@@ -27,6 +27,7 @@ enum lnGpioMode
     lnDAC_MODE,
     lnUART,
     lnSPI_MODE,
+    lnUART_Alt,
 };
 #define GpioMode lnGpioMode
 // typedef int lnPin;

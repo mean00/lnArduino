@@ -1,6 +1,7 @@
 # Select RP2040 vs RP2350
 SET(RP_CHIP rp2040)
 SET(RP_CHIP2 RP2040)
+SET(RP_COMMON_FOLDER  ${CMAKE_CURRENT_SOURCE_DIR}/../../rp_common/src)
 
 MACRO(ADD_RP_INCDIR)
   FOREACH(subdir ${ARGN})
@@ -55,11 +56,11 @@ ENDIF()
 
 
 SET(RP_LN_SOURCES
-        ln_rp_gpio.cpp
-        ln_rp_dma.cpp
+        ${RP_COMMON_FOLDER}/ln_rp_gpio.cpp
+        ${RP_COMMON_FOLDER}/ln_rp_dma.cpp
         ln_rp_spi.cpp
         ln_rp_adc.cpp
-        ln_rp_pio.cpp
+        ${RP_COMMON_FOLDER}/ln_rp_pio.cpp
 )
 IF(FALSE)
   SET(BASE_SOURCES
@@ -85,11 +86,11 @@ ELSE()
 ENDIF()
 SET(RP_SDK_SOURCES
   ${BASE_SOURCES}
+  ${RP_COMMON_FOLDER}/rp_rcu.cpp
+  ${RP_COMMON_FOLDER}/rp_serial.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/ln_rp_stubs.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/ln_rp_stubs_sdk${RP_SDK_VERSION}.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/rp_serial.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/rp_irq.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/rp_rcu.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/../sdk_copy/platform.c
   ${CMAKE_CURRENT_SOURCE_DIR}/../sdk_copy/runtime.c
   ${CRT0}

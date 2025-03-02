@@ -1,12 +1,11 @@
 
 SET(C ${CMAKE_CURRENT_SOURCE_DIR}/rnArduino/c_interface)
 
-include_directories( ${C} )
+INCLUDE_DIRECTORIES( ${C} )
 
 IF(LN_ENABLE_USBD)
-    include(${AF_FOLDER}/libraries/tinyUsb/tiny.cmake)
-    SET(EXTRA ${EXTRA} ${C}/lnCDC_c.cpp ${C}/lnUSB_c.cpp)
-    #MESSAGE(STATUS "********************************************************************* LN_ENABLE_USBD ${LN_ENABLE_USBD}")
+  INCLUDE(${AF_FOLDER}/libraries/tinyUsb/tiny.cmake)
+  SET(EXTRA ${EXTRA} ${C}/lnCDC_c.cpp ${C}/lnUSB_c.cpp)
 ENDIF()
 
 IF(LN_ENABLE_SPI)
@@ -17,18 +16,18 @@ IF(USE_RP2040)
 ELSE()
   SET(EXTRA ${EXTRA} ${C}/lnTiming_adc_c.cpp)
   IF(LN_ENABLE_I2C)
-      SET(EXTRA ${EXTRA} ${C}/lnI2C_c.cpp)
+    SET(EXTRA ${EXTRA} ${C}/lnI2C_c.cpp)
   ENDIF()
-ENDIF() 
+ENDIF()
 
-add_library(lnarduino_c_bindings STATIC 
-                                        ${EXTRA}
-                                        ${C}/lnFast_EventGroup_c.cpp
-                                         )
-target_link_libraries(lnarduino_c_bindings lnArduinoInternal)
+ADD_LIBRARY(lnarduino_c_bindings STATIC
+    ${EXTRA}
+    ${C}/lnFast_EventGroup_c.cpp
+  )
+TARGET_LINK_LIBRARIES(lnarduino_c_bindings lnArduinoInternal)
 
 IF(LN_ENABLE_USBD)
-    target_link_libraries(lnarduino_c_bindings tinyUsb)
+  TARGET_LINK_LIBRARIES(lnarduino_c_bindings tinyUsb)
 ENDIF()
 
 

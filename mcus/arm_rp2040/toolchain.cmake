@@ -1,159 +1,164 @@
 #=============================================================================#
+# https://interrupt.memfault.com/blog/arm-cortexm-with-llvm-clang
 MESSAGE(STATUS "Setting up RP2040/arm cmake environment")
 IF(NOT DEFINED LN_EXT)
-SET(LN_EXT arm_rp2040 CACHE INTERNAL "")
-SET(LN_TOOLCHAIN_EXT  arm_rp2040 CACHE INTERNAL "")
-include(${AF_FOLDER}/../platformConfig.cmake)
+  SET(LN_EXT arm_rp2040 CACHE INTERNAL "")
+  SET(LN_TOOLCHAIN_EXT  arm_rp2040_clang CACHE INTERNAL "")
 
-IF(NOT PLATFORM_TOOLCHAIN_PATH)
-        MESSAGE(FATAL_ERROR "PLATFORM_TOOLCHAIN_PATH is not defined in platformConfig.cmake !!")
-ENDIF(NOT PLATFORM_TOOLCHAIN_PATH)
-#
+  INCLUDE(${AF_FOLDER}/../platformConfig.cmake)
 
+  IF(NOT PLATFORM_TOOLCHAIN_PATH)
+    MESSAGE(FATAL_ERROR "PLATFORM_TOOLCHAIN_PATH is not defined in platformConfig.cmake !!")
+  ENDIF()
+  #
+  #SET(LN_LTO "-flto")
+  #
+  LIST(APPEND CMAKE_SYSTEM_PREFIX_PATH "${PLATFORM_TOOLCHAIN_PATH}")
 
-LIST(APPEND CMAKE_SYSTEM_PREFIX_PATH "${PLATFORM_TOOLCHAIN_PATH}")
-
-FUNCTION(FATAL_BANNER msg)
+  FUNCTION(FATAL_BANNER msg)
     MESSAGE(STATUS "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
     MESSAGE(STATUS "${msg}")
     MESSAGE(STATUS "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
     MESSAGE(FATAL_ERROR "${msg}")
-ENDFUNCTION(FATAL_BANNER msg)
+  ENDFUNCTION()
 
-#
-# Sanity check
-#
-IF(NOT EXISTS "${PLATFORM_TOOLCHAIN_PATH}/${PLATFORM_PREFIX}gcc${PLATFORM_TOOLCHAIN_SUFFIX}")
-   FATAL_BANNER( "!! PLATFORM_TOOLCHAIN_PATH does not point to a valid toolchain ( ${PLATFORM_PREFIX}gcc....)!! (${PLATFORM_TOOLCHAIN_PATH})")
-ENDIF()
-#
-# Setup toolchain for cross compilation
-#
-SET(CMAKE_SYSTEM_NAME Generic CACHE INTERNAL "")
-SET(CMAKE_C_COMPILER_ID   "GNU" CACHE INTERNAL "")
-SET(CMAKE_CXX_COMPILER_ID "GNU" CACHE INTERNAL "")
-set(CMAKE_C_COMPILER_WORKS      TRUE)
-set(CMAKE_CXX_COMPILER_WORKS    TRUE)
-#
-SET(GD32_BOARD       rp2040 CACHE INTERNAL "")
-#SET(LN_LTO "-flto")
-# Speed
+  #
+  # Sanity check
+  #
+  #
+  # Setup toolchain for cross compilation
+  #
+  SET(CMAKE_SYSTEM_NAME Generic CACHE INTERNAL "")
+  SET(CMAKE_C_COMPILER_ID   "GNU" CACHE INTERNAL "")
+  SET(CMAKE_CXX_COMPILER_ID "GNU" CACHE INTERNAL "")
+  SET(CMAKE_C_COMPILER_WORKS      TRUE)
+  SET(CMAKE_CXX_COMPILER_WORKS    TRUE)
+  #
+  SET(GD32_BOARD       rp2040 CACHE INTERNAL "")
 
-# OK, now setup the pico sdk
+  # Speed
+  IF(USE_SCAN_BUILD)
+  ELSE()
+    set(CMAKE_C_COMPILER   ${PLATFORM_TOOLCHAIN_PATH}/${PLATFORM_PREFIX}gcc${TOOLCHAIN_SUFFIX} CACHE PATH "" FORCE)
+    set(CMAKE_ASM_COMPILER ${PLATFORM_TOOLCHAIN_PATH}/${PLATFORM_PREFIX}gcc${TOOLCHAIN_SUFFIX} CACHE PATH "" FORCE)
+    set(CMAKE_CXX_COMPILER ${PLATFORM_TOOLCHAIN_PATH}/${PLATFORM_PREFIX}g++${TOOLCHAIN_SUFFIX} CACHE PATH "" FORCE)
+  ENDIF()
 
-# OK, now setup the pico sdk
-#---------------------------------------------------------
-SET(PICO_COMPILER  pico_arm_clang CACHE INTERNAL "")
-SET(PICO_TOOLCHAIN_PATH  /arm/tools_llvm/bin CACHE INTERNAL "")    
-SET(LD_SCRIPT ${CMAKE_BINARY_DIR}/linker_script.ld)
-set(PICO_BOARD "pico")
-SET(PICO_COMPILER  pico_arm_clang CACHE INTERNAL "")
-SET(PICO_TOOLCHAIN_PATH  ${PLATFORM_CLANG_PATH} CACHE INTERNAL "")    
+  SET(CMAKE_SIZE      ${PLATFORM_TOOLCHAIN_PATH}/${PLATFORM_PREFIX}size${TOOLCHAIN_SUFFIX} CACHE PATH "" FORCE)
+  SET(CMAKE_OBJCOPY   ${PLATFORM_TOOLCHAIN_PATH}/${PLATFORM_PREFIX}objcopy${TOOLCHAIN_SUFFIX} CACHE PATH "" FORCE)
+  SET(CMAKE_OBJDUMP   ${PLATFORM_TOOLCHAIN_PATH}/${PLATFORM_PREFIX}objdump${TOOLCHAIN_SUFFIX} CACHE PATH "" FORCE)
+  SET(CMAKE_AR        ${PLATFORM_TOOLCHAIN_PATH}/${PLATFORM_PREFIX}ar${TOOLCHAIN_SUFFIX} CACHE PATH "" FORCE)
+  SET(CMAKE_RANLIB    ${PLATFORM_TOOLCHAIN_PATH}/${PLATFORM_PREFIX}ranlib${TOOLCHAIN_SUFFIX} CACHE PATH "" FORCE)
 
-include(${PICO_SDK_PATH}/external/pico_sdk_import.cmake)
-pico_sdk_init()
-#---------------------------------------------------------
+  # We use gcc linker, no we dont
+  SET(CMAKE_LINKER  ${CMAKE_CXX_COMPILER} CACHE PATH "" FORCE)
 
-
+  # dont try to create a shared lib, it will not work
+  SET(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 
 
-IF(NOT DEFINED LN_MCU_SPEED)
-    SET(LN_MCU_SPEED 72000000)
-ENDIF()
+  # OK, now setup the pico sdk
+  #---------------------------------------------------------
+  SET(PICO_COMPILER  pico_arm_clang CACHE INTERNAL "")
+  SET(PICO_TOOLCHAIN_PATH  /arm/tools_llvm/bin CACHE INTERNAL "")
+  SET(LD_SCRIPT ${CMAKE_BINARY_DIR}/linker_script.ld CACHE INTERNAL "")
+  SET(PICO_BOARD "pico")
+  SET(PICO_COMPILER  pico_arm_clang CACHE INTERNAL "")
+  SET(PICO_TOOLCHAIN_PATH  ${PLATFORM_CLANG_PATH} CACHE INTERNAL "")
+
+  #---------------------------------------------------------
+
+
+  IF(NOT DEFINED LN_MCU_SPEED)
+    SET(LN_MCU_SPEED 125000000)
+  ENDIF()
+
   # Set default value
-IF(NOT LN_MCU_RAM_SIZE)
+  IF(NOT LN_MCU_RAM_SIZE)
     MESSAGE(STATUS "Ram size not set, using default")
-    SET(LN_MCU_RAM_SIZE 20 )
-ENDIF(NOT LN_MCU_RAM_SIZE)
-IF(NOT LN_MCU_FLASH_SIZE)
+    SET(LN_MCU_RAM_SIZE 230)
+  ENDIF()
+  IF(NOT LN_MCU_FLASH_SIZE)
     MESSAGE(STATUS "Flash size not set, using default")
-    SET(LN_MCU_FLASH_SIZE 64 )
-ENDIF(NOT LN_MCU_FLASH_SIZE)
-IF(NOT LN_MCU_EEPROM_SIZE)
+    SET(LN_MCU_FLASH_SIZE 4000)
+  ENDIF()
+  IF(NOT LN_MCU_EEPROM_SIZE)
     MESSAGE(STATUS "NVME size not set, using default")
-    SET(LN_MCU_EEPROM_SIZE 4 )
-ENDIF(NOT LN_MCU_EEPROM_SIZE)
-IF(NOT LN_MCU_STATIC_RAM)
-        MESSAGE(STATUS "Static ram size not set, using default")
-        SET(LN_MCU_STATIC_RAM 6 )
-ENDIF(NOT LN_MCU_STATIC_RAM)
-#
-SET(LN_MCU_RAM_SIZE ${LN_MCU_RAM_SIZE} CACHE INTERNAL "" FORCE)
-SET(LN_MCU_FLASH_SIZE ${LN_MCU_FLASH_SIZE} CACHE INTERNAL "" FORCE)
-SET(LN_MCU_EEPROM_SIZE ${LN_MCU_EEPROM_SIZE} CACHE INTERNAL "" FORCE)
-SET(LN_MCU_SPEED ${LN_MCU_SPEED} CACHE INTERNAL "" FORCE)
-SET(LN_MCU_STATIC_RAM ${LN_MCU_STATIC_RAM} CACHE INTERNAL "" FORCE)
+    SET(LN_MCU_EEPROM_SIZE 4)
+  ENDIF()
+  IF(NOT LN_MCU_STATIC_RAM)
+    MESSAGE(STATUS "Static ram size not set, using default")
+    SET(LN_MCU_STATIC_RAM 6)
+  ENDIF()
+  #
+  SET(LN_MCU_RAM_SIZE ${LN_MCU_RAM_SIZE} CACHE INTERNAL "" FORCE)
+  SET(LN_MCU_FLASH_SIZE ${LN_MCU_FLASH_SIZE} CACHE INTERNAL "" FORCE)
+  SET(LN_MCU_EEPROM_SIZE ${LN_MCU_EEPROM_SIZE} CACHE INTERNAL "" FORCE)
+  SET(LN_MCU_SPEED ${LN_MCU_SPEED} CACHE INTERNAL "" FORCE)
+  SET(LN_MCU_STATIC_RAM ${LN_MCU_STATIC_RAM} CACHE INTERNAL "" FORCE)
 
-IF(USE_SCAN_BUILD) 
-ELSE(USE_SCAN_BUILD) 
-set(CMAKE_C_COMPILER   ${PLATFORM_TOOLCHAIN_PATH}/${PLATFORM_PREFIX}gcc${TOOLCHAIN_SUFFIX} CACHE PATH "" FORCE)
-set(CMAKE_ASM_COMPILER ${PLATFORM_TOOLCHAIN_PATH}/${PLATFORM_PREFIX}gcc${TOOLCHAIN_SUFFIX} CACHE PATH "" FORCE)
-set(CMAKE_CXX_COMPILER ${PLATFORM_TOOLCHAIN_PATH}/${PLATFORM_PREFIX}g++${TOOLCHAIN_SUFFIX} CACHE PATH "" FORCE)
-ENDIF(USE_SCAN_BUILD) 
-set(CMAKE_SIZE         ${PLATFORM_TOOLCHAIN_PATH}/${PLATFORM_PREFIX}size${TOOLCHAIN_SUFFIX} CACHE PATH "" FORCE)
-set(CMAKE_OBJCOPY      ${PLATFORM_TOOLCHAIN_PATH}/${PLATFORM_PREFIX}objcopy${TOOLCHAIN_SUFFIX} CACHE PATH "" FORCE)
-
-# dont try to create a shared lib, it will not work
-SET(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
-
-MESSAGE(STATUS "GD32 C   compiler ${CMAKE_C_COMPILER}")
-MESSAGE(STATUS "GD32 C++ compiler ${CMAKE_CXX_COMPILER}")
-
-# spec files....
-IF(LN_SPEC)
-    SET(LN_SPEC "${LN_SPEC}" CACHE INTERNAL "" FORCE)
-ELSE(LN_SPEC)
-    SET(LN_SPEC "nano" CACHE INTERNAL "" FORCE)
-ENDIF(LN_SPEC)
-
-#
-SET(GD32_SPECS  "--specs=${LN_SPEC}.specs")
-
-# M3 or M4 ?
+  MESSAGE(STATUS "GD32 C   compiler ${CMAKE_C_COMPILER}")
+  MESSAGE(STATUS "GD32 C++ compiler ${CMAKE_CXX_COMPILER}")
 
 
-SET(GD32_MCU "  -mcpu=cortex-m0plus -mthumb  -march=armv6-m -DPICO_RP2040_USB_FAST_IRQ=0  -DUSE_RP2040 ")
 
-SET(G32_DEBUG_FLAGS "-g3 ${LN_LTO}  -O1 " CACHE INTERNAL "")
+  # M0+
 
-SET(GD32_LD_EXTRA "  -Wl,--unresolved-symbols=report-all -Wl,--warn-common -Wl,--warn-section-align " CACHE INTERNAL "")
-#
-SET(GD32_C_FLAGS  "${GD32_SPECS}  ${PLATFORM_C_FLAGS} ${G32_DEBUG_FLAGS} -DLN_ARCH=LN_ARCH_ARM  -Werror=return-type -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -fno-common ${GD32_BOARD_FLAG}  ${GD32_MCU}" CACHE INTERNAL "")
-SET(CMAKE_C_FLAGS "${GD32_C_FLAGS}" CACHE INTERNAL "")
-SET(CMAKE_ASM_FLAGS "${GD32_C_FLAGS}" CACHE INTERNAL "")
-SET(CMAKE_CXX_FLAGS "${GD32_C_FLAGS}  -fno-rtti -fno-exceptions -fno-threadsafe-statics" CACHE INTERNAL "") 
-#
-SET(GD32_LD_FLAGS "-nostdlib ${GD32_SPECS} ${GD32_MCU} ${GD32_LD_EXTRA}" CACHE INTERNAL "")
-SET(GD32_LD_LIBS "-lm -lgcc -lgcc" CACHE INTERNAL "")
-#
-set(CMAKE_CXX_LINK_EXECUTABLE    "<CMAKE_CXX_COMPILER>   <CMAKE_CXX_LINK_FLAGS>  <LINK_FLAGS> ${LN_LTO} -lgcc -Xlinker -print-memory-usage -Xlinker --gc-sections  -Wl,--start-group  <OBJECTS> <LINK_LIBRARIES> -Wl,--end-group  -Wl,--cref -Wl,-Map,<TARGET>.map   -o <TARGET> ${GD32_LD_FLAGS} ${GD32_LD_LIBS} -e _entry_point " CACHE INTERNAL "")
-SET(CMAKE_EXECUTABLE_SUFFIX_C .elf CACHE INTERNAL "")
-SET(CMAKE_EXECUTABLE_SUFFIX_CXX .elf CACHE INTERNAL "")
+  SET(GD32_LIBC "-L${MINI_SYSROOT}/lib " CACHE INTERNAL "")
+  SET(GD32_MCU "-mcpu=cortex-m0plus  -DUSE_RP2040  -DPICO_RP2040_USB_FAST_IRQ=0  " CACHE INTERNAL "")
 
-#include_directories(${AF_FOLDER}/${LN_EXT}/boards/${GD32_BOARD}/)
-#include_directories(${AF_FOLDER}/${LN_EXT}/)
+  #____________________________
+  # CLANG LINK USING GCC LIBS
+  #____________________________
+  #SET(LN_CLANG_LIBC /home/fx/Arduino_stm32/arm-gcc-2020q4/bin/../lib/gcc/arm-none-eabi/10.2.1/thumb/v7-m/nofp/libgcc.a CACHE INTERNAL "")
+  #SET(LN_CLANG_MULTILIB thumb/v7-m/nofp CACHE INTERNAL "")
 
+  #SET(G32_DEBUG_FLAGS "-g3 ${LN_LTO}  -O0  -gdwarf-4" CACHE INTERNAL "")
+  SET(G32_DEBUG_FLAGS "-g3 ${LN_LTO}  -O1 -gdwarf-4" CACHE INTERNAL "")
 
-    SET(CMAKE_C_STANDARD_INCLUDE_DIRECTORIES  ${CMAKE_C_STANDARD_INCLUDE_DIRECTORIES}
+  SET(GD32_LD_EXTRA "  -Wl,--unresolved-symbols=report-all -Wl,--warn-common  " CACHE INTERNAL "")
+  #
+  SET(GD32_C_FLAGS  "-DPICO_COPY_TO_RAM=1 ${GD32_SPECS}  ${PLATFORM_C_FLAGS} ${G32_DEBUG_FLAGS} -ffunction-sections -ggnu-pubnames --sysroot=${MINI_SYSROOT} -I${MINI_SYSROOT}/include  -DLN_ARCH=LN_ARCH_ARM   ${GD32_BOARD_FLAG}  ${GD32_MCU}" CACHE INTERNAL "")
+  SET(CMAKE_C_FLAGS "${GD32_C_FLAGS}" CACHE INTERNAL "")
+  SET(CMAKE_ASM_FLAGS "${GD32_C_FLAGS}" CACHE INTERNAL "")
+  SET(CMAKE_CXX_FLAGS "${GD32_C_FLAGS} -std=gnu++11 -fno-rtti -fno-exceptions -fno-threadsafe-statics" CACHE INTERNAL "")
+  #
+  SET(GD32_LD_FLAGS " -fuse-ld=lld  -nostdlib ${GD32_SPECS}  ${GD32_MCU}  ${GD32_LD_EXTRA}  ${GD32_LIBC}" CACHE INTERNAL "")
+  SET(GD32_LD_LIBS " -Wl,--gc-sections -Wl,--gdb-index " CACHE INTERNAL "")
+  #
+  SET(CLANG_LINKER_OPT "${MINI_SYSROOT}/lib/libclang_rt.builtins.a" CACHE INTERNAL "")
+  #
+  # --sysroot=${LN_CLANG_SYSROOT}
+  #
+  SET(SB2 ${CMAKE_BINARY_DIR}/lnArduino/mcus/arm_rp2040/src/CMakeFiles/rplib.dir/__/conf/bs2_default_padded_checksummed.S.obj)
+  #SET(CRT ${CMAKE_BINARY_DIR}/lnArduino/mcus/arm_rp2040/src/CMakeFiles/rplib.dir/__/sdk_copy/crt0.S.obj)
+  #SET(CRT ${CMAKE_BINARY_DIR}/lnArduino/mcus/arm_rp2040/src/CMakeFiles/rplib.dir/pico/pico-sdk/src/rp2_common/pico_standard_link/crt0.S.obj)
+  #
+  SET(CMAKE_CXX_LINK_EXECUTABLE    "<CMAKE_LINKER>  <CMAKE_CXX_LINK_FLAGS>  <LINK_FLAGS> ${LN_LTO}    -Wl,--start-group ${CRT} ${SB2} <OBJECTS>  <LINK_LIBRARIES>  -Wl,--end-group -lc  -Wl,-Map,<TARGET>.map   -o <TARGET> ${GD32_LD_FLAGS} ${GD32_LD_LIBS}  ${CLANG_LINKER_OPT} -e _entry_point" CACHE INTERNAL "")
+  SET(CMAKE_EXECUTABLE_SUFFIX_C .elf CACHE INTERNAL "")
+  SET(CMAKE_EXECUTABLE_SUFFIX_CXX .elf CACHE INTERNAL "")
+
+  #include_directories(${AF_FOLDER}/${LN_EXT}/boards/${GD32_BOARD}/)
+  #include_directories(${AF_FOLDER}/${LN_EXT}/)
+
+  SET(CMAKE_C_STANDARD_INCLUDE_DIRECTORIES  ${CMAKE_C_STANDARD_INCLUDE_DIRECTORIES}
         ${ARDUINO_GD32_FREERTOS}/${LN_EXT}/boards/${GD32_BOARD}/
         ${ARDUINO_GD32_FREERTOS}/${LN_EXT}
         CACHE INTERNAL ""
         )
-    SET(CMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES  ${CMAKE_C_STANDARD_INCLUDE_DIRECTORIES} CACHE INTERNAL "")
+  SET(CMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES  ${CMAKE_C_STANDARD_INCLUDE_DIRECTORIES} CACHE INTERNAL "")
 
-    MESSAGE(STATUS ">>> STD C includes:<${CMAKE_C_STANDARD_INCLUDE_DIRECTORIES}>")
-    MESSAGE(STATUS ">>> STD CXX includes:<${CMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES}>")
-  
-
+  MESSAGE(STATUS ">>> STD C includes:<${CMAKE_C_STANDARD_INCLUDE_DIRECTORIES}>")
+  MESSAGE(STATUS ">>> STD CXX includes:<${CMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES}>")
 
 
-MESSAGE(STATUS "MCU Architecture ${LN_ARCH}")
-MESSAGE(STATUS "MCU Type         ${LN_MCU}")
-MESSAGE(STATUS "MCU Speed        ${LN_MCU_SPEED}")
-MESSAGE(STATUS "MCU Flash Size   ${LN_MCU_FLASH_SIZE}")
-MESSAGE(STATUS "NVME Size        ${LN_MCU_EEPROM_SIZE}")
-MESSAGE(STATUS "Bootloader Size  ${LN_BOOTLOADER_SIZE}")
-MESSAGE(STATUS "MCU Ram Size     ${LN_MCU_RAM_SIZE}")
-MESSAGE(STATUS "MCU Static RAM   ${LN_MCU_STATIC_RAM}")
 
-ENDIF(NOT DEFINED LN_EXT)
+
+  MESSAGE(STATUS "MCU Architecture ${LN_ARCH}")
+  MESSAGE(STATUS "MCU Type         ${LN_MCU}")
+  MESSAGE(STATUS "MCU Speed        ${LN_MCU_SPEED}")
+  MESSAGE(STATUS "MCU Flash Size   ${LN_MCU_FLASH_SIZE}")
+  MESSAGE(STATUS "MCU Ram Size     ${LN_MCU_RAM_SIZE}")
+  MESSAGE(STATUS "MCU Static RAM   ${LN_MCU_STATIC_RAM}")
+  MESSAGE(STATUS "Runime           ${PLATFORM_CLANG_C_FLAGS}")
+ENDIF()
