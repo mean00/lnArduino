@@ -6,15 +6,8 @@
 #include "stdio.h"
 
 #include "hardware/structs/scb.h"
-#if RP_SDK_VERSION == 1
-volatile armv6m_scb_t *scb = ((volatile armv6m_scb_t *)(PPB_BASE + M0PLUS_CPUID_OFFSET));
-#elif RP_SDK_VERSION == 2
-volatile armv6m_scb_hw_t *scb = ((volatile armv6m_scb_hw_t *)(PPB_BASE + M0PLUS_CPUID_OFFSET));
-#else
-#error no sdk set
-#endif
-#define NVIC_IPR0_OFFSET M0PLUS_NVIC_IPR0_OFFSET
-#define ARM_CPU_PREFIXED(x) M0PLUS_##x
+volatile armv8m_scb_hw_t *scb = ((volatile armv8m_scb_hw_t *)(PPB_BASE + M33_CPUID_OFFSET));
+#define NVIC_IPR0_OFFSET M33_NVIC_IPR0_OFFSET
 
 /*
 0 msp
@@ -161,16 +154,20 @@ static int8_t irq_hander_chain_free_slot_head;
  */
 void irq_set_mask_enabled(uint32_t mask, bool enabled)
 {
+#warning MEGAFIXME
+#warning MEGAFIXME
+#warning MEGAFIXME
+#warning MEGAFIXME
     if (enabled)
     {
         // Clear pending before enable
         // (if IRQ is actually asserted, it will immediately re-pend)
-        *((io_rw_32 *)(PPB_BASE + M0PLUS_NVIC_ICPR_OFFSET)) = mask;
-        *((io_rw_32 *)(PPB_BASE + M0PLUS_NVIC_ISER_OFFSET)) = mask;
+        //*((io_rw_32 *)(PPB_BASE + CM33_NVIC_ICPR_OFFSET)) = mask;
+        //*((io_rw_32 *)(PPB_BASE + CM33_NVIC_ISER_OFFSET)) = mask;
     }
     else
     {
-        *((io_rw_32 *)(PPB_BASE + M0PLUS_NVIC_ICER_OFFSET)) = mask;
+        //*((io_rw_32 *)(PPB_BASE + CM33_NVIC_ICER_OFFSET)) = mask;
     }
 }
 /**

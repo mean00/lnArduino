@@ -39,7 +39,7 @@ void initTask(void *)
 
 #define LN_INITIAL_STACK_SIZE 8 * 1024
 #define LN_INITIAL_TASK_PRIORITY 2
-uint32_t SystemCoreClock = 125000000;
+uint32_t SystemCoreClock = 150000000;
 
 #if 1
 #define X_SYSTICK SysTick_Handler

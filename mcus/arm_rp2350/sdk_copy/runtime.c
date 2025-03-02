@@ -11,7 +11,7 @@
 #include <sys/times.h>
 #include <unistd.h>
 
-#include "hardware/regs/m0plus.h"
+#include "hardware/regs/m33.h"
 #include "hardware/regs/resets.h"
 #include "hardware/structs/mpu.h"
 #include "hardware/structs/padsbank0.h"
@@ -41,8 +41,10 @@ void runtime_init(void)
 
     // Remove reset from peripherals which are clocked only by clk_sys and
     // clk_ref. Other peripherals stay in reset until we've configured clocks.
-    unreset_block_wait(RESETS_RESET_BITS & ~(RESETS_RESET_ADC_BITS | RESETS_RESET_RTC_BITS | RESETS_RESET_SPI0_BITS |
-                                             RESETS_RESET_SPI1_BITS | RESETS_RESET_UART0_BITS |
+    unreset_block_wait(RESETS_RESET_BITS & ~(RESETS_RESET_ADC_BITS |
+// RESETS_RESET_RTC_BITS |
+#warning MEGAFIXME
+                                             RESETS_RESET_SPI0_BITS | RESETS_RESET_SPI1_BITS | RESETS_RESET_UART0_BITS |
                                              RESETS_RESET_UART1_BITS | RESETS_RESET_USBCTRL_BITS));
 
     // After calling preinit we have enough runtime to do the exciting maths

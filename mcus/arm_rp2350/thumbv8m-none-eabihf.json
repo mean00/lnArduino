@@ -9,7 +9,7 @@
   "is-builtin": false,
   "linker": "rust-lld",
   "linker-flavor": "ld.lld",
-  "llvm-target": "thumbv7em-none-eabihf",
+  "llvm-target": "thumbv8em-none-eabihf",
   "max-atomic-width": 32,
   "panic-strategy": "abort",
   "relocation-model": "static",

@@ -1,6 +1,6 @@
-# Select RP2040 vs RP2350
-SET(RP_CHIP rp2040)
-SET(RP_CHIP2 RP2040)
+# Select  RP2350
+SET(RP_CHIP rp2350)
+SET(RP_CHIP2 RP2350)
 
 MACRO(ADD_RP_INCDIR)
   FOREACH(subdir ${ARGN})
@@ -46,7 +46,7 @@ ADD_CUSTOM_COMMAND(
   )
 
 
-IF(USE_RP2040_PURE_RAM)
+IF(USE_RP2350_PURE_RAM)
   SET(CRT0 ${CMAKE_CURRENT_SOURCE_DIR}/../sdk_copy/crt0_ram.S
            ${CMAKE_CURRENT_SOURCE_DIR}/ln_sys_init_ram.cpp)
 ELSE()
@@ -94,17 +94,17 @@ SET(RP_SDK_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/../sdk_copy/runtime.c
   ${CRT0}
 )
-add_library(rplib STATIC rp.cpp ${CMAKE_CURRENT_SOURCE_DIR}/../conf/bs2_default_padded_checksummed.S ${RP_LN_SOURCES} ${RP_SDK_SOURCES} ${RP_EXTRA_SOURCES})
+ADD_LIBRARY(rplib STATIC rp.cpp ${CMAKE_CURRENT_SOURCE_DIR}/../conf/bs2_default_padded_checksummed.S ${RP_LN_SOURCES} ${RP_SDK_SOURCES} ${RP_EXTRA_SOURCES})
 
 #
-ADD_RP_INCDIR(hardware_adc hardware_base hardware_claim hardware_clocks hardware_divider 
-  hardware_gpio hardware_irq hardware_pll hardware_resets hardware_sync 
+ADD_RP_INCDIR(hardware_adc hardware_base hardware_claim hardware_clocks hardware_divider
+  hardware_gpio hardware_irq hardware_pll hardware_resets hardware_sync
   hardware_timer hardware_uart hardware_vreg hardware_watchdog hardware_xosc hardware_dma hardware_pio)
 
 ADD_RP_INCDIR(boot_stage2 pico_bootrom pico_double pico_float pico_int64_ops pico_malloc pico_mem_ops 
   pico_printf pico_runtime pico_stdio pico_stdio_uart)
-        
-target_include_directories(rplib PUBLIC
+
+TARGET_INCLUDE_DIRECTORIES(rplib PUBLIC
         ${rp_inc_dir}
         ${PICO_SDK_PATH}
         ${PICO_SDK_PATH}/src/boards/include

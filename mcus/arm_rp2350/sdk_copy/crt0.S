@@ -14,7 +14,7 @@ PICO_ASSEMBLER_IS_CLANG   <= SET
 #include "pico.h"
 #include "pico/asm_helper.S"
 
-#include "hardware/regs/m0plus.h"
+#include "hardware/regs/m33.h"
 #include "hardware/regs/addressmap.h"
 #include "hardware/regs/sio.h"
 #include "pico/binary_info/defs.h"
@@ -83,7 +83,7 @@ _entry_point:
     // Debugger tried to run code after loading, so SSI is in 03h-only mode.
     // Go back through bootrom + boot2 to properly initialise flash.
     movs r0, #0
-    ldr r1, =(PPB_BASE + M0PLUS_VTOR_OFFSET)
+    ldr r1, =(PPB_BASE + M33_VTOR_OFFSET)
     str r0, [r1]
     ldmia r0!, {r1, r2}
     msr msp, r1
