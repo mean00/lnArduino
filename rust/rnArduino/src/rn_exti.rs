@@ -1,5 +1,5 @@
 #![allow(dead_code)]
-
+#![allow(clippy::not_unsafe_ptr_arg_deref)]
 //use crate::rn_exti_c as exti;
 use crate::rn_gpio::rnpin2lnpin;
 use crate::rn_gpio::{lnPin, rnPin};
