@@ -3,6 +3,7 @@
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
 #![allow(clashing_extern_declarations)]
+#![allow(unsafe_op_in_unsafe_fn)]
 //#![feature(lang_items)]
 use core::alloc::{GlobalAlloc, Layout};
 extern crate alloc;
@@ -69,14 +70,14 @@ unsafe impl GlobalAlloc for FreeRtosAllocator {
 }
 #[global_allocator] // borrowed from https://github.com/lobaro/FreeRTOS-rust
 static GLOBAL: FreeRtosAllocator = FreeRtosAllocator;
-extern "C" {
+unsafe extern "C" {
     pub fn pvPortMalloc(xSize: size_t) -> *mut cty::c_void;
 }
-extern "C" {
+unsafe extern "C" {
     pub fn vPortFree(pv: *mut cty::c_void);
 }
 
-extern "C" {
+unsafe extern "C" {
     pub fn deadEnd(code: cty::c_int);
 }
 

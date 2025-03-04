@@ -1,6 +1,6 @@
 [package] 
 authors = ["mean00 <mean00@gmail.com>"]
-edition = "2021"
+edition = "2024"
 readme = "README.md"
 name = "rnarduino"
 version = "0.0.0"

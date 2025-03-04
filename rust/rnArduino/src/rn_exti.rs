@@ -14,7 +14,7 @@ pub enum rnEdge {
 }
 pub type lnExtiCallback =
     ::core::option::Option<unsafe extern "C" fn(pin: rnPin, cookie: *mut cty::c_void)>;
-extern "C" {
+unsafe extern "C" {
     #[link_name = "\u{1}_Z21lnExtiAttachInterrupt5lnPin6lnEdgePFvS_PvES1_"]
     pub fn lnExtiAttachInterrupt(
         pin: lnPin,
@@ -23,15 +23,15 @@ extern "C" {
         cookie: *mut cty::c_void,
     );
 }
-extern "C" {
+unsafe extern "C" {
     #[link_name = "\u{1}_Z21lnExtiDetachInterrupt5lnPin"]
     pub fn lnExtiDetachInterrupt(pin: lnPin);
 }
-extern "C" {
+unsafe extern "C" {
     #[link_name = "\u{1}_Z21lnExtiEnableInterrupt5lnPin"]
     pub fn lnExtiEnableInterrupt(pin: lnPin);
 }
-extern "C" {
+unsafe extern "C" {
     #[link_name = "\u{1}_Z22lnExtiDisableInterrupt5lnPin"]
     pub fn lnExtiDisableInterrupt(pin: lnPin);
 }

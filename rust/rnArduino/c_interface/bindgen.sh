@@ -10,8 +10,8 @@ gen_c() {
 	bash ../../../cmake/rustgen_c.sh ${1} ${2} ${3}
 }
 # Will work for CH32/STM32 and GD32
-bash ../../../cmake/rustgen.sh lnGPIO_c.h ../src/rn_gpio_bp_c.rs ../../../mcus/common_bluepill/include ${PWD}
-bash ../../../cmake/rustgen.sh lnGPIO_c.h ../src/rn_gpio_rp2040_c.rs ../../../mcus/arm_rp2040/include ${PWD}
+bash ../../../cmake/rustgen.sh lnGPIO_c.h ../src/rn_gpio_bp_c.rs ../../../mcus/common_bluepill/include #${PWD}
+bash ../../../cmake/rustgen.sh lnGPIO_c.h ../src/rn_gpio_rp2040_c.rs ../../../mcus/arm_rp2040/include #${PWD}
 
 gen_cpp lnTiming_adc_c.h ../src/rn_timing_adc_c.rs ${PWD}
 gen_cpp lnTimer_c.h ../src/rn_timer_c.rs ../../../mcus/common_bluepill/include
