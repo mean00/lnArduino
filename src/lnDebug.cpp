@@ -8,6 +8,7 @@
 #include "stdarg.h"
 #define LOGGER_USE_DMA 1
 
+static lnLoggerFunction *loggerFunction = NULL;
 extern lnSerialTxOnly *serial0;
 lnSerialTxOnly *serial0 = NULL;
 volatile uint32_t lnScratchRegister;
@@ -39,9 +40,17 @@ extern "C" void Logger_chars(int n, const char *data)
 {
     if (!n)
         return; // 0 sized dma does not work...
-    serial0->transmit(n, (uint8_t *)data);
+    if (loggerFunction)
+        loggerFunction(n, data);
+    else
+        serial0->transmit(n, (uint8_t *)data);
 }
-
+/**
+ */
+extern "C" void setLogger(lnLoggerFunction *f)
+{
+    loggerFunction = f;
+}
 /**
  *
  * @param fmt
