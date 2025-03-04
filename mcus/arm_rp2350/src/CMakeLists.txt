@@ -119,6 +119,7 @@ TARGET_INCLUDE_DIRECTORIES(rplib PUBLIC
        "${PICO_SDK_PATH}/src/${RP_CHIP}/hardware_regs/include"
        "${PICO_SDK_PATH}/src/${RP_CHIP}/hardware_structs/include"
         ${PICO_SDK_PATH}/src/rp2_common/boot_stage2/asminclude
+        ${PICO_SDK_PATH}/src/common/boot_picobin_headers/include/
         ${RP_PLATFORM_INCLUDE}
   )
 TARGET_INCLUDE_DIRECTORIES(rplib PUBLIC  ${CMAKE_CURRENT_SOURCE_DIR}/../include)

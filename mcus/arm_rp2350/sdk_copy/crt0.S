@@ -18,12 +18,15 @@ PICO_ASSEMBLER_IS_CLANG   <= SET
 #include "hardware/regs/addressmap.h"
 #include "hardware/regs/sio.h"
 #include "pico/binary_info/defs.h"
+#include "boot/picobin.h"
+#include "pico/bootrom.h"
 
 #ifdef NDEBUG
 #ifndef COLLAPSE_IRQS
 #define COLLAPSE_IRQS
 #endif
 #endif
+#define M33_VTOR_OFFSET _u(0x0000ed08)
 
 pico_default_asm_setup
 
@@ -37,6 +40,7 @@ __vectors:
 .word _reset_handler
 // all default exception handlers do nothing, and we can check for them being set to our
 // default values by seeing if they point to somewhere between __defaults_isrs_start and __default_isrs_end
+.global _enter_vtable_in_r0
 .global __default_isrs_start
 __default_isrs_start:
 
@@ -103,13 +107,17 @@ _reset_handler:
     // sleeping in the bootrom at this point but check to be sure
     ldr r0, =(SIO_BASE + SIO_CPUID_OFFSET)
     ldr r0, [r0]
-    cmp r0, #0
-    bne hold_non_core0_in_bootrom
+    cbz r0, 1f
+hold_non_core0_in_bootrom:
+    // Send back to the ROM to wait for core 0 to launch it.
+    ldr r0, =BOOTROM_VTABLE_OFFSET
+    b _enter_vtable_in_r0
+    
+1:
 
     adr r4, data_cpy_table
 
     // assume there is at least one entry
-1:
     ldmia r4!, {r1-r3}
     cmp r1, #0
     beq 2f
@@ -194,9 +202,15 @@ data_cpy:
 
 // Note the data copy table is still included for NO_FLASH builds, even though
 // we skip the copy, because it is listed in binary info
+_enter_vtable_in_r0:
+  b _enter_vtable_in_r0
+
 
 .align 2
 data_cpy_table:
+.word __boot2_start__
+.word BOOTRAM_BASE
+.word BOOTRAM_BASE + 256
 
 .word __ln_copy_ram_text_source__
 .word __ln_copy_ram_text_start__
@@ -217,12 +231,4 @@ data_cpy_table:
 
 .word 0 // null terminator
 
-// ----------------------------------------------------------------------------
-// If core 1 somehow gets into crt0 due to a spectacular VTOR mishap, we need to
-// catch it and send back to the sleep-and-launch code in the bootrom. Shouldn't
-// happen (it should sleep in the ROM until given an entry point via the
-// cross-core FIFOs) but it's good to be defensive.
-
-hold_non_core0_in_bootrom:
-    b hold_non_core0_in_bootrom
    
