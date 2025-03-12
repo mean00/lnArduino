@@ -47,8 +47,7 @@ ADD_CUSTOM_COMMAND(
 
 
 IF(USE_RP2350_PURE_RAM)
-  SET(CRT0 ${CMAKE_CURRENT_SOURCE_DIR}/../sdk_copy/crt0_ram.S
-           ${CMAKE_CURRENT_SOURCE_DIR}/ln_sys_init_ram.cpp)
+  SET(CRT0 ${CMAKE_CURRENT_SOURCE_DIR}/../sdk_copy/crt0_ram.S ${CMAKE_CURRENT_SOURCE_DIR}/ln_sys_init_ram.cpp)
 ELSE()
   SET(CRT0 ${CMAKE_CURRENT_SOURCE_DIR}/../sdk_copy/crt0.S)
 ENDIF()
@@ -60,6 +59,8 @@ SET(RP_LN_SOURCES
         ln_rp_spi.cpp
         ln_rp_adc.cpp
         ln_rp_pio.cpp
+        minimum_arm_image_def_block.s
+        boot.s
 )
 IF(FALSE)
   SET(BASE_SOURCES
@@ -92,8 +93,11 @@ SET(RP_SDK_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/rp_rcu.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/../sdk_copy/platform.c
   ${CMAKE_CURRENT_SOURCE_DIR}/../sdk_copy/runtime.c
-  ${CRT0}
+  ${CMAKE_CURRENT_SOURCE_DIR}/../sdk_copy/runtime_init.c
+  ${CMAKE_CURRENT_SOURCE_DIR}/../sdk_copy/bootrom.c
+  #${CRT0}
 )
+
 ADD_LIBRARY(rplib STATIC rp.cpp ${CMAKE_CURRENT_SOURCE_DIR}/../conf/bs2_default_padded_checksummed.S ${RP_LN_SOURCES} ${RP_SDK_SOURCES} ${RP_EXTRA_SOURCES})
 
 #
@@ -102,8 +106,13 @@ ADD_RP_INCDIR(hardware_adc hardware_base hardware_claim hardware_clocks hardware
   hardware_timer hardware_uart hardware_vreg hardware_watchdog hardware_xosc hardware_dma hardware_pio)
 
 ADD_RP_INCDIR(boot_stage2 pico_bootrom pico_double pico_float pico_int64_ops pico_malloc pico_mem_ops 
-  pico_printf pico_runtime pico_stdio pico_stdio_uart)
+  pico_printf pico_runtime pico_stdio pico_stdio_uart )
 
+LIST(APPEND rp_inc_dir  ${PICO_SDK_PATH}/src/common/boot_picoboot_headers/include)
+
+TARGET_INCLUDE_DIRECTORIES(rplib PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/../sdk_copy
+)
 TARGET_INCLUDE_DIRECTORIES(rplib PUBLIC
         ${rp_inc_dir}
         ${PICO_SDK_PATH}

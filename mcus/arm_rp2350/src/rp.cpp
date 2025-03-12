@@ -10,7 +10,9 @@ FILE *const stdout = NULL;
 
 extern void setup();
 extern void loop();
-
+extern "C" void runtime_run_initializers();
+extern "C" void mmain();
+extern "C" void pre_main();
 uint8_t ucHeap[configTOTAL_HEAP_SIZE];
 extern void lnRpDmaSysInit();
 /**
@@ -56,13 +58,25 @@ extern "C"
     void X_PENDSV();
     void X_SVHANDLER();
 }
-
 /**
  * @brief
  *
  * @return int
  */
-int main()
+void pre_main()
+{
+    runtime_run_initializers();
+    // ... and the __init_array
+    extern void (*__init_array_start)(void);
+    extern void (*__init_array_end)(void);
+    for (void (**p)(void) = &__init_array_start; p < &__init_array_end; ++p)
+    {
+        (*p)();
+    }
+    mmain();
+}
+
+void mmain()
 {
     lnPinMode(GPIO17, lnUART);
     lnPinMode(GPIO16, lnUART);

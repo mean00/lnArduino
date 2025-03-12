@@ -1,0 +1,3 @@
+minimum_arm_image_def_block
+URL https://github.com/metebalci/rp2350-bare-metal-build
+License GPL v3

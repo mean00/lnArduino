@@ -22,7 +22,7 @@ extern "C" void hw_claim_unlock()
 #include "lnArduino.h"
 extern "C"
 {
-    void *rom_func_lookup(uint32_t code)
+    void *xrom_func_lookup(uint32_t code)
     {
         return NULL;
     }
