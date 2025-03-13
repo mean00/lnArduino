@@ -11,7 +11,7 @@ FILE *const stdout = NULL;
 extern void setup();
 extern void loop();
 extern "C" void runtime_run_initializers();
-extern "C" void mmain();
+extern "C" int main();
 extern "C" void pre_main();
 uint8_t ucHeap[configTOTAL_HEAP_SIZE];
 extern void lnRpDmaSysInit();
@@ -73,10 +73,10 @@ void pre_main()
     {
         (*p)();
     }
-    mmain();
+    main();
 }
 
-void mmain()
+int main()
 {
     lnPinMode(GPIO17, lnUART);
     lnPinMode(GPIO16, lnUART);
@@ -90,6 +90,7 @@ void mmain()
     vTaskStartScheduler();
     // lnGetFreeRTOSDebug();
     deadEnd(25);
+    return 0;
 }
 
 /**

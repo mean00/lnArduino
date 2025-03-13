@@ -54,7 +54,7 @@ MACRO(GENERATE_GD32_FIRMWARE target)
     ELSE()
       ADD_CUSTOM_COMMAND(TARGET ${target}
             POST_BUILD
-            COMMAND picotool uf2 convert  $<TARGET_FILE:${target}> $<TARGET_FILE:${target}>.uf2
+            COMMAND picotool uf2 convert  $<TARGET_FILE:${target}> $<TARGET_FILE:${target}>.uf2 --family rp2350-arm-s --abs-block
             WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
             COMMENT "Generating uf2 files"
             )
