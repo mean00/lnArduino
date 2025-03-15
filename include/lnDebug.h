@@ -19,3 +19,6 @@ void debugLogger(const char *fmt...);
 extern "C" void Logger(const char *fmt...);
 extern "C" int Logger_C(const char *fmt, ...);
 extern "C" void Logger_chars(int n, const char *data);
+typedef void(lnLoggerFunction)(int n, const char *data);
+extern "C" void setLogger(lnLoggerFunction *f);
+
