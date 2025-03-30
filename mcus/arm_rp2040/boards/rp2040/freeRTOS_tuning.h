@@ -11,3 +11,5 @@
 
 #define configMINIMAL_STACK_SIZE ((unsigned short)200)
 #define configTOTAL_HEAP_SIZE ((size_t)((LN_FREERTOS_HEAP_SIZE * 1024)))
+
+#define configENABLE_MPU 0
