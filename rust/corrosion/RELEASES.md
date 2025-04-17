@@ -6,37 +6,109 @@
   [v0.4.0 Release notes](#040-lts-2023-06-01) for more details.
 - Removed native tooling and the corresponding option `CORROSION_NATIVE_TOOLING`.
   Corrosion now always uses pure CMake.
+- Fix Corrosion placing artifacts into the wrong directory when:
+  1. using a Multi-Config Generator (e.g Visual Studio or XCode) AND
+  2. `OUTPUT_DIRECTORY_<CONFIG>` is not set AND 
+  3. `OUTPUT_DIRECTORY` is set AND
+  4. `OUTPUT_DIRECTORY` does not contain a generator expression
+
+  Corrosion now places artifacts into a `$<CONFIG>` subdirectory of the
+  specified `OUTPUT_DIRECTORY`. This matches the [documented behavior][doc-cmake-rt-output-dir]
+  of CMake for regular CMake targets. ([#568]).
 
 ### New features
 
 - Support using the `$<CONFIG>` generator expression in `OUTPUT_DIRECTORY`. [#459]
-- If `corrosion_link_libraries()` is called on a Rust static library target, then
-  `target_link_libraries()` is called to propogate the dependencies to C/C++ consumers.
-  Previously a warning was emitted in this case and the arguments ignored. [#506]
+- Add `OVERRIDE_CRATE_TYPE` option to corrosion_import_crate, allowing users to override
+  the crate-types of Rust libraries (e.g. force building as a staticlib instead of an rlib).
+- Support *-windows-gnullvm targets. 
+- experimental support in corrosion_install for installing libraries and header files
+- Add `CORROSION_TOOLS_RUST_TOOLCHAIN` cache variable which allows users to select a different
+  rust toolchain for compiling build-tools used by corrosion (currently cbindgen and cxxbridge).
+  This mainly allows using a newer toolchain for such build-tools then for the actual project.
+
+[doc-cmake-rt-output-dir]: https://cmake.org/cmake/help/latest/prop_tgt/RUNTIME_OUTPUT_DIRECTORY.html
+[#459]: https://github.com/corrosion-rs/corrosion/pull/459
+[#568]: https://github.com/corrosion-rs/corrosion/pull/568
+
+# v0.5.1 (2024-12-29)
+
+### Fixes
+
+- Update FindRust to support `rustup` v1.28.0. Support for older rustup versions is retained,
+  so updating corrosion quickly is recommended to all rustup users.
+
+
+# v0.5.0 (2024-05-11)
+
+### Breaking Changes
+
+- Dashes (`-`) in names of imported CMake **library** targets are now replaced with underscores (`_`).
+  See [issue #501] for details. Users on older Corrosion versions will experience the same
+  change when using Rust 1.79 or newer. `bin` targets are not affected by this change.
+
+[issue #501]: https://github.com/corrosion-rs/corrosion/issues/501
+
+# v0.4.10 (2024-05-11)
+
+### New features
+
 - `corrosion_experimental_cbindgen()` can now be called multiple times on the same Rust target,
   as long as the output header name differs. This may be useful to generate separate C and C++
   bindings. [#507]
+- If `corrosion_link_libraries()` is called on a Rust static library target, then
+  `target_link_libraries()` is called to propagate the dependencies to C/C++ consumers.
+  Previously a warning was emitted in this case and the arguments ignored. [#506]
 
 ### Fixes
 
 - Combine `-framework` flags on macos to avoid linker deduplication errors [#455]
+- `corrosion_experimental_cbindgen()` will now correctly use the package name, instead of assuming that
+  the package and crate name are identical. ([11e27c])
 - Set the `AR_<triple>` variable for `cc-rs` (except for msvc targets) [#456]
+- Fix hostbuild when cross-compiling to windows [#477]
+- Consider vworks executable suffix [#504]
 - `corrosion_experimental_cbindgen()` now forwards the Rust target-triple (e.g. `aarch64-unknown-linux-gnu`)
   to cbindgen via the `TARGET` environment variable. The `hostbuild` property is considered. [#507]
-- Detect msvc linker flags coming from `--print=native-static-libs` and put them into `INTERFACE_LINK_OPTIONS` instead of `INTERFACE_LINK_LIBRARIES` [#511]
+- Fix linking errors with Rust >= 1.79 and `-msvc` targets.` [#511]
 
-[#459]: https://github.com/corrosion-rs/corrosion/pull/459
-[#456]: https://github.com/corrosion-rs/corrosion/pull/456
+
 [#455]: https://github.com/corrosion-rs/corrosion/pull/455
+[#456]: https://github.com/corrosion-rs/corrosion/pull/456
+[#477]: https://github.com/corrosion-rs/corrosion/pull/477
+[#504]: https://github.com/corrosion-rs/corrosion/pull/504
 [#506]: https://github.com/corrosion-rs/corrosion/pull/506
 [#507]: https://github.com/corrosion-rs/corrosion/pull/507
 [#511]: https://github.com/corrosion-rs/corrosion/pull/511
+[11e27c]: https://github.com/corrosion-rs/corrosion/pull/514/commits/11e27cde2cf32c7ed539c96eb03c2f10035de538
+
+# v0.4.9 (2024-05-01)
+
+### New Features 
+
+- Automatically detect Rust target for OpenHarmony ([#510]).
+
+### Fixes
+
+- Make find_package portable ([#509]).
+
+[#510]: https://github.com/corrosion-rs/corrosion/pull/510
+[#509]: https://github.com/corrosion-rs/corrosion/pull/509
+
+# v0.4.8 (2024-04-03)
+
+### Fixes
+
+- Fix an internal error when passing both the `PROFILE` and `CRATES` option to
+  `corrosion_import_crate()` ([#496]).
+
+[#496]: https://github.com/corrosion-rs/corrosion/pull/496
 
 # v0.4.7 (2024-01-19)
 
 ### Fixes
 
-- The C/C++ compiler passed from corrosion to `cc-rs` can now be overriden by users setting
+- The C/C++ compiler passed from corrosion to `cc-rs` can now be overridden by users setting
   `CC_<target>` (e.g. `CC_x86_64-unknown-linux-gnu=/path/to/my-compiler`) environment variables ([#475]).
 
 [#475]: https://github.com/corrosion-rs/corrosion/pull/475

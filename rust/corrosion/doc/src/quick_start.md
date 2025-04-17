@@ -16,7 +16,7 @@ include(FetchContent)
 FetchContent_Declare(
     Corrosion
     GIT_REPOSITORY https://github.com/corrosion-rs/corrosion.git
-    GIT_TAG v0.4 # Optionally specify a commit hash, version tag or branch here
+    GIT_TAG v0.5 # Optionally specify a commit hash, version tag or branch here
 )
 # Set any global configuration variables such as `Rust_TOOLCHAIN` before this line!
 FetchContent_MakeAvailable(Corrosion)
@@ -32,5 +32,6 @@ add_executable(your_cool_cpp_bin main.cpp)
 # your C/C++ CMake target(s).
 target_link_libraries(your_cool_cpp_bin PUBLIC rust-lib)
 ```
+
 
 Please see the [Usage chapter](usage.md) for a complete discussion of possible configuration options.

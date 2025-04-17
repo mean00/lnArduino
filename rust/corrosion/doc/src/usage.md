@@ -32,6 +32,93 @@ target, see [Per Target options](#per-target-options) for details.
 [`INTERFACE`]: https://cmake.org/cmake/help/latest/command/add_library.html#interface-libraries
 [target_link_libraries]: https://cmake.org/cmake/help/latest/command/target_link_libraries.html
 
+### Experimental: Install crate and headers with `corrosion_install`
+
+The default CMake [install commands] do not work correctly with the targets exported from `corrosion_import_crate()`.
+Corrosion provides `corrosion_install` to automatically install relevant files:
+
+{{#include ../../cmake/Corrosion.cmake:corrosion-install}}
+
+The example below shows how to import a rust library and make it available for install through CMake.
+
+```cmake
+include(FetchContent)
+
+FetchContent_Declare(
+        Corrosion
+        GIT_REPOSITORY https://github.com/corrosion-rs/corrosion.git
+        GIT_TAG v0.5 # Optionally specify a commit hash, version tag or branch here
+)
+# Set any global configuration variables such as `Rust_TOOLCHAIN` before this line!
+FetchContent_MakeAvailable(Corrosion)
+
+# Import targets defined in a package or workspace manifest `Cargo.toml` file
+corrosion_import_crate(MANIFEST_PATH rust-lib/Cargo.toml)
+
+# Add a manually written header file which will be exported
+# Requires CMake >=3.23
+target_sources(rust-lib INTERFACE
+        FILE_SET HEADERS
+        BASE_DIRS include
+        FILES
+        include/rust-lib/rust-lib.h
+)
+
+# OR for CMake <= 3.23
+target_include_directories(is_odd INTERFACE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:include>
+)
+target_sources(is_odd
+        INTERFACE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/rust-lib/rust-lib.h>
+        $<INSTALL_INTERFACE:include/rust-lib/rust-lib.h>
+)
+
+# Rust libraries must be installed using `corrosion_install`.
+corrosion_install(TARGETS rust-lib EXPORT RustLibTargets)
+
+# Installs the main target
+install(
+        EXPORT RustLibTargets
+        NAMESPACE RustLib::
+        DESTINATION lib/cmake/RustLib
+)
+
+# Necessary for packaging helper commands
+include(CMakePackageConfigHelpers)
+# Create a file for checking version compatibility
+# Optional
+write_basic_package_version_file(
+        "${CMAKE_CURRENT_BINARY_DIR}/RustLibConfigVersion.cmake"
+        VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}"
+        COMPATIBILITY AnyNewerVersion
+)
+
+# Configures the main config file that cmake loads
+configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in
+        "${CMAKE_CURRENT_BINARY_DIR}/RustLibConfig.cmake"
+        INSTALL_DESTINATION lib/cmake/RustLib
+        NO_SET_AND_CHECK_MACRO
+        NO_CHECK_REQUIRED_COMPONENTS_MACRO
+)
+# Config.cmake.in contains
+# @PACKAGE_INIT@
+# 
+# include(${CMAKE_CURRENT_LIST_DIR}/RustLibTargetsCorrosion.cmake)
+# include(${CMAKE_CURRENT_LIST_DIR}/RustLibTargets.cmake)
+
+# Install all generated files
+install(FILES
+        ${CMAKE_CURRENT_BINARY_DIR}/RustLibConfigVersion.cmake
+        ${CMAKE_CURRENT_BINARY_DIR}/RustLibConfig.cmake
+        ${CMAKE_CURRENT_BINARY_DIR}/corrosion/RustLibTargetsCorrosion.cmake
+        DESTINATION lib/cmake/RustLib
+)
+```
+
+[install commands]: https://cmake.org/cmake/help/latest/command/install.html
+
 ### Per Target options
 
 Some configuration options can be specified individually for each target. You can set them via the
@@ -68,7 +155,10 @@ Some configuration options can be specified individually for each target. You ca
 
 
 ### Global Corrosion Options
-All of the following variables are evaluated automatically in most cases. In typical cases you
+
+#### Selecting the Rust toolchain and target triple
+
+The following variables are evaluated automatically in most cases. In typical cases you
 shouldn't need to alter any of these. If you do want to specify them manually, make sure to set
 them **before** `find_package(Corrosion REQUIRED)`.
 
@@ -90,7 +180,15 @@ them **before** `find_package(Corrosion REQUIRED)`.
 - `Rust_CARGO_TARGET:STRING` - The default target triple to build for. Alter for cross-compiling.
   Default: On Visual Studio Generator, the matching triple for `CMAKE_VS_PLATFORM_NAME`. Otherwise,
   the default target triple reported by `${Rust_COMPILER} --version --verbose`.
+- `CORROSION_TOOLS_RUST_TOOLCHAIN:STRING`: Specify a different toolchain (e.g. `stable`) to use for compiling helper 
+   tools such as `cbindgen` or `cxxbridge`. This can be useful when you want to compile your project with an 
+   older rust version (e.g. for checking the MSRV), but you can build build-tools with a newer installed rust version.
 
+#### Enable Convenience Options
+
+The following options are off by default, but may increase convenience:
+
+- `Rust_RUSTUP_INSTALL_MISSING_TARGET:BOOL`: Automatically install a missing target via `rustup` instead of failing.
 
 
 #### Developer/Maintainer Options
@@ -113,6 +211,10 @@ versions individually.
 - `Rust_LLVM_VERSION<_MAJOR|_MINOR|_PATCH>` - The LLVM version used by rustc.
 - `Rust_IS_NIGHTLY` - 1 if a nightly toolchain is used, otherwise 0. Useful for selecting an unstable feature for a
   crate, that is only available on nightly toolchains.
+- `Rust_RUSTUP_TOOLCHAINS`, `Rust_RUSTUP_TOOLCHAINS_RUSTC_PATH`, `Rust_RUSTUP_TOOLCHAINS_CARGO_PATH`
+  and `Rust_RUSTUP_TOOLCHAINS_VERSION`: These variables are lists, which should be iterated over with
+  CMakes `foreach(var IN ZIP_LISTS list1 list2 ...)` iterator. They provide a list of installed rustup managed toolchains and
+  the associated rustc and cargo paths as well as the corresponding rustc version.
 - Cache variables containing information based on the target triple for the selected target
   as well as the default host target:
   - `Rust_CARGO_TARGET_ARCH`, `Rust_CARGO_HOST_ARCH`: e.g. `x86_64` or `aarch64`
