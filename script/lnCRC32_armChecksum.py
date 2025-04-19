@@ -2,8 +2,7 @@
 import sys
 import crcmod
 
-header_size=4
-total_header_size=header_size+2*4
+total_header_size=16
 #
 #_____________
 def usage():
@@ -54,7 +53,7 @@ lnHash=crc32(hashed)
 print("zlib mpeg2 reverted digest %x " % (lnHash))
 
 result=open(outfile,"wb")
-result.write(content[0:4])
+result.write(content[0:8])
 write32(result,binSize)
 write32(result,lnHash)
 result.write(payload)
