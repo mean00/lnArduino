@@ -6,8 +6,8 @@ total_header_size=16
 #
 #_____________
 def usage():
-    print("lnCH32Checksum-crc32 : Add a checksum to the fw to check its integrity");
-    print("\tlnCH32Checksum-crc32.py intput_bin_file checksumed_bin_file\n");
+    print("lnCRC32_armChecksum-crc32 : Add a checksum to the fw to check its integrity");
+    print("\tlnCRC32_armChecksum-crc32.py intput_bin_file checksumed_bin_file\n");
 #
 #_____________
 def write32(f,v):
@@ -22,7 +22,7 @@ if(len(sys.argv)!=3):
 infile=sys.argv[1];
 outfile=sys.argv[2];
 
-print("lnCH32Checksum-crc32:  checksuming %s => %s " %(infile,outfile))
+print("lnCRC32_armChecksum-crc32:  checksuming %s => %s " %(infile,outfile))
 
 
 print("Reading file..")
