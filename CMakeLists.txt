@@ -9,10 +9,6 @@ IF(True) #NOT ARDUINO_GD32_FREERTOS)
 
   MESSAGE(STATUS "ARDUINO_GD32_FREERTOS is ${ARDUINO_GD32_FREERTOS}")
 
-
-
-  include(applyPatch)
-
   # Already merged APPLY_PATCH_IF_NEEDED(patch_tinyusb tinyusb_no_static.patch        libraries/tinyUsb      "dont use freertos static constructs ")
 
   OPTION(LN_ENABLE_USBD "Enable USBD support" OFF)

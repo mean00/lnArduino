@@ -5,6 +5,9 @@ IF(NOT DEFINED LN_EXT)
   include(${AF_FOLDER}/../platformConfig.cmake)
   SET(LN_TOOLCHAIN_EXT  riscv_esp32c3_clang CACHE INTERNAL "")
 
+
+
+
   IF(NOT PLATFORM_TOOLCHAIN_PATH)
     MESSAGE(FATAL_ERROR "PLATFORM_TOOLCHAIN_PATH is not defined in platformConfig.cmake !!")
   ENDIF(NOT PLATFORM_TOOLCHAIN_PATH)
@@ -117,9 +120,20 @@ IF(NOT DEFINED LN_EXT)
         CACHE INTERNAL ""
         )
   SET(CMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES  ${CMAKE_C_STANDARD_INCLUDE_DIRECTORIES} CACHE INTERNAL "")
-
   MESSAGE(STATUS ">>> STD C includes:<${CMAKE_C_STANDARD_INCLUDE_DIRECTORIES}>")
   MESSAGE(STATUS ">>> STD CXX includes:<${CMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES}>")
+  # IDF
+  MESSAGE(STATUS "********************** IDF **********************")
+  SET(IDF_PATH "$ENV{IDF_PATH}")
+  IF(IDF_PATH STREQUAL "")
+    MESSAGE(FATAL_ERROR "Cannot find idf throuh env variable IDF_PATH")
+  ENDIF()
+  MESSAGE(STATUS "Found IDF in ${IDF_PATH}")
+  include(${IDF_PATH}/tools/cmake/idf.cmake)
+  idf_build_process(esp32c3)
+  MESSAGE(STATUS "********************** IDF **********************")
+
+
   #include_directories(${ARDUINO_GD32_FREERTOS}/${LN_EXT}/boards/${GD32_BOARD}/)
   #include_directories(${AF_FOLDER}/mcus/common_bluepill/)
   #include_directories(${AF_FOLDER}/mcus/common_bluepill/include)

@@ -25,29 +25,12 @@ MACRO(GENERATE_GD32_FIRMWARE target)
   ENDIF()
 
   TARGET_LINK_OPTIONS(${target}  PRIVATE "-T${SCRIPT}")
+  message(STATUS "Adding ESPRESSIF libaries...")
+  target_link_libraries(${target} PRIVATE idf::freertos idf::esp_common)
+  idf_build_executable(${target}.elf)
 
-
-  add_custom_command(TARGET ${target}
-        POST_BUILD
-        COMMAND ${CMAKE_OBJCOPY} -Obinary $<TARGET_FILE:${target}> $<TARGET_FILE:${target}>.bin
-        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-        COMMENT "Generating bin file"
-    )
-  add_custom_command(TARGET ${target}
-                   POST_BUILD
-                   COMMAND ${CMAKE_SIZE} --format=berkeley $<TARGET_FILE:${target}>
-                   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-                   COMMENT "Memory summary"
-    )
 ENDMACRO()
 MACRO(HASH_GD32_FIRMWARE target)
-  add_custom_command(TARGET ${target}
-        POST_BUILD
-        COMMAND python3 ${AF_FOLDER}/script/lnCRC32Checksum.py  $<TARGET_FILE:${target}>.bin $<TARGET_FILE:${target}>.ck_bin
-        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-        COMMENT "Generating checksumed file"
-    )
-
 ENDMACRO()
 
 MACRO(USE_LIBRARY lib)
