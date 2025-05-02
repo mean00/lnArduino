@@ -84,7 +84,7 @@ IF(NOT DEFINED LN_EXT)
   SET(GD32_SPECS  "--specs=${LN_SPEC}.specs" CACHE INTERNAL "" FORCE)
   MESSAGE(STATUS "ESP32C3 C++ specs   ${LN_SPEC} (${GD32_SPECS})")
   #
-  #SET(MCPU " -march=rv32imac -mabi=ilp32 -msmall-data-limit=8 -msave-restore " CACHE INTERNAL "" FORCE)
+  SET(MCPU " -march=rv32imc_zicsr_zifencei -mabi=ilp32"  CACHE INTERNAL "" FORCE)
   SET(GD32_DEBUG_FLAGS "-g3 -O1 " CACHE INTERNAL "")
 
   #
