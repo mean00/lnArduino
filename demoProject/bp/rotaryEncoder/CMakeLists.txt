@@ -18,5 +18,5 @@ ADD_SUBDIRECTORY( ${Rotary} )
 
 
 GENERATE_GD32_FIRMWARE(hello hello.cpp)
-TARGET_LINK_LIBRARIES(hello RotaryEncoder)
+TARGET_LINK_LIBRARIES(hello PRIVATE RotaryEncoder)
 
