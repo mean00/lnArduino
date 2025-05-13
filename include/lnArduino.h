@@ -38,11 +38,11 @@
 #include "systemHelper.h"
 extern "C"
 {
-#include "FreeRTOS.h"
-#include "event_groups.h"
-#include "queue.h"
-#include "semphr.h"
-#include "task.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/event_groups.h"
+#include "freertos/queue.h"
+#include "freertos/semphr.h"
+#include "freertos/task.h"
 #define xTaskCreate NONONO
 }
 
