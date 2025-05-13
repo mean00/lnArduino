@@ -30,13 +30,13 @@ extern "C"
 {
 #endif
 
-#include "FreeRTOS.h"
-#include "event_groups.h"
-#include "queue.h"
-#include "semphr.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/event_groups.h"
+#include "freertos/queue.h"
+#include "freertos/semphr.h"
 #include "stdbool.h"
 #include "stdint.h"
-#include "task.h"
+#include "freertos/task.h"
 
     bool lnCreateTask(TaskFunction_t pxTaskCode,
                       const char *const pcName, /*lint !e971 Unqualified char types are allowed for strings and single
