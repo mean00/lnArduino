@@ -1,4 +1,4 @@
-SET(EPR ${ARDUINO_GD32_FREERTOS}/embedded_printf/)
+SET(EPR ${LNARDUINO_ROOT}/embedded_printf/)
 include_directories( ${EPR})
 
 FOREACH(common printf.c)
