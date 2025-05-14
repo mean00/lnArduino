@@ -1,13 +1,16 @@
 
 SET(CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/ArduinoToolchainGd32.cmake)
 cmake_minimum_required(VERSION 3.20)
-
+OPTION(LN_EXTERNAL_FREERTOS "Deactivate internal freertos (esp)")
 IF(True) #NOT LNARDUINO_ROOT)
-
-  SET(LNARDUINO_ROOT ${CMAKE_CURRENT_SOURCE_DIR} CACHE INTERNAL "")
-  set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${LNARDUINO_ROOT}/cmake CACHE INTERNAL "")
+  IF(NOT LNARDUINO_ROOT)
+        SET(LNARDUINO_ROOT ${CMAKE_CURRENT_SOURCE_DIR} CACHE INTERNAL "")
+  ENDIF()
 
   MESSAGE(STATUS "LNARDUINO_ROOT is ${LNARDUINO_ROOT}")
+
+  LIST(APPEND CMAKE_MODULE_PATH  ${LNARDUINO_ROOT} ${LNARDUINO_ROOT}/cmake)
+
 
   # Already merged APPLY_PATCH_IF_NEEDED(patch_tinyusb tinyusb_no_static.patch        libraries/tinyUsb      "dont use freertos static constructs ")
 
@@ -53,14 +56,15 @@ IF(True) #NOT LNARDUINO_ROOT)
     SET(LN_BOOTLOADER_SIZE 0 CACHE INTERNAL "")
   ENDIF(LN_BOOTLOADER_SIZE)
 
-
-  include(./freeRTOS.cmake)
-  include(./arduino.cmake)
-  include(./embeddedPrintf.cmake)
+  IF(NOT LN_EXTERNAL_FREERTOS)
+    include(lnFreeRTOS)
+  ENDIF()
+  include(lnArduino_compat)
+  include(lnEmbeddedPrint)
 
   add_subdirectory(${LN_MCU_FOLDER}/src)
 
-  add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src)
+  add_subdirectory(${LNARDUINO_ROOT}/src)
 
   IF(LN_ENABLE_RUST)
     add_subdirectory(rust) # Generate C++->C for easy Rust binding
