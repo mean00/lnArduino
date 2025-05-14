@@ -1,13 +1,18 @@
 #
-SET(LN_SOURCE_UTILS       
-                       lnFreeRTOS_pp.cpp 
-                       systemAlloc.cpp 
-                       lnDebug.cpp
-                       lnStopWatch.cpp
-                       systemHelper.cpp
-                    )
 
-ADD_LIBRARY(ln_utils STATIC  ${LN_SOURCE_UTILS} )
+ADD_LIBRARY(ln_utils STATIC)
+TARGET_SOURCES( ln_utils PRIVATE 
+                       lnFreeRTOS_pp.cpp 
+                       lnDebug.cpp
+                       systemHelper.cpp
+                       lnStopWatch.cpp)
+IF(LN_EXTERNAL_MALLOC)
+ELSE()
+  TARGET_SOURCES( ln_utils PRIVATE 
+                       systemAlloc.cpp 
+                       ln_libc.cpp
+                    )
+ENDIF()
 TARGET_LINK_LIBRARIES(ln_utils PRIVATE  lnArduinoInternal)
 
 
