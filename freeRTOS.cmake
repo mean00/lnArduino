@@ -1,4 +1,4 @@
-SET(FOS ${ARDUINO_GD32_FREERTOS}/FreeRTOS CACHE INTERNAL "")
+SET(FOS ${LNARDUINO_ROOT}/FreeRTOS CACHE INTERNAL "")
 include( ${LN_MCU_FOLDER}/freeRTOS_port_${LN_EXT}.cmake)
 
 FOREACH(common   event_groups.c  list.c  queue.c  stream_buffer.c  tasks.c  timers.c)

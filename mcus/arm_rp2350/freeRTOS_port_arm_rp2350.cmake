@@ -1,4 +1,4 @@
-SET(FOS ${ARDUINO_GD32_FREERTOS}/FreeRTOS)
+SET(FOS ${LNARDUINO_ROOT}/FreeRTOS)
 
 INCLUDE_DIRECTORIES( ${PICO_SDK_PATH}/src/common/pico_base${RP_SUFFIX_INCLUDE}/include )
 INCLUDE_DIRECTORIES( ${PICO_SDK_PATH}/src/common/pico_base_headers/include )
