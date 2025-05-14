@@ -36,13 +36,6 @@ extern "C"
     {
         deadEnd(0x1000);
     }
-    void _exit(int code)
-    {
-        deadEnd(code + 0x2000);
-        while (1)
-        {
-        }
-    }
     void interrupts()
     {
         EXIT_CRITICAL();
@@ -55,75 +48,8 @@ extern "C"
     {
         deadEnd(0x1001);
     }
-    int _getpid()
-    {
-        return 0;
-    }
-    int _kill()
-    {
-        return 0;
-    }
-    int getpid(void)
-    {
-        do_assert("getpid");
-        return 0;
-    }
-    int kill(int pid, int sig)
-    {
-        do_assert("kill");
-        return 0;
-    }
-    int getppid(void)
-    {
-        do_assert("getppid");
-        return 0;
-    }
-    void __cxa_pure_virtual()
-    {
-        do_assert("__cxa_pure_virtual");
-    }
-    uint32_t core_exception_handler(unsigned long mcause, unsigned long sp)
-    {
-        do_assert("core_exception_handler");
-        return 0;
-    }
-    void abort()
-    {
-        do_assert("abort");
-        while (1)
-        {
-        }
-    }
-    void __attribute__((noreturn)) panic(const char *fmt, ...)
-    {
-        do_assert(fmt);
-        while (1)
-        {
-        }
-    }
-    int stderr;
-#undef vfprintf
-    void vfprintf()
-    {
-        do_assert("vfprintf");
-    }
-    void fprintf()
-    {
-        do_assert("vfprintf");
-    }
 }
 
-namespace std
-{
-void __throw_out_of_range(const char *a) //__throw_out_of_range
-{
-    do_assert(a);
-}
-void __throw_length_error(const char *a) //__throw_out_of_range
-{
-    do_assert(a);
-}
-} // namespace std
 /**
 
 */

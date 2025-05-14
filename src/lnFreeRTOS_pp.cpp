@@ -250,7 +250,8 @@ uint32_t lnEventGroup::readEvents(uint32_t maskInt) // it is also cleared automa
 #define INVALID_TASK (TaskHandle_t) - 1
 lnFastEventGroup::lnFastEventGroup()
 {
-    _value = _mask = 0;
+    _value = 0;
+    _mask = 0;
     _waitingTask = INVALID_TASK;
 }
 
@@ -279,7 +280,7 @@ void lnFastEventGroup::setEvents(uint32_t events)
 {
     if (underInterrupt)
     {
-#warning : Could we have a race here between different interrupts ? probably
+//#warning : Could we have a race here between different interrupts ? probably
         _value = _value | events;
         bool w = _value & _mask;
         if (!w || _waitingTask == INVALID_TASK) // no need to wake up task
