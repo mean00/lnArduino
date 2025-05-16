@@ -6,7 +6,7 @@
 #pragma once
 #if 1
 void LoggerInit();
-void debugLogger(const char *fmt...);
+void debugLogger(const char *fmt,...);
 #else
 #define LoggerInit()                                                                                                   \
     {                                                                                                                  \
