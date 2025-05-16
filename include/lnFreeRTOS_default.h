@@ -30,8 +30,19 @@ extern "C"
 {
 #endif
 
-#include "lnFreeRTOS_default.h"
+#include "include/FreeRTOS.h"
+#include "include/event_groups.h"
+#include "include/queue.h"
+#include "include/semphr.h"
+#include "include/task.h"
+#include "stdbool.h"
+#include "stdint.h"
 
+    bool lnCreateTask(TaskFunction_t pxTaskCode,
+                      const char *const pcName, /*lint !e971 Unqualified char types are allowed for strings and single
+                                                   characters only. */
+                      int stackSizeInBytes,     // in bytes  !
+                      void *const pvParameters, UBaseType_t uxPriority);
 #ifdef __cplusplus
 }
 #endif

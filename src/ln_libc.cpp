@@ -3,7 +3,12 @@
  *  See license file
  */
 
-#include "stdint.h"
+//
+//.#include "stdarg.h"
+//
+//.#include "stdint.h"
+//
+//.#include "stdio.h"
 
 #pragma clang diagnostic ignored "-Wextra"
 
@@ -16,6 +21,9 @@ extern "C"
 
 #include "lnSystemTime.h"
 extern "C" void do_assert(const char *a);
+#undef stderr
+void *const stderr = NULL;
+#undef vfprintf
 
 /**
  */
@@ -74,15 +82,12 @@ extern "C"
         {
         }
     }
-#undef stderr
-    int stderr;
-#undef vfprintf
-    int vfprintf( FILE *__restrict, const char *__restrict, __VALIST )
+    int vfprintf(void *)
     {
         do_assert("vfprintf");
         return 0;
     }
-    int fprintf(FILE *__restrict, const char *__restrict, ... )
+    int fprintf(void *)
     {
         do_assert("vfprintf");
         return 0;
