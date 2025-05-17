@@ -32,7 +32,10 @@ IF(True) #NOT LNARDUINO_ROOT)
   OPTION(USE_CH32v3x_PURE_RAM "Load and run from RAM (CH32vxx only)" FALSE)
 
   SET(LN_MCU_FOLDER ${LNARDUINO_ROOT}/mcus/${LN_EXT}/ CACHE INTERNAL "")
-  include( ${LN_MCU_FOLDER}/freeRTOS_port_${LN_EXT}.cmake)
+  #
+  ADD_LIBRARY(lnBoard INTERFACE)
+  target_include_directories(lnBoard INTERFACE ${LN_MCU_FOLDER}/boards/${GD32_BOARD}/) # needed to get the freertos_tuning.h
+  target_include_directories(lnBoard INTERFACE ${LN_MCU_FOLDER}/include/) # needed to get the freertos_tuning.h
 
   # Ok let's create our internal interface libary
   ADD_LIBRARY(lnArduinoInternal INTERFACE)
@@ -42,6 +45,8 @@ IF(True) #NOT LNARDUINO_ROOT)
   target_include_directories(lnArduinoInternal INTERFACE ${CMAKE_BINARY_DIR}) # To catch generated files
   target_include_directories(lnArduinoInternal INTERFACE ${LN_MCU_FOLDER})
   target_include_directories(lnArduinoInternal INTERFACE ${LN_MCU_FOLDER}/include)
+  target_include_directories(lnArduinoInternal INTERFACE lnBoard)
+
 
 
   IF(LN_BOOTLOADER_SIZE)
@@ -70,7 +75,7 @@ IF(True) #NOT LNARDUINO_ROOT)
   # Ok let's create our public libary
   # a firmmware should link against that one
   ADD_LIBRARY(lnArduino INTERFACE)
-  target_link_libraries(lnArduino INTERFACE ln_utils gd32Arduino embeddedPrintf lnArduinoInternal)
+  target_link_libraries(lnArduino INTERFACE lnBoard ln_utils gd32Arduino embeddedPrintf lnArduinoInternal)
   IF(NOT LN_EXTERNAL_FREERTOS)
     target_link_libraries(lnArduino INTERFACE FreeRTOS )
   ENDIF()

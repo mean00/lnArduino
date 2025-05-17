@@ -19,7 +19,7 @@ target_include_directories(FreeRTOS PUBLIC ${LN_FREERTOS_PORT})
 target_include_directories(FreeRTOS PUBLIC ${CMAKE_SOURCE_DIR})
 target_include_directories(FreeRTOS PUBLIC ${FOS}/)
 target_include_directories(FreeRTOS PUBLIC ${FOS}/..)
-target_include_directories(FreeRTOS PUBLIC ${FOS}/../${LN_EXT}/include)
 target_include_directories(FreeRTOS PUBLIC ${FOS}/include)
-target_include_directories(FreeRTOS PUBLIC ${LN_MCU_FOLDER}/boards/${GD32_BOARD}/) # needed to get the freertos_tuning.h
+target_link_libraries(FreeRTOS PUBLIC lnBoard)
+#
 

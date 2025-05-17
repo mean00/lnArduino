@@ -2,9 +2,9 @@
 MACRO(GENERATE_GD32_FIRMWARE target)
   CONFIGURE_FILE("${LN_MCU_FOLDER}/boards/${GD32_BOARD}/rp2350_linker.ld.in" "${CMAKE_BINARY_DIR}/linker_script.ld" @ONLY)
   ADD_EXECUTABLE(${target} ${ARGN})
-  TARGET_LINK_LIBRARIES(${target} rplib)
-  TARGET_LINK_LIBRARIES(${target} pico_stdlib)
-  TARGET_LINK_LIBRARIES(${target} ${USED_LIBS} lnArduino) # duplicates are NOT a mistake !
+  TARGET_LINK_LIBRARIES(${target} PUBLIC rplib)
+  TARGET_LINK_LIBRARIES(${target} PUBLIC pico_stdlib)
+  TARGET_LINK_LIBRARIES(${target} PUBLIC ${USED_LIBS} lnArduino) # duplicates are NOT a mistake !
   # duplicates are NOT a mistake !
   # TARGET_LINK_LIBRARIES(${target} embeddedPrintf gd32_overlay gd32Arduino   FreeRTOS  gd32_lowlevel c  gcc )
   TARGET_LINK_LIBRARIES(${target} embeddedPrintf    FreeRTOS     gcc)
