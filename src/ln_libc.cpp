@@ -22,6 +22,7 @@ extern "C"
 #include "lnSystemTime.h"
 extern "C" void do_assert(const char *a);
 #undef stderr
+extern void *const stderr;
 void *const stderr = NULL;
 #undef vfprintf
 
@@ -36,6 +37,10 @@ extern "C"
         while (1)
         {
         }
+    }
+    void panic(const char *fmt, ...)
+    {
+        do_assert("panic");
     }
     int _getpid()
     {
