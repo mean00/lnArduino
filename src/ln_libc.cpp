@@ -30,12 +30,6 @@ void *const stderr = NULL;
 
 extern "C"
 {
-    uintptr_t handle_trap(uintptr_t mcause, uintptr_t sp)
-    {
-        deadEnd(0xffff);
-        return 0;
-    }
-
     void _exit(int code)
     {
         deadEnd(code + 0x2000);

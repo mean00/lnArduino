@@ -21,4 +21,4 @@ INCLUDE_DIRECTORIES( ${MCP23017} ${MCP23017}/platformExample/longanNano)
 SET(LIBMCP23017  ${MCP23017}/platformExample/longanNano/lnMcp23017.cpp)
 #
 GENERATE_GD32_FIRMWARE(demo_mcp23017 hello.cpp ${LIBMCP23017} )
-target_link_libraries(demo_mcp23017 mcp23017)
+target_link_libraries(demo_mcp23017 PRIVATE mcp23017)

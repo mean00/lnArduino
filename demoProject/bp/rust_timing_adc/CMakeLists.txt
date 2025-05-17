@@ -65,8 +65,8 @@ SET(START_CODE  ${CMAKE_CURRENT_SOURCE_DIR}/src/cpp/rust_start.cpp )
 GENERATE_GD32_FIRMWARE(rust_demo ${START_CODE}  )
 HASH_GD32_FIRMWARE( rust_demo )
 ADD_SUBDIRECTORY( ${CMAKE_CURRENT_SOURCE_DIR}/src/)
-TARGET_LINK_LIBRARIES( rust_demo lnarduino_c_bindings )
-TARGET_LINK_LIBRARIES( rust_demo rsPowerSupply )
+TARGET_LINK_LIBRARIES( rust_demo PRIVATE lnarduino_c_bindings )
+TARGET_LINK_LIBRARIES( rust_demo PRIVATE rsPowerSupply )
 
 # Summary
 MESSAGE(STATUS "Configuration:")
