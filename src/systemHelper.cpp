@@ -10,7 +10,7 @@
 extern "C"
 {
 // #include "riscv_encoding.h"
-#include "FreeRTOS.h"
+#include "lnFreeRTOS.h"
 }
 #include "systemHelper.h"
 
@@ -23,8 +23,8 @@ extern "C" void do_assert(const char *a);
 extern "C"
 {
     void deadEnd(int code);
-    extern void taskENTER_CRITICAL(void);
-    extern void taskEXIT_CRITICAL(void);
+    // extern void taskENTER_CRITICAL(void);
+    // extern void taskEXIT_CRITICAL(void);
 
     uintptr_t handle_trap(uintptr_t mcause, uintptr_t sp)
     {
@@ -44,10 +44,12 @@ extern "C"
     {
         ENTER_CRITICAL();
     }
-    void vApplicationStackOverflowHook(void *xTask, char *pcTaskName)
+#ifndef LN_CUSTOM_FREERTOS
+    void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName)
     {
         deadEnd(0x1001);
     }
+#endif
 }
 
 /**
