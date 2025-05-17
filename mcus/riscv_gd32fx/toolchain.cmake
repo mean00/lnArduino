@@ -35,8 +35,8 @@ SET(CMAKE_CXX_COMPILER_ID "GNU" CACHE INTERNAL "")
 set(CMAKE_C_COMPILER_WORKS      TRUE)
 set(CMAKE_CXX_COMPILER_WORKS    TRUE)
 #
-SET(GD32_BOARD_FLAG      -DGD32VF103C_START) # Longan nano ?
-SET(GD32_BOARD       sipeed-longan-nano CACHE INTERNAL "")
+SET(LN_BOARD_NAME_FLAG      -DGD32VF103C_START) # Longan nano ?
+SET(LN_BOARD_NAME       sipeed-longan-nano CACHE INTERNAL "")
 
 IF(NOT DEFINED LN_MCU_SPEED)
     SET(LN_MCU_SPEED 72000000)
@@ -83,7 +83,7 @@ ELSE(LN_SPEC)
 ENDIF(LN_SPEC)
 SET(GD32_SPECS  "--specs=${LN_SPEC}.specs" CACHE INTERNAL "" FORCE)
 #
-SET(GD32_C_FLAGS  "${GD32_SPECS}  ${PLATFORM_C_FLAGS} -DLN_ARCH=LN_ARCH_RISCV -Werror=return-type  -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -fno-common ${GD32_BOARD_FLAG}")
+SET(GD32_C_FLAGS  "${GD32_SPECS}  ${PLATFORM_C_FLAGS} -DLN_ARCH=LN_ARCH_RISCV -Werror=return-type  -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -fno-common ${LN_BOARD_NAME_FLAG}")
 SET(CMAKE_C_FLAGS "${GD32_C_FLAGS}")
 SET(CMAKE_CXX_FLAGS "${GD32_C_FLAGS}  -fno-rtti -fno-exceptions -fno-threadsafe-statics" ) 
 #
@@ -95,7 +95,7 @@ set(CMAKE_CXX_LINK_EXECUTABLE    "<CMAKE_CXX_COMPILER>   <CMAKE_CXX_LINK_FLAGS> 
 SET(CMAKE_EXECUTABLE_SUFFIX_C .elf)
 SET(CMAKE_EXECUTABLE_SUFFIX_CXX .elf)
 
-include_directories(${LNARDUINO_ROOT}/${LN_EXT}/boards/${GD32_BOARD}/)
+include_directories(${LNARDUINO_ROOT}/${LN_EXT}/boards/${LN_BOARD_NAME}/)
 
 # Sees optimizaton >=2 are causing issues (???)
 

@@ -34,7 +34,7 @@ SET(CMAKE_CXX_COMPILER_ID "Clang" CACHE INTERNAL "")
 set(CMAKE_C_COMPILER_WORKS      TRUE)
 set(CMAKE_CXX_COMPILER_WORKS    TRUE)
 #
-SET(GD32_BOARD       rp2040 CACHE INTERNAL "")
+SET(LN_BOARD_NAME       rp2040 CACHE INTERNAL "")
 
 # Speed
 
@@ -121,7 +121,7 @@ SET(G32_DEBUG_FLAGS "-g3 ${LN_LTO}  -Oz -gdwarf-4" CACHE INTERNAL "")
 
 SET(GD32_LD_EXTRA "  -Wl,--unresolved-symbols=report-all -Wl,--warn-common  " CACHE INTERNAL "")
 #
-SET(GD32_C_FLAGS  "-DPICO_COPY_TO_RAM=1 ${GD32_SPECS}  ${PLATFORM_C_FLAGS} ${G32_DEBUG_FLAGS} -ffunction-sections -ggnu-pubnames --sysroot=${MINI_SYSROOT} -I${MINI_SYSROOT}/include --target=arm-none-eabi -DLN_ARCH=LN_ARCH_ARM   ${GD32_BOARD_FLAG}  ${GD32_MCU}" CACHE INTERNAL "")
+SET(GD32_C_FLAGS  "-DPICO_COPY_TO_RAM=1 ${GD32_SPECS}  ${PLATFORM_C_FLAGS} ${G32_DEBUG_FLAGS} -ffunction-sections -ggnu-pubnames --sysroot=${MINI_SYSROOT} -I${MINI_SYSROOT}/include --target=arm-none-eabi -DLN_ARCH=LN_ARCH_ARM   ${LN_BOARD_NAME_FLAG}  ${GD32_MCU}" CACHE INTERNAL "")
 SET(CMAKE_C_FLAGS "${GD32_C_FLAGS}" CACHE INTERNAL "")
 SET(CMAKE_ASM_FLAGS "${GD32_C_FLAGS}" CACHE INTERNAL "")
 SET(CMAKE_CXX_FLAGS "${GD32_C_FLAGS} -std=gnu++11 -fno-rtti -fno-exceptions -fno-threadsafe-statics" CACHE INTERNAL "") 
@@ -141,11 +141,11 @@ SET(SB2 ${CMAKE_BINARY_DIR}/lnArduino/mcus/arm_rp2040/src/CMakeFiles/rplib.dir/_
 SET(CMAKE_EXECUTABLE_SUFFIX_C .elf CACHE INTERNAL "")
 SET(CMAKE_EXECUTABLE_SUFFIX_CXX .elf CACHE INTERNAL "")
 
-#include_directories(${AF_FOLDER}/${LN_EXT}/boards/${GD32_BOARD}/)
+#include_directories(${AF_FOLDER}/${LN_EXT}/boards/${LN_BOARD_NAME}/)
 #include_directories(${AF_FOLDER}/${LN_EXT}/)
 
     SET(CMAKE_C_STANDARD_INCLUDE_DIRECTORIES  ${CMAKE_C_STANDARD_INCLUDE_DIRECTORIES}
-        ${LNARDUINO_ROOT}/${LN_EXT}/boards/${GD32_BOARD}/
+        ${LNARDUINO_ROOT}/${LN_EXT}/boards/${LN_BOARD_NAME}/
         ${LNARDUINO_ROOT}/${LN_EXT}
         CACHE INTERNAL ""
         )

@@ -10,7 +10,7 @@ ADD_DEFINITIONS("-DLN_FREERTOS_HEAP_SIZE=(${LN_MCU_RAM_SIZE}-${LN_MCU_STATIC_RAM
 SET(MEM ${FOS}/portable/MemMang/heap_4.c)
 #
 SET(FOS_SOURCES ${CMN} ${LN_FREERTOS_PORT_SOURCES} ${MEM} CACHE INTERNAL "")
-MESSAGE(STATUS "Using internal freertos with config in ${LNARDUINO_ROOT}/freertos_config for target ${LN_EXT} boards ${GD32_BOARD}")
+MESSAGE(STATUS "Using internal freertos with config in ${LNARDUINO_ROOT}/freertos_config for target ${LN_EXT} boards ${LN_BOARD_NAME}")
 #
 ADD_LIBRARY( FreeRTOS STATIC)
 target_sources(FreeRTOS PRIVATE ${FOS_SOURCES})

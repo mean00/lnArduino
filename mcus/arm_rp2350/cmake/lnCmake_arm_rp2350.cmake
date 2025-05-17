@@ -1,6 +1,6 @@
 
 MACRO(GENERATE_GD32_FIRMWARE target)
-  CONFIGURE_FILE("${LN_MCU_FOLDER}/boards/${GD32_BOARD}/rp2350_linker.ld.in" "${CMAKE_BINARY_DIR}/linker_script.ld" @ONLY)
+  CONFIGURE_FILE("${LN_MCU_FOLDER}/boards/${LN_BOARD_NAME}/rp2350_linker.ld.in" "${CMAKE_BINARY_DIR}/linker_script.ld" @ONLY)
   ADD_EXECUTABLE(${target} ${ARGN})
   TARGET_LINK_LIBRARIES(${target} PUBLIC rplib)
   TARGET_LINK_LIBRARIES(${target} PUBLIC pico_stdlib)

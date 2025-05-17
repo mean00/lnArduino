@@ -36,8 +36,8 @@ IF(NOT DEFINED LN_EXT)
     set(CMAKE_CXX_COMPILER_WORKS    TRUE    CACHE INTERNAL "")
 
     #
-    SET(GD32_BOARD_FLAG    ""       CACHE INTERNAL "") 
-    SET(GD32_BOARD       ch32v3x    CACHE INTERNAL "")
+    SET(LN_BOARD_NAME_FLAG    ""       CACHE INTERNAL "") 
+    SET(LN_BOARD_NAME       ch32v3x    CACHE INTERNAL "")
 
     IF(NOT DEFINED LN_MCU_SPEED)
         SET(LN_MCU_SPEED 72000000   CACHE INTERNAL "")
@@ -94,7 +94,7 @@ IF(NOT DEFINED LN_EXT)
     #   
     SET(GD32_DEBUG_FLAGS "-g3 -gdwarf-2 ${LN_LTO} -Oz" CACHE INTERNAL "") 
     #
-    SET(GD32_MCU_C_FLAGS "--sysroot ${PLATFORM_CLANG_SYSROOT} ${PLATFORM_CLANG_C_FLAGS} -DLN_MCU=LN_MCU_CH32V3x -DLN_ARCH=LN_ARCH_RISCV ${GD32_BOARD_FLAG} -I${AF_FOLDER}/riscv_ch32v3x/" CACHE INTERNAL "" )
+    SET(GD32_MCU_C_FLAGS "--sysroot ${PLATFORM_CLANG_SYSROOT} ${PLATFORM_CLANG_C_FLAGS} -DLN_MCU=LN_MCU_CH32V3x -DLN_ARCH=LN_ARCH_RISCV ${LN_BOARD_NAME_FLAG} -I${AF_FOLDER}/riscv_ch32v3x/" CACHE INTERNAL "" )
     SET(GD32_C_FLAGS    "${GD32_SPECS_SPECS} ${GD32_MCU_C_FLAGS} ${GD32_DEBUG_FLAGS}  -Werror=return-type  -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -fno-common " CACHE INTERNAL "")
     SET(CMAKE_C_FLAGS   "${GD32_C_FLAGS}"                                                       CACHE INTERNAL "")
     SET(CMAKE_ASM_FLAGS "${GD32_C_FLAGS}"                                                       CACHE INTERNAL "")
@@ -111,7 +111,7 @@ IF(NOT DEFINED LN_EXT)
     SET(CMAKE_EXECUTABLE_SUFFIX_CXX .elf                                                                CACHE INTERNAL "")
 
     SET(CMAKE_C_STANDARD_INCLUDE_DIRECTORIES  ${CMAKE_C_STANDARD_INCLUDE_DIRECTORIES}
-        ${LNARDUINO_ROOT}/${LN_EXT}/boards/${GD32_BOARD}/
+        ${LNARDUINO_ROOT}/${LN_EXT}/boards/${LN_BOARD_NAME}/
         ${AF_FOLDER}/mcus/common_bluepill/
         ${AF_FOLDER}/mcus/common_bluepill/include
         CACHE INTERNAL ""
@@ -120,7 +120,7 @@ IF(NOT DEFINED LN_EXT)
 
     MESSAGE(STATUS ">>> STD C includes:<${CMAKE_C_STANDARD_INCLUDE_DIRECTORIES}>")
     MESSAGE(STATUS ">>> STD CXX includes:<${CMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES}>")
-    #include_directories(${LNARDUINO_ROOT}/${LN_EXT}/boards/${GD32_BOARD}/)
+    #include_directories(${LNARDUINO_ROOT}/${LN_EXT}/boards/${LN_BOARD_NAME}/)
     #include_directories(${AF_FOLDER}/mcus/common_bluepill/)
     #include_directories(${AF_FOLDER}/mcus/common_bluepill/include)
 

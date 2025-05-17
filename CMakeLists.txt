@@ -34,7 +34,7 @@ IF(True) #NOT LNARDUINO_ROOT)
   SET(LN_MCU_FOLDER ${LNARDUINO_ROOT}/mcus/${LN_EXT}/ CACHE INTERNAL "")
   #
   ADD_LIBRARY(lnBoard INTERFACE)
-  target_include_directories(lnBoard INTERFACE ${LN_MCU_FOLDER}/boards/${GD32_BOARD}/) # needed to get the freertos_tuning.h
+  target_include_directories(lnBoard INTERFACE ${LN_MCU_FOLDER}/boards/${LN_BOARD_NAME}/) # needed to get the freertos_tuning.h
   target_include_directories(lnBoard INTERFACE ${LN_MCU_FOLDER}/include/) # needed to get the freertos_tuning.h
 
   # Ok let's create our internal interface libary
