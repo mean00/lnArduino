@@ -35,7 +35,7 @@ SET(CMAKE_CXX_COMPILER_ID "GNU" CACHE INTERNAL "")
 set(CMAKE_C_COMPILER_WORKS      TRUE)
 set(CMAKE_CXX_COMPILER_WORKS    TRUE)
 #
-SET(GD32_BOARD       bluepill CACHE INTERNAL "")
+SET(LN_BOARD_NAME       bluepill CACHE INTERNAL "")
 #SET(LN_LTO "-flto")
 # Speed
 
@@ -107,7 +107,7 @@ SET(G32_DEBUG_FLAGS "-g3 ${LN_LTO}  -O1 " CACHE INTERNAL "")
 
 SET(GD32_LD_EXTRA "  -Wl,--unresolved-symbols=report-all -Wl,--warn-common -Wl,--warn-section-align " CACHE INTERNAL "")
 #
-SET(GD32_C_FLAGS  "${GD32_SPECS}  ${PLATFORM_C_FLAGS} ${G32_DEBUG_FLAGS} -DLN_ARCH=LN_ARCH_ARM  -Werror=return-type -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -fno-common ${GD32_BOARD_FLAG}  ${GD32_MCU}" CACHE INTERNAL "")
+SET(GD32_C_FLAGS  "${GD32_SPECS}  ${PLATFORM_C_FLAGS} ${G32_DEBUG_FLAGS} -DLN_ARCH=LN_ARCH_ARM  -Werror=return-type -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -fno-common ${LN_BOARD_NAME_FLAG}  ${GD32_MCU}" CACHE INTERNAL "")
 SET(CMAKE_C_FLAGS "${GD32_C_FLAGS}" CACHE INTERNAL "")
 SET(CMAKE_ASM_FLAGS "${GD32_C_FLAGS}" CACHE INTERNAL "")
 SET(CMAKE_CXX_FLAGS "${GD32_C_FLAGS}  -fno-rtti -fno-exceptions -fno-threadsafe-statics" CACHE INTERNAL "") 
@@ -120,7 +120,7 @@ SET(CMAKE_EXECUTABLE_SUFFIX_C .elf CACHE INTERNAL "")
 SET(CMAKE_EXECUTABLE_SUFFIX_CXX .elf CACHE INTERNAL "")
 
     SET(CMAKE_C_STANDARD_INCLUDE_DIRECTORIES  ${CMAKE_C_STANDARD_INCLUDE_DIRECTORIES}
-        ${LNARDUINO_ROOT}/${LN_EXT}/boards/${GD32_BOARD}/
+        ${LNARDUINO_ROOT}/${LN_EXT}/boards/${LN_BOARD_NAME}/
         ${LNARDUINO_ROOT}/${LN_EXT}
         ${AF_FOLDER}/mcus/common_bluepill/
         ${AF_FOLDER}/mcus/common_bluepill/include
@@ -132,7 +132,7 @@ SET(CMAKE_EXECUTABLE_SUFFIX_CXX .elf CACHE INTERNAL "")
     MESSAGE(STATUS ">>> STD CXX includes:<${CMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES}>")
   
 
-    #include_directories(${AF_FOLDER}/${LN_EXT}/boards/${GD32_BOARD}/)
+    #include_directories(${AF_FOLDER}/${LN_EXT}/boards/${LN_BOARD_NAME}/)
     #include_directories(${AF_FOLDER}/${LN_EXT}/)
     #include_directories(${AF_FOLDER}/mcus/common_bluepill/)
     #include_directories(${AF_FOLDER}/mcus/common_bluepill/include)
