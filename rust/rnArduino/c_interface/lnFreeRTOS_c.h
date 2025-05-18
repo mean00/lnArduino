@@ -2,4 +2,4 @@
 #include "stdbool.h"
 #include "stdint.h"
 
-void Logger_chars(int n, const char *data);
+extern "C" void Logger_chars(int n, const char *data);
