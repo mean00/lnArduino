@@ -221,86 +221,6 @@ pub type uint_fast64_t = cty::c_ulonglong;
 #[repr(i32)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub enum lnPin {
-    PA0 = 0,
-    PA1 = 1,
-    PA2 = 2,
-    PA3 = 3,
-    PA4 = 4,
-    PA5 = 5,
-    PA6 = 6,
-    PA7 = 7,
-    PA8 = 8,
-    PA9 = 9,
-    PA10 = 10,
-    PA11 = 11,
-    PA12 = 12,
-    PA13 = 13,
-    PA14 = 14,
-    PA15 = 15,
-    PB0 = 16,
-    PB1 = 17,
-    PB2 = 18,
-    PB3 = 19,
-    PB4 = 20,
-    PB5 = 21,
-    PB6 = 22,
-    PB7 = 23,
-    PB8 = 24,
-    PB9 = 25,
-    PB10 = 26,
-    PB11 = 27,
-    PB12 = 28,
-    PB13 = 29,
-    PB14 = 30,
-    PB15 = 31,
-    PC0 = 32,
-    PC1 = 33,
-    PC2 = 34,
-    PC3 = 35,
-    PC4 = 36,
-    PC5 = 37,
-    PC6 = 38,
-    PC7 = 39,
-    PC8 = 40,
-    PC9 = 41,
-    PC10 = 42,
-    PC11 = 43,
-    PC12 = 44,
-    PC13 = 45,
-    PC14 = 46,
-    PC15 = 47,
-    PD0 = 48,
-    PD1 = 49,
-    PD2 = 50,
-    PD3 = 51,
-    PD4 = 52,
-    PD5 = 53,
-    PD6 = 54,
-    PD7 = 55,
-    PD8 = 56,
-    PD9 = 57,
-    PD10 = 58,
-    PD11 = 59,
-    PD12 = 60,
-    PD13 = 61,
-    PD14 = 62,
-    PD15 = 63,
-    PE0 = 64,
-    PE1 = 65,
-    PE2 = 66,
-    PE3 = 67,
-    PE4 = 68,
-    PE5 = 69,
-    PE6 = 70,
-    PE7 = 71,
-    PE8 = 72,
-    PE9 = 73,
-    PE10 = 74,
-    PE11 = 75,
-    PE12 = 76,
-    PE13 = 77,
-    PE14 = 78,
-    PE15 = 79,
     NoPin = -1,
 }
 #[repr(u32)]
@@ -360,25 +280,6 @@ unsafe extern "C" {
 unsafe extern "C" {
     #[link_name = "\u{1}_Z15lnRemapTimerPini"]
     pub fn lnRemapTimerPin(timer: cty::c_int);
-}
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-pub struct lnFastIO {
-    pub _onoff: *mut cty::c_uint,
-    pub _onbit: cty::c_uint,
-    pub _offbit: cty::c_uint,
-}
-unsafe extern "C" {
-    #[link_name = "\u{1}_ZN8lnFastIOC1E5lnPin"]
-    pub fn lnFastIO_lnFastIO(this: *mut lnFastIO, p: lnPin);
-}
-impl lnFastIO {
-    #[inline]
-    pub unsafe fn new(p: lnPin) -> Self {
-        let mut __bindgen_tmp = ::core::mem::MaybeUninit::uninit();
-        lnFastIO_lnFastIO(__bindgen_tmp.as_mut_ptr(), p);
-        __bindgen_tmp.assume_init()
-    }
 }
 unsafe extern "C" {
     #[link_name = "\u{1}_Z19lnGetGpioOnRegisteri"]

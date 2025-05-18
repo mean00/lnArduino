@@ -1,9 +1,14 @@
 #!/bin/bash
 #set -x
 #
-if [ "$#" -ne 4 ]; then
+if [ "$#" -lt 4 ]; then
   echo "rustgen.sh xxx.h xxx.rs"
   exit 1
+fi
+if [ "$#" -eq 5 ]; then
+  export EXTRA_DIR2=-I$5
+else
+  export EXTRA_DIR2=""
 fi
 #input=$1
 output=$2
@@ -50,6 +55,7 @@ $BINDGEN \
   -- -x ${LANG} -DLN_ARCH=LN_ARCH_ARM \
   -funsigned-char \
   -I${EXTRA_DIR} \
+  ${EXTRA_DIR2} \
   -I$LN -I$LN/include/ -I$LN/arduinoLayer/include/ \
   -I$LN/FreeRTOS/include/ \
   -I$LN/mcus/arm_gd32fx/boards/bluepill/ \

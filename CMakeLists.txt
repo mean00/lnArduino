@@ -19,6 +19,7 @@ IF(True) #NOT LNARDUINO_ROOT)
   OPTION(LN_ENABLE_I2C  "Enable I2C support" ON)
   OPTION(LN_ENABLE_SPI  "Enable SPI support" ON)
   OPTION(LN_ENABLE_UART "Enable Full uart support" OFF)
+  OPTION(LN_ENABLE_TIMING_ADC "Enable ADC driver by a timer " ON)
 
   OPTION(LN_ENABLE_RUST "Enable rust support" OFF)
 
@@ -70,7 +71,7 @@ IF(True) #NOT LNARDUINO_ROOT)
   add_subdirectory(${LNARDUINO_ROOT}/src)
 
   IF(LN_ENABLE_RUST)
-    add_subdirectory(rust) # Generate C++->C for easy Rust binding
+    add_subdirectory(${LNARDUINO_ROOT}/rust) # Generate C++->C for easy Rust binding
   ENDIF(LN_ENABLE_RUST)
 
 

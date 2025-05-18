@@ -5,7 +5,7 @@
 
 #include "stdint.h"
 
-#pragma clang diagnostic ignored "-Wextra"
+//#pragma clang diagnostic ignored "-Wextra"
 
 extern "C"
 {

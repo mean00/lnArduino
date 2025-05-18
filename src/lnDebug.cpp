@@ -19,6 +19,18 @@ extern "C" void Logger_crash(const char *st)
     serial0->setSpeed(115200);
     serial0->rawWrite(strlen(st), (const uint8_t *)st);
 }
+/**
+
+*/
+extern "C" void Logger_chars(int n, const char *data)
+{
+    if (!n)
+        return; // 0 sized dma does not work...
+    if (loggerFunction)
+        loggerFunction(n, data);
+    else
+        serial0->transmit(n, (uint8_t *)data);
+}
 
 extern "C" int Logger_C(const char *fmt, ...)
 {
@@ -32,18 +44,6 @@ extern "C" int Logger_C(const char *fmt, ...)
     va_end(va);
     Logger_chars(strlen(buffer), buffer);
     return 0;
-}
-/**
-
-*/
-extern "C" void Logger_chars(int n, const char *data)
-{
-    if (!n)
-        return; // 0 sized dma does not work...
-    if (loggerFunction)
-        loggerFunction(n, data);
-    else
-        serial0->transmit(n, (uint8_t *)data);
 }
 /**
  */

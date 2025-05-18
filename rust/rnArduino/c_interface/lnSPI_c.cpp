@@ -49,7 +49,7 @@ ln_spi_c *lnspi_create(int instance, int pin)
  */
 void lnspi_delete(ln_spi_c *i2c)
 {
-#warning TODO!
+//#warning TODO!
 }
 /**
  *
