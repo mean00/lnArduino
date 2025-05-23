@@ -3,13 +3,27 @@
  *  See license file
  */
 #pragma once
-#define LN_SYSTEM_LED PC13
-#define PPINS(a, val)                                                                                                  \
-    P##a##0 = val, P##a##1, P##a##2, P##a##3, P##a##4, P##a##5, P##a##6, P##a##7, P##a##8, P##a##9, P##a##10,          \
-    P##a##11, P##a##12, P##a##13, P##a##14, P##a##15,
+#define LN_SYSTEM_LED GPIO4
 /**
  */
+#define PINRANGE(x)                                                                                                    \
+    GPIO##x##0, GPIO##x##1, GPIO##x##2, GPIO##x##3, GPIO##x##4, GPIO##x##5, GPIO##x##6, GPIO##x##7, GPIO##x##8,        \
+        GPIO##x##9
+
 enum lnPin : int
 {
-     NoPin = -1
+    GPIO0 = 0,
+    GPIO1,
+    GPIO2,
+    GPIO3,
+    GPIO4,
+    GPIO5,
+    GPIO6,
+    GPIO7,
+    GPIO8,
+    GPIO9,
+    PINRANGE(1),
+    PINRANGE(2),
+    PINRANGE(3),
+    NoPin = -1
 };

@@ -2,6 +2,12 @@
 #include "driver/gpio.h"
 #include "lnArduino.h"
 #include "lnGPIO_pins.h"
+extern "C"
+{
+#include "soc/gpio_periph.h"
+// #include "/register/soc/gpio_struct.h
+#include "register/soc/gpio_struct.h"
+}
 /**
  */
 void lnPinMode(const lnPin pin, const lnGpioMode mode, const int speedInMhz)
@@ -95,4 +101,16 @@ void lnOpenDrainClose(const lnPin pin, const bool close) // if true, the open dr
 {
     xAssert(0);
 }
+/**
+ *
+ */
+lnFastIO::lnFastIO(lnPin p)
+{
+    lnPinMode(p, lnOUTPUT);
+    gpio_dev_t *hw = &GPIO;
+    _bit = 1 << (uint32_t)p;
+    _on = &(hw->out_w1ts.val);
+    _off = &(hw->out_w1tc.val);
+}
+
 //  EOF
