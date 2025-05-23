@@ -221,6 +221,46 @@ pub type uint_fast64_t = cty::c_ulonglong;
 #[repr(i32)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub enum lnPin {
+    GPIO0 = 0,
+    GPIO1 = 1,
+    GPIO2 = 2,
+    GPIO3 = 3,
+    GPIO4 = 4,
+    GPIO5 = 5,
+    GPIO6 = 6,
+    GPIO7 = 7,
+    GPIO8 = 8,
+    GPIO9 = 9,
+    GPIO10 = 10,
+    GPIO11 = 11,
+    GPIO12 = 12,
+    GPIO13 = 13,
+    GPIO14 = 14,
+    GPIO15 = 15,
+    GPIO16 = 16,
+    GPIO17 = 17,
+    GPIO18 = 18,
+    GPIO19 = 19,
+    GPIO20 = 20,
+    GPIO21 = 21,
+    GPIO22 = 22,
+    GPIO23 = 23,
+    GPIO24 = 24,
+    GPIO25 = 25,
+    GPIO26 = 26,
+    GPIO27 = 27,
+    GPIO28 = 28,
+    GPIO29 = 29,
+    GPIO30 = 30,
+    GPIO31 = 31,
+    GPIO32 = 32,
+    GPIO33 = 33,
+    GPIO34 = 34,
+    GPIO35 = 35,
+    GPIO36 = 36,
+    GPIO37 = 37,
+    GPIO38 = 38,
+    GPIO39 = 39,
     NoPin = -1,
 }
 #[repr(u32)]
@@ -280,6 +320,25 @@ unsafe extern "C" {
 unsafe extern "C" {
     #[link_name = "\u{1}_Z15lnRemapTimerPini"]
     pub fn lnRemapTimerPin(timer: cty::c_int);
+}
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+pub struct lnFastIO {
+    pub _onoff: *mut cty::c_uint,
+    pub _onbit: cty::c_uint,
+    pub _offbit: cty::c_uint,
+}
+unsafe extern "C" {
+    #[link_name = "\u{1}_ZN8lnFastIOC1E5lnPin"]
+    pub fn lnFastIO_lnFastIO(this: *mut lnFastIO, p: lnPin);
+}
+impl lnFastIO {
+    #[inline]
+    pub unsafe fn new(p: lnPin) -> Self {
+        let mut __bindgen_tmp = ::core::mem::MaybeUninit::uninit();
+        lnFastIO_lnFastIO(__bindgen_tmp.as_mut_ptr(), p);
+        __bindgen_tmp.assume_init()
+    }
 }
 unsafe extern "C" {
     #[link_name = "\u{1}_Z19lnGetGpioOnRegisteri"]
