@@ -12,7 +12,7 @@ pub use crate::rn_gpio_rp2040_c as gpio;
 mod import_gpio
 {
 pub use crate::rn_gpio_esp32_c;
-pub use crate::rn_fast_gpio_esp32_c as rn_fast_gpio;
+pub use crate::rn_fast_gpio_esp32c3 as rn_fast_gpio;
 pub use crate::rn_gpio_esp32_c as gpio;
 }
 
