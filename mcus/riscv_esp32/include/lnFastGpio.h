@@ -3,38 +3,37 @@
  *  See license file
  */
 #pragma once
-
+#include "stdint.h"
 /**
  *
  * @param p
-*/
-#if 0 
+ */
 class lnFastIO
 {
   public:
     lnFastIO(lnPin p);
     void on() volatile
     {
-        *_onoff = _onbit;
+        *_on = _bit;
     }
     void off() volatile
     {
-        *_onoff = _offbit;
+        *_off = _bit;
     }
     void pulseLow() volatile __attribute__((always_inline))
     {
-        *_onoff = _offbit;
-        *_onoff = _onbit;
+        *_off = _bit;
+        *_on = _bit;
     }
     void pulseHigh() volatile __attribute__((always_inline))
     {
-        *_onoff = _onbit;
-        *_onoff = _offbit;
+        *_off = _bit;
+        *_on = _bit;
     }
 
   protected:
-    volatile uint32_t *_onoff;
-    volatile uint32_t _onbit, _offbit;
+    volatile uint32_t *_on;
+    volatile uint32_t *_off;
+    volatile uint32_t _bit;
 };
-#endif
 // EOF
