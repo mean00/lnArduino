@@ -73,10 +73,19 @@ void Logger(const char *fmt...)
     loggerMutex->unlock();
 }
 /**
- *
+ * 
+ */
+void LoggerInitMutex()
+{
+   loggerMutex = new lnMutex;
+}
+/**
+ * 
  */
 void LoggerInit()
 {
+    LoggerInitMutex();
+    
     int debugUart = 0;
 #ifdef LN_DEBUG_UART
     debugUart = LN_DEBUG_UART;
@@ -85,7 +94,7 @@ void LoggerInit()
 #ifdef LOGGER_USE_DMA
     dma = true;
 #endif
-    loggerMutex = new lnMutex;
+    
     bool buffered = true;
     serial0 = createLnSerialTxOnly(debugUart, dma, buffered);
     serial0->init();
