@@ -28,12 +28,10 @@ void lnPinMode(const lnPin pin, const lnGpioMode mode, const int speedInMhz)
     case lnINPUT_PULLUP:
         io_conf.mode = GPIO_MODE_INPUT;
         io_conf.pull_up_en = GPIO_PULLUP_ENABLE;
-        xAssert(0);
         break;
     case lnINPUT_PULLDOWN:
         io_conf.mode = GPIO_MODE_INPUT;
         io_conf.pull_down_en = GPIO_PULLDOWN_ENABLE;
-        xAssert(0);
         break;
     case lnOUTPUT:
         break;

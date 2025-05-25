@@ -12,6 +12,5 @@ enum LnIRQ : int
 {
     LN_IRQ_NONE = 0,
 };
-extern bool xPortIsInsideInterrupt();
-#define underInterrupt xPortIsInsideInterrupt()
+#define underInterrupt (xPortInIsrContext())
 
