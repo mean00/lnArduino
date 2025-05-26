@@ -55,7 +55,7 @@ void myMcp23017_rtos::start()
     _mcp->start();
 
     // Hook our interrupt handler
-    noInterrupts();
+    lnNoInterrupt();
     pinMode(_pinInterrupt, INPUT_PULLUP);
     attachInterrupt(_pinInterrupt, _myInterrupt, _sem, FALLING);
     interrupts();

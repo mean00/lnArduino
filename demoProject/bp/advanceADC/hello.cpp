@@ -13,7 +13,7 @@
 
 void setup()
 {
-    pinMode(LN_SYSTEM_LED, OUTPUT);
+    lnPinMode(LN_SYSTEM_LED, lnOUTPUT);
 }
 /**
  *
@@ -28,7 +28,7 @@ int val;
 void loop()
 {
     bool onoff = true;
-    digitalWrite(LED, true);
+    lnDigitalWrite(LED, true);
     int roundup = 0;
 
     lnPinMode(PA0, lnADC_MODE);
@@ -83,7 +83,7 @@ void loop()
     {
         dac0->setValue(500);
         dac1->setValue(3500);
-        delay(10);
+        lnDelayMs(10);
         memset(output, 0, 2 * SAMPLE_PER_CHANNEL * sizeof(TYPE));
 
         adc->multiRead(SAMPLE_PER_CHANNEL, (uint16_t *)output);
@@ -100,10 +100,10 @@ void loop()
                 Logger(" PA1 %d : too small : %d \n", i, output[1 + 2 * i]);
             }
         }
-        delay(10);
+        lnDelayMs(10);
         dac0->setValue(3500);
         dac1->setValue(500);
-        delay(10);
+        lnDelayMs(10);
         memset(output, 0, 2 * SAMPLE_PER_CHANNEL * sizeof(TYPE));
         adc->multiRead(SAMPLE_PER_CHANNEL, (uint16_t *)output);
 
@@ -119,6 +119,6 @@ void loop()
                 Logger("PA0 %d : too small : %d \n", i, output[0 + 2 * i]);
             }
         }
-        delay(20);
+        lnDelayMs(20);
     }
 }

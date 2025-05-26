@@ -1,4 +1,4 @@
-#include "Arduino.h"
+#include "lnArduino.h"
 #include "lnCpuID.h"
 #include "lnFreeRTOS_pp.h"
 

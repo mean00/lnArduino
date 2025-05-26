@@ -19,9 +19,9 @@ void mySetup()
     Serial.println("Init");
     // Reset the chip, connected to PA1
     pinMode(PA1, OUTPUT);
-    digitalWrite(PA1, LOW);
-    delay(100);
-    digitalWrite(PA1, HIGH);
+    digitalWrite(PA1, 0);
+    lnDelayMs(100);
+    digitalWrite(PA1, 1);
 
     //
 
@@ -45,7 +45,7 @@ void myLoop(void)
     for (int i = 0; i < 10; i++)
     {
         mcp->process();
-        delay(10);
+        lnDelayMs(10);
     }
     int inc = rotary->count();
     if (inc)

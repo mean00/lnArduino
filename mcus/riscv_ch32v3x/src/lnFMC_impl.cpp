@@ -44,12 +44,12 @@ class autoNoInterrupt
   public:
     autoNoInterrupt()
     {
-        noInterrupts();
+        lnNoInterrupt();
         CH32V3_flashEnhanceMode(false);
     }
     ~autoNoInterrupt()
     {
-        interrupts();
+        lnInterrupts();
         CH32V3_flashEnhanceMode(true);
     }
 };
@@ -96,7 +96,7 @@ static void unlock()
     // send unlock sequence
     aFMC->KEY = 0x45670123;
     aFMC->KEY = 0xCDEF89AB;
-    delayMicroseconds(100);
+    lnDelayUs(100);
     // verify it is unlocked
     xAssert(!(aFMC->CTL & LN_FMC_CTL_LK));
 }

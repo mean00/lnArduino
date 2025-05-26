@@ -261,7 +261,7 @@ void lnDMA::beginTransfer()
 void lnDMA::cancelTransfer()
 {
     DMA_channels *channel = _dma->channels + _channelInt;
-    noInterrupts();
+    lnNoInterrupt();
     uint32_t control = channel->CTL;
     control &= ~LN_DMA_CHAN_ENABLE;
     control &= ~(LN_DMA_CHAN_ERRIE + LN_DMA_CHAN_TFTFIE);
@@ -271,7 +271,7 @@ void lnDMA::cancelTransfer()
     _cookie = NULL;
     CLEAR_ALL_DMA_INTERRUPT();
     _lnDmas[_dmaInt][_channelInt] = NULL;
-    interrupts();
+    lnInterrupts();
 }
 /**
  * @brief

@@ -23,11 +23,13 @@ IF(True) #NOT LNARDUINO_ROOT)
 
   OPTION(LN_ENABLE_RUST "Enable rust support" OFF)
 
+  # WCH32Vxx specific
   OPTION(USE_CH32v3x_HW_IRQ_STACK "Enable WCH HW interrupt stack push pop (CH32V3xx only)" TRUE)
   OPTION(USE_CH32v3x_FAST_IRQ  "Use the WCH fast IRQ mode (CH32V30x only)" TRUE)
   OPTION(USE_CH32v3x_USB_HS  "Use the USB HS interface (CH32V307 only)" FALSE)
   OPTION(USE_CH32v3x_USB_OTG "Use the USB OTG interface (CH32V30x only)" FALSE)
 
+  # RP2xxx specific
   OPTION(USE_RP2350_PURE_RAM "Load and run from RAM (RP2350 only)" FALSE)
   OPTION(USE_RP2040_PURE_RAM "Load and run from RAM (RP2040 only)" FALSE)
   OPTION(USE_CH32v3x_PURE_RAM "Load and run from RAM (CH32vxx only)" FALSE)
@@ -63,11 +65,9 @@ IF(True) #NOT LNARDUINO_ROOT)
     include(lnFreeRTOS)
     target_link_libraries(lnArduinoInternal  INTERFACE FreeRTOS )
   ENDIF()
-  include(lnArduino_compat)
   include(lnEmbeddedPrint)
 
   add_subdirectory(${LN_MCU_FOLDER}/src)
-
   add_subdirectory(${LNARDUINO_ROOT}/src)
 
   IF(LN_ENABLE_RUST)
@@ -78,18 +78,18 @@ IF(True) #NOT LNARDUINO_ROOT)
   # Ok let's create our public libary
   # a firmmware should link against that one
   ADD_LIBRARY(lnArduino INTERFACE)
-  target_link_libraries(lnArduino INTERFACE lnBoard ln_utils gd32Arduino embeddedPrintf lnArduinoInternal)
+  target_link_libraries(lnArduino INTERFACE lnBoard ln_utils embeddedPrintf lnArduinoInternal)
   IF(NOT LN_EXTERNAL_FREERTOS)
     target_link_libraries(lnArduino INTERFACE FreeRTOS )
   ENDIF()
   target_include_directories(lnArduino INTERFACE ${LNARDUINO_ROOT})
   target_include_directories(lnArduino INTERFACE ${LNARDUINO_ROOT}/include)
   target_include_directories(lnArduino INTERFACE ${LN_MCU_FOLDER})
-ENDIF()
 
+  IF(LN_ENABLE_RUST)
+    TARGET_LINK_LIBRARIES(lnArduino INTERFACE lnarduino_c_bindings)
+  ENDIF()
 
-IF(LN_ENABLE_RUST)
-  TARGET_LINK_LIBRARIES(lnArduino INTERFACE lnarduino_c_bindings)
 ENDIF()
 
 

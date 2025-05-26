@@ -18,7 +18,7 @@ int roundup = 0;
 void loop()
 {
     bool onoff = true;
-    digitalWrite(LED, true);
+    lnDigitalWrite(LED, true);
     setLogger(rttLoggerFunction); // REDIRECT LOGGING TO RTT
     SEGGER_RTT_Init();
     while (1)

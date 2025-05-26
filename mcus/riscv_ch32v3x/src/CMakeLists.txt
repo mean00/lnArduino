@@ -7,18 +7,19 @@ add_subdirectory(../../common_bluepill common_bp)
 target_include_directories(lnArduino_impl PRIVATE ${S} ${S}/../include)
 
 target_sources( lnArduino_impl PRIVATE
-    ${S}/lnCpuID_riscv_ch32v3x.cpp  
-    ${S}/lnFMC_impl.cpp  
-    ${S}/lnIRQ_riscv_ch32v3x.cpp  
-    ${S}/ch32v3x_interrupt_table.cpp  
-    ${S}/lnRCU_ch32v3x_usb.cpp  
-    ${S}/lnRCU_systemClock_riscv_ch32v3x.cpp  
-    ${S}/lnRunTime_riscv_ch32v3x.cpp  
-    ${S}/lnSystemTimer_riscv_ch32v3x.cpp  
+    ${S}/lnCpuID_riscv_ch32v3x.cpp
+    ${S}/lnFMC_impl.cpp
+    ${S}/lnIRQ_riscv_ch32v3x.cpp
+    ${S}/ch32v3x_interrupt_table.cpp
+    ${S}/lnRCU_ch32v3x_usb.cpp
+    ${S}/lnRCU_systemClock_riscv_ch32v3x.cpp
+    ${S}/lnRunTime_riscv_ch32v3x.cpp
+    ${S}/lnSystemTimer_riscv_ch32v3x.cpp
     ${S}/lnBoot_riscv_ch32.cpp
+    ${S}/../boards/${LN_BOARD_NAME}/lnPinMapping.cpp
 )
 IF(LN_ENABLE_USBD)
-        target_sources( lnArduino_impl PRIVATE ${S}/lnUSBD_ch32v3x.cpp)
+  target_sources( lnArduino_impl PRIVATE ${S}/lnUSBD_ch32v3x.cpp)
 ENDIF()
 
 IF(LN_ENABLE_I2C)
@@ -33,6 +34,6 @@ IF(USE_CH32v3x_HW_IRQ_STACK)
   MESSAGE(STATUS "Use WCH fast IRQ")
   target_compile_definitions(lnArduino_impl PRIVATE "-DUSE_CH32v3x_HW_IRQ_STACK")
 ELSE()
-  MESSAGE(STATUS "Use WCH slow IRQ")  
+  MESSAGE(STATUS "Use WCH slow IRQ")
 ENDIF()
 

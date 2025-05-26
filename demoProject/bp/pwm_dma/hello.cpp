@@ -7,7 +7,7 @@
 
 void setup()
 {
-    pinMode(LED, OUTPUT);
+    lnPinMode(LED, lnOUTPUT);
 }
 
 class timerCB : public lnDmaTimerCallback
@@ -29,7 +29,7 @@ bool timerCB::timerCallback(bool half)
 void loop()
 {
     bool onoff = true;
-    digitalWrite(LED, true);
+    lnDigitalWrite(LED, true);
     int roundup = 0;
 
     uint16_t sequence[] = {10, 20, 30, 40, 50, 60, 70, 80, 90};

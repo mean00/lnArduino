@@ -1,8 +1,8 @@
 //
-#include "Arduino.h"
 #include "PNP_compressed.h"
 #include "PNP_decl.h"
 #include "gd32ST7735.h"
+#include "lnArduino.h"
 #include "lnI2C.h"
 #include "lnSPI.h"
 #include "lnWS2812B.h"
@@ -253,12 +253,12 @@ void lcdST7735Task(void *)
     lnSPISettings transaction(30 * 1000 * 1000, SPI_MSBFIRST, SPI_MODE0, -1);
     spi->beginTransaction(transaction);
     // Reset LCD
-    pinMode(PINRST, OUTPUT);
-    digitalWrite(PINRST, HIGH);
+    lnPinMode(PINRST, lnOUTPUT);
+    lnDigitalWrite(PINRST, 1);
     xDelay(50);
-    digitalWrite(PINRST, LOW);
+    lnDigitalWrite(PINRST, 0);
     xDelay(50);
-    digitalWrite(PINRST, HIGH);
+    lnDigitalWrite(PINRST, 1);
 
     gd32ST7735 *lcd = new gd32ST7735(160, 80, spi, PINDC, PINCS);
     lcd->init();
@@ -278,7 +278,7 @@ void lcdST7735Task(void *)
     {
         roundup++;
         vTaskDelay(1200);
-        digitalToggle(LED);
+        lnDigitalToggle(LED);
         onoff = !onoff;
         if (onoff)
         {

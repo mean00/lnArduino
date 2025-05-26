@@ -1,7 +1,7 @@
 //
 // The "wheel" effect is derived from the WS2812Demo found in stm32duino
 // https://github.com/rogerclarkmelbourne/WS2812B_STM32_Libmaple/blob/master/examples/WS2812B_test/WS2812B_test.ino
-#include "Arduino.h"
+#include "lnArduino.h"
 #include "lnSPI.h"
 #include "lnWS2812B_timer.h"
 
@@ -17,13 +17,13 @@
  */
 void setup()
 {
-    pinMode(LED, OUTPUT);
+    lnPinMode(LED, lnOUTPUT);
     lnPinMode(WS2812B_PIN, lnPWM);
-    digitalWrite(LED, true);
+    lnDigitalWrite(LED, true);
 }
 
 //
-void Wheel(byte WheelPos, int &r, int &g, int &b)
+void Wheel(uint8_t WheelPos, int &r, int &g, int &b)
 {
     if (WheelPos < 85)
     {
@@ -59,18 +59,18 @@ void wheelDemo(WS2812B_timer *ws)
 
         for (int j = 0; j < 256; j++)
         {
-            before = micros();
+            before = lnGetUs();
             for (int i = 0; i < NB_WS2812B; i++)
             {
                 int pos = (i + j) & 0xff;
                 Wheel(pos, r, g, b);
                 ws->setLedColor(i, r, g, b);
             }
-            after = micros();
+            after = lnGetUs();
             // Logger("Convert = %d\n",after-before);
-            before = micros();
+            before = lnGetUs();
 
-            after = micros();
+            after = lnGetUs();
             // Logger("Convert2 = %d\n",after-before);
             xDelay(20);
             // ws->setGlobalBrightness(brightness);

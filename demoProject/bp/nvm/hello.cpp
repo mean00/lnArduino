@@ -11,7 +11,7 @@
 
 void setup()
 {
-    pinMode(LN_SYSTEM_LED, OUTPUT);
+    lnPinMode(LN_SYSTEM_LED, lnOUTPUT);
 }
 /**
  *
@@ -22,7 +22,7 @@ void stop()
     Logger("** FAILURE ** \n");
     while (1)
     {
-        delay(40);
+        lnDelayMs(40);
     }
 }
 
@@ -79,7 +79,7 @@ void loop()
 {
     lnNvmGd32 nvm;
     // nvm.format();
-    // delay(5000);
+    // lnDelayMs(5000);
     Logger("Starting...\n");
     if (!nvm.begin())
     {
@@ -96,6 +96,6 @@ void loop()
     Logger("End => ALL OK !\n");
     while (1)
     {
-        delay(10);
+        lnDelayMs(10);
     }
 }
