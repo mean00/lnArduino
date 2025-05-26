@@ -9,7 +9,7 @@
 
 void setup()
 {
-    pinMode(LN_SYSTEM_LED, OUTPUT);
+    lnPinMode(LN_SYSTEM_LED, lnOUTPUT);
 }
 /**
  *
@@ -19,7 +19,7 @@ int val;
 void loop()
 {
     bool onoff = true;
-    digitalWrite(LN_SYSTEM_LED, true);
+    lnDigitalWrite(LN_SYSTEM_LED, true);
     int roundup = 0;
 
     lnPinMode(PA4, lnDAC_MODE);

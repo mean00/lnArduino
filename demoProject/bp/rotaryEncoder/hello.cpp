@@ -6,7 +6,7 @@
 
 void setup()
 {
-    pinMode(LED, OUTPUT);
+    lnPinMode(LED, lnOUTPUT);
 }
 /**
  *
@@ -26,7 +26,7 @@ void loop()
     {
         lnRotary::EVENTS ev = rotary->waitForEvent(2000);
         Logger("Pulse\n");
-        digitalToggle(LED);
+        lnDigitalToggle(LED);
 
         if (ev & lnRotary::ROTARY_CHANGE)
         {

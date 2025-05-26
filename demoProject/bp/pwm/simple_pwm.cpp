@@ -7,13 +7,13 @@
 
 void setup()
 {
-    pinMode(LED, OUTPUT);
+    lnPinMode(LED, lnOUTPUT);
 }
 
 void loop()
 {
     bool onoff = true;
-    digitalWrite(LED, true);
+    lnDigitalWrite(LED, true);
     int roundup = 0;
 
     lnPinMode(PWM_PIN, lnPWM);
@@ -26,7 +26,7 @@ void loop()
     timer.enable();
     while (1)
     {
-        digitalToggle(LED);
+        lnDigitalToggle(LED);
         xDelay(1000);
     }
 }

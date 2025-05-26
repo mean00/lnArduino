@@ -8,7 +8,7 @@
  */
 SignalGenerator::SignalGenerator(lnPin pin, int dac)
 {
-    pinMode(pin, lnDAC_MODE);
+    lnPinMode(pin, lnDAC_MODE);
     _dac = new lnDAC(dac);
 }
 /**

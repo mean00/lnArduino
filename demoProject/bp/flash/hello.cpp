@@ -9,7 +9,7 @@
 
 void setup()
 {
-    pinMode(LED, OUTPUT);
+    lnPinMode(LED, lnOUTPUT);
 }
 /**
  *
@@ -52,7 +52,7 @@ void testU(uint32_t adr, const uint8_t *data, int siz)
 void loop()
 {
     bool onoff = true;
-    digitalWrite(LED, true);
+    lnDigitalWrite(LED, true);
 
     uint32_t adr = (uint32_t)&eeprom_begin;
     Logger("Erasing 0x%x\n", eeprom_begin);

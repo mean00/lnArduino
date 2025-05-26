@@ -23,11 +23,11 @@ class autoNoInterrupt
   public:
     autoNoInterrupt()
     {
-        noInterrupts();
+        lnNoInterrupt();
     }
     ~autoNoInterrupt()
     {
-        interrupts();
+        lnInterrupts();
     }
 };
 
@@ -99,7 +99,7 @@ static void unlock()
     // send unlock sequence
     aFMC->KEY = 0x45670123;
     aFMC->KEY = 0xCDEF89AB;
-    delayMicroseconds(100);
+    lnDelayUs(100);
     // verify it is unlocked
     xAssert(!(aFMC->CTL & LN_FMC_CTL_LK));
 }

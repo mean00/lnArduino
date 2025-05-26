@@ -23,8 +23,8 @@ void spiLoop();
  */
 void setup()
 {
-    pinMode(LN_SYSTEM_LED, OUTPUT);
-    digitalWrite(LN_SYSTEM_LED, 0);
+    lnPinMode(LN_SYSTEM_LED, lnOUTPUT);
+    lnDigitalWrite(LN_SYSTEM_LED, 0);
     Logger("Starting AD9833...");
     spi = lnSPI::create(AD9833_SPI);
     spi->begin();
@@ -47,12 +47,12 @@ void loop()
     {
         ad->setWaveForm(simplerAD9833::Triangle);
         ad->setFrequency(1000);
-        xDelay(2000);
+        lnDelayMs(2000);
         ad->setWaveForm(simplerAD9833::Square);
         ad->setFrequency(10000);
-        xDelay(2000);
+        lnDelayMs(2000);
         ad->disable();
-        xDelay(2000);
+        lnDelayMs(2000);
         ad->enable();
     }
 }

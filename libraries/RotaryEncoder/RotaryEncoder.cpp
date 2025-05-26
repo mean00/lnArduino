@@ -86,7 +86,7 @@ static void myPushInterrupt(lnPin pin, void *arg)
 void lnRotary::pushInterrupt()
 {
     bool state = lnDigitalRead(_pinPush);
-    uint32_t m = millis();
+    uint32_t m = lnGetMs();
     if ((m - _lastRead) < THRESHOLD)
         return;
     if (!state) // down
@@ -165,23 +165,23 @@ lnRotary::lnRotary(lnPin pinPush, lnPin pinA, lnPin pinB)
  */
 void lnRotary::start()
 {
-    noInterrupts();
+    lnNoInterrupt();
     lnExtiAttachInterrupt(_pinA, LN_EDGE_BOTH, myInterrupt, this);
     lnExtiAttachInterrupt(_pinB, LN_EDGE_BOTH, myInterrupt, this);
     lnExtiAttachInterrupt(_pinPush, LN_EDGE_BOTH, myPushInterrupt, this);
     lnExtiEnableInterrupt(_pinA);
     lnExtiEnableInterrupt(_pinB);
     lnExtiEnableInterrupt(_pinPush);
-    interrupts();
+    lnInterrupts();
 }
 /*
  */
 int lnRotary::getCount()
 {
-    noInterrupts();
+    lnNoInterrupt();
     int c = _count;
     _count = 0;
-    interrupts();
+    lnInterrupts();
     return c;
 }
 /**

@@ -16,9 +16,9 @@
  */
 void setup()
 {
-    pinMode(LED, OUTPUT);
-    pinMode(LED2, OUTPUT);
-    pinMode(LED3, OUTPUT);
+    lnPinMode(LED, lnOUTPUT);
+    lnPinMode(LED2, lnOUTPUT);
+    lnPinMode(LED3, lnOUTPUT);
 }
 #define MEVENT(x)                                                                                                      \
     case lnUsbStack::USB_##x:                                                                                          \

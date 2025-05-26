@@ -5,7 +5,7 @@
 
 #include "stdint.h"
 
-//#pragma clang diagnostic ignored "-Wextra"
+// #pragma clang diagnostic ignored "-Wextra"
 
 extern "C"
 {
@@ -36,11 +36,11 @@ extern "C"
     {
         deadEnd(0x1000);
     }
-    void interrupts()
+    void lnInterrupts()
     {
         EXIT_CRITICAL();
     }
-    void noInterrupt()
+    void lnNoInterrupt()
     {
         ENTER_CRITICAL();
     }

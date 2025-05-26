@@ -20,7 +20,7 @@ void loop()
     bool onoff = true;
     while (1)
     {
-        delay(1000);
+        lnDelayMs(1000);
         lnOpenDrainClose(LED, onoff);
         onoff = !onoff;
     }

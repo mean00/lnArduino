@@ -1,5 +1,5 @@
 //
-#include "Arduino.h"
+#include "lnArduino.h"
 #include "lnI2C.h"
 
 // green = PA1, blue = PA2, RED PC13

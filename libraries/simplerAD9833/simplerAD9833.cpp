@@ -12,7 +12,7 @@
  ****************************************************/
 
 #include "simplerAD9833.h"
-#include "Arduino.h"
+#include "lnArduino.h"
 #include "simplerAD9833_internal.h"
 /**
  *
@@ -29,8 +29,8 @@ simplerAD9833::simplerAD9833(lnSPI *spi, lnPin cs, int baseClock)
     _factor = (int)(m + 0.49);
     if (_cs != -1)
     {
-        digitalWrite(_cs, true);
-        pinMode(_cs, OUTPUT);
+        lnDigitalWrite(_cs, true);
+        lnPinMode(_cs, lnOUTPUT);
     }
     _waveform = Sine;
     _frequency = 1000;
@@ -137,10 +137,10 @@ void simplerAD9833::setFrequency(int fq)
 void simplerAD9833::writeRegister(int addr, int value)
 {
     _spi->begin(16);
-    digitalWrite(_cs, false);
+    lnDigitalWrite(_cs, false);
     _spi->write16(value);
     lnDelayUs(1);
-    digitalWrite(_cs, true);
+    lnDigitalWrite(_cs, true);
     _spi->end();
 }
 

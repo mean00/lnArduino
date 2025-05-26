@@ -217,7 +217,7 @@ void lnTimer::singleShot(int durationMs, bool down)
     LN_Timers_Registers *t = aTimers(_timer);
     ;
     xAssert(durationMs <= 100);
-    // noInterrupts();
+    // lnNoInterrupt();
     disable();
     setTickFrequency(10 * 1000 * SPEEDUP); // 1 tick=1ms
     t->CAR = 10000 - 1;
@@ -230,12 +230,12 @@ void lnTimer::singleShot(int durationMs, bool down)
     chCtl |= LN_TIME_CHCTL0_CTL_PWM0;
     WRITE_CHANNEL_CTL(_channel, chCtl)
     t->CHCVs[_channel] = durationMs * 10; // high then low when timer elapsed
-    noInterrupts();
+    lnNoInterrupt();
     // t->CTL0|=LN_TIMER_CTL0_SPM; // sign
     t->CNT = t->CAR - 1;
     t->CTL0 |= LN_TIMER_CTL0_CEN;
     t->CHCTL2 |= LN_TIMER_CHTL2_CHxEN(_channel); // basic enable, active high
-    interrupts();
+    lnInterrupts();
     xDelay(durationMs + 10);
     disable();
 }

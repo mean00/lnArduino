@@ -13,7 +13,7 @@
 
 void setup()
 {
-    pinMode(LED, OUTPUT);
+    lnPinMode(LED, lnOUTPUT);
 }
 /**
  *
@@ -23,7 +23,7 @@ int val;
 void loop()
 {
     bool onoff = true;
-    digitalWrite(LED, true);
+    lnDigitalWrite(LED, true);
     int roundup = 0;
 
     lnPinMode(PA0, lnADC_MODE);
@@ -51,16 +51,16 @@ void loop()
     {
         dac0->setValue(500);
         dac1->setValue(3500);
-        delay(10);
+        lnDelayMs(10);
         adc->pollingMultiRead(2, pins, output);
         Logger("500:3500 PA0: %d PA1 :%d \n", output[0], output[1]);
 
-        delay(500);
+        lnDelayMs(500);
         dac0->setValue(3500);
         dac1->setValue(500);
-        delay(10);
+        lnDelayMs(10);
         adc->pollingMultiRead(2, pins, output);
         Logger("3500:500 PA0: %d PA1 :%d \n", output[0], output[1]);
-        delay(500);
+        lnDelayMs(500);
     }
 }

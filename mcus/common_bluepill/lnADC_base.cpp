@@ -55,7 +55,7 @@ void lnBaseAdc::readVcc()
     adc->SAMPT[1] = LN_ADC_SAMPT_239_5;
 
     adc->CTL1 |= LN_ADC_CTL1_ADCON;
-    delayMicroseconds(10);
+    lnDelayUs(10);
     //
     adc_vcc = 0;
     adc_volt = 0.;
@@ -122,7 +122,7 @@ void lnBaseAdc::setup()
 
     adc->CTL1 |= LN_ADC_CTL1_ADCON;
     //  calibration
-    delayMicroseconds(10);
+    lnDelayUs(10);
     // reset calibration
     adc->CTL1 |= LN_ADC_CTL1_RSTCLB;
     while (adc->CTL1 & LN_ADC_CTL1_RSTCLB)

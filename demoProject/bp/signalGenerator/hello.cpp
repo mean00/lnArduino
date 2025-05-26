@@ -12,8 +12,8 @@
 
 void setup()
 {
-    pinMode(LED, OUTPUT);
-    digitalWrite(LED, HIGH);
+    lnPinMode(LED, lnOUTPUT);
+    lnDigitalWrite(LED, 1);
 }
 /**
  */

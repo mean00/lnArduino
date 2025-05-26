@@ -4,7 +4,7 @@
 
 void setup()
 {
-    pinMode(LED, OUTPUT);
+    lnPinMode(LED, lnOUTPUT);
 }
 /**
  *
@@ -15,6 +15,6 @@ void loop()
     Logger("Starting heelo ...\n");
     while (1)
     {
-        digitalToggle(LED);
+        lnDigitalToggle(LED);
     }
 }

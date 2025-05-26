@@ -7,8 +7,8 @@
 
 void setup()
 {
-    pinMode(LED, OUTPUT);
-    digitalWrite(LED, true);
+    lnPinMode(LED, lnOUTPUT);
+    lnDigitalWrite(LED, true);
 }
 
 void loop()
@@ -34,6 +34,6 @@ void loop()
         if (fq >= 100 * 1000)
             fq = 100;
         xDelay(1000);
-        digitalToggle(LED);
+        lnDigitalToggle(LED);
     }
 }

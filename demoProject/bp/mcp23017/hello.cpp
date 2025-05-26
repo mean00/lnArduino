@@ -1,5 +1,5 @@
 //
-#include "Arduino.h"
+#include "lnArduino.h"
 #include "lnI2C.h"
 #include "lnMcp23017.h"
 // green = PA1, blue = PA2, RED PC13
@@ -27,12 +27,12 @@ void loop()
     lnMcp23017 *mcp = new lnMcp23017(i2c, PB5, 0x20);
     mcp->begin();
     bool onoff = false;
-    pinMode(LEDRED, OUTPUT);
+    lnPinMode(LEDRED, lnOUTPUT);
     while (1)
     {
 
         mcp->digitalWrite(0, onoff);
-        digitalWrite(LEDRED, onoff);
+        lnDigitalWrite(LEDRED, onoff);
         bool readBack = mcp->readOutput(0);
         bool readBack5 = mcp->readOutput(5);
         bool readIn = mcp->readInput(0);

@@ -4,7 +4,7 @@
 
 void setup()
 {
-    pinMode(LED, OUTPUT);
+    lnPinMode(LED, lnOUTPUT);
 }
 /**
  *
@@ -22,7 +22,7 @@ void test_time(int ms)
 void loop()
 {
     bool onoff = true;
-    digitalWrite(LED, true);
+    lnDigitalWrite(LED, true);
 
     Logger("Starting a 1 sec wait...\n");
     xDelay(1000);
@@ -36,7 +36,7 @@ void loop()
     {
         roundup++;
         xDelay(500);
-        digitalToggle(LED);
+        lnDigitalToggle(LED);
         onoff = !onoff;
     }
 }

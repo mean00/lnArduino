@@ -34,7 +34,6 @@
 #endif
 #endif
 
-#include "Arduino.h"
 #include "systemHelper.h"
 extern "C"
 {
@@ -56,6 +55,9 @@ extern "C"
 
 #define LN_ALIGN(x) __attribute__((aligned(x)))
 #define LN_USED __attribute__((used))
+
+extern "C" void lnNoInterrupt();
+extern "C" void lnInterrupts();
 
 #ifndef LN_LINUX
 extern "C" void free(void *a) _NOTHROW;
