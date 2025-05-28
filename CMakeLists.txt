@@ -49,6 +49,7 @@ IF(True) #NOT LNARDUINO_ROOT)
   target_include_directories(lnArduinoInternal INTERFACE ${LN_MCU_FOLDER})
   target_include_directories(lnArduinoInternal INTERFACE ${LN_MCU_FOLDER}/include)
   target_include_directories(lnArduinoInternal INTERFACE lnBoard)
+  target_include_directories(lnArduinoInternal INTERFACE embeddedPrintf    )
 
 
 
@@ -89,6 +90,7 @@ IF(True) #NOT LNARDUINO_ROOT)
   IF(LN_ENABLE_RUST)
     TARGET_LINK_LIBRARIES(lnArduino INTERFACE lnarduino_c_bindings)
   ENDIF()
+  target_include_directories(lnArduino INTERFACE embeddedPrintf    )
 
 ENDIF()
 
