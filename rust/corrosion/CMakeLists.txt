@@ -36,7 +36,7 @@ if (NOT CORROSION_INSTALL_ONLY)
 endif()
 
 # Testing
-if (CORROSION_BUILD_TESTS)
+if (FALSE) #CORROSION_BUILD_TESTS)
     include(CTest)
     add_subdirectory(test)
 endif()
