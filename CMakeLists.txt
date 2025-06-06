@@ -36,20 +36,16 @@ IF(True) #NOT ESPRIT_ROOT)
 
   SET(LN_MCU_FOLDER ${ESPRIT_ROOT}/mcus/${LN_EXT}/ CACHE INTERNAL "")
   #
-  ADD_LIBRARY(lnBoard INTERFACE)
-  target_include_directories(lnBoard INTERFACE ${LN_MCU_FOLDER}/boards/${LN_BOARD_NAME}/) # needed to get the freertos_tuning.h
-  target_include_directories(lnBoard INTERFACE ${LN_MCU_FOLDER}/include/) # needed to get the freertos_tuning.h
-
-  # Ok let's create our internal interface libary
-  ADD_LIBRARY(EspritInternal INTERFACE)
-  target_include_directories(EspritInternal INTERFACE ${ESPRIT_ROOT}/)
-  target_include_directories(EspritInternal INTERFACE ${ESPRIT_ROOT}/include)
-  target_include_directories(EspritInternal INTERFACE ${ESPRIT_ROOT}/arduinoLayer/include)
-  target_include_directories(EspritInternal INTERFACE ${CMAKE_BINARY_DIR}) # To catch generated files
-  target_include_directories(EspritInternal INTERFACE ${LN_MCU_FOLDER})
-  target_include_directories(EspritInternal INTERFACE ${LN_MCU_FOLDER}/include)
-  target_include_directories(EspritInternal INTERFACE lnBoard)
-  target_include_directories(EspritInternal INTERFACE embeddedPrintf    )
+  ADD_LIBRARY(esprit_dev INTERFACE)
+  target_include_directories(esprit_dev INTERFACE ${LN_MCU_FOLDER}/boards/${LN_BOARD_NAME}/) # needed to get the freertos_tuning.h
+  target_include_directories(esprit_dev INTERFACE ${LN_MCU_FOLDER}/include/) # needed to get the freertos_tuning.h
+  target_include_directories(esprit_dev INTERFACE ${ESPRIT_ROOT}/)
+  target_include_directories(esprit_dev INTERFACE ${ESPRIT_ROOT}/include)
+  target_include_directories(esprit_dev INTERFACE ${CMAKE_BINARY_DIR}) # To catch generated files
+  target_include_directories(esprit_dev INTERFACE ${LN_MCU_FOLDER})
+  target_include_directories(esprit_dev INTERFACE ${LN_MCU_FOLDER}/include)
+  target_include_directories(esprit_dev INTERFACE esprit_dev)
+  target_include_directories(esprit_dev INTERFACE embeddedPrintf    )
 
 
 
@@ -61,10 +57,10 @@ IF(True) #NOT ESPRIT_ROOT)
   ENDIF(LN_BOOTLOADER_SIZE)
 
   IF(LN_EXTERNAL_FREERTOS)
-    target_compile_definitions(EspritInternal INTERFACE LN_CUSTOM_FREERTOS)
+    target_compile_definitions(esprit_dev INTERFACE LN_CUSTOM_FREERTOS)
   ELSE()
     include(lnFreeRTOS)
-    target_link_libraries(EspritInternal  INTERFACE FreeRTOS )
+    target_include_directories(esprit_dev  INTERFACE FreeRTOS )
   ENDIF()
   include(lnEmbeddedPrint)
 
@@ -76,22 +72,19 @@ IF(True) #NOT ESPRIT_ROOT)
   ENDIF(LN_ENABLE_RUST)
 
 
-  # Ok let's create our public libary
   # a firmmware should link against that one
-  ADD_LIBRARY(esprit_dev INTERFACE)
 
 
   #____________________________________________
   # Merge things into a single lib and single interface
   #____________________________________________
-
+  set(merged_name "esprit_single_lib")
   set(libs_to_merge "${USED_LIBS}")
   set(libs_to_keep esprit_lib)
 
-  target_link_libraries(esprit_dev INTERFACE lnBoard ln_utils embeddedPrintf EspritInternal Esprit_impl)
-  list(APPEND libs_to_merge ln_utils embeddedPrintf Esprit_impl )
+  target_link_libraries(esprit_dev INTERFACE lnBoard ln_utils embeddedPrintf )
+  list(APPEND libs_to_merge ln_utils embeddedPrintf esprit_lib )
   IF(NOT LN_EXTERNAL_FREERTOS)
-    target_link_libraries(esprit_dev INTERFACE FreeRTOS )
     list(APPEND libs_to_merge FreeRTOS )
   ENDIF()
   target_include_directories(esprit_dev INTERFACE ${ESPRIT_ROOT})
@@ -100,7 +93,7 @@ IF(True) #NOT ESPRIT_ROOT)
   target_include_directories(esprit_dev INTERFACE ${ESPRIT_ROOT}/embedded_printf)
 
   IF(LN_ENABLE_RUST)
-    TARGET_LINK_LIBRARIES(esprit_dev INTERFACE lnarduino_c_bindings)
+    target_include_directories(esprit_dev INTERFACE lnarduino_c_bindings)
     list(APPEND libs_to_merge lnarduino_c_bindings )
   ENDIF()
   target_include_directories(esprit_dev INTERFACE embeddedPrintf    )
@@ -117,7 +110,7 @@ IF(True) #NOT ESPRIT_ROOT)
   endforeach()
 
   MESSAGE(STATUS "******merged********* ${all_includes}")
-  add_library(esprit_lib STATIC ${objs})
+  add_library(${merged_name} STATIC ${objs})
 
   set_target_properties(esprit_dev PROPERTIES
         INTERFACE_LINK_LIBRARIES "${libs_to_keep}"

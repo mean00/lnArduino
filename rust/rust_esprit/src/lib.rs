@@ -29,7 +29,7 @@ pub mod rn_gpio_rp2040_c;
 mod rn_i2c_c;
 mod rn_spi_c;
 mod rn_timer_c;
-pub mod rnarduino;
+pub mod rust_esprit;
 // internal API
 pub mod rn_exti;
 pub mod rn_fast_event_group;

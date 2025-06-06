@@ -33,7 +33,7 @@ macro_rules! lnLogger {
 #[macro_export]
 macro_rules! lnLogger_init {
     () => {
-        use rnarduino::rn_logger::W;
+        use rust_esprit::rn_logger::W;
         use ufmt::uwrite;
     };
 }

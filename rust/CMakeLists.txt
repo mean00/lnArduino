@@ -26,10 +26,10 @@ ADD_LIBRARY(lnarduino_c_bindings STATIC
     ${EXTRA}
     ${C}/lnFast_EventGroup_c.cpp
   )
-TARGET_LINK_LIBRARIES(lnarduino_c_bindings EspritInternal)
+TARGET_LINK_LIBRARIES(lnarduino_c_bindings PRIVATE esprit_dev)
 
 IF(LN_ENABLE_USBD)
-  TARGET_LINK_LIBRARIES(lnarduino_c_bindings tinyUsb)
+  TARGET_LINK_LIBRARIES(lnarduino_c_bindings  PRIVATE tinyUsb)
 ENDIF()
 
 

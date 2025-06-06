@@ -15,7 +15,7 @@ use hal::digital::*;
 //---------------------------------
 use crate::rn_os_helper::{delay_ms,delay_us};
 use crate::rn_gpio as gpio;
-use crate::rnarduino::lnPin;
+use crate::rust_esprit::lnPin;
 //---------------------------------
 use super::*;
 

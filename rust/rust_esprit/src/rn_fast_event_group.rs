@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 
 //use alloc::boxed::Box;
-//use crate::rnarduino as rn;
+//use crate::rust_esprit as rn;
 use crate::rn_fast_event_c::{
     lnfast_event_group_c, lnfast_event_group_create, lnfast_event_group_delete,
     lnfast_event_group_read_events, lnfast_event_group_set_events,
