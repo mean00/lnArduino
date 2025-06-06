@@ -2,7 +2,7 @@
  *  (C) 2021 MEAN00 fixounet@free.fr
  *  See license file
  */
-#include "lnArduino.h"
+#include "esprit.h"
 #include "lnDma.h"
 #include "lnPinMapping.h"
 #include "lnTimer.h"

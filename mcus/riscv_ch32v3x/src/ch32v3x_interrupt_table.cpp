@@ -6,7 +6,7 @@
  *
  */
 #include "ch32v30x_isr_helper.h"
-#include "lnArduino.h"
+#include "esprit.h"
 #include "lnIRQ.h"
 #include "lnIRQ_riscv_priv_ch32v3x.h"
 #include "lnRCU.h"

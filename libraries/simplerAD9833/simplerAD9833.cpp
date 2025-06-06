@@ -12,7 +12,7 @@
  ****************************************************/
 
 #include "simplerAD9833.h"
-#include "lnArduino.h"
+#include "esprit.h"
 #include "simplerAD9833_internal.h"
 /**
  *

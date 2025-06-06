@@ -9,7 +9,7 @@
  *
  */
 #pragma once
-#include "lnArduino.h"
+#include "esprit.h"
 #include "lnSPI.h"
 class lnRpDMA;
 class LN_RP_SPIx;

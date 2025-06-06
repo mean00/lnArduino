@@ -1,4 +1,4 @@
-#include "lnArduino.h"
+#include "esprit.h"
 #include "lnTimer.h"
 
 #define LED LN_SYSTEM_LED

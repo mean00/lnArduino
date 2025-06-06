@@ -12,7 +12,7 @@
 // clang-format off
 #include "ln_rp.h" 
 #include "ln_rp_spi.h"
-#include "lnArduino.h"
+#include "esprit.h"
 #include "lnGPIO.h"
 #include "lnSPI.h"
 #include "ln_rp_clocks.h"

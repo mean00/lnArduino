@@ -4,7 +4,7 @@
  */
 
 #include "lnSPI_bp.h"
-#include "lnArduino.h"
+#include "esprit.h"
 #include "lnGPIO.h"
 #include "lnPeripheral_priv.h"
 #include "lnSPI.h"

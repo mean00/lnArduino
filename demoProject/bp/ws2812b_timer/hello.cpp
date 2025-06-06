@@ -1,7 +1,7 @@
 //
 // The "wheel" effect is derived from the WS2812Demo found in stm32duino
 // https://github.com/rogerclarkmelbourne/WS2812B_STM32_Libmaple/blob/master/examples/WS2812B_test/WS2812B_test.ino
-#include "lnArduino.h"
+#include "esprit.h"
 #include "lnSPI.h"
 #include "lnWS2812B_timer.h"
 

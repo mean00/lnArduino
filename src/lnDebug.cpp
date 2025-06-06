@@ -3,7 +3,7 @@
  *  See license file
  */
 
-#include "lnArduino.h"
+#include "esprit.h"
 #include "lnSerial.h"
 #include "stdarg.h"
 #define LOGGER_USE_DMA 1

@@ -4,7 +4,7 @@
  *  See license file
  */
 #include "lnPinMapping.h"
-#include "lnArduino.h"
+#include "esprit.h"
 
 const LN_PIN_MAPPING pinMappings[] = {
     // PIN      ADC     TIMER       TIMERCHANNEL  DAC

@@ -2,7 +2,7 @@
 /*
 
  */
-#include "lnArduino.h"
+#include "esprit.h"
 #include "lnPinMapping.h"
 #include "lnUSBD.h"
 #include "lnUSBD_priv.h"

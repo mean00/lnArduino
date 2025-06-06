@@ -4,7 +4,7 @@
  */
 
 #include "lnRCU.h"
-#include "lnArduino.h"
+#include "esprit.h"
 #include "lnCpuID.h"
 #include "lnPeripheral_priv.h"
 #include "lnRCU_priv.h"

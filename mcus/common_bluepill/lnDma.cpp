@@ -3,7 +3,7 @@
  *  See license file
  */
 #include "lnDma.h"
-#include "lnArduino.h"
+#include "esprit.h"
 #include "lnDma_priv.h"
 #include "lnPeripheral_priv.h"
 

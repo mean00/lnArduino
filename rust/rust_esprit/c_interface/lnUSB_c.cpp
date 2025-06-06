@@ -1,5 +1,5 @@
 #include "include/lnUsbStack.h"
-#include "lnArduino.h"
+#include "esprit.h"
 extern "C"
 {
 #include "lnUSB_c.h"

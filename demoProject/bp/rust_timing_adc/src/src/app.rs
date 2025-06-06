@@ -1,7 +1,7 @@
 use rn::rn_gpio::{pinMode, rnPin};
 use rn::rn_timing_adc::rnTimingAdc;
-use rnarduino as rn;
-use rnarduino::{lnLogger, lnLogger_init};
+use rust_esprit as rn;
+use rust_esprit::{lnLogger, lnLogger_init};
 const PIN_IN: rnPin = rnPin::PA3;
 
 lnLogger_init!();

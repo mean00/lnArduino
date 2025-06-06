@@ -3,7 +3,7 @@
  *  See license file
  */
 #pragma once
-// #include "lnArduino.h"
+// #include "esprit.h"
 #include "stdint.h"
 enum lnPin : int;
 enum LnIRQ : int;

@@ -44,7 +44,7 @@ echo "   #define _UINT32_T_DECLARED " >>$TMP
 echo "   #define uint32_t unsigned int " >>$TMP
 echo "#endif" >>$TMP
 cat $1 >>$TMP
-\rm -f rnArduino.rs.tmp
+\rm -f rnEsprit.rs.tmp
 $BINDGEN \
   --rust-edition 2024 --rust-target="1.85" \
   --use-core --no-doc-comments \

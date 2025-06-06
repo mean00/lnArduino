@@ -1,5 +1,5 @@
 #include "RotaryEncoder.h"
-#include "lnArduino.h"
+#include "esprit.h"
 
 static lnRotary *current = NULL;
 #define THRESHOLD 3          // 3ms

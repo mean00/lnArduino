@@ -3,7 +3,7 @@
  *  See license file
  */
 
-#include "lnArduino.h"
+#include "esprit.h"
 #include "lnCpuID.h"
 #include "lnFMC.h"
 #include "lnFMC_priv.h"

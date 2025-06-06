@@ -9,7 +9,7 @@
  *
  */
 // clang-format off
-#include "lnArduino.h"
+#include "esprit.h"
 #include "ln_rp.h" 
 #include "lnIRQ_arm.h"
 #include "lnRingBuffer.h"

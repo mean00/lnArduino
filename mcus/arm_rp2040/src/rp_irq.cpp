@@ -1,7 +1,7 @@
 
 #include "hardware/irq.h"
 #include "hardware/regs/intctrl.h"
-#include "lnArduino.h"
+#include "esprit.h"
 #include "ln_rp.h"
 #include "stdio.h"
 

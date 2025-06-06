@@ -1,5 +1,5 @@
 
-#include "lnArduino.h"
+#include "esprit.h"
 extern "C"
 {
 #include "lnFast_EventGroup_c.h"

@@ -26,7 +26,7 @@
  ****************************************************/
 #pragma once
 #include "vector"
-#include <lnArduino.h>
+#include "esprit.h"
 class myMcpClient;
 /**
  *

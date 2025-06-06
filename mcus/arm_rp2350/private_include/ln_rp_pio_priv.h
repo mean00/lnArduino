@@ -10,7 +10,7 @@
  */
 
 #pragma once
-#include "lnArduino.h"
+#include "esprit.h"
 #include "ln_rp_memory_map.h"
 #include <cmath>
 

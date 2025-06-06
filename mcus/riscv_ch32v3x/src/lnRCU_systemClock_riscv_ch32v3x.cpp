@@ -7,7 +7,7 @@
  * @copyright Copyright (c) 2021-2024
  *
  */
-#include "lnArduino.h"
+#include "esprit.h"
 #include "lnCpuID.h"
 #include "lnRCU.h"
 #include "lnRCU_priv.h"

@@ -1,5 +1,5 @@
 
-#include "lnArduino.h"
+#include "esprit.h"
 #include "lnPeripheral_priv.h"
 
 __attribute__((section(".initial_heap"))) uint8_t ucHeap[configTOTAL_HEAP_SIZE];

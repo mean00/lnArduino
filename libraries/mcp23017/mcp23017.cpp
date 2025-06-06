@@ -12,7 +12,7 @@
  ****************************************************/
 
 #include "mcp23017.h"
-#include "lnArduino.h"
+#include "esprit.h"
 #include "mcp23017_internal.h"
 
 /**

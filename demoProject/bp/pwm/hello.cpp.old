@@ -1,6 +1,5 @@
-#include "lnArduino.h"
+#include "esprit.h"
 #include "lnTimer.h"
-
 
 #define LED LN_SYSTEM_LED
 
@@ -8,49 +7,46 @@
 
 void setup()
 {
-    pinMode(LED,OUTPUT);    
+    pinMode(LED, OUTPUT);
 }
-int xduration=5;
+int xduration = 5;
 /**
- * 
+ *
  */
 
 void pulse(lnTimer *t, int duration)
 {
-        Logger("duration=%d\n",duration);
-        lnPinMode(PWM_PIN,lnALTERNATE_PP);   
-        t->singleShot(duration); // off by 2%
-        digitalWrite(PWM_PIN,0);
-        lnPinMode(PWM_PIN,lnOUTPUT);
-    
+    Logger("duration=%d\n", duration);
+    lnPinMode(PWM_PIN, lnALTERNATE_PP);
+    t->singleShot(duration); // off by 2%
+    digitalWrite(PWM_PIN, 0);
+    lnPinMode(PWM_PIN, lnOUTPUT);
 }
-
 
 void loop()
 {
-    bool onoff=true;
-    digitalWrite(LED,true);
-    int roundup=0;
-    
-    lnPinMode(PWM_PIN,lnALTERNATE_PP);    
+    bool onoff = true;
+    digitalWrite(LED, true);
+    int roundup = 0;
+
+    lnPinMode(PWM_PIN, lnALTERNATE_PP);
     lnTimer timer(PWM_PIN);
-    
-    Logger("PWM on pin %d\n", PWM_PIN );
-    int ratio=1024;
-    int step=128;
-    
-#if 1    
+
+    Logger("PWM on pin %d\n", PWM_PIN);
+    int ratio = 1024;
+    int step = 128;
+
+#if 1
     timer.setPwmFrequency(10000);
-    timer.setPwmMode(5*85);
+    timer.setPwmMode(5 * 85);
     timer.enable();
-    while(1)
+    while (1)
     {
         digitalToggle(LED);
         xDelay(1000);
     }
-#endif    
-    
-    
+#endif
+
 #if 0    
     while(1)
     {
@@ -82,8 +78,7 @@ void loop()
         onoff=!onoff;
         
     }
-#endif 
-
+#endif
 
 #if 0
     
@@ -96,7 +91,7 @@ void loop()
         digitalToggle(LED);       
     }
 #endif
- 
+
 #if 0
     timer.setTimerFrequency(8);
     timer.enable();

@@ -3,7 +3,7 @@
  *  See license file
  */
 
-#include "lnArduino.h"
+#include "esprit.h"
 #include "lnDma.h"
 #include "lnSPI.h"
 #include "lnSPI_bp.h"

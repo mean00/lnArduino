@@ -122,10 +122,6 @@ IF(NOT DEFINED LN_EXT)
   #____________________________
   # CLANG LINK USING GCC LIBS
   #____________________________
-  #SET(LN_CLANG_LIBC /home/fx/Arduino_stm32/arm-gcc-2020q4/bin/../lib/gcc/arm-none-eabi/10.2.1/thumb/v7-m/nofp/libgcc.a CACHE INTERNAL "")
-  #SET(LN_CLANG_MULTILIB thumb/v7-m/nofp CACHE INTERNAL "")
-
-  #SET(G32_DEBUG_FLAGS "-g3 ${LN_LTO}  -O0  -gdwarf-4" CACHE INTERNAL "")
   SET(G32_DEBUG_FLAGS "-g3 ${LN_LTO}  -O1 -gdwarf-4" CACHE INTERNAL "")
 
   SET(GD32_LD_EXTRA "  -Wl,--unresolved-symbols=report-all -Wl,--warn-common  " CACHE INTERNAL "")
@@ -141,35 +137,15 @@ IF(NOT DEFINED LN_EXT)
   SET(CMAKE_ASM_FLAGS "${GD32_C_FLAGS} -Wno-unused-command-line-argument" CACHE INTERNAL "")
   SET(CMAKE_CXX_FLAGS "${GD32_C_FLAGS} -std=gnu++11 -fno-rtti -fno-exceptions -fno-threadsafe-statics" CACHE INTERNAL "")
   #
-  SET(GD32_LD_FLAGS " -fuse-ld=lld  -nostdlib ${GD32_SPECS}  ${GD32_MCU}  ${GD32_LD_EXTRA}  ${GD32_LIBC}" CACHE INTERNAL "")
-  SET(GD32_LD_LIBS " -Wl,--gc-sections -Wl,--gdb-index " CACHE INTERNAL "")
+  SET(GD32_LD_FLAGS "   -lgcc -nostdlib ${GD32_SPECS}  ${GD32_MCU}  ${GD32_LD_EXTRA}  ${GD32_LIBC}" CACHE INTERNAL "")
+  SET(GD32_LD_LIBS " -Wl,--gc-sections  " CACHE INTERNAL "")
   #
   #
-  SET(CLANG_LINKER_OPT "${MINI_SYSROOT}/lib/libclang_rt.builtins.a" CACHE INTERNAL "")
-  #
-  # --sysroot=${LN_CLANG_SYSROOT}
-  #
-  #SET(SB2 ${CMAKE_BINARY_DIR}/lnArduino/mcus/arm_rp2350/src/CMakeFiles/rplib.dir/__/conf/bs2_default_padded_checksummed.S.obj)
-  #SET(CRT ${CMAKE_BINARY_DIR}/lnArduino/mcus/arm_rp2040/src/CMakeFiles/rplib.dir/__/sdk_copy/crt0.S.obj)
-  #SET(CRT ${CMAKE_BINARY_DIR}/lnArduino/mcus/arm_rp2040/src/CMakeFiles/rplib.dir/pico/pico-sdk/src/rp2_common/pico_standard_link/crt0.S.obj)
+  SET(CLANG_LINKER_OPT "")
   #
   set(CMAKE_CXX_LINK_EXECUTABLE    "<CMAKE_LINKER>  <CMAKE_CXX_LINK_FLAGS>  <LINK_FLAGS> ${LN_LTO}    -Wl,--start-group ${CRT} ${SB2} <OBJECTS>  <LINK_LIBRARIES>  -Wl,--end-group -lc  -Wl,-Map,<TARGET>.map   -o <TARGET> ${GD32_LD_FLAGS} ${GD32_LD_LIBS}  ${CLANG_LINKER_OPT} -e _entry_point" CACHE INTERNAL "")
   SET(CMAKE_EXECUTABLE_SUFFIX_C .elf CACHE INTERNAL "")
   SET(CMAKE_EXECUTABLE_SUFFIX_CXX .elf CACHE INTERNAL "")
-
-  #include_directories(${AF_FOLDER}/${LN_EXT}/boards/${LN_BOARD_NAME}/)
-  #include_directories(${AF_FOLDER}/${LN_EXT}/)
-
-  SET(CMAKE_C_STANDARD_INCLUDE_DIRECTORIES  ${CMAKE_C_STANDARD_INCLUDE_DIRECTORIES}
-        ${ESPRIT_ROOT}/${LN_EXT}/boards/${LN_BOARD_NAME}/
-        ${ESPRIT_ROOT}/${LN_EXT}
-        CACHE INTERNAL ""
-        )
-  SET(CMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES  ${CMAKE_C_STANDARD_INCLUDE_DIRECTORIES} CACHE INTERNAL "")
-
-  MESSAGE(STATUS ">>> STD C includes:<${CMAKE_C_STANDARD_INCLUDE_DIRECTORIES}>")
-  MESSAGE(STATUS ">>> STD CXX includes:<${CMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES}>")
-
 
 
 

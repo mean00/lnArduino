@@ -1,5 +1,7 @@
+include(ln_merge_libs)
 
 MACRO(GENERATE_GD32_FIRMWARE target)
+  LN_MERGE_LIBS()
 
   IF(NOT LN_MCU_RAM_SIZE)
     SET(LN_MCU_RAM_SIZE 32 CACHE INTERNAL "")
@@ -18,8 +20,7 @@ MACRO(GENERATE_GD32_FIRMWARE target)
   ENDIF()
 
   ADD_EXECUTABLE(${target}  ${LN_MCU_FOLDER}/start.S ${ARGN})
-  TARGET_LINK_LIBRARIES(${target} PUBLIC ${USED_LIBS} lnArduino ) # duplicates are NOT a mistake !
-  TARGET_LINK_LIBRARIES(${target} PUBLIC embeddedPrintf esprit_lib  FreeRTOS    gcc ) # dupicates are NOT a mistake !
+  TARGET_LINK_LIBRARIES(${target} PUBLIC  esprit_single_lib esprit_dev ) # duplicates are NOT a mistake !
   TARGET_LINK_OPTIONS(${target}  PRIVATE "-T${CMAKE_BINARY_DIR}/linker_script.ld" )
 
   add_custom_command(TARGET ${target}
@@ -37,9 +38,5 @@ MACRO(HASH_GD32_FIRMWARE target)
         COMMENT "Generating checksumed file"
     )
 ENDMACRO()
+include(ln_use_library)
 
-MACRO(USE_LIBRARY lib)
-  add_subdirectory(${AF_FOLDER}/libraries/${lib})
-  include_directories(${AF_FOLDER}/libraries/${lib})
-  LIST(APPEND USED_LIBS ${lib})
-ENDMACRO(USE_LIBRARY lib)

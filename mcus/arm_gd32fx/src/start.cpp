@@ -42,7 +42,7 @@
  * they apply.
  */
 
-#include "lnArduino.h"
+#include "esprit.h"
 #include <stddef.h>
 
 extern int main(void);

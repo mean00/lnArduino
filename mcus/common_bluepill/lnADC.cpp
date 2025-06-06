@@ -4,7 +4,7 @@
  */
 #include "lnADC.h"
 #include "lnADC_priv.h"
-#include "lnArduino.h"
+#include "esprit.h"
 #include "lnBasicTimer.h"
 #include "lnDma.h"
 #include "lnPeripheral_priv.h"

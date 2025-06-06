@@ -3,7 +3,7 @@
  *  See license file
  */
 #pragma once
-#include "lnArduino.h"
+#include "esprit.h"
 
 #if LN_ARCH == LN_ARCH_RISCV
 #include "lnIRQ_riscv.h"

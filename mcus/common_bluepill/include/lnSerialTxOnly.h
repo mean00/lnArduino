@@ -8,7 +8,7 @@
  *  See license file
  */
 
-#include "lnArduino.h"
+#include "esprit.h"
 #include "lnDma.h"
 #include "lnPeripheral_priv.h"
 #include "lnSerial.h"

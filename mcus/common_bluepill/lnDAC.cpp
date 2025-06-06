@@ -3,7 +3,7 @@
  *  See license file
  */
 #include "lnDAC.h"
-#include "lnArduino.h"
+#include "esprit.h"
 #include "lnBasicTimer.h"
 #include "lnDAC_priv.h"
 #include "lnDma.h"

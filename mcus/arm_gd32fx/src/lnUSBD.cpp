@@ -18,7 +18,7 @@ Original Copyright (c) 2019 Nathan Conrad
  * The modifications are (C) 2022 MEAN00 fixounet@free.fr
  *  See license file
  */
-#include "lnArduino.h"
+#include "esprit.h"
 
 #include "lnPinMapping.h"
 #include "lnUSBD.h"

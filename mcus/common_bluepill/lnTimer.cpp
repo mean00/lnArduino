@@ -3,7 +3,7 @@
  *  See license file
  */
 #include "lnTimer.h"
-#include "lnArduino.h"
+#include "esprit.h"
 #include "lnPinMapping.h"
 #include "lnTimer_priv.h"
 LN_Timers_Registers *aTimer0 = (LN_Timers_Registers *)(LN_TIMER0_ADR);

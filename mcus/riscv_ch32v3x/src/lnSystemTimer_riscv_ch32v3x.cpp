@@ -1,5 +1,5 @@
 
-#include "lnArduino.h"
+#include "esprit.h"
 #include "lnPeripheral_priv.h"
 #include "lnSystemTimer_priv.h"
 

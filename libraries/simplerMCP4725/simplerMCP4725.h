@@ -17,7 +17,7 @@
 */
 /**************************************************************************/
 #pragma once
-#include "lnArduino.h"
+#include "esprit.h"
 #include "lnI2C.h"
 
 #define MCP4725_DEFAULT_I2C_ADDRESS 0x60

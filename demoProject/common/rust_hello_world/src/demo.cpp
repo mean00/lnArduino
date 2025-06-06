@@ -2,7 +2,7 @@
 /*
     On the RP2040 gum stick boards the led is driven by GPIO26, it is NOT open drain
 */
-#include "lnArduino.h"
+#include "esprit.h"
 
 #define LED LN_SYSTEM_LED
 

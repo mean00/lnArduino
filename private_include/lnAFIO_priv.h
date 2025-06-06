@@ -4,7 +4,7 @@
  */
 
 #pragma once
-#include "lnArduino.h"
+#include "esprit.h"
 
 struct LN_AFIOx
 {

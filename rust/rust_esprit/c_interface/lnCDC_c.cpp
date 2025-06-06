@@ -1,7 +1,7 @@
 
 #include "include/lnUsbCDC.h"
 #include "include/lnUsbStack.h"
-#include "lnArduino.h"
+#include "esprit.h"
 extern "C"
 {
 #include "lnCDC_c.h"

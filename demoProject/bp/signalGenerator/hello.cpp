@@ -1,4 +1,4 @@
-#include "lnArduino.h"
+#include "esprit.h"
 #include "lnSPI.h"
 #include "signal.h"
 

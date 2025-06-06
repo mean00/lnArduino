@@ -2,7 +2,7 @@
 #include "PNP_compressed.h"
 #include "PNP_decl.h"
 #include "gd32ST7735.h"
-#include "lnArduino.h"
+#include "esprit.h"
 #include "lnI2C.h"
 #include "lnSPI.h"
 #include "lnWS2812B.h"

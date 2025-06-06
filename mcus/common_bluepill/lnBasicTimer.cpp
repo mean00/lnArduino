@@ -3,7 +3,7 @@
  *  See license file
  */
 #include "lnBasicTimer.h"
-#include "lnArduino.h"
+#include "esprit.h"
 #include "lnBasicTimer_priv.h"
 #include "lnPinMapping.h"
 

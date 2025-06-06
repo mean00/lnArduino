@@ -5,7 +5,7 @@ extern "C"
 #include "lnI2C_c.h"
 }
 
-#include "lnArduino.h"
+#include "esprit.h"
 #include "lnI2C.h"
 
 // manual RC

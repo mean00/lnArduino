@@ -23,3 +23,28 @@ extern "C" int scanf(const char *__restrict, ...)
 {
     return 0;
 }
+
+extern "C" int _read()
+{
+    return 0;
+}
+extern "C" int _fstat()
+{
+    return 0;
+}
+extern "C" int _isatty()
+{
+    return 0;
+}
+extern "C" int _fini()
+{
+    return 0;
+}
+extern "C" int _close()
+{
+    return 0;
+}
+extern "C" int _lseek()
+{
+    return 0;
+}

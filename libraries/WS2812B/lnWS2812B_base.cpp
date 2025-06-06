@@ -5,7 +5,7 @@
  *
  */
 #include "lnWS2812B_base.h"
-#include "lnArduino.h"
+#include "esprit.h"
 
 /**
  *

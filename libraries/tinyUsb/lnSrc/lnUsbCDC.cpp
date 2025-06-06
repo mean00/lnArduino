@@ -1,6 +1,6 @@
 #include "lnUsbCDC.h"
 #include "device/dcd.h"
-#include "lnArduino.h"
+#include "esprit.h"
 #include "lnUsbStack.h"
 #include "tusb.h"
 

@@ -1,5 +1,5 @@
 #include "RotaryEncoder.h"
-#include "lnArduino.h"
+#include "esprit.h"
 #include "lnExti.h"
 
 #define LED LN_SYSTEM_LED

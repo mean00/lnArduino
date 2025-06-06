@@ -1,5 +1,7 @@
+include(ln_merge_libs)
 
 MACRO(GENERATE_GD32_FIRMWARE target)
+  LN_MERGE_LIBS()
 
   IF(NOT LN_MCU_RAM_SIZE)
     SET(LN_MCU_RAM_SIZE 32 CACHE INTERNAL "")
@@ -19,8 +21,7 @@ MACRO(GENERATE_GD32_FIRMWARE target)
 
 
   ADD_EXECUTABLE(${target}  ${LN_MCU_FOLDER}/start.S ${ARGN})
-  TARGET_LINK_LIBRARIES(${target} PUBLIC ${USED_LIBS} ) # duplicates are NOT a mistake !
-  TARGET_LINK_LIBRARIES(${target} PUBLIC lnArduino embeddedPrintf esprit_lib FreeRTOS     ) # dupicates are NOT a mistake !
+  TARGET_LINK_LIBRARIES(${target} PUBLIC esprit_single_lib esprit_dev ) # dupicates are NOT a mistake !
 
   IF(LN_CUSTOM_LD_SCRIPT)
     SET(SCRIPT ${LN_CUSTOM_LD_SCRIPT} CACHE INTERNAL "")
@@ -54,8 +55,4 @@ MACRO(HASH_GD32_FIRMWARE target)
 
 ENDMACRO()
 
-MACRO(USE_LIBRARY lib)
-  add_subdirectory(${AF_FOLDER}/libraries/${lib})
-  include_directories(${AF_FOLDER}/libraries/${lib})
-  LIST(APPEND USED_LIBS ${lib})
-ENDMACRO(USE_LIBRARY lib)
+include(ln_use_library)
