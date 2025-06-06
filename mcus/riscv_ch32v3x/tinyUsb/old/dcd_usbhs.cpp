@@ -29,7 +29,7 @@
 #include "ch32_extra.h"
 #include "ch32_usbhs_reg.h"
 #include "device/dcd.h"
-#include "lnArduino.h"
+#include "esprit.h"
 #include "lnIRQ.h"
 #include "tusb_option.h"
 #undef USBHSD

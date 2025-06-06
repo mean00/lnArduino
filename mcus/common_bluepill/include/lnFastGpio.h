@@ -3,7 +3,7 @@
  *  See license file
  */
 #pragma once
-#include "lnArduino_macro.h"
+#include "esprit_macro.h"
 /**
  *
  * @param p

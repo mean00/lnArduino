@@ -4,7 +4,7 @@
  */
 #include "lnExti.h"
 #include "lnAFIO_priv.h"
-#include "lnArduino.h"
+#include "esprit.h"
 #include "lnExti_priv.h"
 #include "lnGPIO.h"
 #include "lnPeripheral_priv.h"

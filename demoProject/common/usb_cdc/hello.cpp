@@ -1,7 +1,7 @@
 #include "hello.h"
 #include "include/lnUsbCDC.h"
 #include "include/lnUsbStack.h"
-#include "lnArduino.h"
+#include "esprit.h"
 
 #define LED LN_SYSTEM_LED
 

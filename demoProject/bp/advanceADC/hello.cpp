@@ -1,5 +1,5 @@
 #include "lnADC.h"
-#include "lnArduino.h"
+#include "esprit.h"
 #include "lnDAC.h"
 #include "lnTimer.h"
 #include "math.h"

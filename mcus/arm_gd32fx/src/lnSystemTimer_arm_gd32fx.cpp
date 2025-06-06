@@ -1,4 +1,4 @@
-#include "lnArduino.h"
+#include "esprit.h"
 
 // Get systick
 struct LN_SystemTimer_Registersx

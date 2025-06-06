@@ -5,7 +5,7 @@
  *
  */
 #include "lnWS2812B.h"
-#include "lnArduino.h"
+#include "esprit.h"
 
 #define WS_PREAMBLE 4 * 24 // number of zero byte preamble
 

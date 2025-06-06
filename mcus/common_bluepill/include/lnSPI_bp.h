@@ -27,7 +27,7 @@
  */
 
 #pragma once
-#include "lnArduino.h"
+#include "esprit.h"
 #include "lnDma.h"
 #include "lnSPI.h"
 #include "lnSPI_priv.h"

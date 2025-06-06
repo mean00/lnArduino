@@ -10,7 +10,7 @@
  */
 // clang-format off
 #include "ln_rp.h" 
-#include "lnArduino.h"
+#include "esprit.h"
 #include "lnRCU.h"
 #include "hardware/clocks.h"
 #include "pico/time.h"

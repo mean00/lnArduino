@@ -9,7 +9,7 @@
 
 #include "hardware/clocks.h"
 #include "hardware/pio.h"
-#include "lnArduino.h"
+#include "esprit.h"
 #include "lnWS2812_rp_single_pio.h"
 #include "pico/stdlib.h"
 #include "ws2812.pio.h"

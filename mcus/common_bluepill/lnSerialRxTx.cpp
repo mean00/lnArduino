@@ -4,7 +4,7 @@
  */
 
 // clang-format off
-#include "lnArduino.h"
+#include "esprit.h"
 #include "lnSerial.h"
 #include "lnSerial_priv.h"
 #include "lnSerialRxTx.h"

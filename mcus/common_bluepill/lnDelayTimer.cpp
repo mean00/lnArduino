@@ -6,7 +6,7 @@
  * It is most probably incomplete
  *
  */
-#include "lnArduino.h"
+#include "esprit.h"
 #include "lnPinMapping.h"
 #include "lnTimer.h"
 #include "lnTimer_priv.h"

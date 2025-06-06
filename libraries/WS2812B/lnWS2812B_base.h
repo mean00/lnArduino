@@ -3,7 +3,7 @@
  *  See license file
  */
 #pragma once
-#include "lnArduino.h"
+#include "esprit.h"
 class WS2812B_base
 {
   public:

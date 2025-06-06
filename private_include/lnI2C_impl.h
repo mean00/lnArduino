@@ -3,7 +3,7 @@
  *  See license file
  */
 #pragma once
-#include "lnArduino.h"
+#include "esprit.h"
 #include "lnDma.h"
 struct LN_I2C_DESCRIPTOR;
 

@@ -3,7 +3,7 @@
  *  See license file
  */
 #include "nvmCore.h"
-#include "lnArduino.h"
+#include "esprit.h"
 #include "nvmCore_internal.h"
 
 #if 0

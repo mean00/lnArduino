@@ -4,7 +4,7 @@
 #define uint32_t unsigned int
 #endif
 #include "lnADC.h"
-#include "lnArduino.h"
+#include "esprit.h"
 #include "lnBasicTimer.h"
 #include "lnCpuID.h"
 #include "lnDAC.h"

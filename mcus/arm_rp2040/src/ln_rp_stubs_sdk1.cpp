@@ -2,7 +2,7 @@ extern "C" bool running_on_fpga()
 {
     return false;
 }
-#include "lnArduino.h"
+#include "esprit.h"
 extern "C"
 {
 #include "hardware/gpio.h"

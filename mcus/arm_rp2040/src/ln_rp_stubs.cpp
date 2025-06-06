@@ -19,7 +19,7 @@ extern "C" void hw_claim_lock()
 extern "C" void hw_claim_unlock()
 {
 }
-#include "lnArduino.h"
+#include "esprit.h"
 extern "C"
 {
     void *rom_func_lookup(uint32_t code)

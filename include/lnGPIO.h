@@ -3,8 +3,8 @@
  *  See license file
  */
 #pragma once
-// #include "lnArduino.h"
-#include "lnArduino_macro.h"
+// #include "esprit.h"
+#include "esprit_macro.h"
 #include "stdint.h"
 
 /**

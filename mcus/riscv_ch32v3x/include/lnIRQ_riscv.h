@@ -3,7 +3,7 @@
  *  See license file
  */
 #pragma once
-#include "lnArduino.h"
+#include "esprit.h"
 #include "lnPeripherals.h"
 
 #if LN_MCU == LN_MCU_CH32V3x

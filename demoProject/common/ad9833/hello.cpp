@@ -2,7 +2,7 @@
 //
 
 #include "libraries/simplerAD9833/simplerAD9833.h"
-#include "lnArduino.h"
+#include "esprit.h"
 #include "lnSPI.h"
 #include "simplerAD9833.h"
 

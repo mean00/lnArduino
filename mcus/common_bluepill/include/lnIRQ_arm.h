@@ -3,7 +3,7 @@
  *  See license file
  */
 #pragma once
-#include "lnArduino.h"
+#include "esprit.h"
 #include "lnPeripherals.h"
 
 #define LN_IRQ_OFFSET 0

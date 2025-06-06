@@ -4,7 +4,7 @@
  */
 
 #pragma once
-#include "lnArduino.h"
+#include "esprit.h"
 #include <type_traits>
 
 /**

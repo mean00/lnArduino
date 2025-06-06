@@ -3,7 +3,7 @@
  *  See license file
  */
 
-#include "lnArduino.h"
+#include "esprit.h"
 #include "lnIRQ.h"
 #include "lnIRQ_riscv_priv_gd32.h"
 #include "lnRCU.h"

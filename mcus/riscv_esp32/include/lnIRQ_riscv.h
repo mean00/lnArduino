@@ -3,7 +3,7 @@
  *  See license file
  */
 #pragma once
-#include "lnArduino.h"
+#include "esprit.h"
 #include "lnPeripherals.h"
 
 #define LN_INTERRUPT_TYPE __attribute__((used)) __attribute__((interrupt("IRQ")));

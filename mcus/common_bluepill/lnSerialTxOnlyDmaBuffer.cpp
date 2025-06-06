@@ -2,7 +2,7 @@
 
 /**
  */
-#include "lnArduino.h"
+#include "esprit.h"
 #include "lnSerialBpCore.h"
 #include "lnSerialTxOnlyDma.h"
 

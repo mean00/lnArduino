@@ -1,4 +1,4 @@
-#include "lnArduino.h"
+#include "esprit.h"
 #include "lnSerial.h"
 
 #define LED LN_SYSTEM_LED

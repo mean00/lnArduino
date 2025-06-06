@@ -4,7 +4,7 @@
  */
 
 #include "lnI2C_impl.h"
-#include "lnArduino.h"
+#include "esprit.h"
 #include "lnI2C.h"
 #include "lnI2C_priv.h"
 

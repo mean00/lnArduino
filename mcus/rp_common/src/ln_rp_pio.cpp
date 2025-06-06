@@ -8,7 +8,7 @@
 // clang-format off
 #include "ln_rp.h" 
 #include "ln_rp_pio.h"
-#include "lnArduino.h"
+#include "esprit.h"
 #include "ln_rp_clocks.h"
 #include "ln_rp_pio_priv.h"
 // clang-format on

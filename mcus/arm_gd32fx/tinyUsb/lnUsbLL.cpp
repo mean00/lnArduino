@@ -1,6 +1,6 @@
 
 #include "device/dcd.h"
-#include "lnArduino.h"
+#include "esprit.h"
 #include "lnUSBD.h"
 #include "lnUSDB_tinyUSB.h"
 #include "lnUsbStack.h"

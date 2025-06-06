@@ -1,5 +1,5 @@
 #pragma once
-#include "lnArduino.h"
+#include "esprit.h"
 
 #define LN_FREERTOS_MAGIC 0x1FEEBAEUL
 

@@ -6,7 +6,7 @@
  * As far as the callback is concerned, it takes ~ 2.5 us on a VF103, 4 us on F303 and ~ 6 us on aF103
  */
 #include "lnWS2812B_timer.h"
-#include "lnArduino.h"
+#include "esprit.h"
 
 /**
  *

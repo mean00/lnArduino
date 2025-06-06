@@ -1,7 +1,7 @@
 // this is not thread safe, but it should not matter much
 // the returned object ARE thread sage, it's just the creation/deletion that is not
 #include "lnSPI_c.h"
-#include "lnArduino.h"
+#include "esprit.h"
 #include "lnSPI.h"
 #include "stdbool.h"
 #include "stdint.h"
