@@ -4,9 +4,9 @@ MACRO(GENERATE_GD32_FIRMWARE target)
 
   configure_file( "${LN_MCU_FOLDER}/boards/bluepill/ld.lds.in" "${CMAKE_BINARY_DIR}/linker_script.ld" @ONLY)
   ADD_EXECUTABLE(${target} ${ARGN}  ${LN_MCU_FOLDER}/src/start.S   ${LN_MCU_FOLDER}/src/start.cpp      ${LN_MCU_FOLDER}/src/vector_table.S)
-  TARGET_LINK_LIBRARIES(${target} PRIVATE  lnArduino lnArduino_lib) # duplicates are NOT a mistake !
+  TARGET_LINK_LIBRARIES(${target} PRIVATE  esprit_single_lib ) # duplicates are NOT a mistake !
   # duplicates are NOT a mistake !
-  #TARGET_LINK_LIBRARIES(${target}  PRIVATE embeddedPrintf Esprit_impl FreeRTOS   gcc )
+  #TARGET_LINK_LIBRARIES(${target}  PRIVATE embeddedPrintf esprit_lib FreeRTOS   gcc )
   IF(LN_CUSTOM_LD_SCRIPT)
     SET(SCRIPT ${LN_CUSTOM_LD_SCRIPT} CACHE INTERNAL "")
   ELSE()

@@ -20,6 +20,6 @@ target_include_directories(FreeRTOS PUBLIC ${CMAKE_SOURCE_DIR})
 target_include_directories(FreeRTOS PUBLIC ${FOS}/)
 target_include_directories(FreeRTOS PUBLIC ${FOS}/..)
 target_include_directories(FreeRTOS PUBLIC ${FOS}/include)
-target_link_libraries(FreeRTOS PUBLIC lnBoard)
+target_link_libraries(FreeRTOS PUBLIC esprit_dev)
 #
 

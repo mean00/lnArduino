@@ -2,8 +2,8 @@
 #![allow(dead_code)]
 use alloc::boxed::Box;
 
-use crate::rnarduino as rn;
-pub crate::rnarduino::rn_cdc_c as cdc_c;
+use crate::rust_esprit as rn;
+pub crate::rust_esprit::rn_cdc_c as cdc_c;
 
 
 
