@@ -1,4 +1,4 @@
-SET(EPR ${LNARDUINO_ROOT}/embedded_printf/)
+SET(EPR ${ESPRIT_ROOT}/embedded_printf/)
 include_directories( ${EPR})
 
 FOREACH(common printf.c)

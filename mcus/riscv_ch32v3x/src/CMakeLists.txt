@@ -4,9 +4,9 @@ SET(S ${CMAKE_CURRENT_SOURCE_DIR})
 
 add_subdirectory(../../common_bluepill common_bp)
 
-target_include_directories(lnArduino_impl PRIVATE ${S} ${S}/../include)
+target_include_directories(Esprit_impl PRIVATE ${S} ${S}/../include)
 
-target_sources( lnArduino_impl PRIVATE
+target_sources( Esprit_impl PRIVATE
     ${S}/lnCpuID_riscv_ch32v3x.cpp
     ${S}/lnFMC_impl.cpp
     ${S}/lnIRQ_riscv_ch32v3x.cpp
@@ -19,20 +19,20 @@ target_sources( lnArduino_impl PRIVATE
     ${S}/../boards/${LN_BOARD_NAME}/lnPinMapping.cpp
 )
 IF(LN_ENABLE_USBD)
-  target_sources( lnArduino_impl PRIVATE ${S}/lnUSBD_ch32v3x.cpp)
+  target_sources( Esprit_impl PRIVATE ${S}/lnUSBD_ch32v3x.cpp)
 ENDIF()
 
 IF(LN_ENABLE_I2C)
-  target_compile_definitions(lnArduino_impl PRIVATE LN_ENABLE_I2C )
+  target_compile_definitions(Esprit_impl PRIVATE LN_ENABLE_I2C )
 ENDIF()
 
 IF(LN_ENABLE_SPI)
-  target_compile_definitions(lnArduino_impl PRIVATE LN_ENABLE_SPI )
+  target_compile_definitions(Esprit_impl PRIVATE LN_ENABLE_SPI )
 ENDIF()
 
 IF(USE_CH32v3x_HW_IRQ_STACK)
   MESSAGE(STATUS "Use WCH fast IRQ")
-  target_compile_definitions(lnArduino_impl PRIVATE "-DUSE_CH32v3x_HW_IRQ_STACK")
+  target_compile_definitions(Esprit_impl PRIVATE "-DUSE_CH32v3x_HW_IRQ_STACK")
 ELSE()
   MESSAGE(STATUS "Use WCH slow IRQ")
 ENDIF()

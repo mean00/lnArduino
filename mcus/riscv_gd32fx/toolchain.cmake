@@ -95,7 +95,7 @@ set(CMAKE_CXX_LINK_EXECUTABLE    "<CMAKE_CXX_COMPILER>   <CMAKE_CXX_LINK_FLAGS> 
 SET(CMAKE_EXECUTABLE_SUFFIX_C .elf)
 SET(CMAKE_EXECUTABLE_SUFFIX_CXX .elf)
 
-include_directories(${LNARDUINO_ROOT}/${LN_EXT}/boards/${LN_BOARD_NAME}/)
+include_directories(${ESPRIT_ROOT}/${LN_EXT}/boards/${LN_BOARD_NAME}/)
 
 # Sees optimizaton >=2 are causing issues (???)
 

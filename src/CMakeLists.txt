@@ -13,7 +13,7 @@ ELSE()
                        ln_libc.cpp
                     )
 ENDIF()
-TARGET_LINK_LIBRARIES(ln_utils PRIVATE  lnArduinoInternal)
+TARGET_LINK_LIBRARIES(ln_utils PRIVATE  EspritInternal)
 
 
 If(LN_DEBUG_UART)

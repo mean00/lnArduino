@@ -111,7 +111,7 @@ IF(NOT DEFINED LN_EXT)
     SET(CMAKE_EXECUTABLE_SUFFIX_CXX .elf                                                                CACHE INTERNAL "")
 
     SET(CMAKE_C_STANDARD_INCLUDE_DIRECTORIES  ${CMAKE_C_STANDARD_INCLUDE_DIRECTORIES}
-        ${LNARDUINO_ROOT}/${LN_EXT}/boards/${LN_BOARD_NAME}/
+        ${ESPRIT_ROOT}/${LN_EXT}/boards/${LN_BOARD_NAME}/
         ${AF_FOLDER}/mcus/common_bluepill/
         ${AF_FOLDER}/mcus/common_bluepill/include
         CACHE INTERNAL ""
@@ -120,7 +120,7 @@ IF(NOT DEFINED LN_EXT)
 
     MESSAGE(STATUS ">>> STD C includes:<${CMAKE_C_STANDARD_INCLUDE_DIRECTORIES}>")
     MESSAGE(STATUS ">>> STD CXX includes:<${CMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES}>")
-    #include_directories(${LNARDUINO_ROOT}/${LN_EXT}/boards/${LN_BOARD_NAME}/)
+    #include_directories(${ESPRIT_ROOT}/${LN_EXT}/boards/${LN_BOARD_NAME}/)
     #include_directories(${AF_FOLDER}/mcus/common_bluepill/)
     #include_directories(${AF_FOLDER}/mcus/common_bluepill/include)
 
