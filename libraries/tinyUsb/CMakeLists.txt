@@ -78,7 +78,7 @@ target_include_directories(tinyUsb PUBLIC ${TUSB}/device)
 target_include_directories(tinyUsb PUBLIC ${TUSB}/class/device/cdc)
 target_include_directories(tinyUsb PUBLIC ${TUSB}/class/device/dfu)
 
-target_link_libraries(tinyUsb lnArduinoInternal)
+target_link_libraries(tinyUsb EspritInternal)
 
 
 target_compile_definitions(tinyUsb PUBLIC  "${LN_TUSB_EXTRA_DEF}")

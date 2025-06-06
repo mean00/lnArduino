@@ -22,7 +22,7 @@ ENDMACRO (LN_APPEND_FLAGS)
 
 
 MACRO(USE_LIBRARY lib)
-    add_subdirectory(${LNARDUINO_ROOT}/libraries/${lib})
-    include_directories(${LNARDUINO_ROOT}/libraries/${lib})
+    add_subdirectory(${ESPRIT_ROOT}/libraries/${lib})
+    include_directories(${ESPRIT_ROOT}/libraries/${lib})
     LIST(APPEND USED_LIBS ${lib})
 ENDMACRO(USE_LIBRARY lib)

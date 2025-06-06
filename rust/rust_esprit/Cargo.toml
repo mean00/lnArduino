@@ -2,7 +2,7 @@
 authors = ["mean00 <mean00@gmail.com>"]
 edition = "2024"
 readme = "README.md"
-name = "rnarduino"
+name = "rustEsprit"
 version = "0.0.0"
 
 
@@ -18,7 +18,7 @@ esp32c3 = []
 default = []
 
 [lib]
-name = "rnarduino"
+name = "rustEsprit"
 path = "src/lib.rs"
 crate-type = ["rlib"] # Creates static lib
 

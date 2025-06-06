@@ -4,27 +4,25 @@
 
 */
 #pragma once
-
-#include "usbd.h"
-#include "tusb_types.h"
 #include "class/cdc/cdc.h"
-
+#include "tusb_types.h"
+#include "usbd.h"
 
 class lnUsbStack
 {
   public:
     enum lnUsbStackEvents
     {
-        USB_CONNECT=0,
-        USB_DISCONNECT=1,
-        USB_SUSPEND=2,
-        USB_RESUME=3
+        USB_CONNECT = 0,
+        USB_DISCONNECT = 1,
+        USB_SUSPEND = 2,
+        USB_RESUME = 3
     };
 
     typedef void lnUsbStackEventHandler(void *cookie, const lnUsbStackEvents event);
 
   public:
-            lnUsbStack();
+    lnUsbStack();
     virtual ~lnUsbStack();
     void init(int nbDescriptorLine, const char **deviceDescriptor);
     void setConfiguration(const uint8_t *hsConfiguration, const uint8_t *fsConfiguration,

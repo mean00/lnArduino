@@ -3,14 +3,14 @@ SET(CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/ArduinoToolchainGd32.cmake)
 cmake_minimum_required(VERSION 3.20)
 OPTION(LN_EXTERNAL_FREERTOS "Deactivate internal freertos (esp)")
 OPTION(LN_EXTERNAL_MALLOC "Deactivate internal malloc (esp)")
-IF(True) #NOT LNARDUINO_ROOT)
-  IF(NOT LNARDUINO_ROOT)
-    SET(LNARDUINO_ROOT ${CMAKE_CURRENT_SOURCE_DIR} CACHE INTERNAL "")
+IF(True) #NOT ESPRIT_ROOT)
+  IF(NOT ESPRIT_ROOT)
+    SET(ESPRIT_ROOT ${CMAKE_CURRENT_SOURCE_DIR} CACHE INTERNAL "")
   ENDIF()
 
-  MESSAGE(STATUS "LNARDUINO_ROOT is ${LNARDUINO_ROOT}")
+  MESSAGE(STATUS "ESPRIT_ROOT is ${ESPRIT_ROOT}")
 
-  LIST(APPEND CMAKE_MODULE_PATH  ${LNARDUINO_ROOT} ${LNARDUINO_ROOT}/cmake)
+  LIST(APPEND CMAKE_MODULE_PATH  ${ESPRIT_ROOT} ${ESPRIT_ROOT}/cmake)
 
 
   # Already merged APPLY_PATCH_IF_NEEDED(patch_tinyusb tinyusb_no_static.patch        libraries/tinyUsb      "dont use freertos static constructs ")
@@ -34,22 +34,22 @@ IF(True) #NOT LNARDUINO_ROOT)
   OPTION(USE_RP2040_PURE_RAM "Load and run from RAM (RP2040 only)" FALSE)
   OPTION(USE_CH32v3x_PURE_RAM "Load and run from RAM (CH32vxx only)" FALSE)
 
-  SET(LN_MCU_FOLDER ${LNARDUINO_ROOT}/mcus/${LN_EXT}/ CACHE INTERNAL "")
+  SET(LN_MCU_FOLDER ${ESPRIT_ROOT}/mcus/${LN_EXT}/ CACHE INTERNAL "")
   #
   ADD_LIBRARY(lnBoard INTERFACE)
   target_include_directories(lnBoard INTERFACE ${LN_MCU_FOLDER}/boards/${LN_BOARD_NAME}/) # needed to get the freertos_tuning.h
   target_include_directories(lnBoard INTERFACE ${LN_MCU_FOLDER}/include/) # needed to get the freertos_tuning.h
 
   # Ok let's create our internal interface libary
-  ADD_LIBRARY(lnArduinoInternal INTERFACE)
-  target_include_directories(lnArduinoInternal INTERFACE ${LNARDUINO_ROOT}/)
-  target_include_directories(lnArduinoInternal INTERFACE ${LNARDUINO_ROOT}/include)
-  target_include_directories(lnArduinoInternal INTERFACE ${LNARDUINO_ROOT}/arduinoLayer/include)
-  target_include_directories(lnArduinoInternal INTERFACE ${CMAKE_BINARY_DIR}) # To catch generated files
-  target_include_directories(lnArduinoInternal INTERFACE ${LN_MCU_FOLDER})
-  target_include_directories(lnArduinoInternal INTERFACE ${LN_MCU_FOLDER}/include)
-  target_include_directories(lnArduinoInternal INTERFACE lnBoard)
-  target_include_directories(lnArduinoInternal INTERFACE embeddedPrintf    )
+  ADD_LIBRARY(EspritInternal INTERFACE)
+  target_include_directories(EspritInternal INTERFACE ${ESPRIT_ROOT}/)
+  target_include_directories(EspritInternal INTERFACE ${ESPRIT_ROOT}/include)
+  target_include_directories(EspritInternal INTERFACE ${ESPRIT_ROOT}/arduinoLayer/include)
+  target_include_directories(EspritInternal INTERFACE ${CMAKE_BINARY_DIR}) # To catch generated files
+  target_include_directories(EspritInternal INTERFACE ${LN_MCU_FOLDER})
+  target_include_directories(EspritInternal INTERFACE ${LN_MCU_FOLDER}/include)
+  target_include_directories(EspritInternal INTERFACE lnBoard)
+  target_include_directories(EspritInternal INTERFACE embeddedPrintf    )
 
 
 
@@ -61,36 +61,80 @@ IF(True) #NOT LNARDUINO_ROOT)
   ENDIF(LN_BOOTLOADER_SIZE)
 
   IF(LN_EXTERNAL_FREERTOS)
-    target_compile_definitions(lnArduinoInternal INTERFACE LN_CUSTOM_FREERTOS)
+    target_compile_definitions(EspritInternal INTERFACE LN_CUSTOM_FREERTOS)
   ELSE()
     include(lnFreeRTOS)
-    target_link_libraries(lnArduinoInternal  INTERFACE FreeRTOS )
+    target_link_libraries(EspritInternal  INTERFACE FreeRTOS )
   ENDIF()
   include(lnEmbeddedPrint)
 
   add_subdirectory(${LN_MCU_FOLDER}/src)
-  add_subdirectory(${LNARDUINO_ROOT}/src)
+  add_subdirectory(${ESPRIT_ROOT}/src)
 
   IF(LN_ENABLE_RUST)
-    add_subdirectory(${LNARDUINO_ROOT}/rust) # Generate C++->C for easy Rust binding
+    add_subdirectory(${ESPRIT_ROOT}/rust) # Generate C++->C for easy Rust binding
   ENDIF(LN_ENABLE_RUST)
 
 
   # Ok let's create our public libary
   # a firmmware should link against that one
-  ADD_LIBRARY(lnArduino INTERFACE)
-  target_link_libraries(lnArduino INTERFACE lnBoard ln_utils embeddedPrintf lnArduinoInternal)
+  ADD_LIBRARY(esprit_dev INTERFACE)
+
+
+  #____________________________________________
+  # Merge things into a single lib and single interface
+  #____________________________________________
+
+  set(libs_to_merge "${USED_LIBS}")
+  set(libs_to_keep esprit_lib)
+
+  target_link_libraries(esprit_dev INTERFACE lnBoard ln_utils embeddedPrintf EspritInternal Esprit_impl)
+  list(APPEND libs_to_merge ln_utils embeddedPrintf Esprit_impl )
   IF(NOT LN_EXTERNAL_FREERTOS)
-    target_link_libraries(lnArduino INTERFACE FreeRTOS )
+    target_link_libraries(esprit_dev INTERFACE FreeRTOS )
+    list(APPEND libs_to_merge FreeRTOS )
   ENDIF()
-  target_include_directories(lnArduino INTERFACE ${LNARDUINO_ROOT})
-  target_include_directories(lnArduino INTERFACE ${LNARDUINO_ROOT}/include)
-  target_include_directories(lnArduino INTERFACE ${LN_MCU_FOLDER})
+  target_include_directories(esprit_dev INTERFACE ${ESPRIT_ROOT})
+  target_include_directories(esprit_dev INTERFACE ${ESPRIT_ROOT}/include)
+  target_include_directories(esprit_dev INTERFACE ${LN_MCU_FOLDER})
+  target_include_directories(esprit_dev INTERFACE ${ESPRIT_ROOT}/embedded_printf)
 
   IF(LN_ENABLE_RUST)
-    TARGET_LINK_LIBRARIES(lnArduino INTERFACE lnarduino_c_bindings)
+    TARGET_LINK_LIBRARIES(esprit_dev INTERFACE lnarduino_c_bindings)
+    list(APPEND libs_to_merge lnarduino_c_bindings )
   ENDIF()
-  target_include_directories(lnArduino INTERFACE embeddedPrintf    )
+  target_include_directories(esprit_dev INTERFACE embeddedPrintf    )
+
+
+  foreach(lib ${libs_to_merge})
+    get_target_property(cludes ${lib} INTERFACE_INCLUDE_DIRECTORIES)
+    if(NOT "${cludes}" STREQUAL "cludes-NOTFOUND")
+      list(APPEND all_includes ${cludes})
+    endif()
+
+
+    list(APPEND objs $<TARGET_OBJECTS:${lib}>)
+  endforeach()
+
+  MESSAGE(STATUS "******merged********* ${all_includes}")
+  add_library(esprit_lib STATIC ${objs})
+
+  set_target_properties(esprit_dev PROPERTIES
+        INTERFACE_LINK_LIBRARIES "${libs_to_keep}"
+   )
+  get_target_property(original_includes esprit_dev INTERFACE_INCLUDE_DIRECTORIES)
+  MESSAGE(STATUS "****original*********** ${original_includes}")
+  list(APPEND all_includes ${original_includes})
+  #  list(APPEND all_includes "${ESPRIT_ROOT}/mcus/${LN_EXT}/boards/${LN_BOARD_NAME}/")
+  #list(APPEND all_includes "${ESPRIT_ROOT}/mcus/${LN_EXT}/include")
+  MESSAGE(STATUS "******final********* ${all_includes}")
+  set_target_properties(esprit_dev PROPERTIES
+        INTERFACE_INCLUDE_DIRECTORIES "${all_includes}"
+   )
+
+
+
+
 
 ENDIF()
 

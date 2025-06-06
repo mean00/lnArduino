@@ -1,5 +1,5 @@
 
-SET(C ${CMAKE_CURRENT_SOURCE_DIR}/rnArduino/c_interface)
+SET(C ${CMAKE_CURRENT_SOURCE_DIR}/rust_esprit/c_interface)
 
 INCLUDE_DIRECTORIES( ${C} )
 
@@ -26,7 +26,7 @@ ADD_LIBRARY(lnarduino_c_bindings STATIC
     ${EXTRA}
     ${C}/lnFast_EventGroup_c.cpp
   )
-TARGET_LINK_LIBRARIES(lnarduino_c_bindings lnArduinoInternal)
+TARGET_LINK_LIBRARIES(lnarduino_c_bindings EspritInternal)
 
 IF(LN_ENABLE_USBD)
   TARGET_LINK_LIBRARIES(lnarduino_c_bindings tinyUsb)

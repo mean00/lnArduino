@@ -126,27 +126,6 @@ IF(NOT DEFINED LN_EXT)
   SET(CMAKE_EXECUTABLE_SUFFIX_C .elf CACHE INTERNAL "")
   SET(CMAKE_EXECUTABLE_SUFFIX_CXX .elf CACHE INTERNAL "")
 
-  SET(CMAKE_C_STANDARD_INCLUDE_DIRECTORIES  ${CMAKE_C_STANDARD_INCLUDE_DIRECTORIES}
-        ${LNARDUINO_ROOT}/${LN_EXT}/boards/${LN_BOARD_NAME}/
-        ${LNARDUINO_ROOT}/${LN_EXT}
-        ${AF_FOLDER}/mcus/common_bluepill/
-        ${AF_FOLDER}/mcus/common_bluepill/include
-        CACHE INTERNAL ""
-        )
-  include_directories(  # This helps the LSP /IDE
-            ${AF_FOLDER}/mcus/common_bluepill/
-            ${AF_FOLDER}/mcus/common_bluepill/include)
-  SET(CMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES  ${CMAKE_C_STANDARD_INCLUDE_DIRECTORIES} CACHE INTERNAL "")
-
-  MESSAGE(STATUS ">>> STD C includes:<${CMAKE_C_STANDARD_INCLUDE_DIRECTORIES}>")
-  MESSAGE(STATUS ">>> STD CXX includes:<${CMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES}>")
-
-
-  #include_directories(${AF_FOLDER}/${LN_EXT}/boards/${LN_BOARD_NAME}/)
-  #include_directories(${AF_FOLDER}/${LN_EXT}/)
-  #include_directories(${AF_FOLDER}/mcus/common_bluepill/)
-  #include_directories(${AF_FOLDER}/mcus/common_bluepill/include)
-
 
   MESSAGE(STATUS "MCU Architecture ${LN_ARCH}")
   MESSAGE(STATUS "MCU Type         ${LN_MCU}")
