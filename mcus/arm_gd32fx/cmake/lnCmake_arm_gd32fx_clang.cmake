@@ -1,7 +1,7 @@
 include(FindPython3)
+include(ln_merge_libs)
 MACRO(GENERATE_GD32_FIRMWARE target)
-
-
+  LN_MERGE_LIBS()
   configure_file( "${LN_MCU_FOLDER}/boards/bluepill/clang.lld.in" "${CMAKE_BINARY_DIR}/linker_script.ld" @ONLY)
   ADD_EXECUTABLE(${target} ${ARGN}  ${LN_MCU_FOLDER}/src/start.S   ${LN_MCU_FOLDER}/src/start.cpp      ${LN_MCU_FOLDER}/src/vector_table.S)
   #TARGET_LINK_LIBRARIES(${target} PUBLIC ${USED_LIBS} ) # duplicates are NOT a mistake !
@@ -41,4 +41,5 @@ MACRO(USE_LIBRARY lib)
   add_subdirectory(${AF_FOLDER}/libraries/${lib})
   include_directories(${AF_FOLDER}/libraries/${lib})
   LIST(APPEND USED_LIBS ${lib})
+  target_link_libraries(esprit_lib PUBLIC ${lib})
 ENDMACRO(USE_LIBRARY lib)

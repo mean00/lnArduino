@@ -1,6 +1,8 @@
 
+include(ln_merge_libs)
 MACRO(GENERATE_GD32_FIRMWARE target)
 
+  LN_MERGE_LIBS()
 
   configure_file( "${LN_MCU_FOLDER}/boards/bluepill/ld.lds.in" "${CMAKE_BINARY_DIR}/linker_script.ld" @ONLY)
   ADD_EXECUTABLE(${target} ${ARGN}  ${LN_MCU_FOLDER}/src/start.S   ${LN_MCU_FOLDER}/src/start.cpp      ${LN_MCU_FOLDER}/src/vector_table.S)

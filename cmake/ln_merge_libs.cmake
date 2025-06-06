@@ -1,0 +1,21 @@
+MACRO(LN_MERGE_LIBS)
+  #---
+  set(merged_name "esprit_single_lib")
+  set(libs_to_merge "${USED_LIBS}")
+  set(libs_to_keep esprit_lib)
+  list(APPEND libs_to_merge ln_utils embeddedPrintf esprit_lib ${USED_LIBS})
+  MESSAGE(STATUS "Merging libs <${libs_to_merge}>")
+  IF(NOT LN_EXTERNAL_FREERTOS)
+    list(APPEND libs_to_merge FreeRTOS )
+  ENDIF()
+  IF(LN_ENABLE_RUST)
+    target_include_directories(esprit_dev INTERFACE lnarduino_c_bindings)
+    list(APPEND libs_to_merge lnarduino_c_bindings )
+  ENDIF()
+  foreach(lib ${libs_to_merge})
+    list(APPEND objs $<TARGET_OBJECTS:${lib}>)
+  endforeach()
+  add_library(${merged_name} STATIC ${objs})
+  #---
+ENDMACRO()
+

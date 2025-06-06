@@ -73,61 +73,21 @@ IF(True) #NOT ESPRIT_ROOT)
 
 
   # a firmmware should link against that one
-
-
-  #____________________________________________
-  # Merge things into a single lib and single interface
-  #____________________________________________
-  set(merged_name "esprit_single_lib")
-  set(libs_to_merge "${USED_LIBS}")
-  set(libs_to_keep esprit_lib)
-
-  target_link_libraries(esprit_dev INTERFACE lnBoard ln_utils embeddedPrintf )
-  list(APPEND libs_to_merge ln_utils embeddedPrintf esprit_lib )
-  IF(NOT LN_EXTERNAL_FREERTOS)
-    list(APPEND libs_to_merge FreeRTOS )
-  ENDIF()
   target_include_directories(esprit_dev INTERFACE ${ESPRIT_ROOT})
   target_include_directories(esprit_dev INTERFACE ${ESPRIT_ROOT}/include)
   target_include_directories(esprit_dev INTERFACE ${LN_MCU_FOLDER})
   target_include_directories(esprit_dev INTERFACE ${ESPRIT_ROOT}/embedded_printf)
 
-  IF(LN_ENABLE_RUST)
-    target_include_directories(esprit_dev INTERFACE lnarduino_c_bindings)
-    list(APPEND libs_to_merge lnarduino_c_bindings )
-  ENDIF()
+
+
+  #____________________________________________
+  # Merge things into a single lib and single interface
+  #____________________________________________
+
   target_include_directories(esprit_dev INTERFACE embeddedPrintf    )
 
 
-  foreach(lib ${libs_to_merge})
-    get_target_property(cludes ${lib} INTERFACE_INCLUDE_DIRECTORIES)
-    if(NOT "${cludes}" STREQUAL "cludes-NOTFOUND")
-      list(APPEND all_includes ${cludes})
-    endif()
-
-
-    list(APPEND objs $<TARGET_OBJECTS:${lib}>)
-  endforeach()
-
   MESSAGE(STATUS "******merged********* ${all_includes}")
-  add_library(${merged_name} STATIC ${objs})
-
-  set_target_properties(esprit_dev PROPERTIES
-        INTERFACE_LINK_LIBRARIES "${libs_to_keep}"
-   )
-  get_target_property(original_includes esprit_dev INTERFACE_INCLUDE_DIRECTORIES)
-  MESSAGE(STATUS "****original*********** ${original_includes}")
-  list(APPEND all_includes ${original_includes})
-  #  list(APPEND all_includes "${ESPRIT_ROOT}/mcus/${LN_EXT}/boards/${LN_BOARD_NAME}/")
-  #list(APPEND all_includes "${ESPRIT_ROOT}/mcus/${LN_EXT}/include")
-  MESSAGE(STATUS "******final********* ${all_includes}")
-  set_target_properties(esprit_dev PROPERTIES
-        INTERFACE_INCLUDE_DIRECTORIES "${all_includes}"
-   )
-
-
-
-
 
 ENDIF()
 
