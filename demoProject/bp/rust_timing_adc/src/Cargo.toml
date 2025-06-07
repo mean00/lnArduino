@@ -8,7 +8,7 @@ edition = "2024"
 
 [dependencies]
 cty = "0.2.2"
-rnarduino = { path = "../lnArduino/rust/rust_esprit" }
+rust_esprit = { path = "../lnArduino/rust/rust_esprit" }
 ufmt = "*"
 heapless = { version = "*", features = ["ufmt-impl"] }
 

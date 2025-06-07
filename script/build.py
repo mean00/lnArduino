@@ -108,11 +108,11 @@ def build_all(category, title, use):
         #quit()
     pass
 def build_all_bp(category ):
-    build_all(category, "ARM_M4",["GD32F3"])
-    build_all(category, "ARM_M4",["CLANG","GD32F3"])
+#    build_all(category, "ARM_M4",["GD32F3"])
+    #build_all(category, "ARM_M4",["CLANG","GD32F3"])
     build_all(category, "ARM_M3",["CLANG"])
     build_all(category, "ARM_M3",[])
-    build_all(category, "RISCV_CH32V3x",["CLANG","CH32V3x"])
+    #build_all(category, "RISCV_CH32V3x",["CLANG","CH32V3x"])
 #
 #
 #________________________________________

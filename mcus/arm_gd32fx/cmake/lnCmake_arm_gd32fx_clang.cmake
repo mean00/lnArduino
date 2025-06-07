@@ -6,7 +6,7 @@ MACRO(GENERATE_GD32_FIRMWARE target)
   ADD_EXECUTABLE(${target} ${ARGN}  ${LN_MCU_FOLDER}/src/start.S   ${LN_MCU_FOLDER}/src/start.cpp      ${LN_MCU_FOLDER}/src/vector_table.S)
   #TARGET_LINK_LIBRARIES(${target} PUBLIC ${USED_LIBS} ) # duplicates are NOT a mistake !
   # duplicates are NOT a mistake !
-  TARGET_LINK_LIBRARIES(${target}  PUBLIC esprit_single_lib  )
+  TARGET_LINK_LIBRARIES(${target}  PUBLIC esprit_single_lib  esprit_dev)
   IF(LN_CUSTOM_LD_SCRIPT)
     SET(SCRIPT ${LN_CUSTOM_LD_SCRIPT} CACHE INTERNAL "")
   ELSE()
