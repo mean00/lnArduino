@@ -54,6 +54,7 @@ SET(RP_LN_SOURCES
         ln_rp_spi.cpp
         ln_rp_adc.cpp
         ${RP_COMMON_FOLDER}/ln_rp_pio.cpp
+        ${RP_COMMON_FOLDER}/lnStubs.cpp
 )
 SET(BASE_SOURCES
     ${PICO_SDK_PATH}/src/rp2_common/hardware_timer/timer.c
@@ -64,7 +65,6 @@ SET(BASE_SOURCES
     ${PICO_SDK_PATH}/src/rp2_common/hardware_xosc/xosc.c
     ${PICO_SDK_PATH}/src/rp2_common/hardware_irq/irq_handler_chain.S
     ${PICO_SDK_PATH}/src/rp2_common/hardware_pio/pio.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/../conf/bs2_default_padded_checksummed.S
 )
 
 SET(RP_SDK_SOURCES
@@ -88,7 +88,7 @@ ADD_RP_INCDIR(hardware_adc hardware_base hardware_claim hardware_clocks hardware
 ADD_RP_INCDIR(boot_stage2 pico_bootrom pico_double pico_float pico_int64_ops pico_malloc pico_mem_ops
   pico_printf pico_runtime pico_stdio pico_stdio_uart)
 
-target_include_directories(esprit_lib PUBLIC
+target_include_directories(esprit_dev INTERFACE
         ${rp_inc_dir}
         ${PICO_SDK_PATH}
         ${PICO_SDK_PATH}/src/boards/include
@@ -105,8 +105,8 @@ target_include_directories(esprit_lib PUBLIC
         ${PICO_SDK_PATH}/src/rp2_common/boot_stage2/asminclude
         ${RP_PLATFORM_INCLUDE}
   )
-TARGET_INCLUDE_DIRECTORIES(esprit_lib PUBLIC  ${CMAKE_CURRENT_SOURCE_DIR}/../include)
-TARGET_INCLUDE_DIRECTORIES(esprit_lib  PRIVATE ../private_include)
-TARGET_COMPILE_DEFINITIONS(esprit_lib PUBLIC PICO_${RP_CHIP2}=1)
-TARGET_COMPILE_DEFINITIONS(esprit_lib PUBLIC RP_SDK_VERSION=${RP_SDK_VERSION})
+TARGET_INCLUDE_DIRECTORIES(esprit_dev INTERFACE  ${CMAKE_CURRENT_SOURCE_DIR}/../include)
+TARGET_INCLUDE_DIRECTORIES(esprit_dev  INTERFACE ../private_include)
+TARGET_COMPILE_DEFINITIONS(esprit_dev INTERFACE PICO_${RP_CHIP2}=1)
+TARGET_COMPILE_DEFINITIONS(esprit_dev INTERFACE RP_SDK_VERSION=${RP_SDK_VERSION})
 TARGET_LINK_LIBRARIES(esprit_lib  PRIVATE esprit_dev)

@@ -123,10 +123,10 @@ IF(NOT DEFINED LN_EXT)
   SET(CMAKE_ASM_FLAGS "${GD32_C_FLAGS}" CACHE INTERNAL "")
   SET(CMAKE_CXX_FLAGS "${GD32_C_FLAGS} -std=gnu++11 -fno-rtti -fno-exceptions -fno-threadsafe-statics" CACHE INTERNAL "")
   #
-  SET(GD32_LD_FLAGS " -fuse-ld=lld  -nostdlib ${GD32_SPECS}  ${GD32_MCU}  ${GD32_LD_EXTRA}  ${GD32_LIBC}" CACHE INTERNAL "")
-  SET(GD32_LD_LIBS " -Wl,--gc-sections -Wl,--gdb-index " CACHE INTERNAL "")
+  SET(GD32_LD_FLAGS "   -nostdlib ${GD32_SPECS}  ${GD32_MCU}  ${GD32_LD_EXTRA}  ${GD32_LIBC}" CACHE INTERNAL "")
+  SET(GD32_LD_LIBS " -lgcc -Wl,--gc-sections  " CACHE INTERNAL "")
   #
-  SET(CLANG_LINKER_OPT "${MINI_SYSROOT}/lib/libclang_rt.builtins.a" CACHE INTERNAL "")
+  SET(CLANG_LINKER_OPT "" CACHE INTERNAL "")
   #
   # --sysroot=${LN_CLANG_SYSROOT}
   #

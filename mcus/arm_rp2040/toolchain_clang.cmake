@@ -102,8 +102,6 @@ IF(NOT DEFINED LN_EXT)
   MESSAGE(STATUS "GD32 C   compiler ${CMAKE_C_COMPILER}")
   MESSAGE(STATUS "GD32 C++ compiler ${CMAKE_CXX_COMPILER}")
 
-
-
   # M0+
 
   SET(MINI_SYSROOT "${PLATFORM_CLANG_PATH}/../lib/clang-runtimes/arm-none-eabi/armv6m_soft_nofp/" CACHE INTERNAL "")
@@ -113,10 +111,6 @@ IF(NOT DEFINED LN_EXT)
   #____________________________
   # CLANG LINK USING GCC LIBS
   #____________________________
-  #SET(LN_CLANG_LIBC /home/fx/Arduino_stm32/arm-gcc-2020q4/bin/../lib/gcc/arm-none-eabi/10.2.1/thumb/v7-m/nofp/libgcc.a CACHE INTERNAL "")
-  #SET(LN_CLANG_MULTILIB thumb/v7-m/nofp CACHE INTERNAL "")
-
-  #SET(G32_DEBUG_FLAGS "-g3 ${LN_LTO}  -O0  -gdwarf-4" CACHE INTERNAL "")
   SET(G32_DEBUG_FLAGS "-g3 ${LN_LTO}  -Oz -gdwarf-4" CACHE INTERNAL "")
 
   SET(GD32_LD_EXTRA "  -Wl,--unresolved-symbols=report-all -Wl,--warn-common  " CACHE INTERNAL "")
@@ -130,12 +124,6 @@ IF(NOT DEFINED LN_EXT)
   SET(GD32_LD_LIBS " -Wl,--gc-sections -Wl,--gdb-index " CACHE INTERNAL "")
   #
   SET(CLANG_LINKER_OPT "${MINI_SYSROOT}/lib/libclang_rt.builtins.a" CACHE INTERNAL "")
-  #
-  # --sysroot=${LN_CLANG_SYSROOT}
-  #
-  # xx SET(SB2 ${CMAKE_BINARY_DIR}/lnArduino/mcus/arm_rp2040/src/CMakeFiles/rplib.dir/__/conf/bs2_default_padded_checksummed.S.obj)
-  #SET(CRT ${CMAKE_BINARY_DIR}/lnArduino/mcus/arm_rp2040/src/CMakeFiles/rplib.dir/__/sdk_copy/crt0.S.obj)
-  #SET(CRT ${CMAKE_BINARY_DIR}/lnArduino/mcus/arm_rp2040/src/CMakeFiles/rplib.dir/pico/pico-sdk/src/rp2_common/pico_standard_link/crt0.S.obj)
   #
   set(CMAKE_CXX_LINK_EXECUTABLE    "<CMAKE_LINKER>  <CMAKE_CXX_LINK_FLAGS>  <LINK_FLAGS> ${LN_LTO}    -Wl,--start-group ${CRT} ${SB2} <OBJECTS>  <LINK_LIBRARIES>  -Wl,--end-group -lc  -Wl,-Map,<TARGET>.map   -o <TARGET> ${GD32_LD_FLAGS} ${GD32_LD_LIBS}  ${CLANG_LINKER_OPT} -e _entry_point" CACHE INTERNAL "")
   SET(CMAKE_EXECUTABLE_SUFFIX_C .elf CACHE INTERNAL "")
