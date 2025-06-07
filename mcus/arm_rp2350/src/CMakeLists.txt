@@ -113,6 +113,7 @@ SET(RP_LN_SOURCES
         ${RP_COMMON_FOLDER}/ln_rp_gpio.cpp
         ${RP_COMMON_FOLDER}/ln_rp_dma.cpp
         ${RP_COMMON_FOLDER}/ln_rp_pio.cpp
+        ${RP_COMMON_FOLDER}/lnStubs.cpp
         ln_rp_spi.cpp
         ln_rp_adc.cpp
         #boot.s
@@ -124,15 +125,12 @@ SET(RP_LN_SRCS
   #${CMAKE_CURRENT_SOURCE_DIR}/minimum_arm_image_def_block.s
  ${CMAKE_CURRENT_SOURCE_DIR}/rp_irq.cpp
 )
-ADD_LIBRARY(rplib STATIC rp.cpp
+ADD_LIBRARY(esprit_lib STATIC rp.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/../src/bs2_default_padded_checksummed.S
   ${SDK_SRCS}
   ${RP_LN_SOURCES}
   ${RP_LN_SRCS}
 )
-#${RP_SDK_SOURCES}
-#${RP_EXTRA_SOURCES})
-#ADD_LIBRARY(rplib STATIC rp.cpp ${CMAKE_CURRENT_SOURCE_DIR}/../conf/bs2_default_padded_checksummed.S ${RP_LN_SOURCES} ${RP_SDK_SOURCES} ${RP_EXTRA_SOURCES})
 
 #
 ADD_RP_INCDIR(hardware_adc hardware_base hardware_claim hardware_clocks hardware_divider
@@ -144,10 +142,10 @@ ADD_RP_INCDIR(pico_bootrom pico_double pico_float pico_int64_ops pico_malloc pic
 
 LIST(APPEND rp_inc_dir  ${PICO_SDK_PATH}/src/common/boot_picoboot_headers/include)
 
-TARGET_INCLUDE_DIRECTORIES(rplib PRIVATE
+TARGET_INCLUDE_DIRECTORIES(esprit_lib PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/../sdk_copy
 )
-TARGET_INCLUDE_DIRECTORIES(rplib PUBLIC
+TARGET_INCLUDE_DIRECTORIES(esprit_lib PUBLIC
         ${rp_inc_dir}
         ${PICO_SDK_PATH}
         ${PICO_SDK_PATH}/src/boards/include
@@ -165,9 +163,9 @@ TARGET_INCLUDE_DIRECTORIES(rplib PUBLIC
         ${PICO_SDK_PATH}/src/common/boot_picobin_headers/include/
         ${RP_PLATFORM_INCLUDE}
   )
-TARGET_INCLUDE_DIRECTORIES(rplib PUBLIC  ${CMAKE_CURRENT_SOURCE_DIR}/../include)
-TARGET_INCLUDE_DIRECTORIES(rplib  PRIVATE ../private_include)
-TARGET_LINK_LIBRARIES(rplib  PRIVATE esprit_dev)
-TARGET_COMPILE_DEFINITIONS(rplib PUBLIC PICO_${RP_CHIP2}=1)
-TARGET_COMPILE_DEFINITIONS(rplib PUBLIC RP_SDK_VERSION=${RP_SDK_VERSION})
+TARGET_INCLUDE_DIRECTORIES(esprit_lib PUBLIC  ${CMAKE_CURRENT_SOURCE_DIR}/../include)
+TARGET_INCLUDE_DIRECTORIES(esprit_lib  PRIVATE ../private_include)
+TARGET_LINK_LIBRARIES(esprit_lib  PRIVATE esprit_dev)
+TARGET_COMPILE_DEFINITIONS(esprit_lib PUBLIC PICO_${RP_CHIP2}=1)
+TARGET_COMPILE_DEFINITIONS(esprit_lib PUBLIC RP_SDK_VERSION=${RP_SDK_VERSION})
 

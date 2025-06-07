@@ -1,7 +1,8 @@
+include(ln_merge_libs)
 
 MACRO(GENERATE_GD32_FIRMWARE target)
   configure_file( "${LN_MCU_FOLDER}/boards/${LN_BOARD_NAME}/rp2040_linker.ld.in" "${CMAKE_BINARY_DIR}/linker_script.ld" @ONLY)
-  LN_MERGE_LIBS(rplib)
+  LN_MERGE_LIBS()
   ADD_EXECUTABLE(${target} ${ARGN} )
   TARGET_LINK_LIBRARIES(${target} PUBLIC pico_stdlib)
   TARGET_LINK_LIBRARIES(${target} PUBLIC esprit_single_lib esprit_dev) # duplicates are NOT a mistake !

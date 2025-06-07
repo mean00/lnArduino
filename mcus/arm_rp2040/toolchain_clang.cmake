@@ -133,7 +133,7 @@ IF(NOT DEFINED LN_EXT)
   #
   # --sysroot=${LN_CLANG_SYSROOT}
   #
-  SET(SB2 ${CMAKE_BINARY_DIR}/lnArduino/mcus/arm_rp2040/src/CMakeFiles/rplib.dir/__/conf/bs2_default_padded_checksummed.S.obj)
+  # xx SET(SB2 ${CMAKE_BINARY_DIR}/lnArduino/mcus/arm_rp2040/src/CMakeFiles/rplib.dir/__/conf/bs2_default_padded_checksummed.S.obj)
   #SET(CRT ${CMAKE_BINARY_DIR}/lnArduino/mcus/arm_rp2040/src/CMakeFiles/rplib.dir/__/sdk_copy/crt0.S.obj)
   #SET(CRT ${CMAKE_BINARY_DIR}/lnArduino/mcus/arm_rp2040/src/CMakeFiles/rplib.dir/pico/pico-sdk/src/rp2_common/pico_standard_link/crt0.S.obj)
   #

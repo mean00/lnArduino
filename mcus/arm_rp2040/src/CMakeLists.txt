@@ -33,11 +33,11 @@ ELSE()
 ENDIF()
 
 CONFIGURE_FILE(${VERSION_FILE} ${CMAKE_BINARY_DIR}/pico/version.h)
-ADD_CUSTOM_COMMAND(
-  OUTPUT ${CMAKE_BINARY_DIR}/bs2_default_padded_checksummed.S
-  COMMAND python ${PICO_SDK_PATH}/src/rp2_common/boot_stage2/pad_checksum -s 0xffffffff ${PICO_SDK_PATH}/src/rp2_common/boot_stage2/bs2_default.bin ${CMAKE_BINARY_DIR}/bs2_default_padded_checksummed.S
-  DEPENDS
-  )
+#ADD_CUSTOM_COMMAND(
+#OUTPUT ${CMAKE_BINARY_DIR}/bs2_default_padded_checksummed.S
+#COMMAND python ${PICO_SDK_PATH}/src/rp2040/boot_stage2/pad_checksum -s 0xffffffff ${CMAKE_CURRENT_SOURCE_DIR}/bs2_default.bin ${CMAKE_BINARY_DIR}/bs2_default_padded_checksummed.S
+#DEPENDS
+#)
 
 
 IF(USE_RP2040_PURE_RAM)
@@ -64,6 +64,7 @@ SET(BASE_SOURCES
     ${PICO_SDK_PATH}/src/rp2_common/hardware_xosc/xosc.c
     ${PICO_SDK_PATH}/src/rp2_common/hardware_irq/irq_handler_chain.S
     ${PICO_SDK_PATH}/src/rp2_common/hardware_pio/pio.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../conf/bs2_default_padded_checksummed.S
 )
 
 SET(RP_SDK_SOURCES
@@ -77,7 +78,7 @@ SET(RP_SDK_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/../sdk_copy/runtime.c
   ${CRT0}
 )
-add_library(rplib STATIC rp.cpp ${CMAKE_BINARY_DIR}/bs2_default_padded_checksummed.S ${RP_LN_SOURCES} ${RP_SDK_SOURCES} ${RP_EXTRA_SOURCES})
+add_library(esprit_lib STATIC rp.cpp  ${RP_LN_SOURCES} ${RP_SDK_SOURCES} ${RP_EXTRA_SOURCES})
 
 #
 ADD_RP_INCDIR(hardware_adc hardware_base hardware_claim hardware_clocks hardware_divider
@@ -87,7 +88,7 @@ ADD_RP_INCDIR(hardware_adc hardware_base hardware_claim hardware_clocks hardware
 ADD_RP_INCDIR(boot_stage2 pico_bootrom pico_double pico_float pico_int64_ops pico_malloc pico_mem_ops
   pico_printf pico_runtime pico_stdio pico_stdio_uart)
 
-target_include_directories(rplib PUBLIC
+target_include_directories(esprit_lib PUBLIC
         ${rp_inc_dir}
         ${PICO_SDK_PATH}
         ${PICO_SDK_PATH}/src/boards/include
@@ -104,8 +105,8 @@ target_include_directories(rplib PUBLIC
         ${PICO_SDK_PATH}/src/rp2_common/boot_stage2/asminclude
         ${RP_PLATFORM_INCLUDE}
   )
-TARGET_INCLUDE_DIRECTORIES(rplib PUBLIC  ${CMAKE_CURRENT_SOURCE_DIR}/../include)
-TARGET_INCLUDE_DIRECTORIES(rplib  PRIVATE ../private_include)
-TARGET_COMPILE_DEFINITIONS(rplib PUBLIC PICO_${RP_CHIP2}=1)
-TARGET_COMPILE_DEFINITIONS(rplib PUBLIC RP_SDK_VERSION=${RP_SDK_VERSION})
-TARGET_LINK_LIBRARIES(rplib  PRIVATE esprit_dev)
+TARGET_INCLUDE_DIRECTORIES(esprit_lib PUBLIC  ${CMAKE_CURRENT_SOURCE_DIR}/../include)
+TARGET_INCLUDE_DIRECTORIES(esprit_lib  PRIVATE ../private_include)
+TARGET_COMPILE_DEFINITIONS(esprit_lib PUBLIC PICO_${RP_CHIP2}=1)
+TARGET_COMPILE_DEFINITIONS(esprit_lib PUBLIC RP_SDK_VERSION=${RP_SDK_VERSION})
+TARGET_LINK_LIBRARIES(esprit_lib  PRIVATE esprit_dev)

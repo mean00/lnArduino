@@ -17,7 +17,7 @@ ENDMACRO()
 #
 MACRO(GENERATE_GD32_FIRMWARE target)
 
-  LN_MERGE_LIBS(rplib)
+  LN_MERGE_LIBS()
   IF(USE_RP2040_PURE_RAM)
     configure_file( "${LN_MCU_FOLDER}/boards/${LN_BOARD_NAME}/rp2040_linker_ram.ld.in" "${CMAKE_BINARY_DIR}/linker_script.ld" @ONLY)
   ELSE()
