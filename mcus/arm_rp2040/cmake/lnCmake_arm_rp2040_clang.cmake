@@ -1,4 +1,5 @@
 include(FindPython3)
+include(ln_merge_libs)
 #
 #
 #
@@ -16,18 +17,14 @@ ENDMACRO()
 #
 MACRO(GENERATE_GD32_FIRMWARE target)
 
-  #MESSAGE(STATUS " *** LN_MCU_FOLDER ${LN_MCU_FOLDER}")
+  LN_MERGE_LIBS(rplib)
   IF(USE_RP2040_PURE_RAM)
     configure_file( "${LN_MCU_FOLDER}/boards/${LN_BOARD_NAME}/rp2040_linker_ram.ld.in" "${CMAKE_BINARY_DIR}/linker_script.ld" @ONLY)
   ELSE()
     configure_file( "${LN_MCU_FOLDER}/boards/${LN_BOARD_NAME}/rp2040_linker.ld.in" "${CMAKE_BINARY_DIR}/linker_script.ld" @ONLY)
   ENDIF()
   ADD_EXECUTABLE(${target} ${ARGN}  )
-  TARGET_LINK_LIBRARIES(${target} PUBLIC rplib)
-  TARGET_LINK_LIBRARIES(${target} PUBLIC ${USED_LIBS} lnArduino) # duplicates are NOT a mistake !
-  # duplicates are NOT a mistake !
-  # TARGET_LINK_LIBRARIES(${target} embeddedPrintf gd32_overlay gd32Arduino   FreeRTOS  gd32_lowlevel c )
-  TARGET_LINK_LIBRARIES(${target} PUBLIC rplib embeddedPrintf  FreeRTOS)
+  TARGET_LINK_LIBRARIES(${target} PUBLIC esprit_dev esprit_single_lib) # duplicates are NOT a mistake !
   IF(LN_CUSTOM_LD_SCRIPT)
     SET(SCRIPT ${LN_CUSTOM_LD_SCRIPT} CACHE INTERNAL "")
   ELSE()
@@ -63,11 +60,7 @@ MACRO(GENERATE_GD32_FIRMWARE target)
   ENDIF()
 ENDMACRO(GENERATE_GD32_FIRMWARE target)
 
-MACRO(USE_LIBRARY lib)
-  add_subdirectory(${AF_FOLDER}/libraries/${lib})
-  include_directories(${AF_FOLDER}/libraries/${lib})
-  LIST(APPEND USED_LIBS ${lib})
-ENDMACRO(USE_LIBRARY lib)
+include(ln_use_library)
 
 MACRO(HASH_GD32_FIRMWARE target)
 ENDMACRO()

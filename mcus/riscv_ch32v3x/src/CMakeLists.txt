@@ -5,6 +5,8 @@ SET(S ${CMAKE_CURRENT_SOURCE_DIR})
 add_subdirectory(../../common_bluepill common_bp)
 
 target_include_directories(esprit_lib PRIVATE ${S} ${S}/../include)
+target_include_directories(esprit_dev  INTERFACE  ${CMAKE_CURRENT_SOURCE_DIR}/../../common_bluepill/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/../boards/${LN_BOARD_NAME})
 
 target_sources( esprit_lib PRIVATE
     ${S}/lnCpuID_riscv_ch32v3x.cpp

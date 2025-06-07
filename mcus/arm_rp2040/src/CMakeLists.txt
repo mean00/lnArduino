@@ -1,4 +1,3 @@
-# Select RP2040 vs RP2350
 SET(RP_CHIP rp2040)
 SET(RP_CHIP2 RP2040)
 SET(RP_COMMON_FOLDER  ${CMAKE_CURRENT_SOURCE_DIR}/../../rp_common/src)
@@ -10,13 +9,7 @@ MACRO(ADD_RP_INCDIR)
 ENDMACRO()
 #
 
-IF(EXISTS "${PICO_SDK_PATH}/src/common/pico_base/include/pico/version.h.in")
-  MESSAGE(STATUS "Detected SDK v1.x")
-  SET(RP_SDK_VERSION 1)
-  SET(RP_SUFFIX_INCLUDE "")
-  SET(VERSION_FILE "${PICO_SDK_PATH}/src/common/pico_base/include/pico/version.h.in")
-  SET(RP_PLATFORM_INCLUDE "${PICO_SDK_PATH}/src/rp2_common/pico_platform/include")
-ELSEIF(EXISTS "${PICO_SDK_PATH}/src/common/pico_base_headers/include/pico/version.h.in")
+IF(EXISTS "${PICO_SDK_PATH}/src/common/pico_base_headers/include/pico/version.h.in")
   MESSAGE(STATUS "Detected SDK v2.x")
   SET(RP_SDK_VERSION 2)
   SET(RP_SUFFIX_INCLUDE "_headers")
@@ -33,10 +26,10 @@ ELSEIF(EXISTS "${PICO_SDK_PATH}/src/common/pico_base_headers/include/pico/versio
                           "${PICO_SDK_PATH}/src/common/hardware_claim/include/"
                           "${PICO_SDK_PATH}/src/rp2_common/boot_bootrom_headers/include"
                           )
-SET(RP_EXTRA_SOURCES ${PICO_SDK_PATH}/src/rp2_common/pico_runtime_init/runtime_init_clocks.c
-${PICO_SDK_PATH}/src/rp2_common/hardware_ticks/ticks.c)
-ELSEIF()
-  MESSAGE(FATAL_ERROR "Cannot detect pico sdk v1.x or v2.X")
+  SET(RP_EXTRA_SOURCES ${PICO_SDK_PATH}/src/rp2_common/pico_runtime_init/runtime_init_clocks.c
+    ${PICO_SDK_PATH}/src/rp2_common/hardware_ticks/ticks.c)
+ELSE()
+  MESSAGE(FATAL_ERROR "Cannot detect pico sdk v2.X")
 ENDIF()
 
 CONFIGURE_FILE(${VERSION_FILE} ${CMAKE_BINARY_DIR}/pico/version.h)
@@ -62,28 +55,17 @@ SET(RP_LN_SOURCES
         ln_rp_adc.cpp
         ${RP_COMMON_FOLDER}/ln_rp_pio.cpp
 )
-IF(FALSE)
-  SET(BASE_SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/../sdk_copy/timer.c # Maybe
-    ${CMAKE_CURRENT_SOURCE_DIR}/../sdk_copy/uart.c # Maybe
-    ${CMAKE_CURRENT_SOURCE_DIR}/../sdk_copy/clocks.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/../sdk_copy/pll.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/../sdk_copy/vreg.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/../sdk_copy/xosc.c
-)
-ELSE()
-  SET(BASE_SOURCES
-    ${PICO_SDK_PATH}/src/rp2_common/hardware_timer/timer.c # Maybe
-    ${PICO_SDK_PATH}/src/rp2_common/hardware_uart/uart.c # Maybe
+SET(BASE_SOURCES
+    ${PICO_SDK_PATH}/src/rp2_common/hardware_timer/timer.c
+    ${PICO_SDK_PATH}/src/rp2_common/hardware_uart/uart.c
     ${PICO_SDK_PATH}/src/rp2_common/hardware_clocks/clocks.c
     ${PICO_SDK_PATH}/src/rp2_common/hardware_pll/pll.c
     ${PICO_SDK_PATH}/src/rp2_common/hardware_vreg/vreg.c
     ${PICO_SDK_PATH}/src/rp2_common/hardware_xosc/xosc.c
-    #${PICO_SDK_PATH}/src/rp2_common/hardware_irq/irq.c
     ${PICO_SDK_PATH}/src/rp2_common/hardware_irq/irq_handler_chain.S
     ${PICO_SDK_PATH}/src/rp2_common/hardware_pio/pio.c
 )
-ENDIF()
+
 SET(RP_SDK_SOURCES
   ${BASE_SOURCES}
   ${RP_COMMON_FOLDER}/rp_rcu.cpp
@@ -95,16 +77,16 @@ SET(RP_SDK_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/../sdk_copy/runtime.c
   ${CRT0}
 )
-add_library(rplib STATIC rp.cpp ${CMAKE_CURRENT_SOURCE_DIR}/../conf/bs2_default_padded_checksummed.S ${RP_LN_SOURCES} ${RP_SDK_SOURCES} ${RP_EXTRA_SOURCES})
+add_library(rplib STATIC rp.cpp ${CMAKE_BINARY_DIR}/bs2_default_padded_checksummed.S ${RP_LN_SOURCES} ${RP_SDK_SOURCES} ${RP_EXTRA_SOURCES})
 
 #
-ADD_RP_INCDIR(hardware_adc hardware_base hardware_claim hardware_clocks hardware_divider 
-  hardware_gpio hardware_irq hardware_pll hardware_resets hardware_sync 
+ADD_RP_INCDIR(hardware_adc hardware_base hardware_claim hardware_clocks hardware_divider
+  hardware_gpio hardware_irq hardware_pll hardware_resets hardware_sync
   hardware_timer hardware_uart hardware_vreg hardware_watchdog hardware_xosc hardware_dma hardware_pio)
 
-ADD_RP_INCDIR(boot_stage2 pico_bootrom pico_double pico_float pico_int64_ops pico_malloc pico_mem_ops 
+ADD_RP_INCDIR(boot_stage2 pico_bootrom pico_double pico_float pico_int64_ops pico_malloc pico_mem_ops
   pico_printf pico_runtime pico_stdio pico_stdio_uart)
-        
+
 target_include_directories(rplib PUBLIC
         ${rp_inc_dir}
         ${PICO_SDK_PATH}
@@ -124,7 +106,6 @@ target_include_directories(rplib PUBLIC
   )
 TARGET_INCLUDE_DIRECTORIES(rplib PUBLIC  ${CMAKE_CURRENT_SOURCE_DIR}/../include)
 TARGET_INCLUDE_DIRECTORIES(rplib  PRIVATE ../private_include)
-TARGET_LINK_LIBRARIES(rplib  PRIVATE esprit_dev)
 TARGET_COMPILE_DEFINITIONS(rplib PUBLIC PICO_${RP_CHIP2}=1)
 TARGET_COMPILE_DEFINITIONS(rplib PUBLIC RP_SDK_VERSION=${RP_SDK_VERSION})
-
+TARGET_LINK_LIBRARIES(rplib  PRIVATE esprit_dev)

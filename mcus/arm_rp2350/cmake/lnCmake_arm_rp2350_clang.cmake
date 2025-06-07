@@ -62,11 +62,7 @@ MACRO(GENERATE_GD32_FIRMWARE target)
   ENDIF()
 ENDMACRO()
 
-MACRO(USE_LIBRARY lib)
-  ADD_SUBDIRECTORY(${AF_FOLDER}/libraries/${lib})
-  INCLUDE_DIRECTORIES(${AF_FOLDER}/libraries/${lib})
-  LIST(APPEND USED_LIBS ${lib})
-ENDMACRO()
+include(ln_use_library)
 
 MACRO(HASH_GD32_FIRMWARE target)
 ENDMACRO()
