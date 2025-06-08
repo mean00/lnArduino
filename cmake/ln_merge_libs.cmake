@@ -1,9 +1,10 @@
 MACRO(LN_MERGE_LIBS)
   #---
-  IF(NOT DEFINED LN_ALREADY_MERGED)
-    SET(LN_ALREADY_MERGED True CACHE INTERNAL "")
-    set(merged_name "esprit_single_lib")
+  IF(NOT "${LN_ALREADY_MERGED}" STREQUAL "DONE")
+    set(merged_name esprit_single_lib)
     set(libs_to_merge "${USED_LIBS}")
+    message(STATUS "Preparing single lib ==> ${merged_name}")
+    SET(LN_ALREADY_MERGED "DONE" CACHE INTERNAL "")
     list( APPEND libs_to_merge ${ARGN})
     set(libs_to_keep esprit_lib)
     list(APPEND libs_to_merge ln_utils embeddedPrintf esprit_lib ${USED_LIBS})
