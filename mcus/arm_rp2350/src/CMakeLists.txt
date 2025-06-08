@@ -36,11 +36,6 @@ ENDIF()
 
 CONFIGURE_FILE(${VERSION_FILE} ${CMAKE_BINARY_DIR}/pico/version.h)
 
-#ADD_CUSTOM_COMMAND(
-#  OUTPUT ${CMAKE_BINARY_DIR}/bs2_default_padded_checksummed.S
-#  COMMAND python ${PICO_SDK_PATH}/src/rp2350/boot_stage2/pad_checksum -s 0xffffffff -a arm ${PICO_SDK_PATH}/src/rp2350/boot_stage2/bs2_default.bin ${CMAKE_BINARY_DIR}/bs2_default_padded_checksummed.S
-#  DEPENDS
-#  )
 
 SET(RP2350_SDK ${PICO_SDK_PATH})
 SET(SDK_SRCS
@@ -126,7 +121,6 @@ SET(RP_LN_SRCS
  ${CMAKE_CURRENT_SOURCE_DIR}/rp_irq.cpp
 )
 ADD_LIBRARY(esprit_lib STATIC rp.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/../src/bs2_default_padded_checksummed.S
   ${SDK_SRCS}
   ${RP_LN_SOURCES}
   ${RP_LN_SRCS}

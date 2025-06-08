@@ -4,6 +4,7 @@ MACRO(GENERATE_GD32_FIRMWARE target)
   configure_file( "${LN_MCU_FOLDER}/boards/${LN_BOARD_NAME}/rp2040_linker.ld.in" "${CMAKE_BINARY_DIR}/linker_script.ld" @ONLY)
   LN_MERGE_LIBS()
   ADD_EXECUTABLE(${target} ${ARGN} )
+  TARGET_SOURCES(${target} PRIVATE ${LN_MCU_FOLDER}/conf/bs2_default_padded_checksummed.S)
   TARGET_LINK_LIBRARIES(${target} PUBLIC pico_stdlib)
   TARGET_LINK_LIBRARIES(${target} PUBLIC esprit_single_lib esprit_dev) # duplicates are NOT a mistake !
   IF(LN_CUSTOM_LD_SCRIPT)
