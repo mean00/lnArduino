@@ -33,11 +33,6 @@ ELSE()
 ENDIF()
 
 CONFIGURE_FILE(${VERSION_FILE} ${CMAKE_BINARY_DIR}/pico/version.h)
-#ADD_CUSTOM_COMMAND(
-#OUTPUT ${CMAKE_BINARY_DIR}/bs2_default_padded_checksummed.S
-#COMMAND python ${PICO_SDK_PATH}/src/rp2040/boot_stage2/pad_checksum -s 0xffffffff ${CMAKE_CURRENT_SOURCE_DIR}/bs2_default.bin ${CMAKE_BINARY_DIR}/bs2_default_padded_checksummed.S
-#DEPENDS
-#)
 
 
 IF(USE_RP2040_PURE_RAM)

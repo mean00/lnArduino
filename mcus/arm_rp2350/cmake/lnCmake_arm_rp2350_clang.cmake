@@ -23,7 +23,9 @@ MACRO(GENERATE_GD32_FIRMWARE target)
     CONFIGURE_FILE("${LN_MCU_FOLDER}/boards/${LN_BOARD_NAME}/rp2350_linker.ld.in" "${CMAKE_BINARY_DIR}/linker_script.ld" @ONLY)
   ENDIF()
   ADD_EXECUTABLE(${target} ${ARGN})
-  TARGET_LINK_LIBRARIES(${target} PUBLIC ${USED_LIBS} esprit_single_lib esprit_dev) # duplicates are NOT a mistake !
+  TARGET_SOURCES(${target} PRIVATE ${LN_MCU_FOLDER}/conf/bs2_default_padded_checksummed.S)
+
+  TARGET_LINK_LIBRARIES(${target} PUBLIC  esprit_single_lib esprit_dev) # duplicates are NOT a mistake !
   IF(LN_CUSTOM_LD_SCRIPT)
     SET(SCRIPT ${LN_CUSTOM_LD_SCRIPT} CACHE INTERNAL "")
   ELSE()
