@@ -1,6 +1,6 @@
 #
 
-ADD_LIBRARY(ln_utils STATIC)
+ADD_LIBRARY(ln_utils OBJECT)
 TARGET_SOURCES( ln_utils PRIVATE
                        lnFreeRTOS_pp.cpp
                        lnDebug.cpp

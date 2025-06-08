@@ -22,7 +22,7 @@ MACRO(GENERATE_GD32_FIRMWARE target)
   ADD_EXECUTABLE(${target}  ${LN_MCU_FOLDER}/start.S ${ARGN})
   TARGET_LINK_LIBRARIES(${target} PUBLIC  esprit_single_lib esprit_dev ) # duplicates are NOT a mistake !
   TARGET_LINK_OPTIONS(${target}  PRIVATE "-T${CMAKE_BINARY_DIR}/linker_script.ld" )
-
+  target_link_directories(${target} PUBLIC ${CMAKE_BINARY_DIR})
   add_custom_command(TARGET ${target}
         POST_BUILD
         COMMAND ${CMAKE_OBJCOPY} -Obinary $<TARGET_FILE:${target}> $<TARGET_FILE:${target}>.bin

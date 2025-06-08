@@ -19,7 +19,7 @@ target_include_directories(esprit_dev INTERFACE ${FOS}/)
 target_include_directories(esprit_dev INTERFACE ${FOS}/..)
 target_include_directories(esprit_dev INTERFACE ${FOS}/include)
 #
-ADD_LIBRARY( FreeRTOS STATIC)
+ADD_LIBRARY( FreeRTOS OBJECT)
 target_sources(FreeRTOS PRIVATE ${FOS_SOURCES})
 target_link_libraries(FreeRTOS PUBLIC esprit_dev)
 #

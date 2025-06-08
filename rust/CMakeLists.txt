@@ -22,7 +22,7 @@ ELSE()
   ENDIF()
 ENDIF()
 
-ADD_LIBRARY(lnarduino_c_bindings STATIC
+ADD_LIBRARY(lnarduino_c_bindings OBJECT
     ${EXTRA}
     ${C}/lnFast_EventGroup_c.cpp
   )

@@ -22,7 +22,7 @@ MACRO(GENERATE_GD32_FIRMWARE target)
 
   ADD_EXECUTABLE(${target}  ${LN_MCU_FOLDER}/start.S ${ARGN})
   TARGET_LINK_LIBRARIES(${target} PUBLIC esprit_single_lib esprit_dev ) # dupicates are NOT a mistake !
-
+  target_link_directories(${target} PUBLIC ${CMAKE_BINARY_DIR})
   IF(LN_CUSTOM_LD_SCRIPT)
     SET(SCRIPT ${LN_CUSTOM_LD_SCRIPT} CACHE INTERNAL "")
   ELSE()

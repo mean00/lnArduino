@@ -7,6 +7,7 @@ MACRO(GENERATE_GD32_FIRMWARE target)
   #TARGET_LINK_LIBRARIES(${target} PUBLIC ${USED_LIBS} ) # duplicates are NOT a mistake !
   # duplicates are NOT a mistake !
   TARGET_LINK_LIBRARIES(${target}  PUBLIC esprit_single_lib  esprit_dev)
+  target_link_directories(${target} PUBLIC ${CMAKE_BINARY_DIR})
   IF(LN_CUSTOM_LD_SCRIPT)
     SET(SCRIPT ${LN_CUSTOM_LD_SCRIPT} CACHE INTERNAL "")
   ELSE()
