@@ -34,7 +34,7 @@ extern "C"
 #endif
 
 //-------------------------------------------------
-// Translate nuclei calls to lnArduino calls
+// Translate nuclei calls to esprit calls
 // MEANX
 //-------------------------------------------------
 #define STRINGIFY(s) #s

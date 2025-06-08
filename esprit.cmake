@@ -6,7 +6,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this file,
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 #=============================================================================#
-message(STATUS "Invoking lnArduino.cmake for MCU=${LN_MCU}")
+message(STATUS "Invoking esprit.cmake for MCU=${LN_MCU}")
 OPTION(USE_SCAN_BUILD "Disable custom CC")
 IF(NOT DEFINED LN_ARCH)
   MESSAGE(STATUS "Architecture not defined, reverting to RISCV")
@@ -50,5 +50,5 @@ ENDIF()
 SET(CMAKE_C_COMPILER_FORCED TRUE CACHE INTERNAL "")
 SET(CMAKE_CXX_COMPILER_FORCED TRUE CACHE INTERNAL "")
 
-message(STATUS "// Invokation lnArduino.cmake done for MCU=${LN_MCU}")
+message(STATUS "// Invokation esprit.cmake done for MCU=${LN_MCU}")
 

@@ -73,7 +73,7 @@ with open(args.map_file) as f:
            continue
         if(line.find(".o")==-1):
            continue
-        #  8000000  8000000       10     1         CMakeFiles/lnPowerSupply.dir/lnArduino/arm_gd32fx/vector_table.S.obj:(.stm32.interrupt_vector)
+        #  8000000  8000000       10     1         CMakeFiles/lnPowerSupply.dir/esprit/arm_gd32fx/vector_table.S.obj:(.stm32.interrupt_vector)
         pieces = line.split(None,5)
         #print(pieces) 
         size = int(pieces[2],16)

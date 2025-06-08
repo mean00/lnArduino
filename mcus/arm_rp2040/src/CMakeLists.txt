@@ -73,7 +73,7 @@ SET(RP_SDK_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/../sdk_copy/runtime.c
   ${CRT0}
 )
-add_library(esprit_lib STATIC rp.cpp  ${RP_LN_SOURCES} ${RP_SDK_SOURCES} ${RP_EXTRA_SOURCES})
+add_library(esprit_lib OBJECT rp.cpp  ${RP_LN_SOURCES} ${RP_SDK_SOURCES} ${RP_EXTRA_SOURCES})
 
 #
 ADD_RP_INCDIR(hardware_adc hardware_base hardware_claim hardware_clocks hardware_divider

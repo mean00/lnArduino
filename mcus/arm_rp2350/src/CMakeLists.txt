@@ -120,7 +120,7 @@ SET(RP_LN_SRCS
   #${CMAKE_CURRENT_SOURCE_DIR}/minimum_arm_image_def_block.s
  ${CMAKE_CURRENT_SOURCE_DIR}/rp_irq.cpp
 )
-ADD_LIBRARY(esprit_lib STATIC rp.cpp
+ADD_LIBRARY(esprit_lib OBJECT rp.cpp
   ${SDK_SRCS}
   ${RP_LN_SOURCES}
   ${RP_LN_SRCS}

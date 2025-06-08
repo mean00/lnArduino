@@ -11,6 +11,10 @@
 
 #define EVENT_INDEX 1
 
+#if configTASK_NOTIFICATION_ARRAY_ENTRIES < 2
+#error configTASK_NOTIFICATION_ARRAY_ENTRIES should be at least 2!
+#endif
+
 extern "C"
 {
     extern void deadEnd(int code);
@@ -280,7 +284,7 @@ void lnFastEventGroup::setEvents(uint32_t events)
 {
     if (underInterrupt)
     {
-//#warning : Could we have a race here between different interrupts ? probably
+        // #warning : Could we have a race here between different interrupts ? probably
         _value = _value | events;
         bool w = _value & _mask;
         if (!w || _waitingTask == INVALID_TASK) // no need to wake up task

@@ -6,7 +6,7 @@ IF(NOT DEFINED LN_EXT)
   SET(LN_EXT arm_gd32fx CACHE INTERNAL "")
   SET(LN_TOOLCHAIN_EXT  arm_gd32fx_clang CACHE INTERNAL "")
 
-  include(${AF_FOLDER}/../platformConfig.cmake)
+  include(${ESPRIT_ROOT}/../platformConfig.cmake)
 
   IF(NOT PLATFORM_TOOLCHAIN_PATH)
     MESSAGE(FATAL_ERROR "PLATFORM_TOOLCHAIN_PATH is not defined in platformConfig.cmake !!")

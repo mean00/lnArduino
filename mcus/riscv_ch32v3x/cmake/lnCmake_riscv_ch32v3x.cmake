@@ -22,7 +22,7 @@ MACRO(GENERATE_GD32_FIRMWARE target)
   ADD_EXECUTABLE(${target}  ${LN_MCU_FOLDER}/start.S ${ARGN})
   TARGET_LINK_LIBRARIES(${target} PUBLIC  esprit_single_lib esprit_dev ) # duplicates are NOT a mistake !
   TARGET_LINK_OPTIONS(${target}  PRIVATE "-T${CMAKE_BINARY_DIR}/linker_script.ld" )
-
+  target_link_directories(${target} PUBLIC ${CMAKE_BINARY_DIR})
   add_custom_command(TARGET ${target}
         POST_BUILD
         COMMAND ${CMAKE_OBJCOPY} -Obinary $<TARGET_FILE:${target}> $<TARGET_FILE:${target}>.bin
@@ -33,7 +33,7 @@ ENDMACRO()
 MACRO(HASH_GD32_FIRMWARE target)
   add_custom_command(TARGET ${target}
         POST_BUILD
-        COMMAND python3 ${AF_FOLDER}/script/lnCRC32Checksum.py  $<TARGET_FILE:${target}>.bin $<TARGET_FILE:${target}>.ck_bin
+        COMMAND python3 ${ESPRIT_ROOT}/script/lnCRC32Checksum.py  $<TARGET_FILE:${target}>.bin $<TARGET_FILE:${target}>.ck_bin
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         COMMENT "Generating checksumed file"
     )

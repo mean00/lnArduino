@@ -5,8 +5,9 @@
 extern "C"
 {
 #include "soc/gpio_periph.h"
-// #include "/register/soc/gpio_struct.h
-#include "register/soc/gpio_struct.h"
+//#include "/register/soc/gpio_struct.h
+//#include "register/soc/gpio_struct.h"
+#include "hal/gpio_types.h" 
 }
 /**
  */

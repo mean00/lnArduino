@@ -26,6 +26,7 @@ MACRO(GENERATE_GD32_FIRMWARE target)
   ADD_EXECUTABLE(${target} ${ARGN}  )
   TARGET_SOURCES(${target} PRIVATE ${LN_MCU_FOLDER}/conf/bs2_default_padded_checksummed.S)
   TARGET_LINK_LIBRARIES(${target} PUBLIC esprit_dev esprit_single_lib) # duplicates are NOT a mistake !
+  target_link_directories(${target} PUBLIC ${CMAKE_BINARY_DIR})
   IF(LN_CUSTOM_LD_SCRIPT)
     SET(SCRIPT ${LN_CUSTOM_LD_SCRIPT} CACHE INTERNAL "")
   ELSE()
