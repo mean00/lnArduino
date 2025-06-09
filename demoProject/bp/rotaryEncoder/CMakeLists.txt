@@ -8,11 +8,11 @@ INCLUDE(common_CMakeLists)
 PROJECT(RotaryEncoder C CXX ASM)
 
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR})
-ADD_SUBDIRECTORY(${AF_FOLDER})
+ADD_SUBDIRECTORY(${ESPRIT_ROOT})
 
-INCLUDE(${AF_FOLDER}/setup.cmake)
+INCLUDE(${ESPRIT_ROOT}/setup.cmake)
 
-SET( Rotary ${AF_FOLDER}/libraries/RotaryEncoder )
+SET( Rotary ${ESPRIT_ROOT}/libraries/RotaryEncoder )
 INCLUDE_DIRECTORIES( ${Rotary} )
 ADD_SUBDIRECTORY( ${Rotary} )
 

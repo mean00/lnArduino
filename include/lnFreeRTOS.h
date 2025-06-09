@@ -29,8 +29,15 @@
 extern "C"
 {
 #endif
+
 #ifdef LN_CUSTOM_FREERTOS
 #include "lnFreeRTOS_custom.h"
+#elif defined(LN_NO_FREERTOS)
+// no freertos
+#define TaskHandle_t int
+#define EventGroupHandle_t int
+#define SemaphoreHandle_t int
+#define TimerHandle_t int
 #else
 #include "lnFreeRTOS_default.h"
 #endif

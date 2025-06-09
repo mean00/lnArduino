@@ -68,7 +68,7 @@ SET(SRCS  ${CLASS_FILES}
           )
 add_library(tinyUsb OBJECT ${SRCS})
 target_include_directories(tinyUsb PRIVATE ${CMAKE_BINARY_DIR})
-target_include_directories(tinyUsb PRIVATE ${AF_FOLDER}/private_include)
+target_include_directories(tinyUsb PRIVATE ${ESPRIT_ROOT}/private_include)
 target_include_directories(tinyUsb PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories(tinyUsb PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_include_directories(tinyUsb PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/private_include)

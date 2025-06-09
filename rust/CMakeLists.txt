@@ -4,7 +4,7 @@ SET(C ${CMAKE_CURRENT_SOURCE_DIR}/rust_esprit/c_interface)
 INCLUDE_DIRECTORIES( ${C} )
 
 IF(LN_ENABLE_USBD)
-  INCLUDE(${AF_FOLDER}/libraries/tinyUsb/tiny.cmake)
+  INCLUDE(${ESPRIT_ROOT}/libraries/tinyUsb/tiny.cmake)
   SET(EXTRA ${EXTRA} ${C}/lnCDC_c.cpp ${C}/lnUSB_c.cpp)
 ENDIF()
 

@@ -1,9 +1,9 @@
 SET(RP2040_FOLDER       ${LN_MCU_FOLDER}/tinyUsb/)
 SET(PICO_USB_FOLDER     ${PICO_SDK_PATH}/lib/tinyusb/src/portable/raspberrypi/rp2040/)
-SET(NATIVE_DRIVER       ${AF_FOLDER}/libraries/tinyUsb/src/src/portable/raspberrypi/rp2040)
+SET(NATIVE_DRIVER       ${ESPRIT_ROOT}/libraries/tinyUsb/src/src/portable/raspberrypi/rp2040)
 
 
-SET(RP_COMMON_FOLDER ${AF_FOLDER}/mcus/rp_common/tinyUsb/)
+SET(RP_COMMON_FOLDER ${ESPRIT_ROOT}/mcus/rp_common/tinyUsb/)
 
 SET(DRIVERS             ${LNSRC}/lnUsbStack.cpp ${RP_COMMON_FOLDER}/rp2040_usb.cpp  ${RP_COMMON_FOLDER}/lnUSBD_rp2040.cpp   ${NATIVE_DRIVER}/dcd_rp2040.c ${NATIVE_DRIVER}/rp2040_usb.c)
 SET(LN_OPT_TUSB_MCU     OPT_MCU_RP2040)

@@ -6,10 +6,10 @@ INCLUDE(common_CMakeLists)
 
 PROJECT(Hello_gd32_freetos C CXX ASM)
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR})
-ADD_SUBDIRECTORY(${AF_FOLDER})
+ADD_SUBDIRECTORY(${ESPRIT_ROOT})
 
 
-INCLUDE(${AF_FOLDER}/setup.cmake)
+INCLUDE(${ESPRIT_ROOT}/setup.cmake)
 
 
 GENERATE_GD32_FIRMWARE(pio_blink main_pio.cpp pio_blink.cpp )
