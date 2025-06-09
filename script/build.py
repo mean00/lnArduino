@@ -59,11 +59,12 @@ def build_single(  working_dir, build_name, extra_args):
     dbg(build_name+":"+os.getcwd())
     #-- Cleanup
     build_dir=working_dir+'/build'+'_'+str(build_name)
+    esprit_dir=working_dir+'/esprit'
     for i in extra_args:
         build_dir=build_dir+'_'+str(i) 
     subprocess.check_call(['rm','-Rf',build_dir])
-    subprocess.check_call(['rm','-f','lnArduino'])
-    subprocess.check_call(['ln','-s',top_lnArduino,'lnArduino'])
+    subprocess.check_call(['rm','-f','esprit'])
+    subprocess.check_call(['ln','-s',top_esprit,'esprit'])
     subprocess.check_call(['mkdir',build_dir])
     os.chdir(build_dir)
     dbg(os.getcwd())
@@ -85,6 +86,7 @@ def build_single(  working_dir, build_name, extra_args):
     #if it i sok, cleanup
    
     subprocess.check_call(['rm','-Rf',build_dir])
+    subprocess.check_call(['unlink',esprit_dir])
     return True
     #os.chdir(cwd)
     #print(str(projects))
@@ -117,9 +119,9 @@ def build_all_bp(category ):
 #
 #________________________________________
 top_folder=os.path.abspath(os.getcwd()+'/../demoProject/')
-top_lnArduino=os.path.abspath(os.getcwd()+'/../../lnArduino')
+top_esprit=os.path.abspath(os.getcwd()+'/../../esprit')
 
-dbg("LnArduino:"+top_lnArduino)
+dbg("Esprit:"+top_esprit)
 dbg( "Top Folder : "+top_folder)
 print("-- Build all --")
 if True:
