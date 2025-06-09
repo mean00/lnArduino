@@ -1,4 +1,4 @@
- # lnArduino : Arduino style API for STM32/GD32/CH32 chips
+ # esprit, simple but efficient embedded runtime
 
 
 The aim of this project is to offer an Arduino style framework for the Longan Nano board (RISCV)or CH32V307 (RISCV) or GD32F1/F3 (ARM) boards.
@@ -22,7 +22,7 @@ _Demos_
 The demoProject contains simple API demonstration programs.
 
 _How to build the demos :_
-* Symlink/copy/git submodule the lnArduino folder under the demo folder
+* Symlink/copy/git submodule the esprit folder under the demo folder
 Fill-in platformconfig.cmake to point to your toolchain (adjust flags if needed)
 mkdir build && cd build && cmake .. && make
 * edit mcuSelect.Cmake to define which MCU you are using

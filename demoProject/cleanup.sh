@@ -1,2 +1,2 @@
-rm */lnArduino
+rm */esprit
 rm -Rf */build*

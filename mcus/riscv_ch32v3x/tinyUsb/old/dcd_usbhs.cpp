@@ -23,7 +23,7 @@
  *
  * This file is part of the TinyUSB stack.
 
- MEANX : simplified and modified to be inserted into lnArduino
+ MEANX : simplified and modified to be inserted into esprit
 
  */
 #include "ch32_extra.h"
