@@ -16,10 +16,10 @@ use core::panic::PanicInfo;
 mod rn_fast_event_c;
 #[cfg(not(any(feature = "rp2040", feature = "esp32c3")))]
 pub mod rn_fast_gpio_bp;
-#[cfg(feature = "rp2040")]
-pub mod rn_fast_gpio_rp2040;
 #[cfg(feature = "esp32c3")]
 pub mod rn_fast_gpio_esp32c3;
+#[cfg(feature = "rp2040")]
+pub mod rn_fast_gpio_rp2040;
 #[cfg(not(any(feature = "rp2040", feature = "esp32c3")))]
 pub mod rn_gpio_bp_c;
 #[cfg(feature = "esp32c3")]
@@ -59,6 +59,13 @@ pub mod rn_usb;
 pub mod rn_usb_c;
 #[cfg(feature = "cdc")]
 pub mod rn_usb_cdc;
+
+/*
+ * Re-export functions
+ */
+pub use rn_fast_event_group::rnFastEventGroup as FastEventGroup;
+pub use rn_gpio as Gpio;
+pub use rn_os_helper as os_helper;
 
 pub struct FreeRtosAllocator;
 
