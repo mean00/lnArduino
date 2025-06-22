@@ -8,13 +8,13 @@ extern void LoggerInitMutex();
 // Custom printf function for ESP, prints 'n' characters from 'data' followed by a newline
 void espPrintf(int n, const char *data)
 {
-    printf("%.*s\n", n, data);
+    printf("%.*s", n, data);
 }
 
 // System initialization function for ESP
 void lnEspSysInit()
 {
-    LoggerInitMutex(); 
+    LoggerInitMutex();
     setLogger(espPrintf); // Set the logger function to espPrintf
     // make sure nvm is working
     esp_err_t ret = nvs_flash_init();
@@ -22,5 +22,5 @@ void lnEspSysInit()
     {
         ESP_ERROR_CHECK(nvs_flash_erase());
         ret = nvs_flash_init();
-    } 
+    }
 }
