@@ -102,7 +102,7 @@ IF(NOT DEFINED LN_EXT)
   #
   SET(CLANG_LINKER_OPT "" CACHE INTERNAL "")
   #
-  SET(GD32_LD_FLAGS "-fuse-ld=lld  ${LN_LTO} -nostdlib ${GD32_SPECS_SPECS} --sysroot ${PLATFORM_CLANG_SYSROOT}  -Wl,--warn-common" CACHE INTERNAL "")
+  SET(GD32_LD_FLAGS "-fuse-ld=lld  -L${PLATFORM_CLANG_SYSROOT}/lib/riscv32-unknown-unknown-elf ${LN_LTO} -nostdlib ${GD32_SPECS_SPECS} --sysroot ${PLATFORM_CLANG_SYSROOT}  -Wl,--warn-common" CACHE INTERNAL "")
   SET(GD32_LD_LIBS "-lm   ${CLANG_LINKER_OPT} -Wl,--gc-sections -Wl,--gdb-index " CACHE INTERNAL "")
 
   #
