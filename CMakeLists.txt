@@ -18,7 +18,7 @@ IF(True) #NOT ESPRIT_ROOT)
   MESSAGE(STATUS "ESPRIT_ROOT is ${ESPRIT_ROOT}")
 
   LIST(APPEND CMAKE_MODULE_PATH  ${ESPRIT_ROOT} ${ESPRIT_ROOT}/cmake)
-
+  include(colorFormatting)
 
   # Already merged APPLY_PATCH_IF_NEEDED(patch_tinyusb tinyusb_no_static.patch        libraries/tinyUsb      "dont use freertos static constructs ")
 
@@ -94,7 +94,6 @@ IF(True) #NOT ESPRIT_ROOT)
   target_include_directories(esprit_dev INTERFACE embeddedPrintf    )
 
 
-  MESSAGE(STATUS "******merged********* ${all_includes}")
 
 ENDIF()
 

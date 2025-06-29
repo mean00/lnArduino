@@ -8,8 +8,8 @@ version = "0.0.0"
 
 [dependencies]
 cty = "0.2.2"
-ufmt = "*"
-heapless = { version = "*", features = ["ufmt-impl"] }
+ufmt = "0.2.0"
+heapless = { version = "0.7.17", features = ["ufmt-impl"] }
 
 [features]
 cdc = []
