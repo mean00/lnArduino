@@ -97,9 +97,10 @@ typedef struct
 #elif CFG_TUSB_MCU == OPT_MCU_CH32V307
 #include <ch32v30x.h>
 // MEANX
-//  #define USBHD_IRQn OTG_FS_IRQn
+// #define USBHD_IRQn OTG_FS_IRQn
 #define USBHD_IRQn LN_IRQ_OTG_FS
-//
+
+// /MEANS
 #endif
 
 #ifdef __GNUC__
