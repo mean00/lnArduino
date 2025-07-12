@@ -3,19 +3,19 @@ IF(WIN32)
 ENDIF()
 
 IF("${LN_ARCH}" STREQUAL "RISCV") # RISCV
-  IF( "${LN_MCU}" STREQUAL "CH32V3x")   #----------CH32V307
+  IF( ${LN_MCU} STREQUAL "CH32V3x")    #----------CH32V307
     #SET(PLATFORM_PREFIX riscv-none-embed-) # MRS toolchain
     IF(WIN32)
       SET(PLATFORM_TOOLCHAIN_PATH todo_todo) # Use /c/foo or c:\foo depending if you use mingw cmake or win32 cmake
     ELSE()
       #--- GCC ---------
-      SET(PLATFORM_TOOLCHAIN_PATH "/riscv/xpack-14.2.0-2/bin" CACHE INTERNAL "")
+      SET(PLATFORM_TOOLCHAIN_PATH "/riscv/tools5/bin" CACHE INTERNAL "")
       IF(USE_HW_FPU)
         SET(PLATFORM_C_FLAGS "-march=rv32imafc -mabi=ilp32f " CACHE INTERNAL "")
       ELSE()
         SET(PLATFORM_C_FLAGS "-march=rv32imac -mabi=ilp32 " CACHE INTERNAL "")
       ENDIF()
-      SET(PLATFORM_PREFIX "riscv-none-elf-" CACHE INTERNAL "")
+      SET(PLATFORM_PREFIX "riscv32-unknown-elf-" CACHE INTERNAL "")
       # FOR CLANG
 
       SET(PLATFORM_TOOLCHAIN_TRIPLET "riscv32-unknown-elf-" CACHE INTERNAL "")
@@ -44,10 +44,9 @@ IF("${LN_ARCH}" STREQUAL "RISCV") # RISCV
       SET(PLATFORM_TOOLCHAIN_PATH /opt/gd32/toolchain/bin/)
     ENDIF()
   ENDIF()
-ELSE() # ARM
+ELSE()
   SET(PLATFORM_PREFIX arm-none-eabi-)
   SET(PLATFORM_C_FLAGS " ")
-  SET(PICO_SDK_PATH /pico/pico-sdk2/ CACHE INTERNAL "") # For PICO2040
   IF(WIN32)
     SET(PLATFORM_TOOLCHAIN_PATH  "/c/dev/arm83/bin")
   ELSE()
@@ -56,11 +55,12 @@ ELSE() # ARM
     #SET(PLATFORM_CLANG_VERSION "-14")
     #SET(PLATFORM_CLANG_PATH  /opt/llvm_arm/LLVMEmbeddedToolchainForArm-14.0.0/bin)
     #SET(PLATFORM_CLANG_VERSION "")
-    SET(PLATFORM_CLANG_PATH /arm/llvm_19.1/bin)
-    SET(PLATFORM_CLANG_VERSION "-19")
+    SET(PLATFORM_CLANG_PATH /arm/llvm_21/bin)
+    SET(PLATFORM_CLANG_VERSION "-21")
     #SET(PLATFORM_CLANG_PATH  /opt/llvm_arm/14/bin)
     #SET(PLATFORM_CLANG_VERSION "")
-    SET(PLATFORM_TOOLCHAIN_PATH "/arm/113/bin/")
+    SET(PLATFORM_TOOLCHAIN_PATH "/arm/14.2/bin/")
+    SET(PICO_SDK_PATH /pico/pico-sdk2 CACHE INTERNAL "") # For PICO2040
 
   ENDIF()
 ENDIF()
