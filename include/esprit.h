@@ -13,6 +13,10 @@
 #define LN_ARCH_RISCV 1
 #define LN_ARCH_ARM 2
 
+#ifndef _NOTHROW
+#define _NOTHROW // __attribute__((__nothrow__))
+#endif
+xx
 #if LN_ARCH == LN_ARCH_RISCV
 #include "lnIRQ_riscv.h"
 #define LN_FENCE() __asm volatile("fence.i")
@@ -35,11 +39,10 @@
 #endif
 
 #include "systemHelper.h"
-extern "C"
-{
+    extern "C" {
 #include "lnFreeRTOS.h"
 #define xTaskCreate NONONO
-}
+    }
 
 #include "lnDebug.h"
 #include "lnExti.h"
@@ -56,7 +59,8 @@ extern "C"
 #define LN_ALIGN(x) __attribute__((aligned(x)))
 #define LN_USED __attribute__((used))
 
-extern "C" void lnNoInterrupt();
+extern "C" void
+lnNoInterrupt();
 extern "C" void lnInterrupts();
 
 #ifndef LN_LINUX
